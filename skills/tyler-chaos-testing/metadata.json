@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "name": "chaos-testing",
+  "displayName": "Chaos Testing",
+  "description": "Use when designing or implementing chaos engineering experiments to verify system resilience under failure conditions. Covers chaos engineering principles, steady-state hypothesis, blast radius management, game days, and tools like Chaos Monkey, Gremlin, Litmus, Chaos Mesh, Toxiproxy, and cloud-native fault injection services.",
+  "author": "Tyler-R-Kendrick",
+  "license": "MIT",
+  "date": "February 2026",
+  "compatibility": "claude, copilot, cursor",
+  "references": [
+    {
+      "title": "Principles of Chaos Engineering",
+      "url": "https://principlesofchaos.org"
+    },
+    {
+      "title": "Litmus Chaos Engineering GitHub Repository",
+      "url": "https://github.com/litmuschaos/litmus"
+    },
+    {
+      "title": "Chaos Mesh Documentation",
+      "url": "https://chaos-mesh.org/docs/"
+    }
+  ]
+}

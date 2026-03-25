@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "name": "unit-testing",
+  "displayName": "Unit Testing",
+  "description": "Use when writing, improving, or debugging unit tests that verify isolated functions, methods, and classes. Covers cross-platform frameworks including Vitest, Jest, xUnit, NUnit, MSTest, pytest, JUnit 5, and Go testing with mocking strategies, test doubles, AAA pattern, and naming conventions.",
+  "author": "Tyler-R-Kendrick",
+  "license": "MIT",
+  "date": "February 2026",
+  "compatibility": "claude, copilot, cursor",
+  "references": [
+    {
+      "title": "Vitest Documentation",
+      "url": "https://vitest.dev"
+    },
+    {
+      "title": "Jest Documentation",
+      "url": "https://jestjs.io/docs/getting-started"
+    },
+    {
+      "title": "pytest Documentation",
+      "url": "https://docs.pytest.org"
+    },
+    {
+      "title": "xUnit.net Documentation",
+      "url": "https://xunit.net/#documentation"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "name": "performance-testing",
+  "displayName": "Performance Testing",
+  "description": "Use for load, stress, and scalability testing of applications and APIs. Covers k6 (Grafana), JMeter, Gatling, Artillery, and Lighthouse for web performance audits. Includes test type definitions, key metrics, thresholds, CI integration patterns, and performance budgets.",
+  "author": "Tyler-R-Kendrick",
+  "license": "MIT",
+  "date": "February 2026",
+  "compatibility": "claude, copilot, cursor",
+  "references": [
+    {
+      "title": "k6 Documentation (Grafana)",
+      "url": "https://grafana.com/docs/k6/latest/"
+    },
+    {
+      "title": "Apache JMeter",
+      "url": "https://jmeter.apache.org"
+    },
+    {
+      "title": "Gatling Documentation",
+      "url": "https://docs.gatling.io"
+    },
+    {
+      "title": "Lighthouse Documentation (Chrome Developers)",
+      "url": "https://developer.chrome.com/docs/lighthouse/"
+    }
+  ]
+}

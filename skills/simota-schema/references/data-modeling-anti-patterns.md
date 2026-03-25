@@ -1,0 +1,78 @@
+# Data Modeling Anti-Patterns
+
+Purpose: Use this file when evaluating EAV, polymorphic relations, denormalization, or temporal data design.
+
+Contents:
+1. Core anti-patterns
+2. EAV decision rules
+3. Polymorphic alternatives
+4. Normalization vs denormalization
+5. Temporal modeling
+6. Design gates
+
+## Core Anti-Patterns
+
+| ID | Anti-pattern | Signal | Safer pattern |
+|----|--------------|--------|---------------|
+| `DM-01` | EAV Abuse | Dynamic attributes are modeled as rows even though the shape is mostly known | Use dedicated columns; reserve EAV/JSONB for truly dynamic fields |
+| `DM-02` | Polymorphic Association Trap | `*_type + *_id` pairs block FK integrity and create orphans | Use dedicated FK tables, nullable FK with `CHECK`, or explicit join tables |
+| `DM-03` | Over-Normalization | `5+` table joins for routine reads, query latency dominated by join cost | Denormalize strategically or add materialized views |
+| `DM-04` | Under-Normalization | Same business fact duplicated in `3+` tables | Normalize to a single source of truth |
+| `DM-05` | JSONB Everything | Stable business fields live inside JSONB and block reporting/indexing | Promote stable fields to columns |
+| `DM-06` | Multi-Purpose Table | `type` column drives unrelated entity variants, many nullable columns | Split tables or use disciplined STI |
+| `DM-07` | Temporal Blindness | Current state only; no way to answer historical questions | Add history table, valid-time range, or event log |
+
+## EAV Decision Rules
+
+Use EAV or JSONB only when all of these are true:
+- Attribute shape cannot be fully defined up front
+- Attribute count is highly variable, often `100+`
+- Each entity uses a small subset, often `<10%`, of the total attribute universe
+- Strict relational integrity is not required for those fields
+
+Avoid EAV or JSONB when:
+- You need aggregation, sorting, or filtering on the fields often
+- The fields need FK references or strong type guarantees
+- The field set is stable enough to define as columns
+
+## Polymorphic Alternatives
+
+| Situation | Recommended pattern |
+|----------|---------------------|
+| `2-3` target tables | Nullable FKs plus `CHECK (num_nonnulls(...) = 1)` |
+| `4+` target tables | Separate child tables or join tables per target |
+| Legacy framework already uses polymorphic links | Stage toward nullable FK or dedicated relation tables |
+
+## Normalization Vs Denormalization
+
+| Favor normalization when... | Favor denormalization when... |
+|-----------------------------|-------------------------------|
+| Writes are frequent | Reads dominate |
+| Integrity is business-critical | JOIN cost is the bottleneck |
+| Shared master data must stay consistent | Dashboard/reporting latency matters |
+| Source-of-truth must stay singular | You can document update strategy clearly |
+
+If you denormalize, document:
+- Source of truth
+- Refresh or sync method
+- Integrity checks
+- Why a normalized alternative is insufficient
+
+## Temporal Modeling
+
+| Need | Pattern |
+|------|---------|
+| No history required | Type 1 overwrite |
+| Previous value only | Type 3 previous-value columns |
+| Full record history | Type 2 history table with `valid_from` / `valid_to` |
+| Full event trail | Event sourcing |
+
+## Design Gates
+
+- EAV table detected -> justify why dedicated columns or JSONB are insufficient
+- `*_type + *_id` pair detected -> propose a typed alternative
+- `5+` table join in a routine path -> review for denormalization
+- Same fact repeated in `3+` tables -> normalize
+- `5+` JSONB-heavy core columns -> review for column promotion
+- Table has `50%+` nullable columns -> review for table split
+- Historical reporting need exists but no history strategy exists -> add temporal design

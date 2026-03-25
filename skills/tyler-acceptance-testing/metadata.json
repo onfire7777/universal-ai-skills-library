@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "name": "acceptance-testing",
+  "displayName": "Acceptance Testing (BDD)",
+  "description": "Use for verifying business requirements with executable specifications using BDD frameworks. Covers Cucumber (Java, JS, Ruby), SpecFlow/Reqnroll (C#), Behave (Python), Gauge (ThoughtWorks), and Godog (Go). Includes Gherkin feature files, step definitions, BDD workflow, and cross-language examples.",
+  "author": "Tyler-R-Kendrick",
+  "license": "MIT",
+  "date": "February 2026",
+  "compatibility": "claude, copilot, cursor",
+  "references": [
+    {
+      "title": "Cucumber Documentation",
+      "url": "https://cucumber.io/docs"
+    },
+    {
+      "title": "SpecFlow Documentation",
+      "url": "https://docs.specflow.org"
+    },
+    {
+      "title": "Gauge Documentation (ThoughtWorks)",
+      "url": "https://docs.gauge.org"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "name": "visual-testing",
+  "displayName": "Visual Regression Testing",
+  "description": "Use for visual regression testing to catch unintended UI changes. Covers Chromatic (Storybook integration), Percy (BrowserStack), BackstopJS (headless CSS regression), Playwright screenshot assertions, and Applitools Eyes (AI-powered). Includes baseline management, approval workflows, and flaky screenshot handling.",
+  "author": "Tyler-R-Kendrick",
+  "license": "MIT",
+  "date": "February 2026",
+  "compatibility": "claude, copilot, cursor",
+  "references": [
+    {
+      "title": "Chromatic Documentation",
+      "url": "https://www.chromatic.com/docs/"
+    },
+    {
+      "title": "Percy Documentation (BrowserStack)",
+      "url": "https://www.browserstack.com/docs/percy"
+    },
+    {
+      "title": "BackstopJS GitHub Repository",
+      "url": "https://github.com/garris/BackstopJS"
+    }
+  ]
+}

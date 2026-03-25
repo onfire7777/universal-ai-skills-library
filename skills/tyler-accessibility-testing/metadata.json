@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "name": "accessibility-testing",
+  "displayName": "Accessibility Testing",
+  "description": "Use for WCAG compliance testing and assistive technology validation. Covers axe-core (programmatic API, Playwright/React integrations), Pa11y (CLI and CI runner), Lighthouse accessibility audits, Storybook addon-a11y, and WAVE. Includes WCAG 2.1/2.2 levels, common violations, automated vs manual testing guidance.",
+  "author": "Tyler-R-Kendrick",
+  "license": "MIT",
+  "date": "February 2026",
+  "compatibility": "claude, copilot, cursor",
+  "references": [
+    {
+      "title": "W3C Web Content Accessibility Guidelines (WCAG) 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/"
+    },
+    {
+      "title": "Deque axe-core GitHub Repository",
+      "url": "https://github.com/dequelabs/axe-core"
+    },
+    {
+      "title": "Pa11y GitHub Repository",
+      "url": "https://github.com/pa11y/pa11y"
+    }
+  ]
+}

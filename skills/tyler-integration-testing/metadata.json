@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "name": "integration-testing",
+  "displayName": "Integration Testing",
+  "description": "Use when writing or improving integration tests that verify multiple components working together. Covers Testcontainers, ASP.NET WebApplicationFactory, Supertest, pytest with real databases, Spring Boot testing, test database patterns, and CI/Docker-in-Docker strategies.",
+  "author": "Tyler-R-Kendrick",
+  "license": "MIT",
+  "date": "February 2026",
+  "compatibility": "claude, copilot, cursor",
+  "references": [
+    {
+      "title": "Testcontainers Documentation",
+      "url": "https://testcontainers.com"
+    },
+    {
+      "title": "Martin Fowler — Integration Testing",
+      "url": "https://martinfowler.com/bliki/IntegrationTest.html"
+    },
+    {
+      "title": "ASP.NET Core Integration Testing (Microsoft)",
+      "url": "https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests"
+    }
+  ]
+}
