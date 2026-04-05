@@ -1,0 +1,491 @@
+{
+  "timestamp": "2026-04-05T06:41:25.981873+00:00",
+  "skill": "multi-model-oracle",
+  "claude": {
+    "skill_name": "multi-model-oracle",
+    "overall_health": "degraded",
+    "findings": [
+      {
+        "id": "DBG-004",
+        "severity": "high",
+        "category": "structural",
+        "file": "SKILL.md",
+        "line_range": "L3",
+        "title": "Model names in description reference non-existent models (Claude Opus 4.6, GPT-5.4)",
+        "problematic_code": "description: Get the ultimate merged answer from the 3 best AI models (Anthropic Claude Opus 4.6, OpenAI GPT-5.4, Manus gpt-4.1-mini).",
+        "explanation": "The model identifiers 'anthropic/claude-opus-4.6' and 'openai/gpt-5.4' do not exist on OpenRouter. These are fabricated model names. When the script sends requests to OpenRouter with these model IDs, OpenRouter will return a 404 or 422 error. Since 422 is in FATAL_STATUSES, these requests will fail immediately without retry. This means 2 of the 3 models will always fail, and the 'oracle' will effectively just be a single gpt-4.1-mini response. This is the most fundamental issue with the skill.",
+        "fix": "Replace with real model IDs. For example:\n  ANTHROPIC_MODEL = \"anthropic/claude-sonnet-4\" \n  OPENAI_MODEL = \"openai/gpt-4.1\"\nAnd update SKILL.md descriptions accordingly. Alternatively, make the model IDs configurable via environment variables or arguments so they can be updated without code changes.",
+        "confidence": 0.92,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      },
+      {
+        "id": "DBG-002",
+        "severity": "high",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L1-L10",
+        "title": "requests module imported inside function but not at top level \u2014 no install check or graceful error",
+        "problematic_code": "import requests",
+        "explanation": "The `requests` module is imported inside `query_openrouter()` at runtime. If `requests` is not installed, the function will raise an ImportError that is caught by the generic `except Exception as e` handler, but the error message will be cryptic ('No module named requests'). More importantly, the SKILL.md Requirements section lists `requests` as needed but there's no check or installation step. The `openai` package has a graceful fallback in `prompt_engineer()` but `requests` does not get the same treatment in `query_openrouter()` \u2014 it will fail on the first attempt and then retry twice (wasting 20 seconds on sleep) before finally returning an error.",
+        "fix": "Add `requests` to the top-level imports with a try/except, or add an early check in `main()` that verifies both `requests` and `openai` are importable before starting the pipeline:\n\n```python\ndef main():\n    # Early dependency check\n    missing = []\n    try:\n        import requests\n    except ImportError:\n        missing.append('requests')\n    try:\n        import openai\n    except ImportError:\n        missing.append('openai')\n    if missing:\n        print(f\"ERROR: Missing required packages: {', '.join(missing)}\", file=sys.stderr)\n        print(\"Install with: pip install \" + ' '.join(missing), file=sys.stderr)\n        sys.exit(1)\n    ...\n```",
+        "confidence": 0.85,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-003",
+        "severity": "high",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L168-L175",
+        "title": "OpenRouter response parsing assumes 'choices' key exists \u2014 will crash with KeyError on unexpected response format",
+        "problematic_code": "data = resp.json()\ncontent = data[\"choices\"][0][\"message\"][\"content\"].strip()",
+        "explanation": "If the OpenRouter API returns a 200 status but with an error body (which some API proxies do), or if the response JSON structure is different than expected (e.g., missing 'choices' key, empty 'choices' array, or 'content' is None), this line will raise a KeyError, IndexError, or AttributeError. The exception is caught by the outer `except Exception` but only after the code has already passed the `resp.status_code == 200` check, so it will be treated as a retryable error and waste time on retries for a structural issue.",
+        "fix": "Add defensive parsing:\n```python\nif resp.status_code == 200:\n    data = resp.json()\n    choices = data.get(\"choices\")\n    if not choices or not isinstance(choices, list) or len(choices) == 0:\n        return {\"model\": model_id, \"success\": False,\n                \"error\": f\"Unexpected response structure: no choices in {str(data)[:200]}\"}\n    content = (choices[0].get(\"message\", {}).get(\"content\") or \"\").strip()\n    if not content:\n        return {\"model\": model_id, \"success\": False,\n                \"error\": \"Empty content in response\"}\n    usage = data.get(\"usage\", {})\n    return {...}\n```",
+        "confidence": 0.9,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-004",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L46-L48",
+        "title": "RETRY_DELAYS has only 2 elements but is indexed by attempt number \u2014 IndexError if MAX_RETRIES is increased",
+        "problematic_code": "MAX_RETRIES = 2\nRETRY_DELAYS = [5, 15]",
+        "explanation": "The retry loop uses `RETRY_DELAYS[attempt]` where attempt ranges from 0 to MAX_RETRIES-1 (i.e., 0 and 1). Currently this works because RETRY_DELAYS has exactly 2 elements and MAX_RETRIES is 2. But if someone changes MAX_RETRIES to 3 without updating RETRY_DELAYS, `RETRY_DELAYS[2]` will raise an IndexError. This is a latent bug / maintenance trap.",
+        "fix": "Use `min(attempt, len(RETRY_DELAYS) - 1)` as the index, or generate delays dynamically:\n```python\ndelay = RETRY_DELAYS[min(attempt, len(RETRY_DELAYS) - 1)]\ntime.sleep(delay)\n```",
+        "confidence": 0.82,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-005",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L290-L295",
+        "title": "run_oracle uses `str | None` type hint syntax requiring Python 3.10+",
+        "problematic_code": "def run_oracle(\n    query: str,\n    show_individual: bool = False,\n    show_prompts: bool = False,\n    output_file: str | None = None,\n    skip_engineering: bool = False,\n) -> str:",
+        "explanation": "The `str | None` union syntax was introduced in Python 3.10. On Python 3.8 or 3.9 (which are still common on Ubuntu systems, especially older Manus environments), this will raise a `TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'` at import time, crashing the entire script before any code runs.",
+        "fix": "Use `Optional[str]` from typing, or use `from __future__ import annotations` at the top of the file:\n```python\nfrom __future__ import annotations\n```\nOr change to:\n```python\nfrom typing import Optional\n...\ndef run_oracle(\n    query: str,\n    show_individual: bool = False,\n    show_prompts: bool = False,\n    output_file: Optional[str] = None,\n    skip_engineering: bool = False,\n) -> str:\n```",
+        "confidence": 0.88,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-006",
+        "severity": "medium",
+        "category": "integration",
+        "file": "scripts/oracle.py",
+        "line_range": "L310-L340",
+        "title": "Progress/status messages printed to stdout mix with the final output, making it hard for Manus to parse",
+        "problematic_code": "print(\"=\" * 60)\nprint(\"MULTI-MODEL ORACLE\")\n...\nprint(f\"  Detected intent: {intent}\")\n...\noutput = run_oracle(...)\nprint(output)",
+        "explanation": "The `run_oracle()` function prints progress messages to stdout (e.g., 'Querying models in parallel...', 'Detected intent: code', etc.) and then `main()` also prints the final formatted output to stdout. This means the actual output is interleaved with progress messages. When Manus captures stdout, it will get a messy mix of progress logs and the actual answer. The progress messages should go to stderr, or the function should return the output without printing progress to stdout.",
+        "fix": "Change all progress `print()` calls inside `run_oracle()` and `query_all_models()` to use `file=sys.stderr`:\n```python\nprint(\"[Stage 1] Prompt Engineering...\", file=sys.stderr)\nprint(f\"  Detected intent: {intent}\", file=sys.stderr)\n# ... etc for all progress messages\n```\nSome warning prints already use `file=sys.stderr` correctly (e.g., in `prompt_engineer` and `merge_responses`), but the main pipeline progress messages in `run_oracle` and `query_all_models` do not.",
+        "confidence": 0.93,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-011",
+        "severity": "medium",
+        "category": "robustness",
+        "file": "scripts/oracle.py",
+        "line_range": "L108-L140",
+        "title": "prompt_engineer makes 3 sequential API calls, not parallel \u2014 slow and no timeout",
+        "problematic_code": "for model_key, model_id in models_info:\n    ...\n    try:\n        response = client.chat.completions.create(\n            model=MANUS_MODEL,\n            ...\n        )",
+        "explanation": "Stage 1 makes 3 sequential API calls to gpt-4.1-mini to generate prompt variants. Each call could take 10-30 seconds. With no explicit timeout on the OpenAI client, if the API is slow, this stage alone could take 90+ seconds before Stage 2 even begins. The SKILL.md says the pipeline uses parallel execution, but that only applies to Stage 2. Stage 1 is sequential and has no timeout protection.",
+        "fix": "Either parallelize the 3 prompt engineering calls using ThreadPoolExecutor (similar to Stage 2), or set a timeout on the OpenAI client:\n```python\nclient = OpenAI(timeout=60.0)\n```\nThis ensures the prompt engineering stage doesn't hang indefinitely.",
+        "confidence": 0.8,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      },
+      {
+        "id": "DBG-008",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L247-L260",
+        "title": "merge_responses passes model names to the merge LLM despite instructions saying not to reference models",
+        "problematic_code": "model_label = r[\"model\"].split(\"/\")[-1] if \"/\" in r[\"model\"] else r[\"model\"]\nresponse_sections.append(\n    f\"=== Response {i} (from {model_label}) ===\")",
+        "explanation": "The merge prompt includes model names like 'claude-opus-4.6' and 'gpt-5.4' in the response headers sent to the merge LLM. While the MERGE_SYSTEM prompt instructs the LLM not to reference individual models, providing the model names increases the chance the LLM will leak them into the merged output, violating the merge strategy in the reference doc ('Never reference the individual models in the final output'). This is a design inconsistency rather than a crash bug, but it can produce incorrect output.",
+        "fix": "Use anonymous labels instead:\n```python\nresponse_sections.append(\n    f\"=== Response {i} ===\"\n    f\"\\n{r['content']}\"\n)\n```",
+        "confidence": 0.72,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-010",
+        "severity": "medium",
+        "category": "robustness",
+        "file": "scripts/oracle.py",
+        "line_range": "L260-L280",
+        "title": "Merge stage has no retry logic \u2014 single failure loses the entire merge",
+        "problematic_code": "try:\n    from openai import OpenAI\n    client = OpenAI()\n    response = client.chat.completions.create(\n        ...\n    )\n    return response.choices[0].message.content.strip()\nexcept Exception as e:\n    # Fallback: concatenate with headers",
+        "explanation": "The merge stage (Stage 3) makes a single API call with no retry logic. If this call fails due to a transient network error or rate limit, the fallback is simple concatenation which defeats the entire purpose of the oracle. Stage 2 has retry logic (MAX_RETRIES=2) but Stage 3 does not, even though the merge is arguably the most important call since it produces the final output.",
+        "fix": "Add retry logic similar to Stage 2:\n```python\nfor attempt in range(MAX_RETRIES + 1):\n    try:\n        response = client.chat.completions.create(...)\n        return response.choices[0].message.content.strip()\n    except Exception as e:\n        if attempt < MAX_RETRIES:\n            time.sleep(RETRY_DELAYS[attempt])\n            continue\n        # Final fallback\n        print(f\"  [Merge] Warning: AI merge failed ({e}), using concatenation fallback\",\n              file=sys.stderr)\n        ...\n```",
+        "confidence": 0.85,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      },
+      {
+        "id": "DBG-010",
+        "severity": "low",
+        "category": "integration",
+        "file": "SKILL.md",
+        "line_range": "L38-L42",
+        "title": "SKILL.md references --stdin flag but doesn't document it in the workflow steps",
+        "problematic_code": "echo \"Explain quantum entanglement\" | python3 oracle.py --stdin",
+        "explanation": "The `--stdin` flag is shown in the script's docstring but not in the SKILL.md workflow section. Manus relies on SKILL.md instructions to know how to use the skill. While this won't cause a crash, it means Manus won't know about the `--stdin` option and may not use it when appropriate (e.g., for very long queries that could exceed shell argument limits).",
+        "fix": "Add a `--stdin` example to the SKILL.md workflow section:\n```\nFor piped input:\n```bash\necho \"Your question\" | python3 /home/ubuntu/skills/multi-model-oracle/scripts/oracle.py --stdin\n```",
+        "confidence": 0.7,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-012",
+        "severity": "low",
+        "category": "robustness",
+        "file": "scripts/oracle.py",
+        "line_range": "L62-L80",
+        "title": "Intent detection 'code' pattern is overly broad \u2014 matches 'create a story' as code intent",
+        "problematic_code": "\"code\": [\n    r\"\\b(write|create|build|implement|code|script|function|class|program|debug|fix)\\b\",",
+        "explanation": "The first pattern for 'code' intent matches common verbs like 'write' and 'create' without requiring any code-related context. A query like 'Write a poem about nature' would match 'write' in the code patterns AND 'write...poem' in the creative patterns. Since scoring is by match count, the code intent could win if other code patterns also partially match. The creative patterns require a compound match (verb + noun) which is more specific but scores lower. This could cause misclassification of creative queries as code queries.",
+        "fix": "Make the first code pattern require code-related context, or increase the weight of compound matches:\n```python\n\"code\": [\n    r\"\\b(implement|code|script|function|class|program|debug|fix)\\b\",\n    r\"\\b(write|create|build)\\b.*\\b(code|script|function|program|api|app|tool|bot|service)\\b\",\n    ...\n]\n```",
+        "confidence": 0.78,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      }
+    ],
+    "summary": "The skill has a well-structured pipeline design but suffers from several significant issues. The most impactful are: (1) the model IDs reference non-existent models that will fail on OpenRouter, effectively reducing the 'oracle' to a single-model response; (2) progress messages are printed to stdout mixed with the final output, making it difficult for Manus to parse results; (3) the `str | None` type hint syntax will crash the script on Python < 3.10. The core logic is sound but needs fixes to the model identifiers, output stream separation, and defensive response parsing to be production-ready."
+  },
+  "manus": {
+    "skill_name": "multi-model-oracle",
+    "overall_health": "degraded",
+    "findings": [
+      {
+        "id": "DBG-001",
+        "severity": "high",
+        "category": "integration",
+        "file": "SKILL.md",
+        "line_range": "L12-L14",
+        "title": "Hardcoded absolute script paths in usage instructions",
+        "problematic_code": "python3 /home/ubuntu/skills/multi-model-oracle/scripts/oracle.py \"Your question here\"",
+        "explanation": "The usage instructions in SKILL.md use absolute paths (/home/ubuntu/skills/...) which will not exist on other users' systems, causing confusion and failure to run the script as documented.",
+        "fix": "Replace all absolute paths with relative paths or placeholders, e.g., python3 scripts/oracle.py \"Your question here\"",
+        "confidence": 0.99,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-002",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L50-L70",
+        "title": "Intent detection regex patterns contain errors and inconsistencies",
+        "problematic_code": "\"reasoning\": [ r\"\\b(step.by.step|think through|work through|break down)\\b\", ... ]",
+        "explanation": "The regex pattern 'step.by.step' uses '.' which matches any character instead of a literal dot. This causes incorrect intent detection for phrases like 'step by step'. Also, some patterns may be too restrictive or missing common variants.",
+        "fix": "Escape dots in regex patterns: use 'step\\.by\\.step' instead of 'step.by.step'. Review and test all regex patterns for correctness and coverage.",
+        "confidence": 0.95,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-003",
+        "severity": "high",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L180-L190",
+        "title": "Prompt engineering uses Manus model but falls back silently without error",
+        "problematic_code": "except ImportError:\n    # Fallback: return the original query for all models\n    return {...}",
+        "explanation": "If the openai package is missing, prompt engineering silently skips and returns original queries without notifying the user explicitly, which may cause unexpected behavior or degraded results without clear indication.",
+        "fix": "Add a clear warning or error message to stderr when prompt engineering is skipped due to missing openai package to inform the user.",
+        "confidence": 0.9,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-004",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L320-L340",
+        "title": "Hardcoded max_tokens values may cause request failures",
+        "problematic_code": "payload = { ... \"max_tokens\": 4096, ... }",
+        "explanation": "Setting max_tokens to 4096 for all models without considering prompt length or model limits can cause API errors or truncation. For example, OpenRouter or OpenAI models may have different max token limits or combined prompt+completion limits.",
+        "fix": "Calculate max_tokens dynamically based on prompt length and model limits or set a safer default (e.g., 1024) to avoid exceeding token limits.",
+        "confidence": 0.9,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-005",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L520-L540",
+        "title": "Merge stage uses very large max_tokens (8000) which may exceed model limits",
+        "problematic_code": "response = client.chat.completions.create(... max_tokens=8000, ...)",
+        "explanation": "Requesting 8000 tokens for the merge step likely exceeds the token limit of the Manus gpt-4.1-mini model or the API, causing request failures or truncation.",
+        "fix": "Reduce max_tokens to a safe value within model limits (e.g., 2048 or 4096) or dynamically calculate based on prompt size.",
+        "confidence": 0.95,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-006",
+        "severity": "medium",
+        "category": "integration",
+        "file": "scripts/oracle.py",
+        "line_range": "L600-L620",
+        "title": "Output printed twice when run as CLI",
+        "problematic_code": "output = run_oracle(...)\nprint(output)",
+        "explanation": "The run_oracle function prints progress and debug info, then main prints the full output again. This may cause duplicated or confusing output in CLI usage.",
+        "fix": "Separate debug/progress prints from final output or add a flag to suppress intermediate prints when output is captured and printed by main.",
+        "confidence": 0.8,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-009",
+        "severity": "medium",
+        "category": "integration",
+        "file": "scripts/oracle.py",
+        "line_range": "L90-L110",
+        "title": "OPENAI_API_KEY environment variable required but not checked",
+        "problematic_code": "client = OpenAI()  # Uses pre-configured API key and base URL",
+        "explanation": "The Manus model querying requires OPENAI_API_KEY but the script does not check or warn if it is missing, leading to confusing errors at runtime.",
+        "fix": "Add explicit checks for OPENAI_API_KEY environment variable at startup and print clear error if missing.",
+        "confidence": 0.9,
+        "source": "manus",
+        "consensus": false,
+        "sources": [
+          "manus"
+        ]
+      },
+      {
+        "id": "DBG-008",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/oracle.py",
+        "line_range": "L130-L150",
+        "title": "Retry delays list length mismatch with MAX_RETRIES",
+        "problematic_code": "MAX_RETRIES = 2\nRETRY_DELAYS = [5, 15]",
+        "explanation": "If MAX_RETRIES is increased without updating RETRY_DELAYS, index errors or unexpected behavior may occur during retries.",
+        "fix": "Ensure RETRY_DELAYS length matches MAX_RETRIES or use a safer retry delay logic (e.g., exponential backoff with min/max).",
+        "confidence": 0.9,
+        "source": "manus"
+      }
+    ],
+    "summary": "The multi-model-oracle skill is well structured and comprehensive but suffers from several integration and robustness issues. Hardcoded absolute paths in documentation reduce usability. Regex patterns for intent detection contain errors that may cause misclassification. The script lacks explicit environment variable checks and uses unsafe max_tokens values risking API failures. Prompt engineering fallback is silent, which may confuse users. Adjusting these issues will improve reliability and user experience."
+  },
+  "merged": [
+    {
+      "id": "DBG-001",
+      "severity": "high",
+      "category": "script",
+      "file": "scripts/oracle.py",
+      "line_range": "L1-L10",
+      "title": "requests module imported inside function but not at top level \u2014 no install check or graceful error",
+      "problematic_code": "import requests",
+      "explanation": "The `requests` module is imported inside `query_openrouter()` at runtime. If `requests` is not installed, the function will raise an ImportError that is caught by the generic `except Exception as e` handler, but the error message will be cryptic ('No module named requests'). More importantly, the SKILL.md Requirements section lists `requests` as needed but there's no check or installation step. The `openai` package has a graceful fallback in `prompt_engineer()` but `requests` does not get the same treatment in `query_openrouter()` \u2014 it will fail on the first attempt and then retry twice (wasting 20 seconds on sleep) before finally returning an error.",
+      "fix": "Add `requests` to the top-level imports with a try/except, or add an early check in `main()` that verifies both `requests` and `openai` are importable before starting the pipeline:\n\n```python\ndef main():\n    # Early dependency check\n    missing = []\n    try:\n        import requests\n    except ImportError:\n        missing.append('requests')\n    try:\n        import openai\n    except ImportError:\n        missing.append('openai')\n    if missing:\n        print(f\"ERROR: Missing required packages: {', '.join(missing)}\", file=sys.stderr)\n        print(\"Install with: pip install \" + ' '.join(missing), file=sys.stderr)\n        sys.exit(1)\n    ...\n```",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-002",
+      "severity": "high",
+      "category": "script",
+      "file": "scripts/oracle.py",
+      "line_range": "L168-L175",
+      "title": "OpenRouter response parsing assumes 'choices' key exists \u2014 will crash with KeyError on unexpected response format",
+      "problematic_code": "data = resp.json()\ncontent = data[\"choices\"][0][\"message\"][\"content\"].strip()",
+      "explanation": "If the OpenRouter API returns a 200 status but with an error body (which some API proxies do), or if the response JSON structure is different than expected (e.g., missing 'choices' key, empty 'choices' array, or 'content' is None), this line will raise a KeyError, IndexError, or AttributeError. The exception is caught by the outer `except Exception` but only after the code has already passed the `resp.status_code == 200` check, so it will be treated as a retryable error and waste time on retries for a structural issue.",
+      "fix": "Add defensive parsing:\n```python\nif resp.status_code == 200:\n    data = resp.json()\n    choices = data.get(\"choices\")\n    if not choices or not isinstance(choices, list) or len(choices) == 0:\n        return {\"model\": model_id, \"success\": False,\n                \"error\": f\"Unexpected response structure: no choices in {str(data)[:200]}\"}\n    content = (choices[0].get(\"message\", {}).get(\"content\") or \"\").strip()\n    if not content:\n        return {\"model\": model_id, \"success\": False,\n                \"error\": \"Empty content in response\"}\n    usage = data.get(\"usage\", {})\n    return {...}\n```",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-003",
+      "severity": "high",
+      "category": "integration",
+      "file": "SKILL.md",
+      "line_range": "L38-L42",
+      "title": "SKILL.md references --stdin flag but doesn't document it in the workflow steps",
+      "problematic_code": "echo \"Explain quantum entanglement\" | python3 oracle.py --stdin",
+      "explanation": "The `--stdin` flag is shown in the script's docstring but not in the SKILL.md workflow section. Manus relies on SKILL.md instructions to know how to use the skill. While this won't cause a crash, it means Manus won't know about the `--stdin` option and may not use it when appropriate (e.g., for very long queries that could exceed shell argument limits).",
+      "fix": "Add a `--stdin` example to the SKILL.md workflow section:\n```\nFor piped input:\n```bash\necho \"Your question\" | python3 /home/ubuntu/skills/multi-model-oracle/scripts/oracle.py --stdin\n```",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-004",
+      "severity": "high",
+      "category": "structural",
+      "file": "SKILL.md",
+      "line_range": "L3",
+      "title": "Model names in description reference non-existent models (Claude Opus 4.6, GPT-5.4)",
+      "problematic_code": "description: Get the ultimate merged answer from the 3 best AI models (Anthropic Claude Opus 4.6, OpenAI GPT-5.4, Manus gpt-4.1-mini).",
+      "explanation": "The model identifiers 'anthropic/claude-opus-4.6' and 'openai/gpt-5.4' do not exist on OpenRouter. These are fabricated model names. When the script sends requests to OpenRouter with these model IDs, OpenRouter will return a 404 or 422 error. Since 422 is in FATAL_STATUSES, these requests will fail immediately without retry. This means 2 of the 3 models will always fail, and the 'oracle' will effectively just be a single gpt-4.1-mini response. This is the most fundamental issue with the skill.",
+      "fix": "Replace with real model IDs. For example:\n  ANTHROPIC_MODEL = \"anthropic/claude-sonnet-4\" \n  OPENAI_MODEL = \"openai/gpt-4.1\"\nAnd update SKILL.md descriptions accordingly. Alternatively, make the model IDs configurable via environment variables or arguments so they can be updated without code changes.",
+      "confidence": 0.92,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    },
+    {
+      "id": "DBG-005",
+      "severity": "medium",
+      "category": "script",
+      "file": "scripts/oracle.py",
+      "line_range": "L46-L48",
+      "title": "RETRY_DELAYS has only 2 elements but is indexed by attempt number \u2014 IndexError if MAX_RETRIES is increased",
+      "problematic_code": "MAX_RETRIES = 2\nRETRY_DELAYS = [5, 15]",
+      "explanation": "The retry loop uses `RETRY_DELAYS[attempt]` where attempt ranges from 0 to MAX_RETRIES-1 (i.e., 0 and 1). Currently this works because RETRY_DELAYS has exactly 2 elements and MAX_RETRIES is 2. But if someone changes MAX_RETRIES to 3 without updating RETRY_DELAYS, `RETRY_DELAYS[2]` will raise an IndexError. This is a latent bug / maintenance trap.",
+      "fix": "Use `min(attempt, len(RETRY_DELAYS) - 1)` as the index, or generate delays dynamically:\n```python\ndelay = RETRY_DELAYS[min(attempt, len(RETRY_DELAYS) - 1)]\ntime.sleep(delay)\n```",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-006",
+      "severity": "medium",
+      "category": "script",
+      "file": "scripts/oracle.py",
+      "line_range": "L290-L295",
+      "title": "run_oracle uses `str | None` type hint syntax requiring Python 3.10+",
+      "problematic_code": "def run_oracle(\n    query: str,\n    show_individual: bool = False,\n    show_prompts: bool = False,\n    output_file: str | None = None,\n    skip_engineering: bool = False,\n) -> str:",
+      "explanation": "The `str | None` union syntax was introduced in Python 3.10. On Python 3.8 or 3.9 (which are still common on Ubuntu systems, especially older Manus environments), this will raise a `TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'` at import time, crashing the entire script before any code runs.",
+      "fix": "Use `Optional[str]` from typing, or use `from __future__ import annotations` at the top of the file:\n```python\nfrom __future__ import annotations\n```\nOr change to:\n```python\nfrom typing import Optional\n...\ndef run_oracle(\n    query: str,\n    show_individual: bool = False,\n    show_prompts: bool = False,\n    output_file: Optional[str] = None,\n    skip_engineering: bool = False,\n) -> str:\n```",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-007",
+      "severity": "medium",
+      "category": "integration",
+      "file": "scripts/oracle.py",
+      "line_range": "L310-L340",
+      "title": "Progress/status messages printed to stdout mix with the final output, making it hard for Manus to parse",
+      "problematic_code": "print(\"=\" * 60)\nprint(\"MULTI-MODEL ORACLE\")\n...\nprint(f\"  Detected intent: {intent}\")\n...\noutput = run_oracle(...)\nprint(output)",
+      "explanation": "The `run_oracle()` function prints progress messages to stdout (e.g., 'Querying models in parallel...', 'Detected intent: code', etc.) and then `main()` also prints the final formatted output to stdout. This means the actual output is interleaved with progress messages. When Manus captures stdout, it will get a messy mix of progress logs and the actual answer. The progress messages should go to stderr, or the function should return the output without printing progress to stdout.",
+      "fix": "Change all progress `print()` calls inside `run_oracle()` and `query_all_models()` to use `file=sys.stderr`:\n```python\nprint(\"[Stage 1] Prompt Engineering...\", file=sys.stderr)\nprint(f\"  Detected intent: {intent}\", file=sys.stderr)\n# ... etc for all progress messages\n```\nSome warning prints already use `file=sys.stderr` correctly (e.g., in `prompt_engineer` and `merge_responses`), but the main pipeline progress messages in `run_oracle` and `query_all_models` do not.",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-008",
+      "severity": "medium",
+      "category": "script",
+      "file": "scripts/oracle.py",
+      "line_range": "L247-L260",
+      "title": "merge_responses passes model names to the merge LLM despite instructions saying not to reference models",
+      "problematic_code": "model_label = r[\"model\"].split(\"/\")[-1] if \"/\" in r[\"model\"] else r[\"model\"]\nresponse_sections.append(\n    f\"=== Response {i} (from {model_label}) ===\")",
+      "explanation": "The merge prompt includes model names like 'claude-opus-4.6' and 'gpt-5.4' in the response headers sent to the merge LLM. While the MERGE_SYSTEM prompt instructs the LLM not to reference individual models, providing the model names increases the chance the LLM will leak them into the merged output, violating the merge strategy in the reference doc ('Never reference the individual models in the final output'). This is a design inconsistency rather than a crash bug, but it can produce incorrect output.",
+      "fix": "Use anonymous labels instead:\n```python\nresponse_sections.append(\n    f\"=== Response {i} ===\"\n    f\"\\n{r['content']}\"\n)\n```",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-009",
+      "severity": "medium",
+      "category": "integration",
+      "file": "scripts/oracle.py",
+      "line_range": "L90-L110",
+      "title": "OPENAI_API_KEY environment variable required but not checked",
+      "problematic_code": "client = OpenAI()  # Uses pre-configured API key and base URL",
+      "explanation": "The Manus model querying requires OPENAI_API_KEY but the script does not check or warn if it is missing, leading to confusing errors at runtime.",
+      "fix": "Add explicit checks for OPENAI_API_KEY environment variable at startup and print clear error if missing.",
+      "confidence": 0.9,
+      "source": "manus",
+      "consensus": false,
+      "sources": [
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-010",
+      "severity": "medium",
+      "category": "robustness",
+      "file": "scripts/oracle.py",
+      "line_range": "L260-L280",
+      "title": "Merge stage has no retry logic \u2014 single failure loses the entire merge",
+      "problematic_code": "try:\n    from openai import OpenAI\n    client = OpenAI()\n    response = client.chat.completions.create(\n        ...\n    )\n    return response.choices[0].message.content.strip()\nexcept Exception as e:\n    # Fallback: concatenate with headers",
+      "explanation": "The merge stage (Stage 3) makes a single API call with no retry logic. If this call fails due to a transient network error or rate limit, the fallback is simple concatenation which defeats the entire purpose of the oracle. Stage 2 has retry logic (MAX_RETRIES=2) but Stage 3 does not, even though the merge is arguably the most important call since it produces the final output.",
+      "fix": "Add retry logic similar to Stage 2:\n```python\nfor attempt in range(MAX_RETRIES + 1):\n    try:\n        response = client.chat.completions.create(...)\n        return response.choices[0].message.content.strip()\n    except Exception as e:\n        if attempt < MAX_RETRIES:\n            time.sleep(RETRY_DELAYS[attempt])\n            continue\n        # Final fallback\n        print(f\"  [Merge] Warning: AI merge failed ({e}), using concatenation fallback\",\n              file=sys.stderr)\n        ...\n```",
+      "confidence": 0.85,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    },
+    {
+      "id": "DBG-011",
+      "severity": "medium",
+      "category": "robustness",
+      "file": "scripts/oracle.py",
+      "line_range": "L108-L140",
+      "title": "prompt_engineer makes 3 sequential API calls, not parallel \u2014 slow and no timeout",
+      "problematic_code": "for model_key, model_id in models_info:\n    ...\n    try:\n        response = client.chat.completions.create(\n            model=MANUS_MODEL,\n            ...\n        )",
+      "explanation": "Stage 1 makes 3 sequential API calls to gpt-4.1-mini to generate prompt variants. Each call could take 10-30 seconds. With no explicit timeout on the OpenAI client, if the API is slow, this stage alone could take 90+ seconds before Stage 2 even begins. The SKILL.md says the pipeline uses parallel execution, but that only applies to Stage 2. Stage 1 is sequential and has no timeout protection.",
+      "fix": "Either parallelize the 3 prompt engineering calls using ThreadPoolExecutor (similar to Stage 2), or set a timeout on the OpenAI client:\n```python\nclient = OpenAI(timeout=60.0)\n```\nThis ensures the prompt engineering stage doesn't hang indefinitely.",
+      "confidence": 0.8,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    },
+    {
+      "id": "DBG-012",
+      "severity": "low",
+      "category": "robustness",
+      "file": "scripts/oracle.py",
+      "line_range": "L62-L80",
+      "title": "Intent detection 'code' pattern is overly broad \u2014 matches 'create a story' as code intent",
+      "problematic_code": "\"code\": [\n    r\"\\b(write|create|build|implement|code|script|function|class|program|debug|fix)\\b\",",
+      "explanation": "The first pattern for 'code' intent matches common verbs like 'write' and 'create' without requiring any code-related context. A query like 'Write a poem about nature' would match 'write' in the code patterns AND 'write...poem' in the creative patterns. Since scoring is by match count, the code intent could win if other code patterns also partially match. The creative patterns require a compound match (verb + noun) which is more specific but scores lower. This could cause misclassification of creative queries as code queries.",
+      "fix": "Make the first code pattern require code-related context, or increase the weight of compound matches:\n```python\n\"code\": [\n    r\"\\b(implement|code|script|function|class|program|debug|fix)\\b\",\n    r\"\\b(write|create|build)\\b.*\\b(code|script|function|program|api|app|tool|bot|service)\\b\",\n    ...\n]\n```",
+      "confidence": 0.78,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    }
+  ]
+}
