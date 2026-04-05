@@ -41,7 +41,7 @@ python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --validate-only
 
 ## How It Works
 
-1. **Clone or pull** the repo into `~/.skill-sync-cache/` (uses `gh` CLI)
+1. **Clone or pull** the repo into `~/.skill-sync-cache/` (uses `gh` CLI with `git clone` fallback)
 2. **Discover** all directories containing a valid `SKILL.md` (supports both `repo/skill-name/` and `repo/skills/skill-name/` layouts)
 3. **Compare** each skill's content hash against the last sync state
 4. **Install** new skills, **update** changed skills, **skip** unchanged ones
@@ -60,6 +60,15 @@ The script tracks content hashes to avoid unnecessary overwrites:
 ## State File
 
 Sync state is stored at `~/.skill-sync-cache/sync_state.json`. Contains last sync timestamp, commit hash, and per-skill content hashes. Delete this file to force a full re-sync.
+
+## Configuration
+
+Paths can be overridden via environment variables or CLI flags:
+
+| Setting | Default | Override |
+|---|---|---|
+| Skills directory | `/home/ubuntu/skills` | `MANUS_SKILLS_DIR` env var or `--skills-dir` flag |
+| Cache directory | `/home/ubuntu/.skill-sync-cache` | `MANUS_SKILL_SYNC_CACHE` env var or `--cache-dir` flag |
 
 ## After Syncing
 
