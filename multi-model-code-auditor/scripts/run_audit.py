@@ -27,7 +27,8 @@ from pathlib import Path
 try:
     import requests
 except ImportError:
-    os.system(f"{sys.executable} -m pip install requests -q")
+    import subprocess
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "requests", "-q"])
     import requests
 
 # ─── Constants ────────────────────────────────────────────────────────────────
@@ -458,13 +459,36 @@ def discover_best_models(api_key: str) -> list[dict]:
     return selected
 
 
+# Maximum file size to read (1 MB) — skip generated/minified files
+MAX_FILE_SIZE = 1_000_000
+
+
 def collect_source_files(project_dir: Path) -> list[dict]:
     """Collect all source files, sorted by importance (entry points first)."""
+    resolved_root = project_dir.resolve()
     files = []
     for path in sorted(project_dir.rglob("*")):
         if any(skip in path.parts for skip in SKIP_DIRS):
             continue
         if path.is_file() and path.suffix.lower() in SOURCE_EXTENSIONS:
+            # Guard against symlinks pointing outside the project
+            try:
+                resolved = path.resolve()
+                if not str(resolved).startswith(str(resolved_root)):
+                    print(f"  SKIP (symlink escape): {path}", file=sys.stderr)
+                    continue
+            except (OSError, ValueError):
+                continue
+
+            # Guard against excessively large files
+            try:
+                file_size = path.stat().st_size
+                if file_size > MAX_FILE_SIZE:
+                    print(f"  SKIP (>{MAX_FILE_SIZE // 1_000_000}MB): {path}", file=sys.stderr)
+                    continue
+            except OSError:
+                continue
+
             try:
                 content = path.read_text(encoding="utf-8", errors="replace")
                 if content.strip():
@@ -486,7 +510,8 @@ def collect_source_files(project_dir: Path) -> list[dict]:
                         "priority": priority,
                         "size": len(content),
                     })
-            except Exception:
+            except Exception as e:
+                print(f"  WARN: Could not read {path}: {e}", file=sys.stderr)
                 continue
 
     files.sort(key=lambda f: (f["priority"], f["path"]))
@@ -786,7 +811,7 @@ def query_model(model_info: dict, payload: str, api_key: str,
 
 
 def run_audit(project_dir: str, output_file: str, models_override: str = None,
-              parallel: bool = False) -> dict:
+              parallel: bool = False, auto_confirm: bool = False) -> dict:
     """Run the full multi-model audit pipeline.
 
     Args:
@@ -794,6 +819,7 @@ def run_audit(project_dir: str, output_file: str, models_override: str = None,
         output_file: Path to write the JSON results.
         models_override: Comma-separated model IDs (overrides auto-discovery).
         parallel: If True, query all models simultaneously using ThreadPoolExecutor.
+        auto_confirm: If True, skip confirmation prompt for large payloads.
     """
     api_key = os.environ.get("OPENROUTER_API_KEY", "")
     if not api_key:
@@ -842,6 +868,18 @@ def run_audit(project_dir: str, output_file: str, models_override: str = None,
 
     if char_count > WARN_PAYLOAD_CHARS:
         print(f"  NOTE: Large payload. Models with smaller context windows may truncate.")
+
+    # Confirmation for large payloads (source code is being sent to a third-party API)
+    if not auto_confirm and char_count > 100_000:
+        print(f"\n  WARNING: {char_count:,} chars of source code will be sent to OpenRouter API.")
+        try:
+            answer = input("  Continue? [Y/n] ").strip().lower()
+            if answer and answer not in ("y", "yes"):
+                print("  Aborted.")
+                sys.exit(0)
+        except (EOFError, KeyboardInterrupt):
+            # Non-interactive mode (piped stdin) — proceed automatically
+            pass
 
     # Step 3: Query models
     results = []
@@ -931,6 +969,7 @@ Examples:
     parser.add_argument("--models", default=None, help="Comma-separated model IDs (overrides auto-discovery)")
     parser.add_argument("--parallel", action="store_true", help="Query all models simultaneously")
     parser.add_argument("--discover", action="store_true", help="List available frontier models and exit")
+    parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation prompt for large payloads")
     args = parser.parse_args()
 
     if args.discover:
@@ -944,4 +983,4 @@ Examples:
     if not args.project_dir:
         parser.error("project_dir is required unless --discover is used")
 
-    run_audit(args.project_dir, args.output, args.models, args.parallel)
+    run_audit(args.project_dir, args.output, args.models, args.parallel, args.yes)

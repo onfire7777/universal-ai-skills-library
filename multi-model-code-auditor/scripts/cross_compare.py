@@ -31,11 +31,20 @@ SEVERITY_SCORE = {"critical": 4, "high": 3, "medium": 2, "low": 1}
 # Known false positive patterns — findings matching these are flagged.
 # Each pattern has: a regex to match, a reason explaining why it's a false positive,
 # and optionally a verify command to confirm.
-FALSE_POSITIVE_PATTERNS = [
+# Patterns that match against the TITLE + DESCRIPTION fields only
+TEXT_FP_PATTERNS = [
     {
         "pattern": r"yaml\.safe_load.*unsafe",
         "reason": "yaml.safe_load IS the safe variant — this is a model hallucination",
     },
+    {
+        "pattern": r"if.*attacker.*root|if.*root.*access",
+        "reason": "Theoretical-only risk requiring root access — not a real vulnerability",
+    },
+]
+
+# Patterns that match against the VULNERABLE_CODE field only
+CODE_FP_PATTERNS = [
     {
         "pattern": r"\beval\s*\(",
         "verify": "grep -rn 'eval(' to confirm it actually exists",
@@ -50,14 +59,6 @@ FALSE_POSITIVE_PATTERNS = [
         "pattern": r"pickle\.loads",
         "verify": "grep -rn 'pickle.loads' to confirm it actually exists",
         "reason": "Model may be hallucinating pickle.loads usage — verify with grep",
-    },
-    {
-        "pattern": r"if.*attacker.*root|if.*root.*access",
-        "reason": "Theoretical-only risk requiring root access — not a real vulnerability",
-    },
-    {
-        "pattern": r"line_range.*\d{4,}",
-        "reason": "Suspiciously high line number — model may be hallucinating code location",
     },
 ]
 
@@ -273,15 +274,38 @@ def check_false_positive(finding: dict) -> dict | None:
     """Check if a finding matches known false positive patterns.
 
     Returns a dict with reason/verify fields if it matches, or None if clean.
+    Uses field-specific matching to avoid false triggers from unrelated fields.
     """
-    # Serialize the finding for pattern matching
-    text = json.dumps(finding).lower()
+    # Check title + description for text-level FP patterns
+    text_fields = " ".join([
+        finding.get("title", ""),
+        finding.get("description", ""),
+    ]).lower()
 
-    for fp in FALSE_POSITIVE_PATTERNS:
-        if re.search(fp["pattern"], text, re.IGNORECASE):
+    for fp in TEXT_FP_PATTERNS:
+        if re.search(fp["pattern"], text_fields, re.IGNORECASE):
             return {
                 "reason": fp.get("reason", "Matches known false positive pattern"),
                 "verify": fp.get("verify", "Manual verification required"),
+            }
+
+    # Check vulnerable_code for code-level FP patterns
+    vuln_code = (finding.get("vulnerable_code", "") or "").lower()
+    for fp in CODE_FP_PATTERNS:
+        if re.search(fp["pattern"], vuln_code, re.IGNORECASE):
+            return {
+                "reason": fp.get("reason", "Matches known false positive pattern"),
+                "verify": fp.get("verify", "Manual verification required"),
+            }
+
+    # Check line_range specifically for suspiciously high line numbers
+    line_range = finding.get("line_range", "")
+    if line_range:
+        numbers = re.findall(r"\d+", str(line_range))
+        if any(int(n) > 9999 for n in numbers):
+            return {
+                "reason": "Suspiciously high line number (>9999) — model may be hallucinating code location",
+                "verify": "Verify the file actually has this many lines",
             }
 
     # Additional heuristic: if vulnerable_code is suspiciously short (< 5 chars)
