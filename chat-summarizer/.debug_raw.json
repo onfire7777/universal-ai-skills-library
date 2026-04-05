@@ -1,0 +1,319 @@
+{
+  "timestamp": "2026-04-05T06:22:32.586063+00:00",
+  "skill": "chat-summarizer",
+  "claude": {
+    "skill_name": "chat-summarizer",
+    "overall_health": "degraded",
+    "findings": [
+      {
+        "id": "DBG-001",
+        "severity": "high",
+        "category": "script",
+        "file": "scripts/format_summary.py",
+        "line_range": "L195-L197",
+        "title": "Handoff prompt header uses string multiplication on a string literal instead of a repeated character",
+        "problematic_code": "    header = (\n        \"=== AI HANDOFF PROMPT ===\\n\"\n        \"Paste this into a new chat to give the AI full context:\\n\"\n        \"\u2500\" * 60 + \"\\n\"\n    )",
+        "explanation": "Due to Python operator precedence, `\"\u2500\" * 60 + \"\\n\"` is evaluated as `(\"\u2500\" * 60) + \"\\n\"`, which produces the 60-character line plus newline. However, this expression is being implicitly concatenated with the previous string literal `\"Paste this into a new chat to give the AI full context:\\n\"`. Python's implicit string concatenation only works between string literals, but `\"\u2500\" * 60` is an expression, not a literal. So the actual behavior is: the implicit concatenation joins `\"Paste this into a new chat to give the AI full context:\\n\"` with `\"\u2500\"`, producing `\"...context:\\n\u2500\"`, and then `* 60` is applied to the ENTIRE concatenated string, and then `+ \"\\n\"` is appended. This means the header line `Paste this into a new chat...` gets repeated 60 times, producing a massively bloated header instead of a clean separator line. This will make the handoff_prompt.txt file enormous and unusable.",
+        "fix": "    header = (\n        \"=== AI HANDOFF PROMPT ===\\n\"\n        \"Paste this into a new chat to give the AI full context:\\n\"\n        + \"\u2500\" * 60 + \"\\n\"\n    )",
+        "confidence": 0.99,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-002",
+        "severity": "high",
+        "category": "integration",
+        "file": "SKILL.md",
+        "line_range": "L93-L95",
+        "title": "SKILL.md instructs Manus to run with --all which triggers --enrich, but --enrich will almost always fail",
+        "problematic_code": "python3 /home/ubuntu/skills/chat-summarizer/scripts/format_summary.py /home/ubuntu/chat_summary.md --all",
+        "explanation": "The --all flag sets args.enrich = True, which calls enrich_with_ai(). This function requires the `openai` Python package AND the OPENAI_API_KEY environment variable. In most Manus sandbox environments, one or both of these will be missing. When the openai package is not installed, the function returns a string 'AI enrichment unavailable: openai package not installed.' \u2014 this is handled gracefully and won't crash, but it writes a useless ai_recommendations.md file. More importantly, the SKILL.md Step 4 tells Manus to deliver ai_recommendations.md as if it contains useful content ('AI-generated next steps (if --enrich was used)'), which will confuse the user. The parenthetical '(if --enrich was used)' is misleading since --all always enables --enrich. This is a silent failure that produces a misleading artifact.",
+        "fix": "Change the SKILL.md Step 3 command to not use --all by default, and instead use explicit flags:\n\n```bash\npython3 /home/ubuntu/skills/chat-summarizer/scripts/format_summary.py /home/ubuntu/chat_summary.md --json --handoff\n```\n\nAnd update Step 4 to only mention ai_recommendations.md conditionally:\n4. `/home/ubuntu/ai_recommendations.md` \u2014 (only if `openai` package and OPENAI_API_KEY are available; run with `--enrich` to generate)",
+        "confidence": 0.9,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-003",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/format_summary.py",
+        "line_range": "L62-L72",
+        "title": "Section heading regex fails to match sections with mixed case or single-word names",
+        "problematic_code": "        heading_match = re.match(\n            r\"^##\\s+(?:\\d+\\.\\s+)?([A-Z][A-Z_]+(?:\\s*[A-Z_]+)*)\", line\n        )",
+        "explanation": "The regex `[A-Z][A-Z_]+` requires at least 2 uppercase characters. A section heading like `## DISCOVERIES` works, but the regex character class `[A-Z_]` does not match digits or other characters. More critically, the regex uses `[A-Z_]+` which won't match spaces between words properly \u2014 `(?:\\s*[A-Z_]+)*` uses `\\s*` (zero or more) which means it can greedily match across word boundaries. However, the real issue is that the summary template in SKILL.md uses headings like `## SESSION_METADATA` (with underscores), but if Manus writes `## Session Metadata` or `## Session_Metadata` (mixed case), the regex will fail to match because it requires all uppercase `[A-Z]`. Since Manus is an AI generating the markdown, case variation is a realistic scenario.",
+        "fix": "Make the regex case-insensitive or normalize:\n        heading_match = re.match(\n            r\"^##\\s+(?:\\d+\\.\\s+)?([A-Za-z][A-Za-z_]+(?:\\s*[A-Za-z_]+)*)\", line\n        )\n        if heading_match:\n            if current_section:\n                sections[current_section] = \"\\n\".join(current_content).strip()\n            current_section = heading_match.group(1).strip().replace(\" \", \"_\").upper()\n            current_content = []",
+        "confidence": 0.85,
+        "source": "claude"
+      },
+      {
+        "id": "DBG-004",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/format_summary.py",
+        "line_range": "L230-L232",
+        "title": "enrich_with_ai uses non-existent model name 'gpt-4.1-mini'",
+        "problematic_code": "        response = client.chat.completions.create(\n            model=\"gpt-4.1-mini\",",
+        "explanation": "The model name 'gpt-4.1-mini' is not a standard OpenAI model identifier. The likely intended model is 'gpt-4o-mini' or 'gpt-4.1-mini' (if this is a future/internal model). If this model doesn't exist in the API, the call will raise an exception like 'The model `gpt-4.1-mini` does not exist'. While the exception is caught by the broad `except Exception as e` block, it means AI enrichment will always fail even when the API key and package are available, producing a useless error message in the output file.",
+        "fix": "Change to a known model name:\n            model=\"gpt-4o-mini\",",
+        "confidence": 0.72,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      },
+      {
+        "id": "DBG-005",
+        "severity": "medium",
+        "category": "integration",
+        "file": "SKILL.md",
+        "line_range": "L99-L103",
+        "title": "Output file paths in Step 4 assume output-dir is /home/ubuntu but script defaults to input file's parent directory",
+        "problematic_code": "1. `/home/ubuntu/chat_summary.md` \u2014 the full structured summary\n2. `/home/ubuntu/handoff_prompt.txt` \u2014 dense single-block for pasting into new chats\n3. `/home/ubuntu/chat_summary.json` \u2014 machine-parseable version\n4. `/home/ubuntu/ai_recommendations.md` \u2014 AI-generated next steps",
+        "explanation": "The script's --output-dir defaults to `summary_path.parent`, which is the parent directory of the input file. Since the input is `/home/ubuntu/chat_summary.md`, the parent is `/home/ubuntu/`, so the paths happen to be correct in this case. However, if Manus writes the summary to a different location (e.g., a project directory), the output files would be written there instead, but Manus would still look for them at `/home/ubuntu/`. This is fragile but works for the documented happy path.",
+        "fix": "No immediate fix needed for the happy path, but for robustness, add --output-dir /home/ubuntu to the command in SKILL.md:\n```bash\npython3 /home/ubuntu/skills/chat-summarizer/scripts/format_summary.py /home/ubuntu/chat_summary.md --all --output-dir /home/ubuntu\n```",
+        "confidence": 0.7,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      },
+      {
+        "id": "DBG-006",
+        "severity": "low",
+        "category": "script",
+        "file": "scripts/format_summary.py",
+        "line_range": "L84-L90",
+        "title": "extract_file_paths regex captures trailing punctuation and markdown table characters",
+        "problematic_code": "        r\"`(/[^\\s`]+)`\",           # Backtick-wrapped absolute paths\n        r\"(/home/\\S+)\",            # /home/ paths\n        r\"(/mnt/\\S+)\",             # /mnt/ paths",
+        "explanation": "The non-backtick patterns `/home/\\S+` and `/mnt/\\S+` will greedily match trailing markdown table pipes `|`, commas, parentheses, and other punctuation. While there's a `rstrip(\".,;:)\")` call, it doesn't strip `|` which is common in the ARTIFACTS_REGISTRY table format. For example, from a table row like `| /home/ubuntu/app.py | Main app |`, the regex would capture `/home/ubuntu/app.py` followed by trailing content. The backtick pattern is fine, but the bare path patterns will produce false path references that then generate spurious 'path does not exist' warnings.",
+        "fix": "Add `|` to the rstrip characters:\n            path = match.group(1).rstrip(\".,;:)|\")",
+        "confidence": 0.88,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      },
+      {
+        "id": "DBG-008",
+        "severity": "low",
+        "category": "script",
+        "file": "scripts/format_summary.py",
+        "line_range": "L55-L76",
+        "title": "parse_summary discards content before the first ## heading (including the H1 title and Generated timestamp)",
+        "problematic_code": "    for line in text.splitlines():\n        # Match ## SECTION_NAME or ## 1. SECTION_NAME or ## SECTION_METADATA\n        heading_match = re.match(\n            r\"^##\\s+(?:\\d+\\.\\s+)?([A-Z][A-Z_]+(?:\\s*[A-Z_]+)*)\", line\n        )\n        if heading_match:\n            ...\n        elif current_section:\n            current_content.append(line)",
+        "explanation": "The `# Chat Session Summary` H1 heading and `Generated: [timestamp]` line appear before any `##` section. Since `current_section` is None at that point, these lines are silently discarded. The timestamp is potentially useful metadata that could be included in the JSON output. This is a minor data loss issue \u2014 the information isn't used anywhere downstream, but it means the JSON export lacks the generation timestamp from the source document.",
+        "fix": "This is a minor issue. If desired, add pre-section content capture:\n    preamble_lines = []\n    ...\n        elif current_section:\n            current_content.append(line)\n        else:\n            preamble_lines.append(line)\n    sections['_preamble'] = '\\n'.join(preamble_lines).strip()",
+        "confidence": 0.75,
+        "source": "claude",
+        "consensus": false,
+        "sources": [
+          "claude"
+        ]
+      }
+    ],
+    "summary": "The skill is mostly functional but has one high-severity bug (DBG-001) where Python operator precedence causes the handoff prompt header to be repeated 60 times, producing a massively bloated output file. The AI enrichment feature uses a potentially non-existent model name and will silently fail in most environments. The section parser is case-sensitive which may cause validation failures if Manus doesn't produce exact uppercase section headings."
+  },
+  "manus": {
+    "skill_name": "chat-summarizer",
+    "overall_health": "healthy",
+    "findings": [
+      {
+        "id": "DBG-001",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/format_summary.py",
+        "line_range": "L112-L117",
+        "title": "Regex for OBJECTIVE_TREE status indicators misses 'IN-PROGRESS' with hyphen",
+        "problematic_code": "statuses = re.findall(\n    r\"\\b(completed|in.progress|abandoned|blocked|pending)\\b\",\n    sections[\"OBJECTIVE_TREE\"],\n    re.IGNORECASE,\n)",
+        "explanation": "The regex uses 'in.progress' with a dot instead of 'in-progress' with a hyphen, which is the format used in the SKILL.md schema. This causes the validator to miss valid 'IN-PROGRESS' statuses, leading to false warnings about missing status indicators.",
+        "fix": "Change the regex pattern to include 'in-progress' with a hyphen:\n\nstatuses = re.findall(\n    r\"\\b(completed|in-progress|abandoned|blocked|pending)\\b\",\n    sections[\"OBJECTIVE_TREE\"],\n    re.IGNORECASE,\n)",
+        "confidence": 0.98,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-002",
+        "severity": "medium",
+        "category": "script",
+        "file": "scripts/format_summary.py",
+        "line_range": "L121-L126",
+        "title": "Rationale keyword check in DECISIONS_LOG may miss valid rationale phrases",
+        "problematic_code": "rationale_words = re.findall(\n    r\"\\b(because|rationale|reason|chose|decided|alternative)\\b\",\n    sections[\"DECISIONS_LOG\"],\n    re.IGNORECASE,\n)",
+        "explanation": "The rationale keyword list is limited and may miss other common rationale indicators like 'decide', 'decision', 'choose', or 'due to'. This can cause false warnings about missing rationale language even when rationale is present but phrased differently.",
+        "fix": "Expand the regex to include more variants, e.g.:\n\nrationale_words = re.findall(\n    r\"\\b(because|rationale|reason|chose|decided|alternative|decision|choose|due to)\\b\",\n    sections[\"DECISIONS_LOG\"],\n    re.IGNORECASE,\n)",
+        "confidence": 0.85,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-003",
+        "severity": "low",
+        "category": "integration",
+        "file": "SKILL.md",
+        "line_range": "L1-L15",
+        "title": "Hardcoded output file paths may limit deployment flexibility",
+        "problematic_code": "Save to `/home/ubuntu/chat_summary.md`.\n\nRun the validation script:\n\n```bash\npython3 /home/ubuntu/skills/chat-summarizer/scripts/format_summary.py /home/ubuntu/chat_summary.md --all\n```",
+        "explanation": "The instructions and script usage hardcode absolute paths under /home/ubuntu, which may not exist or be writable in other environments. This reduces portability and requires manual path adjustments.",
+        "fix": "Parameterize output paths or instruct Manus to use relative or configurable paths. For example, use environment variables or skill parameters to specify output directory instead of hardcoded /home/ubuntu paths.",
+        "confidence": 0.9,
+        "source": "manus"
+      },
+      {
+        "id": "DBG-007",
+        "severity": "low",
+        "category": "integration",
+        "file": "scripts/format_summary.py",
+        "line_range": "L230-L240",
+        "title": "AI enrichment requires OPENAI_API_KEY and openai package but no fallback or clear error propagation",
+        "problematic_code": "try:\n    from openai import OpenAI\nexcept ImportError:\n    return \"AI enrichment unavailable: openai package not installed.\"\n\napi_key = os.environ.get(\"OPENAI_API_KEY\")\nif not api_key:\n    return \"AI enrichment unavailable: OPENAI_API_KEY not set.\"",
+        "explanation": "If the openai package is missing or the API key is not set, the enrichment silently returns a string message instead of raising an error or logging. Manus may not detect this as a failure and may assume enrichment succeeded.",
+        "fix": "Raise exceptions or log errors explicitly so Manus can detect enrichment failure. Alternatively, document clearly that enrichment is optional and may silently skip if dependencies are missing.",
+        "confidence": 0.8,
+        "source": "manus",
+        "consensus": false,
+        "sources": [
+          "manus"
+        ]
+      }
+    ],
+    "summary": "The chat-summarizer skill is well-structured with clear instructions and a robust validation script. Minor issues include a regex typo that causes missed status detection, limited rationale keyword coverage, hardcoded absolute file paths reducing portability, and silent failure modes in AI enrichment. These can be fixed with small code adjustments and parameterization to improve robustness and integration."
+  },
+  "merged": [
+    {
+      "id": "DBG-001",
+      "severity": "high",
+      "category": "script",
+      "file": "scripts/format_summary.py",
+      "line_range": "L195-L197",
+      "title": "Handoff prompt header uses string multiplication on a string literal instead of a repeated character",
+      "problematic_code": "    header = (\n        \"=== AI HANDOFF PROMPT ===\\n\"\n        \"Paste this into a new chat to give the AI full context:\\n\"\n        \"\u2500\" * 60 + \"\\n\"\n    )",
+      "explanation": "Due to Python operator precedence, `\"\u2500\" * 60 + \"\\n\"` is evaluated as `(\"\u2500\" * 60) + \"\\n\"`, which produces the 60-character line plus newline. However, this expression is being implicitly concatenated with the previous string literal `\"Paste this into a new chat to give the AI full context:\\n\"`. Python's implicit string concatenation only works between string literals, but `\"\u2500\" * 60` is an expression, not a literal. So the actual behavior is: the implicit concatenation joins `\"Paste this into a new chat to give the AI full context:\\n\"` with `\"\u2500\"`, producing `\"...context:\\n\u2500\"`, and then `* 60` is applied to the ENTIRE concatenated string, and then `+ \"\\n\"` is appended. This means the header line `Paste this into a new chat...` gets repeated 60 times, producing a massively bloated header instead of a clean separator line. This will make the handoff_prompt.txt file enormous and unusable.",
+      "fix": "    header = (\n        \"=== AI HANDOFF PROMPT ===\\n\"\n        \"Paste this into a new chat to give the AI full context:\\n\"\n        + \"\u2500\" * 60 + \"\\n\"\n    )",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-002",
+      "severity": "high",
+      "category": "integration",
+      "file": "SKILL.md",
+      "line_range": "L93-L95",
+      "title": "SKILL.md instructs Manus to run with --all which triggers --enrich, but --enrich will almost always fail",
+      "problematic_code": "python3 /home/ubuntu/skills/chat-summarizer/scripts/format_summary.py /home/ubuntu/chat_summary.md --all",
+      "explanation": "The --all flag sets args.enrich = True, which calls enrich_with_ai(). This function requires the `openai` Python package AND the OPENAI_API_KEY environment variable. In most Manus sandbox environments, one or both of these will be missing. When the openai package is not installed, the function returns a string 'AI enrichment unavailable: openai package not installed.' \u2014 this is handled gracefully and won't crash, but it writes a useless ai_recommendations.md file. More importantly, the SKILL.md Step 4 tells Manus to deliver ai_recommendations.md as if it contains useful content ('AI-generated next steps (if --enrich was used)'), which will confuse the user. The parenthetical '(if --enrich was used)' is misleading since --all always enables --enrich. This is a silent failure that produces a misleading artifact.",
+      "fix": "Change the SKILL.md Step 3 command to not use --all by default, and instead use explicit flags:\n\n```bash\npython3 /home/ubuntu/skills/chat-summarizer/scripts/format_summary.py /home/ubuntu/chat_summary.md --json --handoff\n```\n\nAnd update Step 4 to only mention ai_recommendations.md conditionally:\n4. `/home/ubuntu/ai_recommendations.md` \u2014 (only if `openai` package and OPENAI_API_KEY are available; run with `--enrich` to generate)",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-003",
+      "severity": "medium",
+      "category": "script",
+      "file": "scripts/format_summary.py",
+      "line_range": "L62-L72",
+      "title": "Section heading regex fails to match sections with mixed case or single-word names",
+      "problematic_code": "        heading_match = re.match(\n            r\"^##\\s+(?:\\d+\\.\\s+)?([A-Z][A-Z_]+(?:\\s*[A-Z_]+)*)\", line\n        )",
+      "explanation": "The regex `[A-Z][A-Z_]+` requires at least 2 uppercase characters. A section heading like `## DISCOVERIES` works, but the regex character class `[A-Z_]` does not match digits or other characters. More critically, the regex uses `[A-Z_]+` which won't match spaces between words properly \u2014 `(?:\\s*[A-Z_]+)*` uses `\\s*` (zero or more) which means it can greedily match across word boundaries. However, the real issue is that the summary template in SKILL.md uses headings like `## SESSION_METADATA` (with underscores), but if Manus writes `## Session Metadata` or `## Session_Metadata` (mixed case), the regex will fail to match because it requires all uppercase `[A-Z]`. Since Manus is an AI generating the markdown, case variation is a realistic scenario.",
+      "fix": "Make the regex case-insensitive or normalize:\n        heading_match = re.match(\n            r\"^##\\s+(?:\\d+\\.\\s+)?([A-Za-z][A-Za-z_]+(?:\\s*[A-Za-z_]+)*)\", line\n        )\n        if heading_match:\n            if current_section:\n                sections[current_section] = \"\\n\".join(current_content).strip()\n            current_section = heading_match.group(1).strip().replace(\" \", \"_\").upper()\n            current_content = []",
+      "confidence": 1.0,
+      "consensus": true,
+      "sources": [
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-004",
+      "severity": "medium",
+      "category": "script",
+      "file": "scripts/format_summary.py",
+      "line_range": "L230-L232",
+      "title": "enrich_with_ai uses non-existent model name 'gpt-4.1-mini'",
+      "problematic_code": "        response = client.chat.completions.create(\n            model=\"gpt-4.1-mini\",",
+      "explanation": "The model name 'gpt-4.1-mini' is not a standard OpenAI model identifier. The likely intended model is 'gpt-4o-mini' or 'gpt-4.1-mini' (if this is a future/internal model). If this model doesn't exist in the API, the call will raise an exception like 'The model `gpt-4.1-mini` does not exist'. While the exception is caught by the broad `except Exception as e` block, it means AI enrichment will always fail even when the API key and package are available, producing a useless error message in the output file.",
+      "fix": "Change to a known model name:\n            model=\"gpt-4o-mini\",",
+      "confidence": 0.72,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    },
+    {
+      "id": "DBG-005",
+      "severity": "medium",
+      "category": "integration",
+      "file": "SKILL.md",
+      "line_range": "L99-L103",
+      "title": "Output file paths in Step 4 assume output-dir is /home/ubuntu but script defaults to input file's parent directory",
+      "problematic_code": "1. `/home/ubuntu/chat_summary.md` \u2014 the full structured summary\n2. `/home/ubuntu/handoff_prompt.txt` \u2014 dense single-block for pasting into new chats\n3. `/home/ubuntu/chat_summary.json` \u2014 machine-parseable version\n4. `/home/ubuntu/ai_recommendations.md` \u2014 AI-generated next steps",
+      "explanation": "The script's --output-dir defaults to `summary_path.parent`, which is the parent directory of the input file. Since the input is `/home/ubuntu/chat_summary.md`, the parent is `/home/ubuntu/`, so the paths happen to be correct in this case. However, if Manus writes the summary to a different location (e.g., a project directory), the output files would be written there instead, but Manus would still look for them at `/home/ubuntu/`. This is fragile but works for the documented happy path.",
+      "fix": "No immediate fix needed for the happy path, but for robustness, add --output-dir /home/ubuntu to the command in SKILL.md:\n```bash\npython3 /home/ubuntu/skills/chat-summarizer/scripts/format_summary.py /home/ubuntu/chat_summary.md --all --output-dir /home/ubuntu\n```",
+      "confidence": 0.7,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    },
+    {
+      "id": "DBG-006",
+      "severity": "low",
+      "category": "script",
+      "file": "scripts/format_summary.py",
+      "line_range": "L84-L90",
+      "title": "extract_file_paths regex captures trailing punctuation and markdown table characters",
+      "problematic_code": "        r\"`(/[^\\s`]+)`\",           # Backtick-wrapped absolute paths\n        r\"(/home/\\S+)\",            # /home/ paths\n        r\"(/mnt/\\S+)\",             # /mnt/ paths",
+      "explanation": "The non-backtick patterns `/home/\\S+` and `/mnt/\\S+` will greedily match trailing markdown table pipes `|`, commas, parentheses, and other punctuation. While there's a `rstrip(\".,;:)\")` call, it doesn't strip `|` which is common in the ARTIFACTS_REGISTRY table format. For example, from a table row like `| /home/ubuntu/app.py | Main app |`, the regex would capture `/home/ubuntu/app.py` followed by trailing content. The backtick pattern is fine, but the bare path patterns will produce false path references that then generate spurious 'path does not exist' warnings.",
+      "fix": "Add `|` to the rstrip characters:\n            path = match.group(1).rstrip(\".,;:)|\")",
+      "confidence": 0.88,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    },
+    {
+      "id": "DBG-007",
+      "severity": "low",
+      "category": "integration",
+      "file": "scripts/format_summary.py",
+      "line_range": "L230-L240",
+      "title": "AI enrichment requires OPENAI_API_KEY and openai package but no fallback or clear error propagation",
+      "problematic_code": "try:\n    from openai import OpenAI\nexcept ImportError:\n    return \"AI enrichment unavailable: openai package not installed.\"\n\napi_key = os.environ.get(\"OPENAI_API_KEY\")\nif not api_key:\n    return \"AI enrichment unavailable: OPENAI_API_KEY not set.\"",
+      "explanation": "If the openai package is missing or the API key is not set, the enrichment silently returns a string message instead of raising an error or logging. Manus may not detect this as a failure and may assume enrichment succeeded.",
+      "fix": "Raise exceptions or log errors explicitly so Manus can detect enrichment failure. Alternatively, document clearly that enrichment is optional and may silently skip if dependencies are missing.",
+      "confidence": 0.8,
+      "source": "manus",
+      "consensus": false,
+      "sources": [
+        "manus"
+      ]
+    },
+    {
+      "id": "DBG-008",
+      "severity": "low",
+      "category": "script",
+      "file": "scripts/format_summary.py",
+      "line_range": "L55-L76",
+      "title": "parse_summary discards content before the first ## heading (including the H1 title and Generated timestamp)",
+      "problematic_code": "    for line in text.splitlines():\n        # Match ## SECTION_NAME or ## 1. SECTION_NAME or ## SECTION_METADATA\n        heading_match = re.match(\n            r\"^##\\s+(?:\\d+\\.\\s+)?([A-Z][A-Z_]+(?:\\s*[A-Z_]+)*)\", line\n        )\n        if heading_match:\n            ...\n        elif current_section:\n            current_content.append(line)",
+      "explanation": "The `# Chat Session Summary` H1 heading and `Generated: [timestamp]` line appear before any `##` section. Since `current_section` is None at that point, these lines are silently discarded. The timestamp is potentially useful metadata that could be included in the JSON output. This is a minor data loss issue \u2014 the information isn't used anywhere downstream, but it means the JSON export lacks the generation timestamp from the source document.",
+      "fix": "This is a minor issue. If desired, add pre-section content capture:\n    preamble_lines = []\n    ...\n        elif current_section:\n            current_content.append(line)\n        else:\n            preamble_lines.append(line)\n    sections['_preamble'] = '\\n'.join(preamble_lines).strip()",
+      "confidence": 0.75,
+      "source": "claude",
+      "consensus": false,
+      "sources": [
+        "claude"
+      ]
+    }
+  ]
+}
