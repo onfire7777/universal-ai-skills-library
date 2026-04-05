@@ -1,71 +1,93 @@
 ---
 name: context-anchor
-description: Set a persistent core topic/purpose for the entire chat session to keep Manus focused and on-track. Use when the user asks to set a core topic, anchor the context, maintain focus, or ensure Manus remembers the overarching goal regardless of tangential requests.
+description: Set and maintain a persistent core topic/purpose for the entire chat session to keep Manus focused. Use when the user sets a core topic, anchors context, says "let's focus on X", "today we're building Y", "we're working on Z", or any implicit/explicit session purpose framing. Also use when asked to maintain focus, stay on track, or remember the overarching goal.
 ---
 
 # Context Anchor
 
-This skill manages a persistent "context anchor" — a core topic or overarching goal for the session. By externalizing the core purpose to a file and periodically reciting it, Manus maintains deep focus across long sessions (50+ tool calls) and prevents cognitive drift when handling tangential requests.
+Persistent attention anchoring for Manus sessions. Externalizes the core session purpose to `~/.context_anchor.md` and enforces periodic recitation to maintain deep focus across 50+ tool calls, preventing cognitive drift from tangential requests.
 
-## How It Works
+## Activation
 
-1. **Set**: You create an anchor file (`~/.context_anchor.md`) with the user's core topic.
-2. **Recite**: You re-read the anchor periodically to keep it in your active attention.
-3. **Check**: You verify if new tasks or user messages align with the anchor.
-4. **Update**: You evolve the anchor as the project progresses.
+Detect **explicit** triggers: user says "set anchor", "anchor this", "core topic is", "focus on".
+Detect **implicit** triggers: user frames session purpose with "today we're building X", "let's work on Y", "this project is about Z". Summarize the detected intent and confirm with the user before setting.
+
+On session start, check if `~/.context_anchor.md` exists. If it does, run `anchor.py show` immediately and recite the anchor to orient yourself.
 
 ## Quick Start
 
 ```bash
-# Set a basic anchor
-python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py set "Building a SaaS analytics dashboard"
-
-# Set a detailed anchor with objectives, boundaries, and success criteria
+# Set anchor with full context
 python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py set "Building a SaaS analytics dashboard" \
-  -o "Design database schema" "Build REST API" \
+  -o "Design database schema" "Build REST API" "Create React frontend" \
   -b "No mobile app" "No payment processing" \
-  -s "All CRUD endpoints work"
+  -s "All CRUD endpoints work" "Dashboard renders real-time metrics"
 
 # View current anchor
 python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py show
+
+# Check if a sub-task aligns with the anchor (AI-powered relevance scoring)
+python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py check "Should I add Stripe integration?"
 ```
 
-## Workflow: Maintaining Focus
+## Recitation Discipline
 
-Once an anchor is set, you MUST adopt the following attention patterns:
+This is the most critical behavior. You MUST enforce periodic recitation to keep the anchor in your active attention window.
 
-1. **Periodic Recitation**: Every 5-10 tool calls, run `python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py show` to refresh your memory of the core topic. Do this alongside checking your `todo.md` if one exists.
-2. **Pre-Task Check**: Before starting any major sub-task, mentally verify it serves the anchor. If unsure, run `python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py check "description of task"`.
-3. **Handling Tangents**: If the user asks for something outside the anchor's scope (e.g., asking about a recipe while building a web app):
-   - Acknowledge the divergence: "I notice this diverges from our core focus on [anchor topic]."
-   - Fulfill the user's request (the user always has final authority).
-   - Explicitly state your return to the core focus afterward.
+**Every 5-10 tool calls** (aim for ~7), run `anchor.py show` and mentally reaffirm: "My core focus is [anchor topic]." If a `todo.md` also exists, recite both together — anchor first (WHY), then todo (WHAT). If 10 tool calls elapse without recitation, force an immediate refresh.
 
-## Updating the Anchor
+On recitation failure (file missing or inaccessible), fall back to your last known anchor from memory. Log the failure silently and retry next interval. Notify the user only if the anchor file is persistently unavailable.
 
-As the project evolves, refine the anchor instead of clearing it:
+## Handling Tangential Requests
+
+When the user sends a request that diverges from the anchor:
+
+1. Run `anchor.py check "user's request"` if relevance is unclear.
+2. If the score is below 5/10 (divergent), acknowledge: "I notice this diverges from our core focus on [anchor topic]. I'll handle this, then return to the main thread."
+3. Fulfill the request completely — the user always has final authority over the anchor.
+4. After completing the tangent, explicitly restate the anchor: "Returning to our core focus: [anchor topic]."
+
+Never refuse a user request because of the anchor. The anchor is a guide, not a constraint.
+
+## Evolving the Anchor
+
+As projects progress, refine the anchor rather than clearing it:
 
 ```bash
 # Add a new objective
-python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py update --add-objective "Implement WebSocket support"
+python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py update --add-objective "Implement WebSocket for real-time updates"
 
-# Add a boundary (out of scope)
-python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py update --add-boundary "Skip user authentication for now"
+# Add a boundary
+python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py update --add-boundary "Skip authentication for MVP"
 
-# Refine the core topic (narrows focus)
+# Narrow focus to current phase
 python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py update --refine "Phase 2: Backend API development for the analytics dashboard"
 ```
 
-## Advanced Attention Patterns
+Confirm with the user before making anchor changes. Do not update more than once per 3 tool calls to prevent instability.
 
-For deep insights into why anchoring works and advanced drift-detection strategies, read:
-`/home/ubuntu/skills/context-anchor/references/attention_patterns.md`
+## Integration with todo.md
+
+The anchor and `todo.md` are complementary:
+
+| File | Purpose | Contains |
+|---|---|---|
+| `~/.context_anchor.md` | WHY — the overarching purpose | Core topic, objectives, boundaries, success criteria |
+| `todo.md` | WHAT — the specific tasks | Current tasks, progress, next steps |
+
+When both exist, recite them together during periodic recitation. On anchor changes, review `todo.md` to ensure task alignment with the updated purpose.
 
 ## Commands Reference
 
-- `set [topic] [-o objectives...] [-b boundaries...] [-s success...]`: Create/overwrite anchor
-- `show`: Display current anchor
-- `check [message]`: Score relevance of a message against the anchor
-- `update [--add-objective text] [--add-boundary text] [--refine text]`: Modify anchor
-- `history`: Show change log of the anchor
-- `clear`: Delete the anchor
+| Command | Usage |
+|---|---|
+| `set` | `anchor.py set "topic" [-o objectives...] [-b boundaries...] [-s success...]` |
+| `show` | `anchor.py show` |
+| `check` | `anchor.py check "message to evaluate"` |
+| `update` | `anchor.py update [--add-objective text] [--add-boundary text] [--refine text]` |
+| `history` | `anchor.py history` |
+| `clear` | `anchor.py clear` |
+
+## Advanced Patterns
+
+For deep insights into why anchoring works, recitation schedules by session length, drift detection patterns, multi-layer anchoring, and anchor conflict resolution, read: `/home/ubuntu/skills/context-anchor/references/attention_patterns.md`

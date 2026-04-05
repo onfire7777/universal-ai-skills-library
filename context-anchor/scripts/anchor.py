@@ -26,12 +26,16 @@ Usage:
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
 
 ANCHOR_FILE = os.path.expanduser("~/.context_anchor.md")
 HISTORY_FILE = os.path.expanduser("~/.context_anchor_history.json")
+
+# Model for AI-powered relevance checking (configurable via env var)
+ANCHOR_MODEL = os.environ.get("ANCHOR_MODEL", "gpt-4.1-nano")
 
 
 def _load_history():
@@ -91,6 +95,69 @@ def _write_anchor(content):
         return False
 
 
+def _strip_markdown(text):
+    """Strip markdown formatting from text for clean tokenization."""
+    return re.sub(r'[#*`\-|>_\[\]()]', ' ', text.lower())
+
+
+def _insert_into_section(content, section_header, new_item, numbered=False):
+    """Insert an item at the end of a markdown section, before the next ## heading.
+
+    Args:
+        content: Full document content
+        section_header: The ## header to find (e.g., "## Key Objectives")
+        new_item: The text to insert (without prefix)
+        numbered: If True, prefix with next number; if False, prefix with "- "
+
+    Returns:
+        Modified content string, or None if section not found
+    """
+    lines = content.split("\n")
+    new_lines = []
+    in_section = False
+    inserted = False
+    section_items = 0
+
+    for line in lines:
+        if line.strip() == section_header:
+            in_section = True
+            new_lines.append(line)
+            continue
+
+        if in_section and not inserted:
+            if line.startswith("##"):
+                # End of section — insert before next heading
+                if numbered:
+                    new_lines.append(f"{section_items + 1}. {new_item}")
+                else:
+                    new_lines.append(f"- {new_item}")
+                new_lines.append("")
+                new_lines.append(line)
+                inserted = True
+                in_section = False
+            else:
+                new_lines.append(line)
+                # Count items in this section only
+                stripped = line.strip()
+                if stripped:
+                    if numbered and stripped[0].isdigit() and ". " in stripped:
+                        section_items += 1
+                    elif not numbered and stripped.startswith("- "):
+                        section_items += 1
+        else:
+            new_lines.append(line)
+
+    # If section was the last one (no subsequent ##)
+    if in_section and not inserted:
+        if numbered:
+            new_lines.append(f"{section_items + 1}. {new_item}")
+        else:
+            new_lines.append(f"- {new_item}")
+        new_lines.append("")
+
+    return "\n".join(new_lines)
+
+
 def cmd_set(args):
     """Set the context anchor."""
     # Get the core topic
@@ -116,7 +183,7 @@ def cmd_set(args):
     lines = [
         "# Context Anchor",
         "",
-        f"**Set:** {timestamp}",
+        f"<!-- anchor-timestamp -->{timestamp}",
         "",
         "## Core Topic",
         "",
@@ -199,9 +266,9 @@ def cmd_check(args):
     if api_key:
         try:
             from openai import OpenAI
-            client = OpenAI()
+            client = OpenAI(timeout=15.0)
             response = client.chat.completions.create(
-                model="gpt-4.1-nano",
+                model=ANCHOR_MODEL,
                 messages=[
                     {"role": "system", "content": (
                         "You are a relevance checker. Given a context anchor (the core topic/purpose "
@@ -240,7 +307,7 @@ def cmd_check(args):
                 reasoning = result.get("reasoning", "")
                 recommendation = result.get("recommendation", "")
 
-                bar_filled = int(score)
+                bar_filled = min(10, max(0, int(score)))
                 bar_empty = 10 - bar_filled
                 bar = "█" * bar_filled + "░" * bar_empty
 
@@ -256,11 +323,18 @@ def cmd_check(args):
         except ImportError:
             print("Warning: openai package not available. Falling back to keyword check.", file=sys.stderr)
         except Exception as e:
-            print(f"Warning: AI check failed ({e}). Falling back to keyword check.", file=sys.stderr)
+            err_msg = str(e)
+            # Redact API keys from error messages
+            err_msg = re.sub(r'sk-[a-zA-Z0-9]{20,}', 'sk-***REDACTED***', err_msg)
+            print(f"Warning: AI check failed ({err_msg}). Falling back to keyword check.", file=sys.stderr)
 
-    # Fallback: simple keyword overlap check
-    anchor_words = set(content.lower().split())
-    message_words = set(message.lower().split())
+    # Fallback: keyword overlap check (relative to message size)
+    clean_anchor = _strip_markdown(content)
+    clean_message = _strip_markdown(message)
+
+    anchor_words = set(clean_anchor.split())
+    message_words = set(clean_message.split())
+
     # Remove common stop words
     stop_words = {"the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
                   "have", "has", "had", "do", "does", "did", "will", "would", "could",
@@ -271,18 +345,18 @@ def cmd_check(args):
                   "every", "all", "any", "few", "more", "most", "other", "some", "such",
                   "than", "too", "very", "just", "about", "up", "out", "if", "then",
                   "it", "its", "this", "that", "these", "those", "i", "me", "my", "we",
-                  "our", "you", "your", "he", "him", "his", "she", "her", "they", "them",
-                  "#", "##", "**", "-", ""}
+                  "our", "you", "your", "he", "him", "his", "she", "her", "they", "them"}
     anchor_keywords = anchor_words - stop_words
     message_keywords = message_words - stop_words
 
-    if not anchor_keywords:
+    # DBG-003 fix: measure overlap relative to message size, not anchor size
+    if not message_keywords:
         overlap_pct = 0
     else:
         overlap = anchor_keywords & message_keywords
-        overlap_pct = len(overlap) / max(len(anchor_keywords), 1) * 100
+        overlap_pct = len(overlap) / len(message_keywords) * 100
 
-    score = min(10, int(overlap_pct / 5))
+    score = min(10, int(overlap_pct / 10))
     if score >= 7:
         alignment = "aligned"
         recommendation = "proceed"
@@ -319,27 +393,9 @@ def cmd_update(args):
     if args.add_objective:
         obj_text = " ".join(args.add_objective)
         if "## Key Objectives" in content:
-            # Find the section and append
-            lines = content.split("\n")
-            new_lines = []
-            in_objectives = False
-            inserted = False
-            for line in lines:
-                new_lines.append(line)
-                if line.strip() == "## Key Objectives":
-                    in_objectives = True
-                elif in_objectives and not inserted:
-                    if line.strip() == "" or line.startswith("##"):
-                        # Count existing objectives
-                        obj_count = sum(1 for l in new_lines if l.strip() and l.strip()[0].isdigit() and ". " in l)
-                        new_lines.insert(-1, f"{obj_count + 1}. {obj_text}")
-                        inserted = True
-                        in_objectives = False
-            if not inserted:
-                # Append at end of objectives section
-                obj_count = sum(1 for l in new_lines if l.strip() and l.strip()[0].isdigit() and ". " in l)
-                new_lines.append(f"{obj_count + 1}. {obj_text}")
-            content = "\n".join(new_lines)
+            result = _insert_into_section(content, "## Key Objectives", obj_text, numbered=True)
+            if result:
+                content = result
         else:
             content += f"\n## Key Objectives\n\n1. {obj_text}\n"
         modified = True
@@ -348,22 +404,9 @@ def cmd_update(args):
     if args.add_boundary:
         boundary_text = " ".join(args.add_boundary)
         if "## Boundaries (Out of Scope)" in content:
-            lines = content.split("\n")
-            new_lines = []
-            in_boundaries = False
-            inserted = False
-            for line in lines:
-                new_lines.append(line)
-                if line.strip() == "## Boundaries (Out of Scope)":
-                    in_boundaries = True
-                elif in_boundaries and not inserted:
-                    if line.strip() == "" or line.startswith("##"):
-                        new_lines.insert(-1, f"- {boundary_text}")
-                        inserted = True
-                        in_boundaries = False
-            if not inserted:
-                new_lines.append(f"- {boundary_text}")
-            content = "\n".join(new_lines)
+            result = _insert_into_section(content, "## Boundaries (Out of Scope)", boundary_text, numbered=False)
+            if result:
+                content = result
         else:
             content += f"\n## Boundaries (Out of Scope)\n\n- {boundary_text}\n"
         modified = True
@@ -383,19 +426,19 @@ def cmd_update(args):
                 continue
             if in_core and not replaced:
                 if line.startswith("##"):
+                    # End of Core Topic section — insert new topic
                     new_lines.append("")
                     new_lines.append(new_topic)
                     new_lines.append("")
                     new_lines.append(line)
                     replaced = True
                     in_core = False
-                elif line.strip() == "":
-                    new_lines.append(line)
                 else:
-                    # Skip old topic content
+                    # Skip ALL old topic content (blank and non-blank)
                     continue
             else:
                 new_lines.append(line)
+        # If Core Topic was the last section
         if in_core and not replaced:
             new_lines.append("")
             new_lines.append(new_topic)
@@ -408,13 +451,20 @@ def cmd_update(args):
         print("No update flags provided. Use --add-objective, --add-boundary, or --refine.", file=sys.stderr)
         sys.exit(1)
 
-    # Update timestamp
+    # Update timestamp using unique marker
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    if "**Set:**" in content:
+    if "<!-- anchor-timestamp -->" in content:
+        content = re.sub(
+            r'<!-- anchor-timestamp -->.*',
+            f'<!-- anchor-timestamp -->{timestamp} (updated)',
+            content
+        )
+    elif "**Set:**" in content:
+        # Legacy format support
         lines = content.split("\n")
         for i, line in enumerate(lines):
             if line.startswith("**Set:**"):
-                lines[i] = f"**Set:** {timestamp} (updated)"
+                lines[i] = f"<!-- anchor-timestamp -->{timestamp} (updated)"
                 break
         content = "\n".join(lines)
 
