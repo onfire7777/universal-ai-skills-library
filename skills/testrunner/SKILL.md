@@ -1,9 +1,10 @@
 ---
 name: testrunner
 description: Handle flaky tests, crashing tests, hanging tests, out of memory tests, stack overflow tests, test isolation, test suite stability issues in .NET projects. Use when dotnet test hangs, crashes, produces OOM or stack overflow errors, or when the user has an unstable/flaky test suite. Do NOT use for normal test runs — only when standard dotnet test is insufficient.
-argument-hint: "[filter pattern or path]"
+license: Unspecified
+metadata:
+  argument-hint: '[filter pattern or path]'
 ---
-
 ## Prerequisites
 
 This tool requires .NET 10+ SDK (for `dnx` support).

@@ -1,20 +1,15 @@
 ---
 name: data-flow-mapping
-description: >-
-  Guides systematic mapping of international personal data flows across an
-  organisation. Covers system-by-system inventory methodology, third-party
-  identification, transfer mechanism assignment, gap analysis, and data flow
-  visualisation. Keywords: data flow mapping, international transfers, data
-  inventory, transfer register, cross-border data flows.
 license: Apache-2.0
+description: 'Guides systematic mapping of international personal data flows across an organisation. Covers system-by-system inventory methodology, third-party identification, transfer mechanism assignment, gap analysis, and data flow visualisation. Keywords: data flow mapping, international transfers, data inventory, transfer register, cross-border data flows.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: cross-border-transfers
-  tags: "data-flow-mapping, international-transfers, data-inventory, transfer-register, gap-analysis"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: cross-border-transfers
+    tags: data-flow-mapping, international-transfers, data-inventory, transfer-register, gap-analysis
 ---
-
 # Mapping International Data Flows
 
 ## Overview

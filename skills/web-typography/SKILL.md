@@ -1,12 +1,12 @@
 ---
 name: web-typography
-description: 'Select, pair, and implement typefaces for web projects. Use when the user mentions "font pairing", "which typeface", "line height", "responsive typography", "web font loading", or "type hierarchy". Covers readability evaluation, CSS implementation, and performance optimization. For overall UI design systems, see refactoring-ui. For dramatic typographic experiences, see top-design.'
 license: MIT
+description: Select, pair, and implement typefaces for web projects. Use when the user mentions "font pairing", "which typeface", "line height", "responsive typography", "web font loading", or "type hierarchy". Covers readability evaluation, CSS implementation, and performance optimization. For overall UI design systems, see refactoring-ui. For dramatic typographic experiences, see top-design.
 metadata:
-  author: wondelai
-  version: "1.1.1"
+  metadata:
+    author: wondelai
+    version: 1.1.1
 ---
-
 # Web Typography
 
 A practical guide to choosing, pairing, and implementing typefaces for the web. Typography serves communication — the best typography is invisible, immersing readers in content rather than calling attention to itself.

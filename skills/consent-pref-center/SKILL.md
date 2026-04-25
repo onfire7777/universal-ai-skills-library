@@ -1,19 +1,15 @@
 ---
 name: consent-pref-center
-description: >-
-  Technical architecture guide for building a multi-purpose consent preference center.
-  Covers per-purpose granularity, easy withdrawal under Article 7(3), version history,
-  audit trails, and IAB Transparency and Consent Framework v2.2 integration.
-  Includes database schema, API design, and UI component specifications.
 license: Apache-2.0
+description: Technical architecture guide for building a multi-purpose consent preference center. Covers per-purpose granularity, easy withdrawal under Article 7(3), version history, audit trails, and IAB Transparency and Consent Framework v2.2 integration. Includes database schema, API design, and UI component specifications.
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: consent-management
-  tags: "consent-preference-center, tcf-v2, consent-management, audit-trail, consent-ui"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: consent-management
+    tags: consent-preference-center, tcf-v2, consent-management, audit-trail, consent-ui
 ---
-
 # Building a Consent Preference Center
 
 ## Overview

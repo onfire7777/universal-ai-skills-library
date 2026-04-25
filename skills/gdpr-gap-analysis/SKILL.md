@@ -1,16 +1,15 @@
 ---
 name: gdpr-gap-analysis
-description: >-
-  Guides systematic assessment of current state versus GDPR requirements across all chapters with prioritised remediation matrix. Activate when starting compliance programmes or conducting periodic reassessment. Keywords: gap analysis, compliance assessment, remediation matrix, GDPR readiness.
 license: Apache-2.0
+description: 'Guides systematic assessment of current state versus GDPR requirements across all chapters with prioritised remediation matrix. Activate when starting compliance programmes or conducting periodic reassessment. Keywords: gap analysis, compliance assessment, remediation matrix, GDPR readiness.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: gdpr-compliance
-  tags: "gdpr, gap-analysis, compliance-assessment, remediation, readiness, maturity"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: gdpr-compliance
+    tags: gdpr, gap-analysis, compliance-assessment, remediation, readiness, maturity
 ---
-
 # Conducting GDPR Compliance Gap Analysis
 
 ## Overview

@@ -1,9 +1,10 @@
 ---
 name: distinctive-design-systems
-model: reasoning
 description: Patterns for creating design systems with personality and distinctive aesthetics. Covers aesthetic documentation, color token architecture, typography systems, layered surfaces, and motion. Use when building design systems that go beyond generic templates. Triggers on design system, design tokens, aesthetic, color palette, typography, CSS variables, tailwind config.
+license: Unspecified
+metadata:
+  model: reasoning
 ---
-
 # Distinctive Design Systems
 
 Create design systems with personality that users remember. Move beyond generic templates to build cohesive, emotionally resonant visual languages.

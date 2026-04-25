@@ -1,0 +1,401 @@
+{
+  "src": "%USERPROFILE%\\projects\\manus-skills-library\\skills",
+  "out": "C:\\tmp\\skills-pipeline\\cleaned\\skills",
+  "input_folders": 849,
+  "parsed_ok": 846,
+  "dropped_missing_skill_md": [
+    "excalidraw-diagram",
+    "mlevison-systems-thinking",
+    "socratic-architect"
+  ],
+  "dropped_no_frontmatter": [],
+  "dropped_unparseable": [],
+  "dropped_missing_name": [],
+  "dropped_missing_description": [],
+  "dropped_empty_body": [],
+  "repaired_yaml": [
+    "davila-motion-canvas"
+  ],
+  "duplicate_drops": [
+    {
+      "folder": "implementing-aes-encryption-for-data-at-rest",
+      "kept_folder": "aes-encryption",
+      "reason": "duplicate name 'implementing-aes-encryption-for-data-at-rest'"
+    },
+    {
+      "folder": "AI Expertise Engine",
+      "kept_folder": "ai-expertise-engine",
+      "reason": "duplicate name 'ai-expertise-engine'"
+    },
+    {
+      "folder": "alirezarezvani-ui-design-system",
+      "kept_folder": "ui-design-system",
+      "reason": "duplicate name 'ui-design-system'"
+    },
+    {
+      "folder": "implementing-api-gateway-security-controls",
+      "kept_folder": "api-gateway-security",
+      "reason": "duplicate name 'implementing-api-gateway-security-controls'"
+    },
+    {
+      "folder": "implementing-api-rate-limiting-and-throttling",
+      "kept_folder": "api-rate-limiting",
+      "reason": "duplicate name 'implementing-api-rate-limiting-and-throttling'"
+    },
+    {
+      "folder": "implementing-api-security-posture-management",
+      "kept_folder": "api-security-posture",
+      "reason": "duplicate name 'implementing-api-security-posture-management'"
+    },
+    {
+      "folder": "conducting-api-security-testing",
+      "kept_folder": "api-security-testing",
+      "reason": "duplicate name 'conducting-api-security-testing'"
+    },
+    {
+      "folder": "asynkron-cloc",
+      "kept_folder": "cloc",
+      "reason": "duplicate name 'cloc'"
+    },
+    {
+      "folder": "asynkron-pre-pr",
+      "kept_folder": "pre-pr",
+      "reason": "duplicate name 'pre-pr'"
+    },
+    {
+      "folder": "asynkron-profile",
+      "kept_folder": "profile",
+      "reason": "duplicate name 'profile'"
+    },
+    {
+      "folder": "asynkron-quickdup",
+      "kept_folder": "quickdup",
+      "reason": "duplicate name 'quickdup'"
+    },
+    {
+      "folder": "asynkron-systematic-debug",
+      "kept_folder": "systematic-debug",
+      "reason": "duplicate name 'systematic-debug'"
+    },
+    {
+      "folder": "asynkron-testrunner",
+      "kept_folder": "testrunner",
+      "reason": "duplicate name 'testrunner'"
+    },
+    {
+      "folder": "asynkron-uxly",
+      "kept_folder": "uxly",
+      "reason": "duplicate name 'uxly'"
+    },
+    {
+      "folder": "implementing-attack-surface-management",
+      "kept_folder": "attack-surface-management",
+      "reason": "duplicate name 'implementing-attack-surface-management'"
+    },
+    {
+      "folder": "implementing-aws-iam-permission-boundaries",
+      "kept_folder": "aws-iam-boundaries",
+      "reason": "duplicate name 'implementing-aws-iam-permission-boundaries'"
+    },
+    {
+      "folder": "implementing-aws-security-hub-compliance",
+      "kept_folder": "aws-security-hub",
+      "reason": "duplicate name 'implementing-aws-security-hub-compliance'"
+    },
+    {
+      "folder": "implementing-azure-ad-privileged-identity-management",
+      "kept_folder": "azure-ad-pim",
+      "reason": "duplicate name 'implementing-azure-ad-privileged-identity-management'"
+    },
+    {
+      "folder": "research-paper-review",
+      "kept_folder": "besser-paper-review",
+      "reason": "duplicate name 'research-paper-review'"
+    },
+    {
+      "folder": "implementing-beyondcorp-zero-trust-access-model",
+      "kept_folder": "beyondcorp-zero-trust",
+      "reason": "duplicate name 'implementing-beyondcorp-zero-trust-access-model'"
+    },
+    {
+      "folder": "commandcode-brainstorming",
+      "kept_folder": "brainstorming",
+      "reason": "duplicate name 'brainstorming'"
+    },
+    {
+      "folder": "composio-canvas-design",
+      "kept_folder": "canvas-design",
+      "reason": "duplicate name 'canvas-design'"
+    },
+    {
+      "folder": "davila-mobile-design",
+      "kept_folder": "mobile-design",
+      "reason": "duplicate name 'mobile-design'"
+    },
+    {
+      "folder": "davila-n8n-code-javascript",
+      "kept_folder": "n8n-code-javascript",
+      "reason": "duplicate name 'n8n-code-javascript'"
+    },
+    {
+      "folder": "davila-n8n-code-python",
+      "kept_folder": "n8n-code-python",
+      "reason": "duplicate name 'n8n-code-python'"
+    },
+    {
+      "folder": "davila-n8n-expression-syntax",
+      "kept_folder": "n8n-expression-syntax",
+      "reason": "duplicate name 'n8n-expression-syntax'"
+    },
+    {
+      "folder": "davila-n8n-mcp-tools-expert",
+      "kept_folder": "n8n-mcp-tools-expert",
+      "reason": "duplicate name 'n8n-mcp-tools-expert'"
+    },
+    {
+      "folder": "davila-n8n-node-configuration",
+      "kept_folder": "n8n-node-configuration",
+      "reason": "duplicate name 'n8n-node-configuration'"
+    },
+    {
+      "folder": "davila-n8n-validation-expert",
+      "kept_folder": "n8n-validation-expert",
+      "reason": "duplicate name 'n8n-validation-expert'"
+    },
+    {
+      "folder": "davila-n8n-workflow-patterns",
+      "kept_folder": "n8n-workflow-patterns",
+      "reason": "duplicate name 'n8n-workflow-patterns'"
+    },
+    {
+      "folder": "Network 101",
+      "kept_folder": "davila-network-101",
+      "reason": "duplicate name 'network-101'"
+    },
+    {
+      "folder": "davila-planning-with-files",
+      "kept_folder": "planning-with-files",
+      "reason": "duplicate name 'planning-with-files'"
+    },
+    {
+      "folder": "davila-prompt-engineering",
+      "kept_folder": "prompt-engineering",
+      "reason": "duplicate name 'prompt-engineering'"
+    },
+    {
+      "folder": "davila-roier-seo",
+      "kept_folder": "roier-seo",
+      "reason": "duplicate name 'roier-seo'"
+    },
+    {
+      "folder": "davila-scientific-brainstorming",
+      "kept_folder": "scientific-brainstorming",
+      "reason": "duplicate name 'scientific-brainstorming'"
+    },
+    {
+      "folder": "davila-scrape",
+      "kept_folder": "scrape",
+      "reason": "duplicate name 'scrape'"
+    },
+    {
+      "folder": "davila-scroll-experience",
+      "kept_folder": "scroll-experience",
+      "reason": "duplicate name 'scroll-experience'"
+    },
+    {
+      "folder": "davila-search",
+      "kept_folder": "search",
+      "reason": "duplicate name 'search'"
+    },
+    {
+      "folder": "davila-segment-cdp",
+      "kept_folder": "segment-cdp",
+      "reason": "duplicate name 'segment-cdp'"
+    },
+    {
+      "folder": "davila-shopify-development",
+      "kept_folder": "shopify-development",
+      "reason": "duplicate name 'shopify-development'"
+    },
+    {
+      "folder": "davila-skill-judge",
+      "kept_folder": "skill-judge",
+      "reason": "duplicate name 'skill-judge'"
+    },
+    {
+      "folder": "davila-slack-bot-builder",
+      "kept_folder": "slack-bot-builder",
+      "reason": "duplicate name 'slack-bot-builder'"
+    },
+    {
+      "folder": "SMTP Penetration Testing",
+      "kept_folder": "davila-smtp-penetration-testing",
+      "reason": "duplicate name 'smtp-penetration-testing'"
+    },
+    {
+      "folder": "davila-software-architecture",
+      "kept_folder": "software-architecture",
+      "reason": "duplicate name 'software-architecture'"
+    },
+    {
+      "folder": "davila-subagent-driven-development",
+      "kept_folder": "subagent-driven-development",
+      "reason": "duplicate name 'subagent-driven-development'"
+    },
+    {
+      "folder": "davila-systematic-debugging",
+      "kept_folder": "systematic-debugging",
+      "reason": "duplicate name 'systematic-debugging'"
+    },
+    {
+      "folder": "davila-vulnerability-scanner",
+      "kept_folder": "vulnerability-scanner",
+      "reason": "duplicate name 'vulnerability-scanner'"
+    },
+    {
+      "folder": "develop-web-game",
+      "kept_folder": "davila-web-game",
+      "reason": "duplicate name 'develop-web-game'"
+    },
+    {
+      "folder": "davila-web-performance-optimization",
+      "kept_folder": "web-performance-optimization",
+      "reason": "duplicate name 'web-performance-optimization'"
+    },
+    {
+      "folder": "davila-web-quality-audit",
+      "kept_folder": "web-quality-audit",
+      "reason": "duplicate name 'web-quality-audit'"
+    },
+    {
+      "folder": "osmani-web-quality-audit",
+      "kept_folder": "web-quality-audit",
+      "reason": "duplicate name 'web-quality-audit'"
+    },
+    {
+      "folder": "davila-webapp-testing",
+      "kept_folder": "webapp-testing",
+      "reason": "duplicate name 'webapp-testing'"
+    },
+    {
+      "folder": "Windows Privilege Escalation",
+      "kept_folder": "davila-windows-privilege-escalation",
+      "reason": "duplicate name 'windows-privilege-escalation'"
+    },
+    {
+      "folder": "Wireshark Network Traffic Analysis",
+      "kept_folder": "davila-wireshark-analysis",
+      "reason": "duplicate name 'wireshark-network-traffic-analysis'"
+    },
+    {
+      "folder": "davila-workflow-automation",
+      "kept_folder": "workflow-automation",
+      "reason": "duplicate name 'workflow-automation'"
+    },
+    {
+      "folder": "davila-writing-clearly-and-concisely",
+      "kept_folder": "davila-writing-clearly",
+      "reason": "duplicate name 'writing-clearly-and-concisely'"
+    },
+    {
+      "folder": "writing-clearly-and-concisely",
+      "kept_folder": "davila-writing-clearly",
+      "reason": "duplicate name 'writing-clearly-and-concisely'"
+    },
+    {
+      "folder": "Writing Hookify Rules",
+      "kept_folder": "davila-writing-rules",
+      "reason": "duplicate name 'writing-hookify-rules'"
+    },
+    {
+      "folder": "davila-xlsx-official",
+      "kept_folder": "xlsx",
+      "reason": "duplicate name 'xlsx'"
+    },
+    {
+      "folder": "davila-yeet",
+      "kept_folder": "yeet",
+      "reason": "duplicate name 'yeet'"
+    },
+    {
+      "folder": "davila-zapier-make-patterns",
+      "kept_folder": "zapier-make-patterns",
+      "reason": "duplicate name 'zapier-make-patterns'"
+    },
+    {
+      "folder": "implementing-ddos-mitigation-with-cloudflare",
+      "kept_folder": "ddos-mitigation",
+      "reason": "duplicate name 'implementing-ddos-mitigation-with-cloudflare'"
+    },
+    {
+      "folder": "Deep Research & Scholarly Analysis Engine",
+      "kept_folder": "deep-research-scholarly-engine",
+      "reason": "duplicate name 'deep-research-scholarly-analysis-engine'"
+    },
+    {
+      "folder": "frontend-design-guidelines",
+      "kept_folder": "frontend-design",
+      "reason": "duplicate name 'frontend-design'"
+    },
+    {
+      "folder": "wondelai-high-perf-browser",
+      "kept_folder": "high-perf-browser",
+      "reason": "duplicate name 'high-perf-browser'"
+    },
+    {
+      "folder": "lyn-focus-timeboxing",
+      "kept_folder": "lyn-focus-8020",
+      "reason": "duplicate name 'focus-timeboxing-8020'"
+    },
+    {
+      "folder": "lyn-negotiation-governance",
+      "kept_folder": "lyn-negotiation-alignment",
+      "reason": "duplicate name 'negotiation-alignment-governance'"
+    },
+    {
+      "folder": "lyn-portfolio-roadmapping",
+      "kept_folder": "lyn-portfolio-bets",
+      "reason": "duplicate name 'portfolio-roadmapping-bets'"
+    },
+    {
+      "folder": "lyn-project-risk-register",
+      "kept_folder": "lyn-risk-register",
+      "reason": "duplicate name 'project-risk-register'"
+    },
+    {
+      "folder": "mblode-ui-design",
+      "kept_folder": "wpank-ui-design",
+      "reason": "duplicate name 'ui-design'"
+    },
+    {
+      "folder": "osmani-core-web-vitals",
+      "kept_folder": "tlc-core-web-vitals",
+      "reason": "duplicate name 'core-web-vitals'"
+    },
+    {
+      "folder": "wpank-responsive-design",
+      "kept_folder": "responsive-design",
+      "reason": "duplicate name 'responsive-design'"
+    },
+    {
+      "folder": "semgrep-official",
+      "kept_folder": "tob-semgrep",
+      "reason": "duplicate name 'semgrep'"
+    }
+  ],
+  "final_count": 773,
+  "copy_errors": [
+    {
+      "folder": "ui-ux-pro-max",
+      "child": "%USERPROFILE%\\projects\\manus-skills-library\\skills\\ui-ux-pro-max\\data",
+      "error": "dead symlink \u2014 skipped (target does not exist)",
+      "kind": "dead_symlink"
+    },
+    {
+      "folder": "ui-ux-pro-max",
+      "child": "%USERPROFILE%\\projects\\manus-skills-library\\skills\\ui-ux-pro-max\\scripts",
+      "error": "dead symlink \u2014 skipped (target does not exist)",
+      "kind": "dead_symlink"
+    }
+  ]
+}

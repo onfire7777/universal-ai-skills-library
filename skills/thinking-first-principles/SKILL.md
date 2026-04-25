@@ -1,8 +1,8 @@
 ---
 name: thinking-first-principles
 description: Break complex problems into fundamental truths by questioning assumptions and rebuilding from irreducible components. Use for innovation, challenging status quo, or when conventional solutions fail.
+license: Unspecified
 ---
-
 # First Principles Reasoning
 
 ## Overview

@@ -1,22 +1,15 @@
 ---
 name: breach-forensics
-description: >-
-  Conducts digital forensics investigations following a personal data breach,
-  covering evidence preservation, chain of custody documentation, log analysis,
-  scope determination, and root cause analysis. References industry-standard
-  tools including Splunk, ELK Stack, and Wireshark. Provides forensic workflow
-  from initial evidence collection through final investigation report. Keywords:
-  digital forensics, breach investigation, evidence preservation, chain of
-  custody, root cause analysis, Splunk, ELK, Wireshark.
 license: Apache-2.0
+description: 'Conducts digital forensics investigations following a personal data breach, covering evidence preservation, chain of custody documentation, log analysis, scope determination, and root cause analysis. References industry-standard tools including Splunk, ELK Stack, and Wireshark. Provides forensic workflow from initial evidence collection through final investigation report. Keywords: digital forensics, breach investigation, evidence preservation, chain of custody, root cause analysis, Splunk, ELK, Wireshark.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: data-breach-response
-  tags: "digital-forensics, breach-investigation, evidence-preservation, chain-of-custody, root-cause"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: data-breach-response
+    tags: digital-forensics, breach-investigation, evidence-preservation, chain-of-custody, root-cause
 ---
-
 # Conducting Breach Investigation Forensics
 
 ## Overview

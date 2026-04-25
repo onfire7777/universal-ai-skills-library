@@ -1,22 +1,8 @@
 ---
 name: typescript-clean-code
-description: |
-  Clean Code principles, professional practices, and workflows for TypeScript developers. Based on Robert C. Martin's "Clean Code" and "The Clean Coder" books.
-
-  IMPORTANT: When this skill is active, always load and consult the reference files (rules.md, examples.md) before giving advice or writing code. Reference content takes precedence over general knowledge.
-
-  Use this skill when:
-  - Writing TypeScript/JavaScript code
-  - Reviewing code or pull requests
-  - Refactoring existing code
-  - Following test-driven development (TDD)
-  - Fixing bugs with proper test coverage
-  - Planning test strategy for features
-  - Estimating tasks accurately
-  - Handling deadlines and commitments professionally
-  - Working effectively with teams
+description: 'Clean Code principles, professional practices, and workflows for TypeScript developers. Based on Robert C. Martin''s "Clean Code" and "The Clean Coder" books. IMPORTANT: When this skill is active, always load and consult the reference files (rules.md, examples.md) before giving advice or writing code. Reference content takes precedence over general knowledge. Use this skill when: - Writing TypeScript/JavaScript code - Reviewing code or pull requests - Refactoring existing code - Following test-driven development (TDD) - Fixing bugs with proper test coverage - Planning test strategy for features - Estimating tasks accurately - Handling deadlines and commitments professionally - Working effectively with teams'
+license: Unspecified
 ---
-
 # Clean Code
 
 Principles, practices, and workflows for TypeScript developers.

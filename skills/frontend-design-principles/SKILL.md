@@ -1,8 +1,8 @@
 ---
 name: frontend-design-principles
 description: Create polished, intentional frontend interfaces. Use this skill when building any UI — dashboards, admin panels, landing pages, marketing sites, or web applications. Routes to specialized guidance based on context.
+license: Unspecified
 ---
-
 # Frontend Design Principles
 
 Build frontend interfaces with craft and intention.

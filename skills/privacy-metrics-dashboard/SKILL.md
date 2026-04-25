@@ -1,19 +1,15 @@
 ---
 name: privacy-metrics-dashboard
-description: >-
-  Build privacy KPI dashboards tracking DSAR volume and response time, breach
-  count and severity, DPIA completion rate, training coverage, and consent rates.
-  Includes metric definitions, data collection patterns, visualization designs,
-  and executive reporting templates for privacy program measurement.
 license: Apache-2.0
+description: Build privacy KPI dashboards tracking DSAR volume and response time, breach count and severity, DPIA completion rate, training coverage, and consent rates. Includes metric definitions, data collection patterns, visualization designs, and executive reporting templates for privacy program measurement.
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: privacy-engineering
-  tags: "privacy-metrics, kpi-dashboard, dsar-tracking, breach-metrics, privacy-reporting"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: privacy-engineering
+    tags: privacy-metrics, kpi-dashboard, dsar-tracking, breach-metrics, privacy-reporting
 ---
-
 # Privacy Metrics Dashboard
 
 ## Overview

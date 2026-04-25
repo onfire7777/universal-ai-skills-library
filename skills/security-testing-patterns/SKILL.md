@@ -1,8 +1,8 @@
 ---
 name: security-testing-patterns
 description: Security testing patterns including SAST, DAST, penetration testing, and vulnerability assessment techniques. Use when implementing security testing pipelines, conducting security audits, or validating application security controls.
+license: Unspecified
 ---
-
 # Security Testing Patterns
 
 Expert guidance for implementing comprehensive security testing strategies including static analysis, dynamic testing, penetration testing, and vulnerability assessment.

@@ -1,10 +1,11 @@
 ---
 name: uxly
 description: Scan web pages for UI consistency issues — misalignment, bad contrast, near-miss colors, inconsistent spacing, and more. Requires Chrome DevTools MCP. Use when the user asks to "check the UI", "scan for design issues", "run UXly", or "audit the page".
-disable-model-invocation: true
-argument-hint: "[URL to scan, or 'all' to scan multiple pages]"
+license: Unspecified
+metadata:
+  disable-model-invocation: true
+  argument-hint: '[URL to scan, or ''all'' to scan multiple pages]'
 ---
-
 ## Prerequisites
 
 This skill requires:

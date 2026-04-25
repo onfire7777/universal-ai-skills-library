@@ -1,19 +1,15 @@
 ---
 name: linddun-threat-model
-description: >-
-  Conduct LINDDUN privacy threat modeling across all seven categories: Linking,
-  Identifying, Non-repudiation, Detecting, Data Disclosure, Unawareness, and
-  Non-compliance. Includes DFD-based analysis, threat trees, privacy-specific
-  mitigation strategies, and integration with STRIDE security threat modeling.
 license: Apache-2.0
+description: 'Conduct LINDDUN privacy threat modeling across all seven categories: Linking, Identifying, Non-repudiation, Detecting, Data Disclosure, Unawareness, and Non-compliance. Includes DFD-based analysis, threat trees, privacy-specific mitigation strategies, and integration with STRIDE security threat modeling.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: privacy-engineering
-  tags: "linddun, threat-modeling, privacy-threats, dfd-analysis, privacy-mitigation"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: privacy-engineering
+    tags: linddun, threat-modeling, privacy-threats, dfd-analysis, privacy-mitigation
 ---
-
 # LINDDUN Privacy Threat Modeling
 
 ## Overview

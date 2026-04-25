@@ -1,19 +1,15 @@
 ---
 name: bcr-establishment
-description: >-
-  Guides development and approval of Binding Corporate Rules under GDPR Article 47
-  for intra-group international data transfers. Covers Art. 47(2)(a)-(n) content
-  requirements, BCR approval process with lead supervisory authority, and WP256/WP257
-  referentials. Keywords: BCR, binding corporate rules, intra-group transfers, Art. 47.
 license: Apache-2.0
+description: 'Guides development and approval of Binding Corporate Rules under GDPR Article 47 for intra-group international data transfers. Covers Art. 47(2)(a)-(n) content requirements, BCR approval process with lead supervisory authority, and WP256/WP257 referentials. Keywords: BCR, binding corporate rules, intra-group transfers, Art. 47.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: cross-border-transfers
-  tags: "bcr, binding-corporate-rules, article-47, intra-group-transfers, gdpr-chapter-5"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: cross-border-transfers
+    tags: bcr, binding-corporate-rules, article-47, intra-group-transfers, gdpr-chapter-5
 ---
-
 # Establishing Binding Corporate Rules
 
 ## Overview

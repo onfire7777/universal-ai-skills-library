@@ -1,9 +1,10 @@
 ---
-name: "yeet"
-description: "Use only when the user explicitly asks to stage, commit, push, and open a GitHub pull request in one flow using the GitHub CLI (`gh`)."
-author: openai
+name: yeet
+description: Use only when the user explicitly asks to stage, commit, push, and open a GitHub pull request in one flow using the GitHub CLI (`gh`).
+license: Unspecified
+metadata:
+  author: openai
 ---
-
 ## Prerequisites
 
 - Require GitHub CLI `gh`. Check `gh --version`. If missing, ask the user to install `gh` and stop.

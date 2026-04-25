@@ -1,8 +1,8 @@
 ---
 name: similarweb-analytics
-description: "Analyze websites and domains using SimilarWeb traffic data. Get traffic metrics, engagement stats, global rankings, traffic sources, and geographic distribution for comprehensive website research."
+description: Analyze websites and domains using SimilarWeb traffic data. Get traffic metrics, engagement stats, global rankings, traffic sources, and geographic distribution for comprehensive website research.
+license: Unspecified
 ---
-
 # SimilarWeb Analytics
 
 Comprehensive website and domain analysis using SimilarWeb traffic data.

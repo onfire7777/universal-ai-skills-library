@@ -1,19 +1,15 @@
 ---
 name: privacy-api-design
-description: >-
-  Design privacy API patterns including data subject API for DSAR endpoints,
-  consent API for preference management, deletion API with cascading delete
-  orchestration, and audit API for compliance reporting. Provides OpenAPI
-  specifications, error handling, rate limiting, and authentication patterns.
 license: Apache-2.0
+description: Design privacy API patterns including data subject API for DSAR endpoints, consent API for preference management, deletion API with cascading delete orchestration, and audit API for compliance reporting. Provides OpenAPI specifications, error handling, rate limiting, and authentication patterns.
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: privacy-engineering
-  tags: "privacy-api, dsar-api, consent-api, deletion-api, openapi-specification"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: privacy-engineering
+    tags: privacy-api, dsar-api, consent-api, deletion-api, openapi-specification
 ---
-
 # Privacy API Design Patterns
 
 ## Overview

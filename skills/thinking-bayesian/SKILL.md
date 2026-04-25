@@ -1,8 +1,8 @@
 ---
 name: thinking-bayesian
 description: Update beliefs systematically based on new evidence using probabilistic reasoning. Use when estimating probabilities, learning from data, or making decisions under uncertainty.
+license: Unspecified
 ---
-
 # Bayesian Reasoning
 
 ## Overview

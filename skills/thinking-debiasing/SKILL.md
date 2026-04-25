@@ -1,8 +1,8 @@
 ---
 name: thinking-debiasing
 description: Systematic checklist to identify and counteract cognitive biases in decision-making. Use before major decisions, when evaluating recommendations, or when stakes are high.
+license: Unspecified
 ---
-
 # Cognitive Debiasing
 
 ## Overview

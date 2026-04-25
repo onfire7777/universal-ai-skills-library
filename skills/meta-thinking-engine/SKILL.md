@@ -1,14 +1,8 @@
 ---
 name: meta-thinking-engine
-description: >
-  A comprehensive metacognition and meta-thinking skill for monitoring, evaluating, and
-  improving one's own thinking processes in real-time. Use when approaching complex problems,
-  when reasoning quality matters, when you need to check for blind spots, when calibrating
-  confidence, or when the user asks for careful/rigorous/thorough thinking. Combines
-  metacognitive monitoring, epistemic humility, cognitive calibration, thinking audits,
-  and self-correction protocols.
+description: A comprehensive metacognition and meta-thinking skill for monitoring, evaluating, and improving one's own thinking processes in real-time. Use when approaching complex problems, when reasoning quality matters, when you need to check for blind spots, when calibrating confidence, or when the user asks for careful/rigorous/thorough thinking. Combines metacognitive monitoring, epistemic humility, cognitive calibration, thinking audits, and self-correction protocols.
+license: Unspecified
 ---
-
 # Meta-Thinking Engine
 
 ## Purpose

@@ -1,19 +1,15 @@
 ---
 name: brazil-lgpd
-description: >-
-  Guides compliance with Brazil's Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018).
-  Covers the 10 lawful bases under Art. 7, DPO appointment, ANPD enforcement, data subject
-  rights under Arts. 17-22, and international transfer mechanisms. Keywords: LGPD, Brazil
-  data protection, ANPD, lawful bases, data subject rights, international transfers.
 license: Apache-2.0
+description: 'Guides compliance with Brazil''s Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018). Covers the 10 lawful bases under Art. 7, DPO appointment, ANPD enforcement, data subject rights under Arts. 17-22, and international transfer mechanisms. Keywords: LGPD, Brazil data protection, ANPD, lawful bases, data subject rights, international transfers.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: global-privacy-regulations
-  tags: "lgpd, brazil-data-protection, anpd, lawful-bases, international-transfers"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: global-privacy-regulations
+    tags: lgpd, brazil-data-protection, anpd, lawful-bases, international-transfers
 ---
-
 # Brazil LGPD Compliance (Lei 13.709/2018)
 
 ## Overview

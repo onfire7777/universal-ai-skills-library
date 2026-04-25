@@ -1,8 +1,8 @@
 ---
 name: n8n-code-python
 description: Write Python code in n8n Code nodes. Use when writing Python in n8n, using _input/_json/_node syntax, working with standard library, or need to understand Python limitations in n8n Code nodes.
+license: Unspecified
 ---
-
 # Python Code Node (Beta)
 
 Expert guidance for writing Python code in n8n Code nodes.

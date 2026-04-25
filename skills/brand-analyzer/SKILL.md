@@ -1,8 +1,8 @@
 ---
 name: brand-analyzer
 description: This skill should be used when the user requests brand analysis, brand guidelines creation, brand audits, or establishing brand identity and consistency standards. It provides comprehensive frameworks for analyzing brand elements and creating actionable brand guidelines based on requirements.
+license: Unspecified
 ---
-
 # Brand Analyzer
 
 ## Overview

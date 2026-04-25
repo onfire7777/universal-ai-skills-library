@@ -1,8 +1,8 @@
 ---
 name: thinking-second-order
 description: Think beyond immediate consequences to second and third-order effects. Use for strategic decisions, policy changes, and avoiding unintended consequences.
+license: Unspecified
 ---
-
 # Second-Order Thinking
 
 ## Overview

@@ -1,26 +1,27 @@
 ---
 name: openclaw-color-palette
-version: 2.0.0
-description: "Design-grade color processing suite — generate harmonious palettes from any seed color, check WCAG 2.1 AA/AAA contrast accessibility, convert between hex/RGB/HSL/HSV/CMYK, simulate 8 color blindness types, and extract dominant colors from images. Use when: (1) user says 'generate a color palette' or 'give me a color scheme for my website', (2) user asks 'check contrast' or 'is this readable' or 'WCAG accessibility', (3) user needs to 'convert hex to RGB' or 'what is #FF5733 in HSL', (4) user wants to 'simulate color blindness' or 'how do colorblind users see this', (5) user requests 'extract colors from image' or 'pull brand colors from this logo'. 6 harmony algorithms, 140 CSS named colors, k-means clustering. Zero install, sub-100ms on Cloudflare Workers. Free + Pro $9/mo."
-read_when:
-  - "User asks to generate a color palette, color scheme, or harmonious colors for a project"
-  - "User needs to check text/background contrast ratio or WCAG accessibility compliance"
-  - "User wants to convert a color between formats: hex, RGB, HSL, HSV, CMYK, or CSS named colors"
-  - "User asks how colors appear to colorblind users or wants a color blindness simulation"
-  - "User wants to extract dominant colors from an image, logo, or screenshot"
-commands:
+description: 'Design-grade color processing suite — generate harmonious palettes from any seed color, check WCAG 2.1 AA/AAA contrast accessibility, convert between hex/RGB/HSL/HSV/CMYK, simulate 8 color blindness types, and extract dominant colors from images. Use when: (1) user says ''generate a color palette'' or ''give me a color scheme for my website'', (2) user asks ''check contrast'' or ''is this readable'' or ''WCAG accessibility'', (3) user needs to ''convert hex to RGB'' or ''what is #FF5733 in HSL'', (4) user wants to ''simulate color blindness'' or ''how do colorblind users see this'', (5) user requests ''extract colors from image'' or ''pull brand colors from this logo''. 6 harmony algorithms, 140 CSS named colors, k-means clustering. Zero install, sub-100ms on Cloudflare Workers. Free + Pro $9/mo.'
+license: Unspecified
+metadata:
+  version: 2.0.0
+  read_when:
+  - User asks to generate a color palette, color scheme, or harmonious colors for a project
+  - User needs to check text/background contrast ratio or WCAG accessibility compliance
+  - 'User wants to convert a color between formats: hex, RGB, HSL, HSV, CMYK, or CSS named colors'
+  - User asks how colors appear to colorblind users or wants a color blindness simulation
+  - User wants to extract dominant colors from an image, logo, or screenshot
+  commands:
   - generate_palette
   - check_contrast
   - convert_color
   - color_blindness_sim
   - extract_palette
-metadata:
-  openclaw:
-    emoji: "\U0001F3A8"
-    homepage: https://github.com/yedanyagamiai-cmd/openclaw-mcp-servers
-    always: false
+  metadata:
+    openclaw:
+      emoji: 🎨
+      homepage: https://github.com/yedanyagamiai-cmd/openclaw-mcp-servers
+      always: false
 ---
-
 # OpenClaw Color Palette v2.0
 
 **Design-grade color tools -- 5 tools for palettes, accessibility, conversion, simulation, and extraction.**

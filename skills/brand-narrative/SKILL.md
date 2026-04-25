@@ -1,8 +1,8 @@
 ---
 name: brand-narrative
-description: "Extract brand tone and generate multi-version brand narratives and naming proposals"
+description: Extract brand tone and generate multi-version brand narratives and naming proposals
+license: Unspecified
 ---
-
 # Brand Narrative
 
 ## Overview

@@ -1,21 +1,15 @@
 ---
 name: conducting-gdpr-dpia
-description: >-
-  Guides the end-to-end GDPR Data Protection Impact Assessment process under
-  Article 35, including mandatory trigger identification per Art. 35(3), DPIA
-  content requirements per Art. 35(7), and EDPB WP248rev.01 methodology.
-  Activate for systematic profiling, large-scale special category processing,
-  or large-scale public monitoring. Keywords: DPIA, Article 35, impact
-  assessment, WP248, data protection, risk assessment.
 license: Apache-2.0
+description: 'Guides the end-to-end GDPR Data Protection Impact Assessment process under Article 35, including mandatory trigger identification per Art. 35(3), DPIA content requirements per Art. 35(7), and EDPB WP248rev.01 methodology. Activate for systematic profiling, large-scale special category processing, or large-scale public monitoring. Keywords: DPIA, Article 35, impact assessment, WP248, data protection, risk assessment.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: privacy-impact-assessment
-  tags: "dpia, gdpr, article-35, wp248, risk-assessment, data-protection"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: privacy-impact-assessment
+    tags: dpia, gdpr, article-35, wp248, risk-assessment, data-protection
 ---
-
 # Conducting GDPR Data Protection Impact Assessment
 
 ## Overview

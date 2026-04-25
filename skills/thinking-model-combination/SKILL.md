@@ -1,8 +1,8 @@
 ---
 name: thinking-model-combination
 description: Combine multiple mental models for richer analysis. Use for complex problems requiring multiple lenses, high-stakes decisions, or when single models leave blind spots.
+license: Unspecified
 ---
-
 # Model Combination
 
 ## Overview

@@ -1,11 +1,21 @@
 ---
-name: AI Expertise Engine
+name: ai-expertise-engine
 description: Comprehensive AI/ML expertise covering prompt engineering, LLM architecture, AI agent design, RAG systems, fine-tuning, AI safety, and cutting-edge AI research for building and leveraging AI systems.
-version: 1.0.0
-author: Custom Meta-Skill
-tags: [AI, machine-learning, LLM, prompt-engineering, agents, RAG, fine-tuning, AI-safety, deep-learning]
+license: Unspecified
+metadata:
+  version: 1.0.0
+  author: Custom Meta-Skill
+  tags:
+  - AI
+  - machine-learning
+  - LLM
+  - prompt-engineering
+  - agents
+  - RAG
+  - fine-tuning
+  - AI-safety
+  - deep-learning
 ---
-
 # AI Expertise Engine
 
 ## Purpose

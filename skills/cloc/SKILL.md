@@ -1,9 +1,10 @@
 ---
 name: cloc
 description: Count lines of code, analyze codebase size and composition, compare code between versions. Use when the user asks about lines of code, codebase size, language breakdown, or code statistics.
-argument-hint: "[path or git ref]"
+license: Unspecified
+metadata:
+  argument-hint: '[path or git ref]'
 ---
-
 ## Prerequisites
 
 Before running cloc, check if it is installed:

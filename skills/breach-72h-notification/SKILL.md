@@ -1,20 +1,15 @@
 ---
 name: breach-72h-notification
-description: >-
-  Executes the GDPR Article 33 mandatory breach notification to the supervisory
-  authority within 72 hours of becoming aware of a personal data breach.
-  Covers required notification content, deadline calculation, risk assessment
-  for notification threshold, and DPO involvement. Keywords: GDPR, Article 33,
-  breach notification, 72 hours, supervisory authority, DPO, EDPB.
 license: Apache-2.0
+description: 'Executes the GDPR Article 33 mandatory breach notification to the supervisory authority within 72 hours of becoming aware of a personal data breach. Covers required notification content, deadline calculation, risk assessment for notification threshold, and DPO involvement. Keywords: GDPR, Article 33, breach notification, 72 hours, supervisory authority, DPO, EDPB.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: data-breach-response
-  tags: "gdpr, article-33, breach-notification, 72-hour, supervisory-authority, dpo"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: data-breach-response
+    tags: gdpr, article-33, breach-notification, 72-hour, supervisory-authority, dpo
 ---
-
 # Executing GDPR 72-Hour Breach Notification
 
 ## Overview

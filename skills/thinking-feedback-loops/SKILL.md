@@ -1,8 +1,8 @@
 ---
 name: thinking-feedback-loops
 description: Analyze systems using Donella Meadows' feedback loop framework to identify reinforcing loops, balancing loops, delays, and leverage points. Use for organizational dynamics, product growth design, debugging runaway or oscillating systems, and finding high-impact interventions.
+license: Unspecified
 ---
-
 # Feedback Loop Analysis
 
 ## Overview

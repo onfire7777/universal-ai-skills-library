@@ -1,8 +1,8 @@
 ---
 name: printable-cards
 description: Create beautiful printable foldable greeting cards (birthday, thank you, etc.) as PDFs. Use when the user asks to make, design, or create a printable card, greeting card, birthday card, or foldable card for someone.
+license: Unspecified
 ---
-
 # Printable Cards
 
 Create high-quality printable foldable greeting cards rendered as 2-page PDFs via HTML/CSS + WeasyPrint.

@@ -1,8 +1,8 @@
 ---
 name: secure-coding-practices
 description: Secure coding practices and defensive programming patterns for building security-first applications. Use when implementing authentication, handling user input, managing sensitive data, or conducting secure code reviews.
+license: Unspecified
 ---
-
 # Secure Coding Practices
 
 Comprehensive guidance for implementing security-first development patterns with defensive programming techniques and proactive threat mitigation strategies.

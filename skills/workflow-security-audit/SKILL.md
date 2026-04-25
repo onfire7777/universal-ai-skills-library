@@ -1,8 +1,8 @@
 ---
 name: workflow-security-audit
 description: Comprehensive security assessment and remediation. Use for security reviews, compliance checks, vulnerability assessments.
+license: Unspecified
 ---
-
 # Security Audit Workflow
 
 Comprehensive security assessment process.

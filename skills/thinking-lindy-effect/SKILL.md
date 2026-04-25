@@ -1,8 +1,8 @@
 ---
 name: thinking-lindy-effect
 description: For non-perishable things, future life expectancy is proportional to current age. Use for technology selection, evaluating frameworks/libraries, and predicting tool longevity.
+license: Unspecified
 ---
-
 # The Lindy Effect
 
 ## Overview

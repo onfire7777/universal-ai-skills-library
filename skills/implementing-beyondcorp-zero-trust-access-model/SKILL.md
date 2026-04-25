@@ -1,17 +1,21 @@
 ---
 name: implementing-beyondcorp-zero-trust-access-model
-description: >
-  Implementing Google's BeyondCorp zero trust access model to eliminate implicit trust
-  from the network perimeter, enforce identity-aware access controls using IAP, Access
-  Context Manager, and Chrome Enterprise Premium for VPN-less secure application access.
-domain: cybersecurity
-subdomain: zero-trust-architecture
-tags: [beyondcorp, zero-trust, google-cloud, iap, identity-aware-proxy, ztna, access-context-manager]
-version: "1.0"
-author: mahipal
 license: Apache-2.0
+description: Implementing Google's BeyondCorp zero trust access model to eliminate implicit trust from the network perimeter, enforce identity-aware access controls using IAP, Access Context Manager, and Chrome Enterprise Premium for VPN-less secure application access.
+metadata:
+  domain: cybersecurity
+  subdomain: zero-trust-architecture
+  tags:
+  - beyondcorp
+  - zero-trust
+  - google-cloud
+  - iap
+  - identity-aware-proxy
+  - ztna
+  - access-context-manager
+  version: '1.0'
+  author: mahipal
 ---
-
 # Implementing BeyondCorp Zero Trust Access Model
 
 ## When to Use

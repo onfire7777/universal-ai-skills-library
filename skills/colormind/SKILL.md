@@ -1,10 +1,19 @@
 ---
 name: colormind
 description: Generate color palettes and get color suggestions via the Colormind.io API (list models, generate palettes with optional locked colors).
-version: 1.1.1
-metadata: {"clawdbot":{"emoji":"🎨","requires":{"bins":["node","python3","convert"],"env":[]}}}
+license: Unspecified
+metadata:
+  version: 1.1.1
+  metadata:
+    clawdbot:
+      emoji: 🎨
+      requires:
+        bins:
+        - node
+        - python3
+        - convert
+        env: []
 ---
-
 # Colormind (Color Palette Generator)
 
 ⚠️ **Privacy & Security Notice:**

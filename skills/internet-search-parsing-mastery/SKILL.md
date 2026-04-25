@@ -1,11 +1,19 @@
 ---
-name: Internet Search & Parsing Mastery
+name: internet-search-parsing-mastery
 description: Advanced internet search techniques, web content extraction, OSINT methodology, fact-checking, and information synthesis for finding and parsing the best information from the web.
-version: 1.0.0
-author: Custom Meta-Skill
-tags: [search, internet, parsing, web-scraping, OSINT, fact-checking, information-retrieval]
+license: Unspecified
+metadata:
+  version: 1.0.0
+  author: Custom Meta-Skill
+  tags:
+  - search
+  - internet
+  - parsing
+  - web-scraping
+  - OSINT
+  - fact-checking
+  - information-retrieval
 ---
-
 # Internet Search & Parsing Mastery
 
 ## Purpose

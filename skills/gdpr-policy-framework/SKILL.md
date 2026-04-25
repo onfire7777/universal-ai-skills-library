@@ -1,16 +1,15 @@
 ---
 name: gdpr-policy-framework
-description: >-
-  Guides creation of organisational privacy policy hierarchy aligned to GDPR chapters including top-level policy, supporting procedures, operational guidelines, and training materials. Activate when building or updating policy frameworks. Keywords: policy framework, privacy policy, procedures, guidelines, policy hierarchy.
 license: Apache-2.0
+description: 'Guides creation of organisational privacy policy hierarchy aligned to GDPR chapters including top-level policy, supporting procedures, operational guidelines, and training materials. Activate when building or updating policy frameworks. Keywords: policy framework, privacy policy, procedures, guidelines, policy hierarchy.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: gdpr-compliance
-  tags: "gdpr, policy-framework, privacy-policy, procedures, guidelines, documentation"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: gdpr-compliance
+    tags: gdpr, policy-framework, privacy-policy, procedures, guidelines, documentation
 ---
-
 # Developing GDPR Policy Framework
 
 ## Overview

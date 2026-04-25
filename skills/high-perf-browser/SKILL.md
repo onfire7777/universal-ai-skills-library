@@ -1,12 +1,12 @@
 ---
 name: high-perf-browser
-description: 'Optimize web performance through network protocols, resource loading, and browser rendering internals. Use when the user mentions "page load speed", "Core Web Vitals", "HTTP/2", "resource hints", "network latency", or "render blocking". Covers TCP/TLS optimization, caching strategies, WebSocket/SSE, and protocol selection. For UI visual performance, see refactoring-ui. For font loading, see web-typography.'
 license: MIT
+description: Optimize web performance through network protocols, resource loading, and browser rendering internals. Use when the user mentions "page load speed", "Core Web Vitals", "HTTP/2", "resource hints", "network latency", or "render blocking". Covers TCP/TLS optimization, caching strategies, WebSocket/SSE, and protocol selection. For UI visual performance, see refactoring-ui. For font loading, see web-typography.
 metadata:
-  author: wondelai
-  version: "1.0.0"
+  metadata:
+    author: wondelai
+    version: 1.0.0
 ---
-
 # High Performance Browser Networking Framework
 
 A systematic approach to web performance optimization grounded in how browsers, protocols, and networks actually work. Apply these principles when building frontend applications, reviewing performance budgets, configuring servers, or diagnosing slow page loads.

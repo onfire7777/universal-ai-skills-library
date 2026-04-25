@@ -1,8 +1,8 @@
 ---
 name: thinking-opportunity-cost
 description: Evaluate decisions by what you give up, not just what you gain. Use for resource allocation, prioritization, build vs. buy choices, and technical debt evaluation.
+license: Unspecified
 ---
-
 # Opportunity Cost Thinking
 
 ## Overview

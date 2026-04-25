@@ -1,9 +1,10 @@
 ---
 name: design-system-components
-model: standard
 description: Patterns for building design system components using Surface primitives, CVA variants, and consistent styling. Use when building reusable UI components that follow design token architecture. Triggers on Surface component, CVA, class-variance-authority, component variants, design tokens.
+license: Unspecified
+metadata:
+  model: standard
 ---
-
 # Design System Components
 
 Build reusable components that leverage design tokens with Surface primitives and CVA (class-variance-authority).

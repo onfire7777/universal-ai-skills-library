@@ -1,8 +1,8 @@
 ---
 name: thinking-fermi-estimation
 description: Make order-of-magnitude estimates for unknown quantities by decomposing into known or estimable factors. Use for capacity planning, cost estimation, market sizing, and technical feasibility assessment.
+license: Unspecified
 ---
-
 # Fermi Estimation
 
 ## Overview

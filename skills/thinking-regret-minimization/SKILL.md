@@ -1,8 +1,8 @@
 ---
 name: thinking-regret-minimization
 description: Project to your future self and ask what you would regret not doing. Use for career decisions, strategic pivots, risk-taking choices, and life-changing decisions.
+license: Unspecified
 ---
-
 # Regret Minimization Framework
 
 ## Overview

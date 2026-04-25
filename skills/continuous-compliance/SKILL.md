@@ -1,21 +1,15 @@
 ---
 name: continuous-compliance
-description: >-
-  Guides continuous privacy compliance monitoring implementation including automated
-  control testing, evidence collection automation, real-time compliance dashboards,
-  alert-based remediation workflows, regulatory change integration, and deviation
-  management. Covers GRC platform configuration, control framework mapping, and
-  compliance-as-code approaches. Keywords: continuous compliance, automated monitoring,
-  evidence collection, dashboard, regulatory change, compliance-as-code.
 license: Apache-2.0
+description: 'Guides continuous privacy compliance monitoring implementation including automated control testing, evidence collection automation, real-time compliance dashboards, alert-based remediation workflows, regulatory change integration, and deviation management. Covers GRC platform configuration, control framework mapping, and compliance-as-code approaches. Keywords: continuous compliance, automated monitoring, evidence collection, dashboard, regulatory change, compliance-as-code.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: privacy-audit-certification
-  tags: "continuous-compliance, automated-monitoring, evidence-collection, dashboard, regulatory-change"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: privacy-audit-certification
+    tags: continuous-compliance, automated-monitoring, evidence-collection, dashboard, regulatory-change
 ---
-
 # Continuous Privacy Compliance Monitoring
 
 ## Overview

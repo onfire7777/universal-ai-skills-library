@@ -1,8 +1,8 @@
 ---
 name: thinking-jobs-to-be-done
 description: Understand what "job" users hire your product to do, focusing on progress users seek rather than features. Use for product development, feature prioritization, user research, and market positioning.
+license: Unspecified
 ---
-
 # Jobs to Be Done
 
 ## Overview

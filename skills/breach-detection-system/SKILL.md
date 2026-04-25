@@ -1,21 +1,15 @@
 ---
 name: breach-detection-system
-description: >-
-  Implements technical breach detection capabilities including SIEM integration,
-  DLP alert configuration, anomaly detection rules, and insider threat monitoring.
-  Provides a breach classification taxonomy across confidentiality, integrity,
-  and availability dimensions. Covers detection tool selection, alert tuning,
-  and integration with privacy incident response workflows. Keywords: breach
-  detection, SIEM, DLP, anomaly detection, insider threat, classification.
 license: Apache-2.0
+description: 'Implements technical breach detection capabilities including SIEM integration, DLP alert configuration, anomaly detection rules, and insider threat monitoring. Provides a breach classification taxonomy across confidentiality, integrity, and availability dimensions. Covers detection tool selection, alert tuning, and integration with privacy incident response workflows. Keywords: breach detection, SIEM, DLP, anomaly detection, insider threat, classification.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: data-breach-response
-  tags: "breach-detection, siem, dlp, anomaly-detection, insider-threat, classification"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: data-breach-response
+    tags: breach-detection, siem, dlp, anomaly-detection, insider-threat, classification
 ---
-
 # Implementing Breach Detection System
 
 ## Overview

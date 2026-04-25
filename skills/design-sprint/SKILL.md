@@ -1,12 +1,12 @@
 ---
 name: design-sprint
-description: 'Run a structured 5-day process to prototype, test, and validate product ideas with real users. Use when the user mentions "design sprint", "validate in a week", "rapid prototype", "test with users", or "de-risk before building". Covers mapping, sketching, deciding, prototyping, and testing. For ongoing experimentation, see lean-startup. For customer job analysis, see jobs-to-be-done.'
 license: MIT
+description: Run a structured 5-day process to prototype, test, and validate product ideas with real users. Use when the user mentions "design sprint", "validate in a week", "rapid prototype", "test with users", or "de-risk before building". Covers mapping, sketching, deciding, prototyping, and testing. For ongoing experimentation, see lean-startup. For customer job analysis, see jobs-to-be-done.
 metadata:
-  author: wondelai
-  version: "1.0.1"
+  metadata:
+    author: wondelai
+    version: 1.0.1
 ---
-
 # Design Sprint Framework
 
 A five-day process for answering critical business questions through design, prototyping, and testing ideas with customers. Developed at Google Ventures and used by Google, Slack, Airbnb, and hundreds of startups.

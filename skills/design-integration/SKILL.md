@@ -1,17 +1,11 @@
 ---
 name: design-integration
-description: >-
-  Design a Uniswap integration architecture. Use when user is building a
-  project that needs to integrate Uniswap and wants recommendations on
-  integration method (Trading API vs SDK vs direct contract), architecture
-  patterns, required dependencies, and security considerations.
-allowed-tools: >-
-  Read, Write, Edit, Glob, Grep,
-  Task(subagent_type:integration-architect),
-  mcp__uniswap__get_supported_chains
-model: opus
+description: Design a Uniswap integration architecture. Use when user is building a project that needs to integrate Uniswap and wants recommendations on integration method (Trading API vs SDK vs direct contract), architecture patterns, required dependencies, and security considerations.
+license: Unspecified
+metadata:
+  allowed-tools: Read, Write, Edit, Glob, Grep, Task(subagent_type:integration-architect), mcp__uniswap__get_supported_chains
+  model: opus
 ---
-
 # Design Integration
 
 ## Overview

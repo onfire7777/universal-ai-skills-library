@@ -1,8 +1,8 @@
 ---
-name: "SVG Logo Designer"
-description: "Create professional SVG logos from descriptions and design specifications. Generates multiple logo variations with different layouts, styles, and concepts. Produces scalable vector graphics that can be used directly or exported to PNG. Use this skill when users ask to create logos, brand identities, icons, or visual marks for their designs."
+name: svg-logo-designer
+description: Create professional SVG logos from descriptions and design specifications. Generates multiple logo variations with different layouts, styles, and concepts. Produces scalable vector graphics that can be used directly or exported to PNG. Use this skill when users ask to create logos, brand identities, icons, or visual marks for their designs.
+license: Unspecified
 ---
-
 # SVG Logo Designer
 
 This skill creates professional, scalable vector graphic (SVG) logos from design specifications, offering multiple variations and layout options.

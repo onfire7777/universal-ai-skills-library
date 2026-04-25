@@ -1,19 +1,15 @@
 ---
 name: data-portability
-description: >-
-  Executes GDPR Article 20 data portability requests, covering machine-readable
-  format requirements (JSON, CSV, XML), direct controller-to-controller transfer
-  mechanisms, and scope limitations to data provided by the subject on consent
-  or contract basis. Activate for portability, data export, Art. 20, data transfer queries.
 license: Apache-2.0
+description: Executes GDPR Article 20 data portability requests, covering machine-readable format requirements (JSON, CSV, XML), direct controller-to-controller transfer mechanisms, and scope limitations to data provided by the subject on consent or contract basis. Activate for portability, data export, Art. 20, data transfer queries.
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: data-subject-rights
-  tags: "data-portability, gdpr-article-20, machine-readable, data-export, controller-transfer"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: data-subject-rights
+    tags: data-portability, gdpr-article-20, machine-readable, data-export, controller-transfer
 ---
-
 # Executing Data Portability Requests
 
 ## Overview

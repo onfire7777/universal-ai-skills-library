@@ -1,9 +1,10 @@
 ---
 name: profile
 description: Profile .NET applications for CPU performance, memory allocations, lock contention, exceptions, heap analysis, and JIT inlining. Use when the user asks about performance bottlenecks, memory leaks, high CPU, slow code, lock contention, excessive exceptions, GC pressure, heap growth, or JIT compilation in .NET projects.
-argument-hint: "[--cpu|--memory|--contention|--exception|--heap] [path]"
+license: Unspecified
+metadata:
+  argument-hint: '[--cpu|--memory|--contention|--exception|--heap] [path]'
 ---
-
 ## Prerequisites
 
 This tool requires .NET 10+ SDK (for `dnx` support).

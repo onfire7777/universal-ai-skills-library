@@ -1,8 +1,8 @@
 ---
 name: gws-best-practices
 description: Best practices for using the gws CLI with supported Google Workspace services (Drive, Docs, Sheets, Slides). Use when performing any operation with the gws CLI.
+license: Unspecified
 ---
-
 # gws CLI Best Practices
 
 Critical guidelines for using the `gws` command-line interface. Follow these rules to prevent common errors and protect user data.

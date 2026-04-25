@@ -1,9 +1,10 @@
 ---
 name: design-system-creation
-model: reasoning
 description: Complete workflow for creating distinctive design systems from scratch. Orchestrates aesthetic documentation, token architecture, components, and motion. Use when starting a new design system or refactoring an existing one. Triggers on create design system, design tokens, design system setup, visual identity, theming.
+license: Unspecified
+metadata:
+  model: reasoning
 ---
-
 # Design System Creation (Meta-Skill)
 
 Complete workflow for creating distinctive design systems with personality.

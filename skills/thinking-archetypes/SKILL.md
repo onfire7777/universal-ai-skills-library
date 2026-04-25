@@ -1,8 +1,8 @@
 ---
 name: thinking-archetypes
 description: Recognize Senge's Systems Archetypes to diagnose recurring organizational and technical problems, identify why fixes keep failing, and design interventions that address root structure.
+license: Unspecified
 ---
-
 # Systems Archetypes
 
 ## Overview

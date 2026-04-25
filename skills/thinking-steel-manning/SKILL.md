@@ -1,8 +1,8 @@
 ---
 name: thinking-steel-manning
 description: Argue against the strongest version of opposing positions, not the weakest. Use for design reviews, evaluating alternatives, conflict resolution, and decision validation.
+license: Unspecified
 ---
-
 # Steel-Manning
 
 ## Overview

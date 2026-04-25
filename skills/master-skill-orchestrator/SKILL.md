@@ -1,13 +1,8 @@
 ---
 name: master-skill-orchestrator
-description: >
-  The master conductor for all 630+ installed skills. Activates automatically on every task to
-  determine which skills to apply, in what order, and how to combine them. Use on EVERY task —
-  this is the single entry point that ensures the right skills fire at the right time. Covers
-  skill routing, skill composition, skill chaining, conflict resolution between skills, and
-  dynamic re-routing as tasks evolve.
+description: The master conductor for all 630+ installed skills. Activates automatically on every task to determine which skills to apply, in what order, and how to combine them. Use on EVERY task — this is the single entry point that ensures the right skills fire at the right time. Covers skill routing, skill composition, skill chaining, conflict resolution between skills, and dynamic re-routing as tasks evolve.
+license: Unspecified
 ---
-
 # Master Skill Orchestrator
 
 ## Purpose

@@ -1,21 +1,15 @@
 ---
 name: breach-response-playbook
-description: >-
-  Builds a comprehensive breach response team playbook defining CSIRT and privacy
-  team structure with named roles (incident commander, legal counsel, communications,
-  IT forensics, DPO), escalation matrices, communication templates, pre-negotiated
-  vendor contacts, and regulatory authority contacts organized by jurisdiction.
-  Keywords: breach response playbook, CSIRT, incident response team, escalation
-  matrix, communication templates, vendor contacts.
 license: Apache-2.0
+description: 'Builds a comprehensive breach response team playbook defining CSIRT and privacy team structure with named roles (incident commander, legal counsel, communications, IT forensics, DPO), escalation matrices, communication templates, pre-negotiated vendor contacts, and regulatory authority contacts organized by jurisdiction. Keywords: breach response playbook, CSIRT, incident response team, escalation matrix, communication templates, vendor contacts.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: data-breach-response
-  tags: "breach-playbook, csirt, incident-response-team, escalation-matrix, communication-templates"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: data-breach-response
+    tags: breach-playbook, csirt, incident-response-team, escalation-matrix, communication-templates
 ---
-
 # Building Breach Response Team Playbook
 
 ## Overview

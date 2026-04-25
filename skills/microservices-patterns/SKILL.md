@@ -1,8 +1,8 @@
 ---
 name: microservices-patterns
 description: Design microservices architectures with service boundaries, event-driven communication, and resilience patterns. Use when building distributed systems, decomposing monoliths, or implementing microservices.
+license: Unspecified
 ---
-
 # Microservices Patterns
 
 Master microservices architecture patterns including service boundaries, inter-service communication, data management, and resilience patterns for building distributed systems.

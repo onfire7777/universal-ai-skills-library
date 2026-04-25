@@ -1,8 +1,8 @@
 ---
 name: thinking-margin-of-safety
 description: Build in buffers for unknown unknowns and don't optimize to the edge. Use for capacity planning, deadline estimation, architecture design, and risk management.
+license: Unspecified
 ---
-
 # Margin of Safety
 
 ## Overview

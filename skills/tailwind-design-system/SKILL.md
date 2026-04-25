@@ -1,8 +1,10 @@
 ---
 name: tailwind-design-system
-model: fast
+description: Build production-ready component libraries with Tailwind CSS using CVA, compound components, design tokens, and theming.
+license: Unspecified
+metadata:
+  model: fast
 ---
-
 # Tailwind Design System
 
 Build production-ready component libraries with Tailwind CSS using CVA, compound components, design tokens, and theming.

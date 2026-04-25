@@ -1,8 +1,8 @@
 ---
 name: kubernetes-security-policies
 description: Kubernetes security policies, RBAC, and Pod Security Standards for hardened cluster deployments. Use when implementing cluster security, defining network policies, or enforcing security compliance in Kubernetes environments.
+license: Unspecified
 ---
-
 # Kubernetes Security Policies
 
 Comprehensive guidance for implementing security policies in Kubernetes clusters, covering Pod Security Standards, Network Policies, RBAC, Security Contexts, admission control, secrets management, and runtime security for production-grade hardened deployments.

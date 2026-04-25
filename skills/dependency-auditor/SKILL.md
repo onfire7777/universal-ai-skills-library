@@ -1,8 +1,8 @@
 ---
-name: "dependency-auditor"
-description: "Dependency Auditor"
+name: dependency-auditor
+description: Dependency Auditor
+license: Unspecified
 ---
-
 # Dependency Auditor
 
 > **Skill Type:** POWERFUL  

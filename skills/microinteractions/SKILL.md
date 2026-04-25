@@ -1,12 +1,12 @@
 ---
 name: microinteractions
-description: 'Design the small details — triggers, rules, feedback, loops and modes — that separate good products from great ones. Use when the user mentions "microinteraction", "button feedback", "loading state", "toggle design", "animation detail", or "interaction polish". Covers trigger design, state rules, feedback mechanisms, and progressive loops. For overall UI polish, see refactoring-ui. For affordance design, see design-everyday-things.'
 license: MIT
+description: Design the small details — triggers, rules, feedback, loops and modes — that separate good products from great ones. Use when the user mentions "microinteraction", "button feedback", "loading state", "toggle design", "animation detail", or "interaction polish". Covers trigger design, state rules, feedback mechanisms, and progressive loops. For overall UI polish, see refactoring-ui. For affordance design, see design-everyday-things.
 metadata:
-  author: wondelai
-  version: "1.0.0"
+  metadata:
+    author: wondelai
+    version: 1.0.0
 ---
-
 # Microinteractions Framework
 
 A systematic approach to designing the tiny, contained product moments that users interact with every day -- toggles, password fields, loading indicators, pull-to-refresh, like buttons. Based on Dan Saffer's four-part structure (Trigger, Rules, Feedback, Loops & Modes), this framework turns invisible details into the polish that separates forgettable products from beloved ones.

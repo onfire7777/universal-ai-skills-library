@@ -1,8 +1,8 @@
 ---
 name: thinking-inversion
 description: Approach problems backward by identifying paths to failure, then systematically avoiding them. Use for risk identification, planning, and avoiding obvious mistakes.
+license: Unspecified
 ---
-
 # Inversion Thinking
 
 ## Overview

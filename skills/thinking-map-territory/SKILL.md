@@ -1,8 +1,8 @@
 ---
 name: thinking-map-territory
 description: Recognize limits of mental models and diagrams. Use when models diverge from reality, debugging expectation mismatches, or questioning abstraction accuracy.
+license: Unspecified
 ---
-
 # Map-Territory Thinking
 
 ## Overview

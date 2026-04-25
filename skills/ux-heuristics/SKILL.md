@@ -1,12 +1,12 @@
 ---
 name: ux-heuristics
-description: 'Evaluate and improve interface usability using heuristic analysis. Use when the user mentions "usability audit", "UX review", "users are confused", "heuristic evaluation", "form usability", or "navigation problems". Covers Nielsen''s 10 heuristics, severity ratings, and information architecture. For visual design fixes, see refactoring-ui. For conversion-focused audits, see cro-methodology.'
 license: MIT
+description: Evaluate and improve interface usability using heuristic analysis. Use when the user mentions "usability audit", "UX review", "users are confused", "heuristic evaluation", "form usability", or "navigation problems". Covers Nielsen's 10 heuristics, severity ratings, and information architecture. For visual design fixes, see refactoring-ui. For conversion-focused audits, see cro-methodology.
 metadata:
-  author: wondelai
-  version: "1.2.1"
+  metadata:
+    author: wondelai
+    version: 1.2.1
 ---
-
 # UX Heuristics Framework
 
 Practical usability principles for evaluating and improving user interfaces. Based on a fundamental truth: users don't read, they scan. They don't make optimal choices, they satisfice. They don't figure out how things work, they muddle through.

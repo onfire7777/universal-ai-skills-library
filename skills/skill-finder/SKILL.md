@@ -1,14 +1,8 @@
 ---
 name: skill-finder
-description: >
-  Search the installed skill library to find and fully activate the most relevant skills for any
-  user task. Use when the user asks to find a skill, search for skills, says "find the best skill
-  for this", "which skill should I use", "search skills", or when Manus needs to identify which
-  installed skills are most applicable to a complex or unfamiliar task before execution. Also use
-  proactively when facing a task outside core capabilities to discover specialized workflows,
-  scripts, and domain expertise from the 800+ skill library.
+description: Search the installed skill library to find and fully activate the most relevant skills for any user task. Use when the user asks to find a skill, search for skills, says "find the best skill for this", "which skill should I use", "search skills", or when Manus needs to identify which installed skills are most applicable to a complex or unfamiliar task before execution. Also use proactively when facing a task outside core capabilities to discover specialized workflows, scripts, and domain expertise from the 800+ skill library.
+license: Unspecified
 ---
-
 # Skill Finder
 
 Identify, select, and fully activate the most relevant installed skills to execute any user task end-to-end — not summarize, but use them.

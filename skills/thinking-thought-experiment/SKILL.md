@@ -1,8 +1,8 @@
 ---
 name: thinking-thought-experiment
 description: Test ideas through hypothetical scenarios when empirical testing is impractical. Use for architecture evaluation, edge case analysis, ethics considerations, and strategy development.
+license: Unspecified
 ---
-
 # Thought Experiments
 
 ## Overview

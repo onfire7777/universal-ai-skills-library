@@ -1,20 +1,15 @@
 ---
 name: india-dpdp-act
-description: >-
-  Guides compliance with India's Digital Personal Data Protection Act 2023. Covers
-  consent manager registration, data fiduciary obligations under Sections 4-7,
-  significant data fiduciary requirements under Section 10, data principal rights,
-  and Board enforcement framework. Keywords: DPDP Act, India data protection,
-  consent manager, data fiduciary, significant data fiduciary, data principal rights.
 license: Apache-2.0
+description: 'Guides compliance with India''s Digital Personal Data Protection Act 2023. Covers consent manager registration, data fiduciary obligations under Sections 4-7, significant data fiduciary requirements under Section 10, data principal rights, and Board enforcement framework. Keywords: DPDP Act, India data protection, consent manager, data fiduciary, significant data fiduciary, data principal rights.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: global-privacy-regulations
-  tags: "dpdp-act, india-data-protection, consent-manager, data-fiduciary, data-principal"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: global-privacy-regulations
+    tags: dpdp-act, india-data-protection, consent-manager, data-fiduciary, data-principal
 ---
-
 # India DPDP Act 2023 Compliance
 
 ## Overview

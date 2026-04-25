@@ -1,8 +1,8 @@
 ---
 name: design-to-code
 description: Implements UI from design mockups (Figma, Sketch, or image) with pixel-accurate layout, responsive behavior, and design tokens. Use when 还原设计图, implementing designs, 切图, 设计稿转代码, or converting mockups to frontend code.
+license: Unspecified
 ---
-
 # 还原设计图（Design to Code）
 
 将设计稿（Figma/Sketch/图片）高保真还原为前端代码，保证布局、间距、字体、颜色与交互一致。

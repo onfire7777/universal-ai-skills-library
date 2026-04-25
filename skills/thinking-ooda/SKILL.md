@@ -1,8 +1,8 @@
 ---
 name: thinking-ooda
 description: Rapid decision-making loop for dynamic situations. Use for incident response, competitive scenarios, time-sensitive decisions, and situations requiring quick adaptation.
+license: Unspecified
 ---
-
 # OODA Loop
 
 ## Overview

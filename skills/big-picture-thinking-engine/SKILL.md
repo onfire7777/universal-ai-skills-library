@@ -1,14 +1,8 @@
 ---
 name: big-picture-thinking-engine
-description: >
-  Comprehensive skill for bigger-picture thinking, long-term thinking, and strategic foresight.
-  Use when you need to zoom out from immediate details to see the whole system, when making
-  decisions with long-term consequences, when connecting today's actions to future outcomes,
-  when evaluating whether tactical work aligns with strategic goals, or when the user asks
-  you to "think bigger," "zoom out," "consider the long term," or "see the forest for the trees."
-  Combines systems thinking, temporal reasoning, strategic foresight, and multi-scale analysis.
+description: Comprehensive skill for bigger-picture thinking, long-term thinking, and strategic foresight. Use when you need to zoom out from immediate details to see the whole system, when making decisions with long-term consequences, when connecting today's actions to future outcomes, when evaluating whether tactical work aligns with strategic goals, or when the user asks you to "think bigger," "zoom out," "consider the long term," or "see the forest for the trees." Combines systems thinking, temporal reasoning, strategic foresight, and multi-scale analysis.
+license: Unspecified
 ---
-
 # Big Picture Thinking Engine
 
 ## Purpose

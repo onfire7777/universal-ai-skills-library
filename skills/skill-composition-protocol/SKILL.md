@@ -1,13 +1,8 @@
 ---
 name: skill-composition-protocol
-description: >
-  The definitive guide to chaining, composing, and layering multiple skills together for complex
-  multi-phase tasks. Use when a task requires more than 2-3 skills, when you need to determine
-  the optimal sequence of skill application, when skills need to pass outputs to each other,
-  or when you need to build a custom workflow from existing skills. This is the "programming
-  language" for skill orchestration — it turns individual skills into composable pipelines.
+description: The definitive guide to chaining, composing, and layering multiple skills together for complex multi-phase tasks. Use when a task requires more than 2-3 skills, when you need to determine the optimal sequence of skill application, when skills need to pass outputs to each other, or when you need to build a custom workflow from existing skills. This is the "programming language" for skill orchestration — it turns individual skills into composable pipelines.
+license: Unspecified
 ---
-
 # Skill Composition Protocol
 
 ## Purpose

@@ -1,12 +1,12 @@
 ---
 name: mysql
-description: "Execute read-only SQL queries against multiple MySQL databases. Use when: (1) querying MySQL databases, (2) exploring database schemas/tables, (3) running SELECT queries for data analysis, (4) checking database contents. Supports multiple database connections with descriptions for intelligent auto-selection. Blocks all write operations (INSERT, UPDATE, DELETE, DROP, etc.) for safety."
 license: Apache-2.0
+description: 'Execute read-only SQL queries against multiple MySQL databases. Use when: (1) querying MySQL databases, (2) exploring database schemas/tables, (3) running SELECT queries for data analysis, (4) checking database contents. Supports multiple database connections with descriptions for intelligent auto-selection. Blocks all write operations (INSERT, UPDATE, DELETE, DROP, etc.) for safety.'
 metadata:
-  author: sanjay3290
-  version: "1.0"
+  metadata:
+    author: sanjay3290
+    version: '1.0'
 ---
-
 # MySQL Read-Only Query Skill
 
 Execute safe, read-only queries against configured MySQL databases.

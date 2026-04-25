@@ -1,15 +1,8 @@
 ---
 name: long-term-consequential-thinking
-description: >
-  Deep temporal reasoning skill for tracing the long-term consequences of decisions, identifying
-  slow-moving forces that will reshape the landscape, and making choices that optimize for
-  enduring value rather than immediate gratification. Use when making decisions with consequences
-  beyond the current quarter, when evaluating technology bets, when designing systems that need
-  to last, when the user asks about long-term implications, or when you sense that short-term
-  thinking is driving a bad decision. Combines futures thinking, consequence mapping, temporal
-  discounting correction, and legacy-aware decision-making.
+description: Deep temporal reasoning skill for tracing the long-term consequences of decisions, identifying slow-moving forces that will reshape the landscape, and making choices that optimize for enduring value rather than immediate gratification. Use when making decisions with consequences beyond the current quarter, when evaluating technology bets, when designing systems that need to last, when the user asks about long-term implications, or when you sense that short-term thinking is driving a bad decision. Combines futures thinking, consequence mapping, temporal discounting correction, and legacy-aware decision-making.
+license: Unspecified
 ---
-
 # Long-Term Consequential Thinking
 
 ## Purpose

@@ -1,8 +1,8 @@
 ---
 name: thinking-circle-of-competence
 description: Know the boundaries of your expertise and operate within them. Use when evaluating opportunities, making decisions outside your domain, or assessing when to defer to experts.
+license: Unspecified
 ---
-
 # Circle of Competence
 
 ## Overview

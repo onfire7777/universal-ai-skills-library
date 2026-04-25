@@ -1,13 +1,14 @@
 ---
 name: design-audit
 description: Perform comprehensive audit of interface quality across accessibility, performance, theming, and responsive design. Generates detailed report of issues with severity ratings and recommendations.
-args:
+license: Unspecified
+metadata:
+  args:
   - name: area
     description: The feature or area to audit (optional)
     required: false
-user-invocable: true
+  user-invocable: true
 ---
-
 Run systematic quality checks and generate a comprehensive audit report with prioritized issues and actionable recommendations. Don't fix issues - document them for other commands to address.
 
 **First**: Use the frontend-design skill for design principles and anti-patterns.

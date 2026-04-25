@@ -1,8 +1,8 @@
 ---
 name: thinking-socratic
 description: Systematic questioning framework to deepen understanding, challenge assumptions, and uncover hidden beliefs. Use for requirements gathering, debugging, coaching, and critical analysis.
+license: Unspecified
 ---
-
 # Socratic Questioning
 
 ## Overview

@@ -1,21 +1,15 @@
 ---
 name: children-data-minimization
-description: >-
-  Implements strict data minimization and retention limits for
-  children's personal data under GDPR Art. 5(1)(c), Recital 38, UK
-  AADC Standard 8, and COPPA Section 312.7. Covers strict necessity
-  testing, shorter retention periods, limited profiling, parental
-  dashboard design, and automated deletion. Keywords: data
-  minimization, children, retention, necessity test, parental dashboard.
 license: Apache-2.0
+description: 'Implements strict data minimization and retention limits for children''s personal data under GDPR Art. 5(1)(c), Recital 38, UK AADC Standard 8, and COPPA Section 312.7. Covers strict necessity testing, shorter retention periods, limited profiling, parental dashboard design, and automated deletion. Keywords: data minimization, children, retention, necessity test, parental dashboard.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: children-data-protection
-  tags: "data-minimization, children, retention, necessity-test, parental-dashboard, deletion"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: children-data-protection
+    tags: data-minimization, children, retention, necessity-test, parental-dashboard, deletion
 ---
-
 # Children's Data Minimisation and Retention Limits
 
 ## Overview

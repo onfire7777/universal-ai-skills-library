@@ -1,8 +1,8 @@
 ---
 name: thinking-model-selection
 description: Choose the right mental model for the problem at hand. Use when facing new problems, when current approaches fail, or when you need to match tool to context.
+license: Unspecified
 ---
-
 # Model Selection
 
 ## Overview

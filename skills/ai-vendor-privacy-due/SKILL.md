@@ -1,20 +1,15 @@
 ---
 name: ai-vendor-privacy-due
-description: >-
-  Determines controller-processor relationships for AI services and conducts
-  privacy due diligence. Covers SaaS AI (processor), embedded AI (joint
-  controller), API-based AI (assessment framework), and vendor risk
-  assessment. Keywords: AI vendor, controller-processor, due diligence,
-  SaaS AI, joint controller, Art. 28.
 license: Apache-2.0
+description: 'Determines controller-processor relationships for AI services and conducts privacy due diligence. Covers SaaS AI (processor), embedded AI (joint controller), API-based AI (assessment framework), and vendor risk assessment. Keywords: AI vendor, controller-processor, due diligence, SaaS AI, joint controller, Art. 28.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: ai-privacy-governance
-  tags: "ai-vendor, controller-processor, due-diligence, saas-ai, joint-controller, art-28"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: ai-privacy-governance
+    tags: ai-vendor, controller-processor, due-diligence, saas-ai, joint-controller, art-28
 ---
-
 # AI Vendor Privacy Due Diligence
 
 ## Overview

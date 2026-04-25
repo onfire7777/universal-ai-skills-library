@@ -1,9 +1,10 @@
 ---
 name: product-showcase
-description: "Generate a comprehensive marketing website for a web app — multi-page with real screenshots, animated GIF walkthroughs, feature deep-dives, and workflow demonstrations. Browses the running app, captures screens and sequences, and produces a deployable site that actually teaches people what the product does. Especially useful for complex or agentic apps that are hard to explain. Triggers: 'showcase site', 'product page', 'show off the app', 'marketing site', 'demo site', 'product showcase', 'explain the app', 'how do I market this'."
-compatibility: claude-code-only
+description: 'Generate a comprehensive marketing website for a web app — multi-page with real screenshots, animated GIF walkthroughs, feature deep-dives, and workflow demonstrations. Browses the running app, captures screens and sequences, and produces a deployable site that actually teaches people what the product does. Especially useful for complex or agentic apps that are hard to explain. Triggers: ''showcase site'', ''product page'', ''show off the app'', ''marketing site'', ''demo site'', ''product showcase'', ''explain the app'', ''how do I market this''.'
+license: Unspecified
+metadata:
+  compatibility: claude-code-only
 ---
-
 # Product Showcase Generator
 
 Generate a marketing website that actually teaches people what a web app does. Not just a hero and feature grid — a multi-page site with real screenshots, animated GIF walkthroughs of workflows, feature deep-dives, and progressive depth from "what is this" to "here's exactly how it works."

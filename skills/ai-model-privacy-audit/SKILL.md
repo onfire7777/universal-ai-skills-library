@@ -1,20 +1,15 @@
 ---
 name: ai-model-privacy-audit
-description: >-
-  Conducts privacy auditing of AI models including training data extraction
-  testing, membership inference attacks, model inversion testing, and attribute
-  inference assessment. Uses ML Privacy Meter and related tools to quantify
-  privacy leakage. Keywords: model audit, membership inference, privacy meter,
-  model inversion, training data extraction.
 license: Apache-2.0
+description: 'Conducts privacy auditing of AI models including training data extraction testing, membership inference attacks, model inversion testing, and attribute inference assessment. Uses ML Privacy Meter and related tools to quantify privacy leakage. Keywords: model audit, membership inference, privacy meter, model inversion, training data extraction.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: ai-privacy-governance
-  tags: "model-audit, membership-inference, privacy-meter, model-inversion, data-extraction, attribute-inference"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: ai-privacy-governance
+    tags: model-audit, membership-inference, privacy-meter, model-inversion, data-extraction, attribute-inference
 ---
-
 # AI Model Privacy Audit
 
 ## Overview

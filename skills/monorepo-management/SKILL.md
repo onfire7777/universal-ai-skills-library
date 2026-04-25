@@ -1,8 +1,8 @@
 ---
 name: monorepo-management
 description: Master monorepo management with Turborepo, Nx, and pnpm workspaces to build efficient, scalable multi-package repositories with optimized builds and dependency management. Use when setting up monorepos, optimizing builds, or managing shared dependencies.
+license: Unspecified
 ---
-
 # Monorepo Management
 
 Build efficient, scalable monorepos that enable code sharing, consistent tooling, and atomic changes across multiple packages and applications.

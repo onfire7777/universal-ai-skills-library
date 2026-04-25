@@ -1,9 +1,10 @@
 ---
 name: quickdup
 description: Find and reduce code duplication, clean up redundant code, detect code clones, reduce codebase size, DRY violations, copy-paste detection. Use when the user asks about duplicate code, code cleanup, reducing code size, DRY principles, or finding copy-pasted code.
-argument-hint: "[path or extension]"
+license: Unspecified
+metadata:
+  argument-hint: '[path or extension]'
 ---
-
 ## Prerequisites
 
 Before running quickdup, check if it is installed:

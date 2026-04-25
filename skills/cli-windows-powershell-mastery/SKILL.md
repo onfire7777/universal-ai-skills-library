@@ -1,11 +1,20 @@
 ---
-name: CLI, Windows & PowerShell Mastery
+name: cli-windows-powershell-mastery
 description: Comprehensive command-line expertise across Bash, PowerShell, Windows CMD, and cross-platform terminal operations for maximum productivity and system control.
-version: 1.0.0
-author: Custom Meta-Skill
-tags: [cli, bash, powershell, windows, terminal, command-line, shell-scripting, automation]
+license: Unspecified
+metadata:
+  version: 1.0.0
+  author: Custom Meta-Skill
+  tags:
+  - cli
+  - bash
+  - powershell
+  - windows
+  - terminal
+  - command-line
+  - shell-scripting
+  - automation
 ---
-
 # CLI, Windows & PowerShell Mastery
 
 ## Purpose

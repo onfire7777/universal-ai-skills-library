@@ -1,20 +1,15 @@
 ---
 name: hipaa-deidentification
-description: >-
-  Implements HIPAA de-identification methods under 45 CFR §164.514(a)-(b).
-  Covers expert determination method and safe harbor method with 18
-  identifiers removal, re-identification risk assessment, limited dataset
-  requirements, and data use agreements. Keywords: HIPAA de-identification,
-  safe harbor, expert determination, 18 identifiers, limited dataset, PHI.
 license: Apache-2.0
+description: 'Implements HIPAA de-identification methods under 45 CFR §164.514(a)-(b). Covers expert determination method and safe harbor method with 18 identifiers removal, re-identification risk assessment, limited dataset requirements, and data use agreements. Keywords: HIPAA de-identification, safe harbor, expert determination, 18 identifiers, limited dataset, PHI.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: healthcare-privacy
-  tags: "hipaa, de-identification, safe-harbor, expert-determination, 18-identifiers, limited-dataset, phi"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: healthcare-privacy
+    tags: hipaa, de-identification, safe-harbor, expert-determination, 18-identifiers, limited-dataset, phi
 ---
-
 # HIPAA De-Identification Methods — 45 CFR §164.514(a)-(b)
 
 ## Overview

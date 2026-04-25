@@ -1,8 +1,8 @@
 ---
 name: thinking-dual-process
 description: Apply Kahneman's Dual-Process Theory to recognize when to trust intuition vs engage deliberate analysis. Use for high-stakes decisions, error-prone contexts, or when balancing speed vs accuracy.
+license: Unspecified
 ---
-
 # Dual-Process Thinking
 
 ## Overview

@@ -1,13 +1,16 @@
 ---
 name: compliance-audit
-description: >-
-  Regulatory compliance auditing across GDPR, HIPAA, PCI DSS, SOC 2, and ISO
-  frameworks with automated evidence collection and gap analysis. Use when
-  conducting compliance assessments, preparing for certifications, or
-  implementing regulatory controls.
-version: 1.0.0
-tags: [compliance, audit, regulatory, security, privacy]
-triggers:
+description: Regulatory compliance auditing across GDPR, HIPAA, PCI DSS, SOC 2, and ISO frameworks with automated evidence collection and gap analysis. Use when conducting compliance assessments, preparing for certifications, or implementing regulatory controls.
+license: Unspecified
+metadata:
+  version: 1.0.0
+  tags:
+  - compliance
+  - audit
+  - regulatory
+  - security
+  - privacy
+  triggers:
   - compliance audit
   - regulatory assessment
   - GDPR compliance
@@ -17,12 +20,18 @@ triggers:
   - ISO 27001 alignment
   - evidence collection
   - gap analysis
-dependencies:
-  skills: [secure-coding-practices, owasp-top-10]
-  tools: [Read, Write, Bash, Grep, Glob]
-token_estimate: ~3000
+  dependencies:
+    skills:
+    - secure-coding-practices
+    - owasp-top-10
+    tools:
+    - Read
+    - Write
+    - Bash
+    - Grep
+    - Glob
+  token_estimate: ~3000
 ---
-
 # Compliance Audit
 
 Systematic regulatory compliance auditing with automated evidence collection, control mapping,

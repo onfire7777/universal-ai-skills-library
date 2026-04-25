@@ -1,20 +1,15 @@
 ---
 name: ai-transparency-reqs
-description: >-
-  Implements AI transparency requirements under EU AI Act Arts. 13-14 and GDPR
-  Arts. 13-14. Covers user notification of AI interaction, system capability
-  disclosure, limitation documentation, and meaningful information about
-  automated logic. Keywords: AI transparency, EU AI Act, GDPR notification,
-  explainability, automated decision.
 license: Apache-2.0
+description: 'Implements AI transparency requirements under EU AI Act Arts. 13-14 and GDPR Arts. 13-14. Covers user notification of AI interaction, system capability disclosure, limitation documentation, and meaningful information about automated logic. Keywords: AI transparency, EU AI Act, GDPR notification, explainability, automated decision.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: ai-privacy-governance
-  tags: "ai-transparency, eu-ai-act, gdpr-notification, explainability, disclosure, automated-logic"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: ai-privacy-governance
+    tags: ai-transparency, eu-ai-act, gdpr-notification, explainability, disclosure, automated-logic
 ---
-
 # AI Transparency Requirements
 
 ## Overview

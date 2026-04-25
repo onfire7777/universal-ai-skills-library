@@ -1,13 +1,8 @@
 ---
 name: strategic-planning-engine
-description: >
-  A comprehensive planning skill covering project planning, strategic planning, sprint planning,
-  scenario planning, contingency planning, roadmapping, resource allocation, milestone tracking,
-  risk management, and execution frameworks. Use when the user needs to plan anything — from
-  a single feature to a multi-year strategy. Combines the best planning frameworks: OKRs, WBS,
-  Gantt, critical path, agile ceremonies, scenario planning, wardley mapping, and more.
+description: 'A comprehensive planning skill covering project planning, strategic planning, sprint planning, scenario planning, contingency planning, roadmapping, resource allocation, milestone tracking, risk management, and execution frameworks. Use when the user needs to plan anything — from a single feature to a multi-year strategy. Combines the best planning frameworks: OKRs, WBS, Gantt, critical path, agile ceremonies, scenario planning, wardley mapping, and more.'
+license: Unspecified
 ---
-
 # Strategic Planning Engine
 
 ## Purpose

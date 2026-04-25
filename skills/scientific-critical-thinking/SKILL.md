@@ -1,9 +1,14 @@
 ---
 name: scientific-critical-thinking
-description: "Evaluate research rigor. Assess methodology, experimental design, statistical validity, biases, confounding, evidence quality (GRADE, Cochrane ROB), for critical analysis of scientific claims."
-allowed-tools: [Read, Write, Edit, Bash]
+description: Evaluate research rigor. Assess methodology, experimental design, statistical validity, biases, confounding, evidence quality (GRADE, Cochrane ROB), for critical analysis of scientific claims.
+license: Unspecified
+metadata:
+  allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
 ---
-
 # Scientific Critical Thinking
 
 ## Overview

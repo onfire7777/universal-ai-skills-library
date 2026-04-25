@@ -1,8 +1,8 @@
 ---
 name: multi-repo-git-ops
 description: Manages git operations (branching, committing, pushing) across multi-repo systems with git submodules. Use this skill whenever the user wants to create a feature branch, commit changes, push code, sync submodules, or manage branches across the parent repo and service repos. Also use when implementing BMAD stories that touch one or more services, or when the user asks about git workflow in a multi-repo project. Triggers on phrases like "create branch", "commit changes", "push to remote", "sync submodules", "start working on story", "update service branch", or any git operation that spans parent and submodule repos.
+license: Unspecified
 ---
-
 # Multi-Repo Git Operations
 
 This skill handles git operations in **multi-repo systems** that use git submodules. The parent repo orchestrates multiple service repos, each an independent git repository with its own branches, history, and CI/CD.

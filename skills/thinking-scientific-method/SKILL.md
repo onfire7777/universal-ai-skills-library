@@ -1,8 +1,8 @@
 ---
 name: thinking-scientific-method
 description: Hypothesis → Prediction → Test → Revise with explicit falsification. Use for debugging, feature experimentation, performance investigation, and A/B testing design.
+license: Unspecified
 ---
-
 # Scientific Method
 
 ## Overview

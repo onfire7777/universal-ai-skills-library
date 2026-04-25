@@ -1,20 +1,15 @@
 ---
 name: adequacy-assessment
-description: >-
-  Guides assessment of third-country adequacy decisions under GDPR Article 45 for
-  international data transfers. Covers the current EC adequacy decisions list,
-  adequacy assessment criteria, partial adequacy handling, and monitoring of
-  adequacy decision reviews. Keywords: adequacy decision, Article 45, third country,
-  adequate protection, EC adequacy list.
 license: Apache-2.0
+description: 'Guides assessment of third-country adequacy decisions under GDPR Article 45 for international data transfers. Covers the current EC adequacy decisions list, adequacy assessment criteria, partial adequacy handling, and monitoring of adequacy decision reviews. Keywords: adequacy decision, Article 45, third country, adequate protection, EC adequacy list.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: cross-border-transfers
-  tags: "adequacy-decision, article-45, third-country-adequacy, ec-adequacy-list, data-transfers"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: cross-border-transfers
+    tags: adequacy-decision, article-45, third-country-adequacy, ec-adequacy-list, data-transfers
 ---
-
 # Assessing Third-Country Adequacy
 
 ## Overview

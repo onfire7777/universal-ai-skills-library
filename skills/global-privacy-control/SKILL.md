@@ -1,19 +1,15 @@
 ---
 name: global-privacy-control
-description: >-
-  Implementation guide for Global Privacy Control (GPC) automated opt-out signal
-  per CPRA Section 1798.135(e). Covers Sec-GPC HTTP header detection, JavaScript
-  navigator.globalPrivacyControl API, and state-specific requirements for CA, CO,
-  CT, MT, TX, and OR. Includes server-side detection code and compliance mapping.
 license: Apache-2.0
+description: Implementation guide for Global Privacy Control (GPC) automated opt-out signal per CPRA Section 1798.135(e). Covers Sec-GPC HTTP header detection, JavaScript navigator.globalPrivacyControl API, and state-specific requirements for CA, CO, CT, MT, TX, and OR. Includes server-side detection code and compliance mapping.
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: consent-management
-  tags: "global-privacy-control, gpc, cpra, opt-out-signal, browser-privacy"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: consent-management
+    tags: global-privacy-control, gpc, cpra, opt-out-signal, browser-privacy
 ---
-
 # Implementing Global Privacy Control (GPC)
 
 ## Overview

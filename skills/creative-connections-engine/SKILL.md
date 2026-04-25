@@ -1,16 +1,8 @@
 ---
 name: creative-connections-engine
-description: >
-  A meta-skill for radical creativity, lateral thinking, idea synthesis, conceptual blending,
-  bisociation, mind mapping, and finding unexpected connections between disparate ideas.
-  Use when brainstorming, generating novel ideas, synthesizing across domains, creating
-  mind maps, finding analogies, breaking creative blocks, or when the user asks for
-  creative thinking, lateral thinking, divergent thinking, or unique perspectives.
-  Combines the best frameworks from Arthur Koestler's bisociation theory, Edward de Bono's
-  lateral thinking, Fauconnier & Turner's conceptual blending, TRIZ, SCAMPER, synectics,
-  random stimulation, forced connections, and mind mapping methodologies.
+description: A meta-skill for radical creativity, lateral thinking, idea synthesis, conceptual blending, bisociation, mind mapping, and finding unexpected connections between disparate ideas. Use when brainstorming, generating novel ideas, synthesizing across domains, creating mind maps, finding analogies, breaking creative blocks, or when the user asks for creative thinking, lateral thinking, divergent thinking, or unique perspectives. Combines the best frameworks from Arthur Koestler's bisociation theory, Edward de Bono's lateral thinking, Fauconnier & Turner's conceptual blending, TRIZ, SCAMPER, synectics, random stimulation, forced connections, and mind mapping methodologies.
+license: Unspecified
 ---
-
 # Creative Connections Engine
 
 ## Purpose

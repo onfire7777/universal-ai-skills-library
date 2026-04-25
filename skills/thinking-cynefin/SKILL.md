@@ -1,8 +1,8 @@
 ---
 name: thinking-cynefin
 description: Classify problems by complexity domain (clear, complicated, complex, chaotic) and match approach to domain. Use for choosing methodologies, problem framing, and process design.
+license: Unspecified
 ---
-
 # Cynefin Framework
 
 ## Overview

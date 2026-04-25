@@ -1,11 +1,21 @@
 ---
-name: Data Analyst Engine
+name: data-analyst-engine
 description: Comprehensive data analysis expertise covering statistical analysis, data visualization, exploratory data analysis, hypothesis testing, machine learning, data cleaning, and data storytelling.
-version: 1.0.0
-author: Custom Meta-Skill
-tags: [data-analysis, statistics, visualization, pandas, numpy, matplotlib, EDA, hypothesis-testing, data-storytelling]
+license: Unspecified
+metadata:
+  version: 1.0.0
+  author: Custom Meta-Skill
+  tags:
+  - data-analysis
+  - statistics
+  - visualization
+  - pandas
+  - numpy
+  - matplotlib
+  - EDA
+  - hypothesis-testing
+  - data-storytelling
 ---
-
 # Data Analyst Engine
 
 ## Purpose

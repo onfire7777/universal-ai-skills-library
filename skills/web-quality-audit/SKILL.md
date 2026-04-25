@@ -1,12 +1,12 @@
 ---
 name: web-quality-audit
-description: Comprehensive web quality audit covering performance, accessibility, SEO, and best practices. Use when asked to "audit my site", "review web quality", "run lighthouse audit", "check page quality", or "optimize my website".
 license: MIT
+description: Comprehensive web quality audit covering performance, accessibility, SEO, and best practices. Use when asked to "audit my site", "review web quality", "run lighthouse audit", "check page quality", or "optimize my website".
 metadata:
-  author: web-quality-skills
-  version: "1.0"
+  metadata:
+    author: web-quality-skills
+    version: '1.0'
 ---
-
 # Web quality audit
 
 Comprehensive quality review based on Google Lighthouse audits. Covers Performance, Accessibility, SEO, and Best Practices across 150+ checks.

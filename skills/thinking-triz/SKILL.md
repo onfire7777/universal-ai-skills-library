@@ -1,8 +1,8 @@
 ---
 name: thinking-triz
 description: Apply TRIZ (Theory of Inventive Problem Solving) methodology to resolve technical contradictions and find innovative solutions. Use for engineering design, breaking through impossible constraints, and systematic innovation.
+license: Unspecified
 ---
-
 # TRIZ Thinking
 
 ## Overview

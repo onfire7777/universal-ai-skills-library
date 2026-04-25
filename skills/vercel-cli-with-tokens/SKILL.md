@@ -1,11 +1,12 @@
 ---
 name: vercel-cli-with-tokens
 description: Deploy and manage projects on Vercel using token-based authentication. Use when working with Vercel CLI using access tokens rather than interactive login — e.g. "deploy to vercel", "set up vercel", "add environment variables to vercel".
+license: Unspecified
 metadata:
-  author: vercel
-  version: "1.0.0"
+  metadata:
+    author: vercel
+    version: 1.0.0
 ---
-
 # Vercel CLI with Tokens
 
 Deploy and manage projects on Vercel using the CLI with token-based authentication, without relying on `vercel login`.

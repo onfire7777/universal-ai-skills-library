@@ -1,8 +1,8 @@
 ---
 name: thinking-systems
 description: Analyze problems as interconnected systems with feedback loops, emergent behavior, and non-linear effects. Use for debugging complex systems, architecture decisions, and understanding unexpected behavior.
+license: Unspecified
 ---
-
 # Systems Thinking
 
 ## Overview

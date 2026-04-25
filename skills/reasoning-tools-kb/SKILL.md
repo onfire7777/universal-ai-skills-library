@@ -1,15 +1,8 @@
 ---
 name: reasoning-tools-kb
-description: >
-  A comprehensive library of 100+ transferable reasoning primitives extracted from 34 high-value domains.
-  Covers: Decision Under Uncertainty, Persuasion & Influence, Creative Generation, Complex Systems,
-  Skill Mastery, Coordination & Cooperation, Truth-Seeking & Verification, Conflict & Competition,
-  Resource Allocation, and Pattern Recognition. Each tool includes what it is, why it matters,
-  the key mental move, classic and surprising applications, and failure modes.
-  Use when facing any complex reasoning challenge, decision under uncertainty, or when you need
-  to apply structured thinking frameworks to a problem.
+description: 'A comprehensive library of 100+ transferable reasoning primitives extracted from 34 high-value domains. Covers: Decision Under Uncertainty, Persuasion & Influence, Creative Generation, Complex Systems, Skill Mastery, Coordination & Cooperation, Truth-Seeking & Verification, Conflict & Competition, Resource Allocation, and Pattern Recognition. Each tool includes what it is, why it matters, the key mental move, classic and surprising applications, and failure modes. Use when facing any complex reasoning challenge, decision under uncertainty, or when you need to apply structured thinking frameworks to a problem.'
+license: Unspecified
 ---
-
 # Reasoning Tools Knowledge Base
 
 A comprehensive, structured library of transferable reasoning tools extracted from 34 high-value domains.

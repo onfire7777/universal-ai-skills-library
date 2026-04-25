@@ -1,9 +1,8 @@
 ---
 name: skill-creator
-description: Guide for creating or updating skills that extend Manus via specialized knowledge, workflows, or tool integrations. For any modification or improvement request, MUST first read this skill and follow its update workflow instead of editing files directly.
 license: Complete terms in LICENSE.txt
+description: Guide for creating or updating skills that extend Manus via specialized knowledge, workflows, or tool integrations. For any modification or improvement request, MUST first read this skill and follow its update workflow instead of editing files directly.
 ---
-
 # Skill Creator
 
 This skill provides guidance for creating effective skills.

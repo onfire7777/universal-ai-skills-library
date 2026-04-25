@@ -1,9 +1,25 @@
 ---
 name: infographic
 description: Generate high-density infographics with structured layout and style choices and bundled generation tooling. Use when the user asks to create an infographic, a visual summary, or a dense single-page information graphic.
-metadata: { "pattern": ["generator", "pipeline"], "openclaw": { "emoji": "📊", "primaryEnv": "IMAGE_GEN_API_KEY", "requires": { "env": ["IMAGE_GEN_API_KEY"], "anyBins": ["bun", "npx"], "bins": ["node", "npm"] } } }
+license: Unspecified
+metadata:
+  metadata:
+    pattern:
+    - generator
+    - pipeline
+    openclaw:
+      emoji: 📊
+      primaryEnv: IMAGE_GEN_API_KEY
+      requires:
+        env:
+        - IMAGE_GEN_API_KEY
+        anyBins:
+        - bun
+        - npx
+        bins:
+        - node
+        - npm
 ---
-
 # Infographic Generation (`infographic`)
 
 ## Reference Images (Important)

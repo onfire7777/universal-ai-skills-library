@@ -1,8 +1,8 @@
 ---
 name: thinking-theory-of-constraints
 description: Identify and manage the bottleneck; improvements elsewhere don't matter until the constraint is addressed. Use for performance optimization, process improvement, and resource allocation.
+license: Unspecified
 ---
-
 # Theory of Constraints
 
 ## Overview

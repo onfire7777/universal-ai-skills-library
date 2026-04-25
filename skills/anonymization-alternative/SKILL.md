@@ -1,19 +1,15 @@
 ---
 name: anonymization-alternative
-description: >-
-  Evaluates anonymization as a retention alternative under GDPR Recital 26, applying the
-  WP29 Opinion 05/2014 techniques including randomization and generalization. Validates
-  anonymization effectiveness using k-anonymity, l-diversity, and t-closeness metrics.
-  Activate for anonymization, de-identification, k-anonymity, retention alternative queries.
 license: Apache-2.0
+description: Evaluates anonymization as a retention alternative under GDPR Recital 26, applying the WP29 Opinion 05/2014 techniques including randomization and generalization. Validates anonymization effectiveness using k-anonymity, l-diversity, and t-closeness metrics. Activate for anonymization, de-identification, k-anonymity, retention alternative queries.
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: data-retention-deletion
-  tags: "anonymization, de-identification, k-anonymity, wp29-opinion, recital-26"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: data-retention-deletion
+    tags: anonymization, de-identification, k-anonymity, wp29-opinion, recital-26
 ---
-
 # Anonymization as Retention Alternative
 
 ## Overview

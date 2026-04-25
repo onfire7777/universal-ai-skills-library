@@ -1,8 +1,8 @@
 ---
 name: thinking-kepner-tregoe
 description: Systematic rational process for complex problem analysis, decision making, and risk assessment. Use for high-stakes engineering decisions, root cause analysis beyond 5 Whys, and multi-factor evaluations requiring structured criteria.
+license: Unspecified
 ---
-
 # Kepner-Tregoe Rational Process
 
 ## Overview

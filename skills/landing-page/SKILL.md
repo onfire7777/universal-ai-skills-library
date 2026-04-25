@@ -1,15 +1,16 @@
 ---
 name: landing-page
-description: "Generate a complete, deployable landing page from a brief. Produces a single self-contained HTML file with Tailwind CSS (via CDN), responsive design, dark mode, semantic HTML, and OG meta tags. Sections: hero with CTA, features, social proof, pricing (optional), FAQ, footer. Use when building a marketing page, product launch page, coming soon page, or any standalone landing page. Triggers: 'landing page', 'create a page', 'marketing page', 'launch page', 'coming soon page', 'one-page site'."
-allowed-tools:
+description: 'Generate a complete, deployable landing page from a brief. Produces a single self-contained HTML file with Tailwind CSS (via CDN), responsive design, dark mode, semantic HTML, and OG meta tags. Sections: hero with CTA, features, social proof, pricing (optional), FAQ, footer. Use when building a marketing page, product launch page, coming soon page, or any standalone landing page. Triggers: ''landing page'', ''create a page'', ''marketing page'', ''launch page'', ''coming soon page'', ''one-page site''.'
+license: Unspecified
+metadata:
+  allowed-tools:
   - Read
   - Write
   - Edit
   - Glob
   - Grep
-compatibility: claude-code-only
+  compatibility: claude-code-only
 ---
-
 # Landing Page Generator
 
 Generate a complete, deployable landing page as a single HTML file. No build step, no dependencies — open it in a browser or deploy anywhere.

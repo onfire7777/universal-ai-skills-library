@@ -1,14 +1,21 @@
 ---
 name: implementing-azure-ad-privileged-identity-management
-description: Configure Microsoft Entra Privileged Identity Management to enforce just-in-time role activation, approval workflows, and access reviews for Azure AD privileged roles.
-domain: cybersecurity
-subdomain: identity-access-management
-tags: [azure-ad, pim, entra-id, just-in-time, privileged-roles, identity-governance, zero-trust]
-version: "1.0"
-author: mahipal
 license: Apache-2.0
+description: Configure Microsoft Entra Privileged Identity Management to enforce just-in-time role activation, approval workflows, and access reviews for Azure AD privileged roles.
+metadata:
+  domain: cybersecurity
+  subdomain: identity-access-management
+  tags:
+  - azure-ad
+  - pim
+  - entra-id
+  - just-in-time
+  - privileged-roles
+  - identity-governance
+  - zero-trust
+  version: '1.0'
+  author: mahipal
 ---
-
 # Implementing Azure AD Privileged Identity Management
 
 ## Overview

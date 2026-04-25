@@ -1,10 +1,11 @@
 ---
 name: pre-pr
 description: Run mandatory pre-PR quality checks for .NET projects before creating a pull request. Use before creating any PR, or when the user says "prepare for PR", "pre-PR checks", or "quality gate".
-disable-model-invocation: true
-argument-hint: "[solution or project path]"
+license: Unspecified
+metadata:
+  disable-model-invocation: true
+  argument-hint: '[solution or project path]'
 ---
-
 ## Prerequisites
 
 Check that required tools are available:

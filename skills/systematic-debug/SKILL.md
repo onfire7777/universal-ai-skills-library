@@ -1,9 +1,10 @@
 ---
 name: systematic-debug
 description: Systematic debugging techniques for unclear root causes. Use when a bug's origin is unknown, multiple hypotheses need testing, you need to narrow down a failing area, end-to-end tests fail but you can't tell where, or the user says "I don't know why this is broken". Includes test bombs (hypothesis elimination) and layered tests (pipeline stage isolation).
-argument-hint: "[bug description]"
+license: Unspecified
+metadata:
+  argument-hint: '[bug description]'
 ---
-
 ## Choose Your Technique
 
 | Technique | Use when | Finds |

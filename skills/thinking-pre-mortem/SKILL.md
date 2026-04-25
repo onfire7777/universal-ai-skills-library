@@ -1,8 +1,8 @@
 ---
 name: thinking-pre-mortem
 description: Imagine a project has failed and work backward to identify why. Use at project kickoffs, before major decisions, or when optimism may be obscuring risks.
+license: Unspecified
 ---
-
 # Pre-Mortem Analysis
 
 ## Overview

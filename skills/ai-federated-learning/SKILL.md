@@ -1,20 +1,15 @@
 ---
 name: ai-federated-learning
-description: >-
-  Implements federated learning architecture patterns for GDPR compliance.
-  Covers secure aggregation protocols, differential privacy integration,
-  communication protocols, and privacy-by-design distributed ML training.
-  Keywords: federated learning, distributed training, secure aggregation,
-  differential privacy, privacy-preserving ML.
 license: Apache-2.0
+description: 'Implements federated learning architecture patterns for GDPR compliance. Covers secure aggregation protocols, differential privacy integration, communication protocols, and privacy-by-design distributed ML training. Keywords: federated learning, distributed training, secure aggregation, differential privacy, privacy-preserving ML.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: ai-privacy-governance
-  tags: "federated-learning, secure-aggregation, differential-privacy, distributed-ml, privacy-preserving, gdpr"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: ai-privacy-governance
+    tags: federated-learning, secure-aggregation, differential-privacy, distributed-ml, privacy-preserving, gdpr
 ---
-
 # Federated Learning for GDPR Compliance
 
 ## Overview

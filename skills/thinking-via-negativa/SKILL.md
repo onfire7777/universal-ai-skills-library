@@ -1,8 +1,8 @@
 ---
 name: thinking-via-negativa
 description: Improve by removal rather than addition. Focus on what to stop doing, eliminate the negative, and subtract complexity. Use for system simplification, process improvement, and feature prioritization.
+license: Unspecified
 ---
-
 # Via Negativa
 
 ## Overview

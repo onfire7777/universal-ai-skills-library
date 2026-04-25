@@ -1,16 +1,11 @@
 ---
 name: design-hook
-description: >-
-  Design a Uniswap V4 hook architecture without code generation. Use when user
-  wants to plan a hook, understand which callbacks to use, or review an
-  architecture before building. Returns a design document, not code.
-allowed-tools: >-
-  Read, Glob, Grep,
-  Task(subagent_type:hook-builder),
-  mcp__uniswap__get_supported_chains
-model: opus
+description: Design a Uniswap V4 hook architecture without code generation. Use when user wants to plan a hook, understand which callbacks to use, or review an architecture before building. Returns a design document, not code.
+license: Unspecified
+metadata:
+  allowed-tools: Read, Glob, Grep, Task(subagent_type:hook-builder), mcp__uniswap__get_supported_chains
+  model: opus
 ---
-
 # Design Hook
 
 ## Overview

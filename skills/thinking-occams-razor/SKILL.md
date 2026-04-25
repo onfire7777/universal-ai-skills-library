@@ -1,8 +1,8 @@
 ---
 name: thinking-occams-razor
 description: Apply parsimony principle to prefer simpler explanations with fewer assumptions. Use for hypothesis selection in debugging, architecture decisions, and choosing between competing approaches.
+license: Unspecified
 ---
-
 # Occam's Razor (Parsimony Principle)
 
 ## Overview

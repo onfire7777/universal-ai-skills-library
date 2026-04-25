@@ -1,8 +1,8 @@
 ---
 name: thinking-reversibility
 description: Classify decisions by reversibility and match decision process to decision type. Use for technology choices, architecture decisions, process changes, and hiring decisions.
+license: Unspecified
 ---
-
 # Reversibility Thinking
 
 ## Overview

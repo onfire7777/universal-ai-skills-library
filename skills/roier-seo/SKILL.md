@@ -1,13 +1,27 @@
 ---
 name: roier-seo
-description: Technical SEO auditor and fixer. Runs Lighthouse/PageSpeed audits on websites or local dev servers, analyzes SEO/performance/accessibility scores, and automatically implements fixes for meta tags, structured data, Core Web Vitals, and accessibility issues.
-version: 1.0.0
-author: Kemeny Studio
 license: MIT
-tags: [SEO, Lighthouse, PageSpeed, Accessibility, Performance, Meta Tags, Structured Data, Core Web Vitals, WCAG, Next.js, React, Vue]
-dependencies: [lighthouse, chrome-launcher]
+description: Technical SEO auditor and fixer. Runs Lighthouse/PageSpeed audits on websites or local dev servers, analyzes SEO/performance/accessibility scores, and automatically implements fixes for meta tags, structured data, Core Web Vitals, and accessibility issues.
+metadata:
+  version: 1.0.0
+  author: Kemeny Studio
+  tags:
+  - SEO
+  - Lighthouse
+  - PageSpeed
+  - Accessibility
+  - Performance
+  - Meta Tags
+  - Structured Data
+  - Core Web Vitals
+  - WCAG
+  - Next.js
+  - React
+  - Vue
+  dependencies:
+  - lighthouse
+  - chrome-launcher
 ---
-
 # Roier SEO - Technical SEO Auditor & Fixer
 
 AI-powered SEO optimization skill that audits websites and automatically implements fixes.

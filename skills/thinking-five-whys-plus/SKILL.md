@@ -1,8 +1,8 @@
 ---
 name: thinking-five-whys-plus
 description: Enhanced root cause analysis with explicit bias guards and stopping criteria. Use for incident post-mortems, bug investigations, and process failures where standard 5 Whys might mislead.
+license: Unspecified
 ---
-
 # Five Whys Plus
 
 ## Overview

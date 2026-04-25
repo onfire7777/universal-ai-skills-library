@@ -1,19 +1,15 @@
 ---
 name: gdpr-valid-consent
-description: >-
-  Guide for implementing GDPR-valid consent under Article 7 conditions and Article 4(11)
-  definition. Covers five core requirements: freely given, specific, informed, unambiguous,
-  and clear affirmative action. Includes pre-ticked boxes prohibition per Planet49 CJEU
-  C-673/17, consent form audit checklist, and practical implementation patterns.
 license: Apache-2.0
+description: 'Guide for implementing GDPR-valid consent under Article 7 conditions and Article 4(11) definition. Covers five core requirements: freely given, specific, informed, unambiguous, and clear affirmative action. Includes pre-ticked boxes prohibition per Planet49 CJEU C-673/17, consent form audit checklist, and practical implementation patterns.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: consent-management
-  tags: "gdpr-consent, article-7, valid-consent, affirmative-action, consent-audit"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: consent-management
+    tags: gdpr-consent, article-7, valid-consent, affirmative-action, consent-audit
 ---
-
 # Implementing GDPR-Valid Consent
 
 ## Overview

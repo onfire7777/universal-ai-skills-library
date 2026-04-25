@@ -1,8 +1,8 @@
 ---
 name: thinking-red-team
 description: Deliberately attack your own plans, systems, and assumptions to find weaknesses before adversaries or reality does. Use for security review, architecture validation, plan stress-testing, and pre-launch preparation.
+license: Unspecified
 ---
-
 # Red Team Thinking
 
 ## Overview

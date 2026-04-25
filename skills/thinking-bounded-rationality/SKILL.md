@@ -1,8 +1,8 @@
 ---
 name: thinking-bounded-rationality
 description: Apply Herbert Simon's Bounded Rationality and satisficing to make good-enough decisions under real-world constraints. Use for design decisions under time pressure, recognizing cognitive limits, and setting appropriate stopping criteria.
+license: Unspecified
 ---
-
 # Bounded Rationality and Satisficing
 
 ## Overview

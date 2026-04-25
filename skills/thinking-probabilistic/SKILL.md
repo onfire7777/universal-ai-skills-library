@@ -1,8 +1,8 @@
 ---
 name: thinking-probabilistic
 description: Express confidence in ranges, update predictions with new information, and track calibration over time. Use for project estimation, risk assessment, and decision making under uncertainty.
+license: Unspecified
 ---
-
 # Probabilistic Thinking
 
 ## Overview

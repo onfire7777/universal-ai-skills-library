@@ -1,19 +1,15 @@
 ---
 name: pii-detection-pipeline
-description: >-
-  Build automated PII detection and redaction pipelines using spaCy NER,
-  Microsoft Presidio, and AWS Macie integration. Includes confidence scoring,
-  custom entity type definitions, batch processing workflows, and multi-format
-  document scanning for structured and unstructured data sources.
 license: Apache-2.0
+description: Build automated PII detection and redaction pipelines using spaCy NER, Microsoft Presidio, and AWS Macie integration. Includes confidence scoring, custom entity type definitions, batch processing workflows, and multi-format document scanning for structured and unstructured data sources.
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: privacy-engineering
-  tags: "pii-detection, presidio, spacy-ner, data-redaction, aws-macie"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: privacy-engineering
+    tags: pii-detection, presidio, spacy-ner, data-redaction, aws-macie
 ---
-
 # Automated PII Detection and Redaction Pipeline
 
 ## Overview

@@ -1,21 +1,15 @@
 ---
 name: healthcare-ai-privacy
-description: >-
-  Addresses healthcare AI privacy at the intersection of HIPAA and the EU AI
-  Act for clinical decision support systems. Covers training data PHI
-  handling, model transparency and explainability, patient rights in
-  algorithmic decisions, FDA/OCR regulatory coordination, and bias
-  monitoring. Keywords: healthcare AI, HIPAA, AI Act, clinical decision
-  support, PHI training data, model transparency.
 license: Apache-2.0
+description: 'Addresses healthcare AI privacy at the intersection of HIPAA and the EU AI Act for clinical decision support systems. Covers training data PHI handling, model transparency and explainability, patient rights in algorithmic decisions, FDA/OCR regulatory coordination, and bias monitoring. Keywords: healthcare AI, HIPAA, AI Act, clinical decision support, PHI training data, model transparency.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: healthcare-privacy
-  tags: "healthcare-ai, hipaa, ai-act, clinical-decision-support, phi-training-data, model-transparency, bias"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: healthcare-privacy
+    tags: healthcare-ai, hipaa, ai-act, clinical-decision-support, phi-training-data, model-transparency, bias
 ---
-
 # Healthcare AI Privacy — HIPAA and AI Act Intersection
 
 ## Overview

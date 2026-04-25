@@ -1,8 +1,8 @@
 ---
 name: cost-optimization
 description: Optimize cloud costs across AWS, Azure, GCP, and OCI through resource rightsizing, tagging strategies, reserved instances, and spending analysis. Use when reducing cloud expenses, analyzing infrastructure costs, or implementing cost governance policies.
+license: Unspecified
 ---
-
 # Cloud Cost Optimization
 
 Strategies and patterns for optimizing cloud costs across AWS, Azure, GCP, and OCI.

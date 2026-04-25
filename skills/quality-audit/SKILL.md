@@ -1,27 +1,29 @@
 ---
 name: quality-audit
-description: >-
-  Meta-skill for auditing and validating skill quality. Use when reviewing
-  skills for consistency, completeness, accuracy, and adherence to standards.
-  Provides structured rubrics, scoring frameworks, and actionable recommendations.
-author: cortex team
-version: 1.0.0
 license: MIT
-tags: [meta, quality, validation, review, standards]
-created: 2026-01-05
-updated: 2026-01-05
-triggers:
+description: Meta-skill for auditing and validating skill quality. Use when reviewing skills for consistency, completeness, accuracy, and adherence to standards. Provides structured rubrics, scoring frameworks, and actionable recommendations.
+metadata:
+  author: cortex team
+  version: 1.0.0
+  tags:
+  - meta
+  - quality
+  - validation
+  - review
+  - standards
+  created: 2026-01-05
+  updated: 2026-01-05
+  triggers:
   - audit skill
   - review skill quality
   - validate skill
   - skill quality check
   - rubric assessment
-dependencies:
-  skills: []
-  tools: []
-token_estimate: ~2000
+  dependencies:
+    skills: []
+    tools: []
+  token_estimate: ~2000
 ---
-
 # Quality Audit Skill
 
 Systematic framework for evaluating skill quality across four dimensions: **Clarity**, **Completeness**, **Accuracy**, and **Usefulness**.

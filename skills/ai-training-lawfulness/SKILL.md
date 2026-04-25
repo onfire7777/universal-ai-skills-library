@@ -1,20 +1,15 @@
 ---
 name: ai-training-lawfulness
-description: >-
-  Assesses lawful basis for AI training data processing per EDPB April 2025
-  report on LLMs and general-purpose AI. Covers legitimate interest balancing
-  tests, consent challenges for ML training, public dataset assessment, and
-  web scraping lawfulness. Keywords: AI training data, lawful basis, EDPB LLM,
-  legitimate interest, consent, web scraping.
 license: Apache-2.0
+description: 'Assesses lawful basis for AI training data processing per EDPB April 2025 report on LLMs and general-purpose AI. Covers legitimate interest balancing tests, consent challenges for ML training, public dataset assessment, and web scraping lawfulness. Keywords: AI training data, lawful basis, EDPB LLM, legitimate interest, consent, web scraping.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: ai-privacy-governance
-  tags: "ai-training, lawful-basis, edpb-llm, legitimate-interest, web-scraping, consent"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: ai-privacy-governance
+    tags: ai-training, lawful-basis, edpb-llm, legitimate-interest, web-scraping, consent
 ---
-
 # Lawful Basis for AI Training Data
 
 ## Overview

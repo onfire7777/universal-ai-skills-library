@@ -1,8 +1,8 @@
 ---
-name: "Web Design Builder"
-description: "Create and refactor HTML5/JavaScript web designs from specifications or descriptions. Generates complete, accessible, responsive web designs with modern frameworks. Automatically verifies designs using Playwright MCP for accessibility and functionality testing. Use this skill when users ask to create web designs, mockups, landing pages, web applications, or refactor existing HTML/CSS/JS designs."
+name: web-design-builder
+description: Create and refactor HTML5/JavaScript web designs from specifications or descriptions. Generates complete, accessible, responsive web designs with modern frameworks. Automatically verifies designs using Playwright MCP for accessibility and functionality testing. Use this skill when users ask to create web designs, mockups, landing pages, web applications, or refactor existing HTML/CSS/JS designs.
+license: Unspecified
 ---
-
 # Web Design Builder
 
 This skill creates professional HTML5/JavaScript web designs from specifications, with automatic accessibility and functionality verification using Playwright MCP.

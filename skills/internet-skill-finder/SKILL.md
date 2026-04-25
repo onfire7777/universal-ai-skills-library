@@ -1,8 +1,8 @@
 ---
 name: internet-skill-finder
 description: Search and recommend Agent Skills from verified GitHub repositories. Use when users ask to find, discover, search for, or recommend skills/plugins for specific tasks, domains, or workflows.
+license: Unspecified
 ---
-
 # Internet Skill Finder
 
 Search 7 verified GitHub repositories for Agent Skills.

@@ -1,8 +1,8 @@
 ---
 name: prompt-engineering
 description: Expert guide on prompt engineering patterns, best practices, and optimization techniques. Use when user wants to improve prompts, learn prompting strategies, or debug agent behavior.
+license: Unspecified
 ---
-
 # Prompt Engineering Patterns
 
 Advanced prompt engineering techniques to maximize LLM performance, reliability, and controllability.

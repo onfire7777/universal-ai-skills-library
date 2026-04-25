@@ -1,13 +1,8 @@
 ---
 name: skill-connection-map
-description: >
-  Maps the hidden connections between all 630+ installed skills, enabling cross-pollination of
-  ideas across domains. Use when you want to find unexpected connections, when a problem in one
-  domain might benefit from thinking in another domain, when you want to transfer patterns
-  between fields, or when you want to see the bigger picture of how skills relate. This is the
-  "neural network" that connects all skills into a living, interconnected knowledge system.
+description: Maps the hidden connections between all 630+ installed skills, enabling cross-pollination of ideas across domains. Use when you want to find unexpected connections, when a problem in one domain might benefit from thinking in another domain, when you want to transfer patterns between fields, or when you want to see the bigger picture of how skills relate. This is the "neural network" that connects all skills into a living, interconnected knowledge system.
+license: Unspecified
 ---
-
 # Skill Connection Map
 
 ## Purpose

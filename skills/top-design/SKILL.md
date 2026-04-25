@@ -1,12 +1,12 @@
 ---
 name: top-design
-description: 'Create award-winning, immersive web experiences at the level of Awwwards-featured agencies. Use when the user mentions "premium website", "portfolio site", "scroll animations", "Awwwards quality", or "brand experience". Covers dramatic typography, purposeful motion, scroll-based composition, and performance-optimized animation. For foundational UI, see refactoring-ui. For type selection, see web-typography.'
 license: MIT
+description: Create award-winning, immersive web experiences at the level of Awwwards-featured agencies. Use when the user mentions "premium website", "portfolio site", "scroll animations", "Awwwards quality", or "brand experience". Covers dramatic typography, purposeful motion, scroll-based composition, and performance-optimized animation. For foundational UI, see refactoring-ui. For type selection, see web-typography.
 metadata:
-  author: wondelai
-  version: "1.2.0"
+  metadata:
+    author: wondelai
+    version: 1.2.0
 ---
-
 # Top-Design: Award-Winning Digital Experiences
 
 Create websites and applications at the level of world-class digital agencies. This skill embodies the craft of studios that consistently win FWA, Awwwards, CSS Design Awards, and Webby Awards.

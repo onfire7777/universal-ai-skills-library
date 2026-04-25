@@ -1,12 +1,12 @@
 ---
 name: lean-ux
-description: 'Apply lean thinking to UX: hypothesis-driven design, collaborative sketching, and rapid experiments instead of heavy deliverables. Use when the user mentions "Lean UX", "design hypothesis", "UX experiment", "collaborative design", or "outcome over output". Covers hypothesis statements, MVPs for UX, and cross-functional collaboration. For Build-Measure-Learn, see lean-startup. For usability audits, see ux-heuristics.'
 license: MIT
+description: 'Apply lean thinking to UX: hypothesis-driven design, collaborative sketching, and rapid experiments instead of heavy deliverables. Use when the user mentions "Lean UX", "design hypothesis", "UX experiment", "collaborative design", or "outcome over output". Covers hypothesis statements, MVPs for UX, and cross-functional collaboration. For Build-Measure-Learn, see lean-startup. For usability audits, see ux-heuristics.'
 metadata:
-  author: wondelai
-  version: "1.0.0"
+  metadata:
+    author: wondelai
+    version: 1.0.0
 ---
-
 # Lean UX Framework
 
 A practice-driven approach to user experience design that replaces heavy deliverables with rapid experimentation, cross-functional collaboration, and continuous learning. Based on a fundamental truth: teams that obsess over pixel-perfect specs before testing with real users waste months building the wrong thing. Lean UX shifts the question from "What should we design?" to "What do we need to learn?"

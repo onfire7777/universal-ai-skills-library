@@ -1,13 +1,8 @@
 ---
 name: github-gem-seeker
-description: >
-  Search GitHub for battle-tested solutions instead of reinventing the wheel. Use when
-  the user's problem is universal enough that open source developers have probably
-  solved it already—especially for: format conversion (video/audio/image/document),
-  media downloading, file manipulation, web scraping/archiving, automation scripts,
-  and CLI tools. Prefer this skill over writing custom code for well-trodden problems.
+description: 'Search GitHub for battle-tested solutions instead of reinventing the wheel. Use when the user''s problem is universal enough that open source developers have probably solved it already—especially for: format conversion (video/audio/image/document), media downloading, file manipulation, web scraping/archiving, automation scripts, and CLI tools. Prefer this skill over writing custom code for well-trodden problems.'
+license: Unspecified
 ---
-
 # GitHub Gem Seeker
 
 Find and use battle-tested open source projects on GitHub to solve the user's problem immediately. After successfully solving the problem, offer to package the solution into a reusable skill.

@@ -1,8 +1,8 @@
 ---
 name: scrape
 description: Scrape any webpage as clean markdown via Bright Data Web Unlocker API. Bypasses bot detection and CAPTCHA. Requires BRIGHTDATA_API_KEY and BRIGHTDATA_UNLOCKER_ZONE environment variables.
+license: Unspecified
 ---
-
 # Bright Data - Web Scraper
 
 Scrape any webpage and get clean markdown content using Bright Data's Web Unlocker API. Automatically bypasses bot detection and CAPTCHA.

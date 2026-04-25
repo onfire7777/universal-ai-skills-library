@@ -1,14 +1,22 @@
 ---
 name: implementing-api-security-posture-management
-description: Implement API Security Posture Management to continuously discover, classify, and score APIs based on risk while enforcing security policies across the API lifecycle.
-domain: cybersecurity
-subdomain: api-security
-tags: [api-security, aspm, api-posture-management, api-discovery, risk-scoring, api-governance, continuous-monitoring, api-inventory]
-version: "1.0"
-author: mahipal
 license: Apache-2.0
+description: Implement API Security Posture Management to continuously discover, classify, and score APIs based on risk while enforcing security policies across the API lifecycle.
+metadata:
+  domain: cybersecurity
+  subdomain: api-security
+  tags:
+  - api-security
+  - aspm
+  - api-posture-management
+  - api-discovery
+  - risk-scoring
+  - api-governance
+  - continuous-monitoring
+  - api-inventory
+  version: '1.0'
+  author: mahipal
 ---
-
 # Implementing API Security Posture Management
 
 ## Overview

@@ -1,21 +1,15 @@
 ---
 name: breach-simulation
-description: >-
-  Designs and executes tabletop breach simulation exercises for testing
-  organizational breach response capabilities. Covers scenario creation with
-  realistic inject timelines, participant role assignment, communication
-  testing across internal and external channels, decision-point evaluation,
-  and after-action report generation. Keywords: tabletop exercise, breach
-  simulation, incident response testing, scenario design, after-action report.
 license: Apache-2.0
+description: 'Designs and executes tabletop breach simulation exercises for testing organizational breach response capabilities. Covers scenario creation with realistic inject timelines, participant role assignment, communication testing across internal and external channels, decision-point evaluation, and after-action report generation. Keywords: tabletop exercise, breach simulation, incident response testing, scenario design, after-action report.'
 metadata:
-  author: mukul975
-  version: "1.0"
-  domain: privacy
-  subdomain: data-breach-response
-  tags: "tabletop-exercise, breach-simulation, incident-response, scenario-design, after-action"
+  metadata:
+    author: mukul975
+    version: '1.0'
+    domain: privacy
+    subdomain: data-breach-response
+    tags: tabletop-exercise, breach-simulation, incident-response, scenario-design, after-action
 ---
-
 # Designing Breach Simulation Exercise
 
 ## Overview

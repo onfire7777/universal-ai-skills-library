@@ -1,8 +1,8 @@
 ---
 name: thinking-leverage-points
 description: Identify where small changes can have large effects using Donella Meadows' hierarchy of system intervention points. Use for strategic decisions, system optimization, and choosing where to focus engineering effort.
+license: Unspecified
 ---
-
 # Leverage Points
 
 ## Overview

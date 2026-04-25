@@ -1,9 +1,10 @@
 ---
 name: ux-audit
-description: "Dogfood web apps — browse as a real user, notice friction, document findings. Adopts a user persona, tracks emotional friction (trust, anxiety, confusion), counts click efficiency, tests resilience (mid-form navigation, back button, refresh), and asks 'would I come back?'. Produces ranked audit reports. Trigger with 'ux audit', 'dogfood this', 'ux walkthrough', 'qa test', 'test the app', or 'check all pages'."
-compatibility: claude-code-only
+description: Dogfood web apps — browse as a real user, notice friction, document findings. Adopts a user persona, tracks emotional friction (trust, anxiety, confusion), counts click efficiency, tests resilience (mid-form navigation, back button, refresh), and asks 'would I come back?'. Produces ranked audit reports. Trigger with 'ux audit', 'dogfood this', 'ux walkthrough', 'qa test', 'test the app', or 'check all pages'.
+license: Unspecified
+metadata:
+  compatibility: claude-code-only
 ---
-
 # UX Audit
 
 Dogfood web apps by browsing them as a real user would — with their goals, their patience, and their context. Goes beyond "does it work?" to "is it good?" by tracking emotional friction (trust, anxiety, confusion), counting click efficiency, testing resilience, and asking the ultimate question: "would I come back?" Uses Chrome MCP (for authenticated apps with your session) or Playwright for browser automation. Produces structured audit reports with findings ranked by impact.

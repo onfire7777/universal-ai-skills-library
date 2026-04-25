@@ -1,8 +1,8 @@
 ---
 name: thinking-model-router
 description: Route to the right mental model based on your domain and problem type. The single entry point for all thinking skills.
+license: Unspecified
 ---
-
 # Model Router
 
 ## Overview

@@ -1,11 +1,18 @@
 ---
 name: design-system-starter
 description: Use this skill when creating or evolving design systems for applications. Provides design token structures, component architecture patterns, documentation templates, and accessibility guidelines. Ensures consistent, scalable, and accessible UI design across products.
-version: 1.0.0
-author: AI Agent Hub
-tags: [design-system, ui, components, design-tokens, accessibility, frontend]
+license: Unspecified
+metadata:
+  version: 1.0.0
+  author: AI Agent Hub
+  tags:
+  - design-system
+  - ui
+  - components
+  - design-tokens
+  - accessibility
+  - frontend
 ---
-
 # Design System Starter
 
 ## Overview

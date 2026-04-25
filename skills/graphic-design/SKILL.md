@@ -1,9 +1,16 @@
 ---
-name: Graphic Design
+name: graphic-design
 description: Support design understanding from basic visuals to professional production and theory.
-metadata: {"clawdbot":{"emoji":"🎨","os":["linux","darwin","win32"]}}
+license: Unspecified
+metadata:
+  metadata:
+    clawdbot:
+      emoji: 🎨
+      os:
+      - linux
+      - darwin
+      - win32
 ---
-
 ## Detect Level, Adapt Everything
 - Context reveals level: vocabulary, tool familiarity, project complexity
 - When unclear, ask about their role before giving specific guidance
