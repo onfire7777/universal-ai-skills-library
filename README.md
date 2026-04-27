@@ -1,66 +1,97 @@
 # Manus Skills Library
 
-**791 curated agent skills** for Manus — the most comprehensive collection covering software development, UI/UX design, security, privacy, reasoning, creativity, planning, and more.
+Canonical flat store of **770 production-quality skills** in the Anthropic / OpenAI Agent Skills standard format.
 
-## Quick Install
+## Layout
 
-In any Manus task, just say:
-
-> "Clone my manus-skills-library repo and run the install script"
-
-Or Manus can run:
-
-```bash
-gh repo clone manus-skills-library /tmp/manus-skills-library && bash /tmp/manus-skills-library/install.sh
+```
+skills/
+├── aes-encryption/SKILL.md
+├── motion-canvas/SKILL.md
+├── thinking-bayesian/SKILL.md
+└── ... (770 skills total)
 ```
 
-## What's Included
+Every skill folder contains a `SKILL.md` with YAML frontmatter (`name`, `description`, optional `license` and `metadata`) and markdown body. Some include `scripts/`, `references/`, `assets/` subfolders.
 
-| Category | Count | Highlights |
-|----------|-------|------------|
-| **Frontend & UI/UX** | 85+ | Anthropic frontend-design, shadcn/ui, GSAP animations, Tailwind, design systems, responsive design |
-| **Backend & Architecture** | 40+ | API design, Clean Architecture, microservices, FastAPI, databases (PostgreSQL, MySQL, MSSQL) |
-| **Security** | 100+ | Trail of Bits (47), Semgrep, OWASP, zero trust, encryption, pentest, DevSecOps |
-| **Privacy & Compliance** | 65+ | GDPR, CCPA, HIPAA, differential privacy, LINDDUN, data breach response |
-| **Bug Detection & Optimization** | 60+ | Simota suite, static analysis, profiling, refactoring, dead code detection |
-| **Reasoning & Thinking** | 90+ | 39 mental models, thinking partner, cognitive bias detection, decision frameworks |
-| **Creativity & Innovation** | 70+ | Creative connections engine, lateral thinking, mind mapping, 17 book-based skills |
-| **Planning & Meta-Thinking** | 60+ | Strategic planning, PM skills, meta-thinking engine, skill orchestrator |
-| **AI & Prompt Engineering** | 20+ | LLM expertise, RAG, agent design, prompt engineering, AI safety |
-| **Data Analysis** | 15+ | Statistics, visualization, pandas, scientific methodology |
-| **DevOps & IT** | 30+ | GitHub Actions, Docker, Kubernetes, cloud infrastructure, sysadmin |
-| **Custom Meta-Skills** | 12 | Master orchestrator, skill connection map, big picture thinking, introspection engine |
+## Direct flat install
 
-## Sources
+Drop into any agent's flat skills folder:
 
-Skills curated from the best repositories:
-- **Anthropic** (official)
-- **Trail of Bits** (security research)
-- **Vercel Labs** (React/Next.js)
-- **obra/superpowers** (development workflows)
-- **simota** (100-skill agent suite)
-- **davila7** (86 specialized tools)
-- **deanpeters** (product management)
-- **tjboudreaux** (39 mental models)
-- **wondelai** (book-based design/business skills)
-- **wpank/openclaw** (design systems)
-- And 10+ more top-tier sources
+```bash
+# Claude Code / Cowork
+cp -r skills/* ~/.claude/skills/
 
-## Custom-Built Skills
+# OpenAI Codex CLI
+cp -r skills/* ~/.codex/skills/
+```
 
-These were built from scratch specifically for this library:
-- `master-skill-orchestrator` — Routes any task to the right combination of skills
-- `skill-connection-map` — Maps how all 791 skills interconnect
-- `big-picture-thinking-engine` — Long-term, systems-level thinking
-- `skill-composition-protocol` — How to chain skills for complex tasks
-- `creative-connections-engine` — Bisociation, conceptual blending, lateral thinking
-- `meta-thinking-engine` — Metacognition and self-correction
-- `strategic-planning-engine` — 5-level planning from vision to task
-- `long-term-consequential-thinking` — Temporal reasoning and foresight
-- `introspection-reflection-engine` — Self-improvement through reflection
-- `deep-research-scholarly-engine` — Systematic research methodology
-- `internet-search-parsing-mastery` — Advanced search and source evaluation
-- `data-analyst-engine` — Full data analysis lifecycle
-- `ai-expertise-engine` — Comprehensive AI/ML expertise
-- `cli-windows-powershell-mastery` — Cross-platform CLI reference
-- `it-infrastructure-sysadmin` — IT infrastructure management
+Both auto-detect on next session start. The format is identical across both ecosystems (Anthropic donated Skills as an open spec on 2025-12-18; OpenAI adopted it for Codex and ChatGPT in December 2025).
+
+## For plugin-style install
+
+See [`manus-skills-marketplace`](https://github.com/onfire7777/manus-skills-marketplace).
+
+## For browse / discovery
+
+See [`manus-skills-organized`](https://github.com/onfire7777/manus-skills-organized).
+
+## Categories
+
+| # | Browse folder | Plugin name | Skills | Purpose |
+|--:|---|---|--:|---|
+| 01 | `01-security` | `manus-security` | 134 | Security: pentesting, exploits, hardening, crypto, AppSec/NetSec |
+| 02 | `02-privacy-compliance` | `manus-privacy-compliance` | 55 | Privacy and compliance: GDPR/CCPA/HIPAA, DPIAs, AI Act, ISO 27701 |
+| 03 | `03-frontend-design` | `manus-frontend-design` | 113 | Frontend and design: UI/UX, web frontend, design systems, accessibility |
+| 04 | `04-backend-architecture` | `manus-backend-architecture` | 55 | Backend architecture: APIs, system design, distributed systems, databases |
+| 05 | `05-devops-infra` | `manus-devops-infra` | 21 | DevOps and infrastructure: CI/CD, containers, cloud, IaC, SRE |
+| 06 | `06-ai-prompt-engineering` | `manus-ai-prompt-engineering` | 32 | AI and prompt engineering: LLM apps, agents, RAG, evals |
+| 07 | `07-data-analysis` | `manus-data-analysis` | 16 | Data analysis: analytics, viz, statistics, ML/data pipelines |
+| 08 | `08-reasoning-thinking` | `manus-reasoning-thinking` | 72 | Reasoning and thinking: mental models, critical thinking, epistemics |
+| 09 | `09-creativity-innovation` | `manus-creativity-innovation` | 23 | Creativity and innovation: creative writing, art, ideation |
+| 10 | `10-planning-strategy` | `manus-planning-strategy` | 68 | Planning and strategy: PM, strategic planning, roadmaps, OKRs |
+| 11 | `11-communication` | `manus-communication` | 25 | Communication: writing, presentations, facilitation, leadership |
+| 12 | `12-quality-engineering` | `manus-quality-engineering` | 46 | Quality engineering: code review, testing, debugging, refactoring |
+| 13 | `13-meta-skills` | `manus-meta-skills` | 109 | Meta-skills: skill creation, learning, productivity |
+| 14 | `14-domain-specific` | `manus-domain-specific` | 1 | Narrow verticals: medical, legal, finance, scientific domains |
+
+## Companion repos
+
+These three repos hold the **same 770 skills** in different layouts. Use whichever fits your workflow:
+
+| Repo | Role | Layout |
+|---|---|---|
+| [`manus-skills-library`](https://github.com/onfire7777/manus-skills-library) | **Canonical store** | Flat `skills/<slug>/SKILL.md` |
+| [`manus-skills-organized`](https://github.com/onfire7777/manus-skills-organized) | **Browse view** | Numbered category folders `skills/<NN-category>/<slug>/` |
+| [`manus-skills-marketplace`](https://github.com/onfire7777/manus-skills-marketplace) | **Install distribution** | Plugin format for Claude Code (`plugins/`) and OpenAI Codex CLI (`ai-codex/plugins/`) |
+
+## Naming convention (consistent across all three repos)
+
+Same 14 category slugs everywhere. Prefix differs only by purpose:
+
+- **Skill slug:** `aes-encryption`, `motion-canvas`, `thinking-bayesian` (kebab-case, no prefix)
+- **Browse folder:** `01-security`, `02-privacy-compliance`, ... (numeric prefix sorts naturally for navigation)
+- **Plugin identifier:** `manus-security`, `manus-privacy-compliance`, ... (`manus-` namespace prefix for plugin ecosystems)
+
+
+## Format
+
+```yaml
+---
+name: kebab-case-slug
+description: One-line description of what the skill does and when it triggers.
+license: ...
+metadata:
+  domain: ...
+  tags: [...]
+---
+
+# Title
+
+## Overview
+...
+```
+
+## Provenance
+
+Built by deduplicating, normalizing, and re-categorizing skills from the original Manus skills ecosystem. 849 input → 773 cleaned (3 unsalvageable, 73 duplicates collapsed) → 770 final after additional plugin-canonical dedup. Zero defects on the final output (verified): no broken YAML, no missing required fields, no name collisions, no duplicate bodies.
