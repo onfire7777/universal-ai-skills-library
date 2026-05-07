@@ -147,7 +147,7 @@ These are the top-level, deeply debugged and optimized skills that define the me
 
 ## The Skills Library (770+ Skills)
 
-The `skills/` directory contains 770 agent skills formatted to the [OpenSkills specification](https://github.com/asynkron/openskills).
+The library contains 770+ agent skills formatted to the [OpenSkills specification](https://github.com/asynkron/openskills).
 
 ### Quality Guarantees
 
@@ -278,7 +278,7 @@ This setup is verified to work with:
 manus-skills-library/
 ├── README.md                          # This file
 ├── INSTALLED_REPOS.md                 # Catalog of all GitHub repos
-├── MANIFEST.json                      # Skill metadata index
+├── manifest.json                      # Machine-readable catalog of all skills
 ├── DROPPED.md                         # Skills removed during normalization
 ├── NORMALIZATION_REPORT.md            # Audit trail of normalization
 ├── install.sh                         # Legacy Linux installer
@@ -375,3 +375,4 @@ Start-ScheduledTask -TaskName "Manus-McpWatchdog"
 ---
 
 *Maintained as part of the Universal AI Architecture. For questions or issues, open a GitHub issue on this repository.*
+| 2025-05-07 | Repo Hygiene | Added comprehensive .gitignore, removed debug artifacts, generated manifest.json, updated installer to handle core skills |
