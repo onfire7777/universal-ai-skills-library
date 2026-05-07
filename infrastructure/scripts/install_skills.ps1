@@ -1,21 +1,50 @@
-# Universal Skills Installer
-# Installs all skills from this repository to all detected AI platform roots
+# Universal AI Skills Installer
+# Installs ALL skills (core + library) from this repository to all detected AI platform roots
 # Run from the repository root directory
+#
+# Usage:
+#   .\infrastructure\scripts\install_skills.ps1           # Install with junctions
+#   .\infrastructure\scripts\install_skills.ps1 -DryRun   # Preview without changes
+#   .\infrastructure\scripts\install_skills.ps1 -Force    # Overwrite existing installations
+#   .\infrastructure\scripts\install_skills.ps1 -Copy     # Copy files instead of junction
 
 param(
     [switch]$DryRun,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Copy
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$SkillsSource = Join-Path $RepoRoot "skills"
 
-Write-Host "=== Universal Skills Installer ===" -ForegroundColor Cyan
-Write-Host "Source: $SkillsSource"
+Write-Host "=== Universal AI Skills Installer ===" -ForegroundColor Cyan
+Write-Host "Repository: $RepoRoot"
 Write-Host ""
 
-# Define all AI platform skill roots
+# ─── Identify all skills ──────────────────────────────────────────────────────
+# Core skills: top-level directories with SKILL.md (not skills/, infrastructure/, .git)
+$coreSkillDirs = Get-ChildItem $RepoRoot -Directory | Where-Object {
+    (Test-Path (Join-Path $_.FullName "SKILL.md")) -and
+    $_.Name -notin @("skills", "infrastructure", ".git", "node_modules")
+}
+
+# Library skills: in the skills/ subdirectory
+$librarySkillsDir = Join-Path $RepoRoot "skills"
+$librarySkillDirs = @()
+if (Test-Path $librarySkillsDir) {
+    $librarySkillDirs = Get-ChildItem $librarySkillsDir -Directory | Where-Object {
+        Test-Path (Join-Path $_.FullName "SKILL.md")
+    }
+}
+
+$totalSkills = $coreSkillDirs.Count + $librarySkillDirs.Count
+Write-Host "Skills found:" -ForegroundColor Green
+Write-Host "  Core skills:    $($coreSkillDirs.Count) (top-level, with scripts)"
+Write-Host "  Library skills: $($librarySkillDirs.Count) (in skills/ directory)"
+Write-Host "  Total:          $totalSkills"
+Write-Host ""
+
+# ─── Define AI platform roots ─────────────────────────────────────────────────
 $platforms = @(
     @{ Name = "Claude Desktop"; Path = "$env:APPDATA\Claude\skills" },
     @{ Name = "Claude Code";    Path = "$env:USERPROFILE\.claude\skills" },
@@ -26,12 +55,39 @@ $platforms = @(
     @{ Name = "Manus Local";    Path = "$env:USERPROFILE\.manus\skills" }
 )
 
-# Count skills
-$skillCount = (Get-ChildItem $SkillsSource -Directory).Count
-Write-Host "Skills available: $skillCount" -ForegroundColor Green
-Write-Host ""
+# ─── Install function ─────────────────────────────────────────────────────────
+function Install-SkillToTarget {
+    param(
+        [string]$SourceDir,
+        [string]$TargetDir,
+        [string]$SkillName
+    )
+    
+    $targetSkillPath = Join-Path $TargetDir $SkillName
+    
+    if (Test-Path $targetSkillPath) {
+        if (-not $Force) {
+            $item = Get-Item $targetSkillPath -Force -ErrorAction SilentlyContinue
+            if ($item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
+                return "linked"
+            }
+            return "exists"
+        }
+        Remove-Item $targetSkillPath -Recurse -Force
+    }
+    
+    if ($Copy) {
+        Copy-Item $SourceDir -Destination $targetSkillPath -Recurse -Force
+    } else {
+        New-Item -ItemType Junction -Path $targetSkillPath -Target $SourceDir | Out-Null
+    }
+    return "installed"
+}
 
-# Install to each platform
+# ─── Install to each platform ─────────────────────────────────────────────────
+$installedCount = 0
+$skippedCount = 0
+
 foreach ($platform in $platforms) {
     $targetPath = $platform.Path
     $parentDir = Split-Path $targetPath -Parent
@@ -39,45 +95,67 @@ foreach ($platform in $platforms) {
     # Check if the platform is installed (parent directory exists)
     if (-not (Test-Path $parentDir)) {
         Write-Host "  SKIP: $($platform.Name) (not installed)" -ForegroundColor DarkGray
+        $skippedCount++
         continue
     }
     
     Write-Host "  Installing to $($platform.Name)..." -ForegroundColor Yellow
     
-    if ($DryRun) {
-        Write-Host "    [DRY RUN] Would create junction: $targetPath -> $SkillsSource"
-        continue
-    }
-    
-    # Remove existing skills directory/junction
-    if (Test-Path $targetPath) {
-        if ($Force) {
-            Remove-Item $targetPath -Recurse -Force
-        } else {
-            # Check if it's already a junction pointing to our source
-            $item = Get-Item $targetPath -Force
-            if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-                $target = [System.IO.Path]::GetFullPath((cmd /c "dir /al `"$parentDir`"" 2>$null | Select-String $item.Name | ForEach-Object { ($_ -split '\[')[1] -replace '\]','' }))
-                if ($target -eq $SkillsSource) {
-                    Write-Host "    Already linked correctly" -ForegroundColor Green
-                    continue
-                }
-            }
-            Write-Host "    WARNING: $targetPath exists. Use -Force to overwrite." -ForegroundColor Red
-            continue
+    # Create skills directory if it doesn't exist
+    if (-not (Test-Path $targetPath)) {
+        if (-not $DryRun) {
+            New-Item -ItemType Directory -Path $targetPath -Force | Out-Null
         }
     }
     
-    # Create directory junction (symlink for directories)
-    New-Item -ItemType Junction -Path $targetPath -Target $SkillsSource | Out-Null
-    Write-Host "    Linked: $targetPath -> $SkillsSource" -ForegroundColor Green
+    if ($DryRun) {
+        Write-Host "    [DRY RUN] Would install $totalSkills skills to: $targetPath"
+        continue
+    }
+    
+    $platformInstalled = 0
+    $platformLinked = 0
+    $platformSkipped = 0
+    
+    # Install core skills (these have scripts and are the most important)
+    foreach ($skill in $coreSkillDirs) {
+        $result = Install-SkillToTarget -SourceDir $skill.FullName -TargetDir $targetPath -SkillName $skill.Name
+        switch ($result) {
+            "installed" { $platformInstalled++ }
+            "linked"    { $platformLinked++ }
+            "exists"    { $platformSkipped++ }
+        }
+    }
+    
+    # Install library skills
+    foreach ($skill in $librarySkillDirs) {
+        $result = Install-SkillToTarget -SourceDir $skill.FullName -TargetDir $targetPath -SkillName $skill.Name
+        switch ($result) {
+            "installed" { $platformInstalled++ }
+            "linked"    { $platformLinked++ }
+            "exists"    { $platformSkipped++ }
+        }
+    }
+    
+    Write-Host "    New: $platformInstalled | Already linked: $platformLinked | Skipped: $platformSkipped" -ForegroundColor Green
+    $installedCount++
 }
 
 Write-Host ""
 Write-Host "=== Installation Complete ===" -ForegroundColor Green
+Write-Host "  Platforms configured: $installedCount"
+Write-Host "  Platforms skipped:    $skippedCount (not installed)"
 Write-Host ""
-Write-Host "All platforms now share the same skills directory via junctions."
-Write-Host "Updates to the repo will automatically propagate to all platforms."
+
+if (-not $Copy) {
+    Write-Host "Skills are linked via directory junctions." -ForegroundColor Cyan
+    Write-Host "Updates to the repo will automatically propagate to all platforms."
+} else {
+    Write-Host "Skills were copied. Run again after updates to re-sync." -ForegroundColor Yellow
+}
+
 Write-Host ""
-Write-Host "To also set up MCP bridges, run:"
-Write-Host "  .\infrastructure\scripts\setup_mcp_bridges.ps1" -ForegroundColor Cyan
+Write-Host "Next steps:" -ForegroundColor White
+Write-Host "  1. Set up MCP bridges:  .\infrastructure\scripts\setup_mcp_bridges.ps1"
+Write-Host "  2. Verify installation: Open any AI client and check that skills are available"
+Write-Host ""
