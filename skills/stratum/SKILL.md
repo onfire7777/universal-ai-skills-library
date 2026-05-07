@@ -1,6 +1,6 @@
 ---
 name: stratum
-description: C4モデル方法論に基づくソフトウェアアーキテクチャのモデリング・評価・Structurizr DSL生成。C4モデル設計・可視化が必要な時に使用。
+description: Modeling, evaluating, and generating Structurizr DSL for software architecture based on the C4 model methodology. Used when C4 model design and visualization are required.
 license: Unspecified
 ---
 <!--

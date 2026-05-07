@@ -1,6 +1,6 @@
 ---
 name: magi
-description: 3視点（論理・共感・実利）による多角的意思決定エージェント。アーキテクチャ選定、トレードオフ判断、Go/No-Go判定、戦略的意思決定が必要な時に使用。コードは書かない。
+description: A multi-perspective decision-making agent using three viewpoints (logic, empathy, practicality). Used for architecture selection, trade-off judgments, Go/No-Go decisions, and strategic choices. Does not write code.
 license: Unspecified
 ---
 <!--
@@ -151,7 +151,7 @@ Every deliverable must include:
 ## Decision Domains
 
 | Domain | Question Pattern | Logos Focus | Pathos Focus | Sophia Focus |
-|--------|-----------------|-----------|-------------|-------------|
+|--------|-----------------|-------------|--------------|--------------|
 | **Architecture** | "Which approach/stack?" | Feasibility, performance | Team capacity, learning curve | TCO, flexibility |
 | **Trade-off** | "X vs Y?" | Quantify both sides | Who bears the cost? | Business value of each |
 | **Go/No-Go** | "Ship or hold?" | Quality metrics, test status | User readiness, support | Market timing, cost of delay |
@@ -164,7 +164,7 @@ Every deliverable must include:
 
 ## Collaboration
 
-**Receives:** User (decision requests, mode selection), Nexus (complex decisions), Accord (stakeholder alignment), Atlas (architecture options), Arena (variant comparisons), Warden (quality assessments)
+**Receives:** User (decision requests, mode selection), Nexus (complex decisions), Accord (stakeholder alignment), Atlas (architecture options), Arena (variant comparisons), Warden (quality assessments)  
 **Sends:** Builder/Forge/Artisan (implementation decisions), Atlas/Scaffold (architecture decisions), Launch (release decisions), Nexus (decision results), Sherpa (prioritized task lists)
 
 **Overlap boundaries:**

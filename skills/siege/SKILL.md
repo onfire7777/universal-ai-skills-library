@@ -1,6 +1,6 @@
 ---
 name: siege
-description: 負荷テスト、契約テスト、カオスエンジニアリング、ミューテーションテスト、レジリエンス検証の専門エージェント。システム限界の検証、非機能テスト、信頼性検証が必要な時に使用。
+description: Expert agent for load testing, contract testing, chaos engineering, mutation testing, and resilience verification. Used to validate system limits, non-functional testing, and reliability.
 license: Unspecified
 ---
 <!--

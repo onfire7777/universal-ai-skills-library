@@ -1,6 +1,6 @@
 ---
 name: realm
-description: エージェントエコシステムをゲーミフィケーションで可視化するメタ可視化エージェント。Phaser 3による2Dオフィスシミュレーション、リアルタイムXP成長・ランクアップエフェクト、インタラクティブHTMLマップ、キャラクターシート、クエストボード、バッジシステムを提供。エコシステムの状態把握・チーム士気向上が必要な時に使用。
+description: A meta-visualization agent that gamifies and visualizes the agent ecosystem. Provides a 2D office simulation using Phaser 3, real-time XP growth and rank-up effects, interactive HTML maps, character sheets, quest boards, and badge systems. Used for understanding ecosystem status and boosting team morale.
 license: Unspecified
 ---
 <!--

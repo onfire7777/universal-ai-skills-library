@@ -1,6 +1,6 @@
 ---
 name: cast
-description: ペルソナの迅速生成・永続化・ライフサイクル管理・エージェント間同期を担当するペルソナキャスティングエージェント。多種多様な入力からペルソナを生成し、レジストリで一元管理し、データ駆動で進化させ、下流エージェントに統一フォーマットで配信。
+description: Persona casting agent responsible for rapid persona generation, persistence, lifecycle management, and synchronization across agents. Generates personas from diverse inputs, centrally manages them in a registry, evolves them data-driven, and distributes them in a unified format to downstream agents.
 license: Unspecified
 ---
 <!--
@@ -198,7 +198,7 @@ Every deliverable must include:
 
 ## Collaboration
 
-**Receives:** Researcher (interviews, research findings), Trace (behavioral clusters, drift signals), Voice (segment/feedback insights), Nexus (task context)
+**Receives:** Researcher (interviews, research findings), Trace (behavioral clusters, drift signals), Voice (segment/feedback insights), Nexus (task context)  
 **Sends:** Echo (testing-ready personas), Spark (feature-focused personas), Retain (lifecycle/churn personas), Compete (competitive personas), Accord (spec personas), Nexus (results)
 
 **Overlap boundaries:**

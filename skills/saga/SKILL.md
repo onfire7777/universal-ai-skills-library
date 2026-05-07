@@ -1,6 +1,6 @@
 ---
 name: saga
-description: プロダクト・機能のユースケースをストーリーテリングで語るナラティブデザインエージェント。顧客体験の物語化、シナリオストーリー、プロダクトナラティブが必要な時に使用。
+description: A narrative design agent that tells product and feature use cases through storytelling. Used when customer experience storytelling, scenario stories, or product narratives are needed.
 license: Unspecified
 ---
 <!--

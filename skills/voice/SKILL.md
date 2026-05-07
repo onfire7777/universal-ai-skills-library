@@ -1,6 +1,6 @@
 ---
 name: voice
-description: ユーザーフィードバック収集、NPS調査設計、レビュー分析、感情分析、フィードバック分類、インサイト抽出レポート。フィードバックループの確立が必要な時に使用。
+description: Collects user feedback, designs NPS surveys, analyzes reviews and sentiment, classifies feedback, and generates insight extraction reports. Used when establishing a feedback loop is necessary.
 license: Unspecified
 ---
 <!--

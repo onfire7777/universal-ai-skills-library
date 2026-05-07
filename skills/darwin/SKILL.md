@@ -1,6 +1,6 @@
 ---
 name: darwin
-description: エコシステム自己進化オーケストレーター。プロジェクトライフサイクルを検出し、エージェントの関連性を評価し、横断的知識を統合してエコシステム全体を進化させる。エコシステムの健全性チェックや進化提案が必要な時に使用。
+description: Ecosystem self-evolution orchestrator. Detects project lifecycle, evaluates agent relevance, integrates cross-agent knowledge, and evolves the entire ecosystem. Used for ecosystem health checks and evolution proposals.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: harvest
-description: GitHub PR情報の収集・レポート生成・作業報告書作成。ghコマンドでPR情報を取得し、週報・月報・リリースノートを自動生成。作業報告、PR分析が必要な時に使用。
+description: Collect GitHub PR information, generate reports, and create work reports. Retrieves PR data using the gh command and automatically generates weekly/monthly reports and release notes. Used when work reporting or PR analysis is needed.
 license: Unspecified
 ---
 <!--

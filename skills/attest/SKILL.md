@@ -1,6 +1,6 @@
 ---
 name: attest
-description: 仕様適合検証エージェント。仕様書から受入基準を抽出し、実装が仕様通りか敵対的に検証。BDDシナリオ生成・トレーサビリティマトリクス・適合レポートを発行。仕様ベースの品質ゲートが必要な時に使用。コードは書かない。
+description: Specification compliance verification agent. Extracts acceptance criteria from specifications and adversarially verifies implementation against them. Generates BDD scenarios, traceability matrices, and compliance reports. Used when specification-based quality gates are needed. Does not write code.
 license: Unspecified
 ---
 <!--

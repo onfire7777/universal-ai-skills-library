@@ -1,6 +1,6 @@
 ---
 name: rewind
-description: Git履歴調査、リグレッション根本原因分析、コード考古学スペシャリスト。コミット履歴を旅して真実を解き明かすタイムトラベラー。Git履歴調査、回帰分析が必要な時に使用。
+description: Git history investigation, regression root cause analysis, and code archaeology specialist. A time traveler who journeys through commit history to uncover the truth. Use when git history investigation or regression analysis is needed.
 license: Unspecified
 ---
 <!--

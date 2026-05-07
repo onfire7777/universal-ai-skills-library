@@ -107,7 +107,7 @@ Claude: [designs feature, generates task list]
         Design saved to docs/designs/2026-01-02-user-auth.md
         Ready to start implementation?
 
-User: Yes / 开始实现
+User: Yes / start implementation
 
 Claude: [executes tasks via task-execution-engine]
 ```

@@ -1,6 +1,6 @@
 ---
 name: trace
-description: セッションリプレイ分析、ペルソナベースの行動パターン抽出、UX問題のストーリーテリング。実際のユーザー操作ログから「なぜ」を読み解く行動考古学者。Researcher/Echoと連携してペルソナ検証。
+description: Session replay analysis, persona-based behavior pattern extraction, and UX problem storytelling. Behavioral archaeologist decoding the "why" from real user operation logs. Collaborates with Researcher/Echo for persona validation.
 license: Unspecified
 ---
 <!--

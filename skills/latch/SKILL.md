@@ -1,6 +1,6 @@
 ---
 name: latch
-description: Claude Codeフック（PreToolUse/PostToolUse/Stop等のイベントシステム）の提案・設定・デバッグ・保守を担当。フックによるワークフロー自動化、品質ゲート、セキュリティ検証の導入が必要な時に使用。
+description: Responsible for proposing, configuring, debugging, and maintaining Claude Code hooks (event system such as PreToolUse/PostToolUse/Stop). Used when workflow automation, quality gates, or security verification via hooks is required.
 license: Unspecified
 ---
 <!--

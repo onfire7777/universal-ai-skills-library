@@ -1,6 +1,6 @@
 ---
 name: skill-judge
-description: Evaluate Agent Skill design quality against official specifications and best practices. Use when reviewing, auditing, or improving SKILL.md files and skill packages. Provides multi-dimensional scoring and actionable improvement suggestions.
+description: Evaluate Agent Skills against official specifications and patterns derived from 17+ official examples. Use when reviewing, auditing, or improving SKILL.md files and skill packages. Provides multi-dimensional scoring and actionable improvement suggestions.
 license: Unspecified
 ---
 # Skill Judge
@@ -264,11 +264,11 @@ Analysis:
 
 **Poor description** (missing elements):
 ```yaml
-description: "处理文档相关功能"
+description: "Handle document-related functions"
 ```
 
 Problems:
-- WHAT: vague ("文档相关功能" — what specifically?)
+- WHAT: vague ("document-related functions" — what specifically?)
 - WHEN: missing (when should Agent use this?)
 - KEYWORDS: missing (no ".docx", no specific scenarios)
 
@@ -746,7 +746,5 @@ This Skill (skill-judge) should itself pass evaluation:
 - **Freedom**: Medium freedom appropriate for evaluation task
 - **Pattern**: Follows Tool pattern with decision frameworks
 - **Usability**: Clear protocol, report template, quick reference
-
-
 
 Evaluate this Skill against itself as a calibration exercise.

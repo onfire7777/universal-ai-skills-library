@@ -1,6 +1,6 @@
 ---
 name: spark
-description: 既存データ/ロジックを活用した新機能をMarkdown仕様書で提案。新機能のアイデア出し、プロダクト企画、機能提案が必要な時に使用。コードは書かない。
+description: Proposes new features by leveraging existing data and logic, creating Markdown specification documents for feature ideation, product planning, and feature proposals without writing code.
 license: Unspecified
 ---
 <!--

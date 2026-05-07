@@ -1,6 +1,6 @@
 ---
 name: muse
-description: デザイントークンの定義・管理、既存コードへのトークン適用、Design System構築。トークン体系の設計、余白・色・タイポグラフィの統一、ダークモード対応を担当。デザイントークン設計、UI一貫性が必要な時に使用。
+description: Define and manage design tokens, apply tokens to existing code, and build design systems. Responsible for token system design, unifying spacing, color, and typography, and supporting dark mode. Used when design token design and UI consistency are required.
 license: Unspecified
 ---
 <!--

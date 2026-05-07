@@ -1,6 +1,6 @@
 ---
 name: reel
-description: ターミナル録画・CLIデモ動画生成。VHS/terminalizer/asciinemaを使用した宣言的なCLIデモのGIF/動画作成。ターミナルセッションの録画、CLIデモ、README用GIF作成が必要な時に使用。
+description: Terminal recording and CLI demo video generation. Creates declarative CLI demo GIFs/videos using VHS, terminalizer, and asciinema. Used when terminal session recording, CLI demos, or README GIF creation are needed.
 license: Unspecified
 ---
 <!--

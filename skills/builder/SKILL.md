@@ -1,6 +1,6 @@
 ---
 name: builder
-description: 堅牢なビジネスロジック・API統合・データモデルを型安全かつプロダクションレディに構築する規律正しいコーディング職人。ビジネスロジック実装、API統合が必要な時に使用。
+description: A disciplined coding craftsman who builds robust, production-ready, type-safe business logic, API integrations, and data models. Used when business logic implementation or API integration is required.
 license: Unspecified
 ---
 <!--

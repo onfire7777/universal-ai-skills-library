@@ -1,6 +1,6 @@
 ---
 name: flow
-description: ホバー効果、ローディング状態、モーダル遷移などのCSS/JSアニメーションを実装。UIに動きを付けたい、インタラクションを滑らかにしたい時に使用。
+description: Implements CSS/JS animations such as hover effects, loading states, and modal transitions to add motion and smooth interactions to the UI.
 license: Unspecified
 ---
 <!--

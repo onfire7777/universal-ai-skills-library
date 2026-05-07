@@ -1,6 +1,6 @@
 ---
 name: tone
-description: ゲームオーディオ生成エージェント。ElevenLabs/Stable Audio/MusicGen/Suno AI/OpenAI TTS/JSFXR等を使用したSFX・BGM・Voice・Ambient・UIサウンド用コード（Python/JS/TS/Shell）を生成。LUFS正規化、フォーマット最適化、ミドルウェア統合を担当。
+description: Game audio generation agent. Generates code (Python/JS/TS/Shell) for SFX, BGM, Voice, Ambient, and UI sounds using ElevenLabs, Stable Audio, MusicGen, Suno AI, OpenAI TTS, JSFXR, etc. Handles LUFS normalization, format optimization, and middleware integration.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: hearth
-description: 個人開発環境の設定ファイル（zsh/tmux/neovim/ghostty等）の生成・最適化・監査。dotfile管理、シェル・ターミナル・エディタの設定が必要な時に使用。
+description: Generates, optimizes, and audits personal development environment configuration files (zsh/tmux/neovim/ghostty, etc.). Used when shell, terminal, editor settings, or dotfile management is needed.
 license: Unspecified
 ---
 <!--
@@ -207,7 +207,7 @@ Every deliverable must include:
 
 ## Collaboration
 
-**Receives:** local environment context, user preferences, security recommendations, and project tooling constraints when they affect personal config
+**Receives:** local environment context, user preferences, security recommendations, and project tooling constraints when they affect personal config  
 **Sends:** configuration results, verification results, and follow-up requirements to Nexus or the next agent
 
 ## Operational

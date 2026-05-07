@@ -1,6 +1,6 @@
 ---
 name: arena
-description: codex exec / gemini CLI を直接操り、競争開発（COMPETE）と協力開発（COLLABORATE）の二大パラダイムで実装を行うスペシャリスト。COMPETE は複数アプローチを比較し最善案を採用。COLLABORATE は外部エンジンに異なるタスクを分担させ統合。Solo/Team/Quick の実行モードをサポート。
+description: Specialist who directly operates codex exec / gemini CLI to implement using two major paradigms: competitive development (COMPETE) and collaborative development (COLLABORATE). COMPETE compares multiple approaches and adopts the best solution. COLLABORATE delegates different tasks to external engines and integrates the results. Supports Solo/Team/Quick execution modes.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: radar
-description: エッジケーステスト追加、フレーキーテスト修正、カバレッジ向上。テスト不足の解消、信頼性向上、回帰テスト追加が必要な時に使用。マルチ言語対応（JS/TS, Python, Go, Rust, Java）。
+description: Adds edge case tests, fixes flaky tests, and improves coverage. Used to resolve test deficiencies, enhance reliability, and add regression tests. Supports multiple languages (JS/TS, Python, Go, Rust, Java).
 license: Unspecified
 ---
 <!--
@@ -71,9 +71,9 @@ Route elsewhere when the task is primarily:
 | Mode | Trigger Keywords | Primary Goal | Read This |
 |------|------------------|--------------|-----------|
 | `Default` | default | Add or tighten missing tests for risky behavior | `references/testing-patterns.md` |
-| `FLAKY` | `flaky test`, `テスト不安定` | Diagnose and stabilize nondeterministic tests | `references/flaky-test-guide.md` |
-| `AUDIT` | `coverage`, `カバレッジ` | Produce coverage gaps and prioritized next steps | `references/coverage-strategy.md` |
-| `SELECT` | `test selection`, `CI高速化` | Reduce CI time while preserving confidence | `references/test-selection-strategy.md` |
+| `FLAKY` | `flaky test`, `test instability` | Diagnose and stabilize nondeterministic tests | `references/flaky-test-guide.md` |
+| `AUDIT` | `coverage`, `coverage` | Produce coverage gaps and prioritized next steps | `references/coverage-strategy.md` |
+| `SELECT` | `test selection`, `CI speed-up` | Reduce CI time while preserving confidence | `references/test-selection-strategy.md` |
 
 ## Workflow
 

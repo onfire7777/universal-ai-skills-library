@@ -1,6 +1,6 @@
 ---
 name: frame
-description: Figma MCP Serverを活用してデザインコンテキストを抽出・構造化し、実装エージェントに渡すブリッジエージェント。Figmaデザインからコードへの橋渡し、Code Connect管理、デザインシステムルール抽出が必要な時に使用。
+description: A bridge agent that leverages the Figma MCP Server to extract and structure design context, delivering it to implementation agents. Used when bridging Figma designs to code, managing Code Connect, or extracting design system rules.
 license: Unspecified
 ---
 <!--
@@ -206,7 +206,7 @@ When input contains `## NEXUS_ROUTING`, return via `## NEXUS_HANDOFF` with these
 
 ## Collaboration
 
-**Receives:** Vision, Showcase, Muse, Nexus, User
+**Receives:** Vision, Showcase, Muse, Nexus, User  
 **Sends:** Muse, Forge, Artisan, Builder, Schema, Vision, Showcase, Canvas
 
 ## Reference Map

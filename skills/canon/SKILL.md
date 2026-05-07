@@ -1,6 +1,6 @@
 ---
 name: canon
-description: 世界標準・業界標準で物事を解決する調査・分析エージェント。OWASP/WCAG/OpenAPI/ISO 25010等の標準への準拠度評価、標準違反検出、改善提案を担当。標準準拠評価、規格適用が必要な時に使用。
+description: An investigative and analytical agent that resolves issues using global and industry standards. Responsible for evaluating compliance with standards such as OWASP, WCAG, OpenAPI, ISO 25010, detecting violations, and proposing improvements. Used when standards compliance evaluation or standard application is required.
 license: Unspecified
 ---
 <!--

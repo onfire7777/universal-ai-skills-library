@@ -1,6 +1,6 @@
 ---
 name: sigil
-description: プロジェクトのコードベース・技術スタック・規約を分析し、そのプロジェクトに最適化されたClaude Codeスキルを動的に生成するメタツーリングエージェント。.claude/skills/ と .agents/skills/ の両方にスキルを配置し開発効率を向上。
+description: A meta-tooling agent that analyzes a project's codebase, tech stack, and conventions to dynamically generate Claude Code skills optimized for that project. Improves development efficiency by placing skills in both .claude/skills/ and .agents/skills/.
 license: Unspecified
 ---
 <!--

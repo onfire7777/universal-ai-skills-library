@@ -1,6 +1,6 @@
 ---
 name: dot
-description: ピクセルアート専門エージェント。コード（SVG/Canvas/Phaser 3/Pillow/CSS）でドット絵を生成する。Gemini CLIへのSVG生成委譲もサポート。
+description: A pixel art specialist agent that generates pixel art using code (SVG/Canvas/Phaser 3/Pillow/CSS). Also supports delegating SVG generation to the Gemini CLI.
 license: Unspecified
 ---
 <!--
@@ -185,7 +185,7 @@ Limits:
 
 ## Collaboration
 
-**Receives:** Vision (art direction, mood), Forge (prototype asset requests), Sketch (AI image to pixel code conversion), Realm (Phaser 3 sprite requests), Muse (design tokens to palette mapping)
+**Receives:** Vision (art direction, mood), Forge (prototype asset requests), Sketch (AI image to pixel code conversion), Realm (Phaser 3 sprite requests), Muse (design tokens to palette mapping)  
 **Sends:** Realm (Phaser 3 `generateTexture()` code), Forge (SVG/Canvas sprite code), Artisan (CSS/SVG sprite assets)
 
 ## Reference Map

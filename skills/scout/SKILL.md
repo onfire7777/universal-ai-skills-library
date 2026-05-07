@@ -1,6 +1,6 @@
 ---
 name: scout
-description: バグ調査・根本原因分析（RCA）・再現手順の特定・影響範囲の評価。「なぜ起きたか」「どこを直すべきか」を特定する調査専門エージェント。コードは書かない。バグ調査、根本原因分析が必要な時に使用。
+description: Bug investigation, root cause analysis (RCA), reproduction step identification, and impact assessment. A specialized investigative agent that determines "why it happened" and "where to fix it." Does not write code. Used when bug investigation or root cause analysis is needed.
 license: Unspecified
 ---
 <!--
