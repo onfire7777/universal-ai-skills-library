@@ -211,3 +211,8 @@ Every deletion event is logged for accountability:
 - **Children's Profiling Limits**: Data minimisation directly limits the data available for profiling, reinforcing AADC Standard 12 restrictions
 - **Children's Deletion Requests**: The retention framework defines what data exists to be deleted and when automatic deletion occurs
 - **EdTech Privacy Assessment**: Educational platforms must balance data minimisation with legitimate educational record-keeping needs
+## Summary
+
+Ensuring data minimisation in children’s apps and services is critical to protecting their privacy and complying with legal standards such as GDPR, COPPA, and the UK Age Appropriate Design Code. Developers and organizations must rigorously evaluate the necessity of each data element collected, avoid excessive or background data gathering, and provide transparent controls for parents and guardians. Enforcement actions demonstrate the significant risks and penalties associated with non-compliance, emphasizing the importance of embedding data minimisation principles from the earliest design stages.
+
+By adhering to these guidelines and integration points, stakeholders can create safer digital environments that respect children’s rights and foster trust among users and regulators alike. This approach not only mitigates legal risks but also promotes ethical data stewardship in products aimed at younger audiences.

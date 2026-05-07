@@ -54,3 +54,20 @@ Functions that run on a schedule
 ## Related Skills
 
 Works well with: `nextjs-app-router`, `vercel-deployment`, `supabase-backend`, `email-systems`, `ai-agents-architect`, `stripe-integration`
+## Core Concepts Recap
+
+- **Events** are the triggers that start workflows or functions.
+- **Steps** represent discrete units of work with built-in durability and retry.
+- **Workflows** orchestrate multiple steps, allowing parallelism, branching, and long-running processes.
+- **Durability** ensures your workflows survive failures, restarts, and scale transparently.
+- **Serverless** means you focus on business logic, not infrastructure or workers.
+
+By embracing these principles, you can build resilient, scalable, and maintainable background jobs and workflows that integrate seamlessly with modern serverless architectures.
+
+---
+
+With Inngest, you get the best of both worlds: the simplicity of serverless with the power of durable, event-driven workflows. Whether you’re handling user onboarding, processing payments, or running AI pipelines, Inngest enables you to build robust systems without the operational overhead.
+
+Keep your event payloads lean, leverage steps for checkpointing, and design workflows with concurrency and error handling in mind for optimal results.
+
+Happy building!

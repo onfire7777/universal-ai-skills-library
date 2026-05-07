@@ -160,3 +160,8 @@ and shall implement bias mitigation measures as required.
 - **ai-training-lawfulness**: Vendor training on customer data requires lawful basis assessment
 - **ai-transparency-reqs**: Data subjects must be informed about AI vendor processing
 - **ai-deployment-checklist**: Vendor due diligence is a pre-deployment checklist item
+## Summary
+
+Ensuring compliance with data protection laws when engaging AI vendors requires careful attention to roles, responsibilities, and lawful bases for processing. Providers must implement robust privacy and bias mitigation measures, maintain transparency with data subjects, and support customer oversight through audits and reporting. Customers should conduct thorough due diligence, incorporate AI vendor risks into DPIAs, and clearly define processing purposes and limits in contracts. Together, these practices help mitigate legal risks and uphold individuals’ fundamental rights in AI-driven data processing.
+
+```

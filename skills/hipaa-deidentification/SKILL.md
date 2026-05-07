@@ -235,3 +235,12 @@ OCR has not imposed penalties specifically for de-identification methodology fai
 - **hipaa-minimum-necessary**: De-identification and limited datasets serve minimum necessary purposes for research and analytics
 - **healthcare-ai-privacy**: AI training data often requires de-identification; model memorization risk can undermine de-identification
 - **hipaa-risk-analysis**: Re-identification risk assessment parallels security risk analysis methodology
+## Summary
+
+Proper de-identification of protected health information (PHI) is critical to enabling data use for research, analytics, and public health while maintaining patient privacy and HIPAA compliance. Both the Safe Harbor and Expert Determination methods have strengths and limitations, and selecting the appropriate approach depends on the data context and intended use. Ongoing vigilance is necessary to address evolving re-identification risks, especially as external data sources and advanced analytics techniques become more prevalent.
+
+Organizations should implement robust policies, conduct thorough risk assessments, and document de-identification processes to demonstrate compliance. Collaboration with privacy experts and legal counsel is recommended to navigate complex scenarios and ensure that de-identified data remains outside the scope of HIPAA protections.
+
+By understanding and applying the principles outlined in this skill, stakeholders can responsibly leverage health data to advance knowledge and improve care without compromising individual privacy.
+
+```

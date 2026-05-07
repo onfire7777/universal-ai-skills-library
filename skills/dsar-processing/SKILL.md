@@ -3,7 +3,6 @@ name: dsar-processing
 license: Apache-2.0
 description: Guides AI agents through the complete GDPR Data Subject Access Request (DSAR) workflow under Article 15, including identity verification, 30-day deadline calculation with extensions, response formatting, exemptions, and fee provisions. Activate when handling DSAR, access request, subject access, Art. 15, or SAR queries.
 metadata:
-  metadata:
     author: mukul975
     version: '1.0'
     domain: privacy

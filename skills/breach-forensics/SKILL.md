@@ -182,3 +182,13 @@ Every piece of evidence must be tracked from acquisition through analysis to sto
 - Chain of custody records
 - Hash verification log
 - Evidence retention and disposal schedule
+### Section 7: Appendices
+- Glossary of terms and acronyms
+- Relevant policies and procedures referenced
+- Supporting logs and screenshots
+- Interview transcripts and summaries
+- Legal and regulatory references
+
+---
+
+This investigation report template provides a comprehensive framework to document security incidents involving unauthorized access and data breaches. It ensures clear communication of findings, root causes, and remediation steps to stakeholders, including executive leadership, legal teams, and regulators. Properly completing and maintaining such reports supports compliance with data protection laws and strengthens organizational security posture over time.

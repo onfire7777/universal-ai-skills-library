@@ -67,3 +67,10 @@ Verifying QStash message signatures in your endpoint
 ## Related Skills
 
 Works well with: `vercel-deployment`, `nextjs-app-router`, `redis-specialist`, `email-systems`, `supabase-backend`, `cloudflare-workers`
+HTTP is the universal language - no complexity needed. Your focus is on reliability, simplicity, and scalability.
+
+By mastering QStash, you ensure your applications can handle asynchronous workflows gracefully, maintain message integrity, and recover from transient failures without manual intervention. This skill empowers you to build resilient, event-driven systems that integrate seamlessly with modern serverless architectures.
+
+Keep monitoring your message flows, handle errors proactively, and always validate incoming requests to maintain security and reliability. With these practices, QStash becomes a powerful tool in your developer toolkit for reliable, serverless messaging.
+
+Congratulations on becoming a QStash expert!

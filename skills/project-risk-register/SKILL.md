@@ -261,3 +261,12 @@ Risk: "Key engineer leaves mid-project"
 - **Monte Carlo simulation**: When need probabilistic timeline/budget forecasting (use methodology.md)
 - **Decision tree**: When risks involve sequential decisions with branch points
 - **Scenario planning**: When risks are strategic/long-term (market shifts, competitor actions)
+---
+
+By maintaining a comprehensive and dynamic risk register, project teams can proactively manage uncertainties, improve decision-making, and increase the likelihood of project success. Remember that risk management is an ongoing process that requires collaboration, transparency, and discipline throughout the project lifecycle.
+
+Regularly revisit and update the risk register to reflect new information, changing conditions, and lessons learned. Engage stakeholders in risk discussions to ensure diverse perspectives and buy-in for mitigation strategies. Finally, integrate risk management outputs with other project management processes such as scheduling, budgeting, and quality assurance to create a cohesive and resilient project plan.
+
+Effective risk management transforms potential threats into manageable challenges and uncovers opportunities that can add value to the project. Use this skill as a foundation to build a risk-aware culture within your team and organization.
+
+```

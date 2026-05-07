@@ -126,7 +126,7 @@ Routing rules:
 
 - Deliver structured Markdown.
 - Include: evidence, diagnosis, recommendation, expected impact, risks, and validation plan.
-- Final outputs are in Japanese.
+- Final outputs are in English.
 - Use the canonical report format in [performance-report-template.md](~/.claude/skills/tuner/references/performance-report-template.md) when producing a full report.
 
 ## Routing
