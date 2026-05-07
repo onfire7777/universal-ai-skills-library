@@ -279,9 +279,12 @@ manus-skills-library/
 ├── README.md                          # This file
 ├── INSTALLED_REPOS.md                 # Catalog of all GitHub repos
 ├── manifest.json                      # Machine-readable catalog of all skills
-├── DROPPED.md                         # Skills removed during normalization
-├── NORMALIZATION_REPORT.md            # Audit trail of normalization
-├── install.sh                         # Legacy Linux installer
+├── install.sh                         # Universal Linux/macOS installer
+│
+├── docs/                              # Legacy audit documentation
+│   ├── build_manifest.json            # Original normalization build log
+│   ├── DROPPED.md                     # Skills removed during normalization
+│   └── NORMALIZATION_REPORT.md        # Audit trail of normalization
 │
 ├── chat-summarizer/                   # Custom core skill
 ├── context-anchor/                    # Custom core skill
@@ -365,14 +368,14 @@ Start-ScheduledTask -TaskName "Manus-McpWatchdog"
 
 | Date | Action | Details |
 |:---|:---|:---|
-| 2025-05-07 | Full audit | 770 skills validated: 238 healthy, 516 minor, 15 degraded, 0 broken |
-| 2025-05-07 | Translation | 101 Japanese/CJK skills translated to English |
-| 2025-05-07 | Security pass | Removed hardcoded credentials from 2 skills, added env var patterns |
-| 2025-05-07 | Bug fixes | 29 critical/high issues fixed (truncated content, nested YAML, formatting) |
-| 2025-05-07 | Infrastructure | Added MCP bridges, watchdog, install scripts |
-| 2025-05-07 | Completeness | Added 5 missing core skills (file-organizer, manus-api, music-prompter, persistent-computing, skill-creator) |
+| 2026-05-07 | Full audit | 770 skills validated: 238 healthy, 516 minor, 15 degraded, 0 broken |
+| 2026-05-07 | Translation | 101 Japanese/CJK skills translated to English |
+| 2026-05-07 | Security pass | Removed hardcoded credentials from 2 skills, added env var patterns |
+| 2026-05-07 | Bug fixes | 29 critical/high issues fixed (truncated content, nested YAML, formatting) |
+| 2026-05-07 | Infrastructure | Added MCP bridges, watchdog, install scripts |
+| 2026-05-07 | Completeness | Added 5 missing core skills (file-organizer, manus-api, music-prompter, persistent-computing, skill-creator) |
+| 2026-05-07 | Repo Hygiene | Added .gitignore, removed debug artifacts, generated manifest.json, moved legacy docs to docs/ |
 
 ---
 
 *Maintained as part of the Universal AI Architecture. For questions or issues, open a GitHub issue on this repository.*
-| 2025-05-07 | Repo Hygiene | Added comprehensive .gitignore, removed debug artifacts, generated manifest.json, updated installer to handle core skills |
