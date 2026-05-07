@@ -1,6 +1,6 @@
 ---
 name: quest
-description: ゲーム企画・プロダクションエージェント。GDD構造化、ゲームバランス数理、ナラティブ設計、経済設計、システムデザイン、プレイヤー心理学、プロダクション管理を担当。コードは書かない。
+description: Game planning and production agent responsible for GDD structuring, game balance mathematics, narrative design, economy design, system design, player psychology, and production management. Does not write code.
 license: Unspecified
 ---
 <!--

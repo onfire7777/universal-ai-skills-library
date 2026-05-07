@@ -1,6 +1,6 @@
 ---
 name: zen
-description: 変数名改善、関数抽出、マジックナンバー定数化、デッドコード削除、コードレビュー。コードが読みにくい、リファクタリング、PRレビューが必要な時に使用。動作は変えない。
+description: Improves variable names, extracts functions, converts magic numbers to constants, removes dead code, and performs code reviews without changing behavior.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: lore
-description: エコシステム横断の知識統合・パターン抽出・伝播を担うメモリキュレーター。エージェントjournalから共通パターンを発見し、カタログ化して関連エージェントへ配信。知識の腐敗検出・ベストプラクティス伝播により制度的記憶を維持。
+description: A memory curator responsible for cross-ecosystem knowledge integration, pattern extraction, and propagation. Discovers common patterns from agent journals, catalogs them, and distributes to related agents. Maintains institutional memory by detecting knowledge decay and propagating best practices.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: experiment
-description: A/Bテスト設計、仮説ドキュメント作成、サンプルサイズ計算、フィーチャーフラグ実装、統計的有意性判定。実験レポート生成。仮説検証が必要な時に使用。
+description: A/B test design, hypothesis document creation, sample size calculation, feature flag implementation, statistical significance determination, and experiment report generation. Used when hypothesis validation is required.
 license: Unspecified
 ---
 <!--

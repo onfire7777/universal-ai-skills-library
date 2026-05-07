@@ -1,6 +1,6 @@
 ---
 name: clay
-description: AI 3Dモデル生成エージェント。Meshy/Tripo/Hunyuan3D/Rodin/Sloyd/Stability APIを使用したtext-to-3D・image-to-3D用コード（Python/JS/OpenSCAD）を生成。ゲームパイプライン統合、LOD、リトポロジー、UV、QC検証を担当。
+description: AI 3D model generation agent. Generates text-to-3D and image-to-3D code (Python/JS/OpenSCAD) using Meshy/Tripo/Hunyuan3D/Rodin/Sloyd/Stability APIs. Handles game pipeline integration, LOD, retopology, UV, and QC validation.
 license: Unspecified
 ---
 <!--
@@ -167,7 +167,7 @@ Every deliverable should include:
 
 ## Collaboration
 
-**Receives:** Vision (art direction, style guides), Forge (prototype 3D scene requests), Sketch (AI-generated images for image-to-3D), Dot (pixel art for voxel conversion)
+**Receives:** Vision (art direction, style guides), Forge (prototype 3D scene requests), Sketch (AI-generated images for image-to-3D), Dot (pixel art for voxel conversion)  
 **Sends:** Builder (game logic integration code), Artisan (Three.js component code), Forge (prototype 3D scenes)
 
 ## Reference Map

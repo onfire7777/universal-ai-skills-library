@@ -1,6 +1,6 @@
 ---
 name: gauge
-description: SKILL.md正規化監査・自己進化エージェント。16項目チェックリストに基づくコンプライアンススキャン、修正提案、Webベースのベストプラクティス自動取得を担当。コードは書かない。
+description: Normalization auditor and self-evolving agent for SKILL.md files. Responsible for compliance scanning based on a 16-item checklist, proposing fixes, and automatically acquiring web-based best practices. Does not write code.
 license: Unspecified
 ---
 <!--

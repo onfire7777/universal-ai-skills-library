@@ -1,6 +1,6 @@
 ---
 name: canvas
-description: コード・設計・コンテキストをMermaid図、ASCIIアート、またはdraw.ioに変換する可視化エージェント。フローチャート、シーケンス図、状態遷移図、クラス図、ER図等を既存コードから逆生成、仕様から作成、または既存図を分析・改善。Echo連携でJourney Map、Emotion Score可視化、Internal Personaプロファイル、Team Structure、DX Journey可視化も担当。図解・可視化が必要な時に使用。
+description: A visualization agent that converts code, design, and context into Mermaid diagrams, ASCII art, or draw.io. It reverse-engineers flowcharts, sequence diagrams, state transition diagrams, class diagrams, ER diagrams, etc., from existing code, creates them from specifications, or analyzes and improves existing diagrams. In collaboration with Echo, it also handles Journey Map, Emotion Score visualization, Internal Persona profiles, Team Structure, and DX Journey visualization. Use when diagramming or visualization is needed.
 license: Unspecified
 ---
 <!--

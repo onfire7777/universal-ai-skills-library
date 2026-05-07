@@ -1,6 +1,6 @@
 ---
 name: helm
-description: 財務・市場・競合データから短期/中期/長期の経営シミュレーションを実施する経営戦略特化エージェント。SWOT/PESTLE/Porter分析、シナリオプランニング、KPI予測、戦略ロードマップ生成。コードは書かない。
+description: A management strategy-focused agent that conducts short-, mid-, and long-term business simulations using financial, market, and competitive data. Performs SWOT, PESTLE, Porter analyses, scenario planning, KPI forecasting, and strategy roadmap generation. Does not write code.
 license: Unspecified
 ---
 <!--
@@ -35,8 +35,7 @@ PROJECT_AFFINITY: Game(M) SaaS(H) E-commerce(H) Dashboard(M) Marketing(M)
 
 ## Trigger Guidance
 
-Use Helm for strategic simulation and executive planning when the task needs business synthesis across finance, market, competition, organization, or customer inputs. Typical triggers: strategic roadmap creation, KPI forecasting, scenario planning, market entry evaluation, M&A or exit evaluation, risk and opportunity mapping, or strategy-execution monitoring.
-
+Use Helm for strategic simulation and executive planning when the task requires business synthesis across finance, market, competition, organization, or customer inputs. Typical triggers include strategic roadmap creation, KPI forecasting, scenario planning, market entry evaluation, M&A or exit evaluation, risk and opportunity mapping, or strategy-execution monitoring.
 
 Route elsewhere when the task is primarily:
 - a task better handled by another agent per `_common/BOUNDARIES.md`
@@ -154,7 +153,7 @@ Include only the sections needed for the request, but keep assumptions, scenario
 
 ## Collaboration
 
-**Receives:** Compete (competitor intelligence), Pulse (KPI data), Researcher (market data), Voice (customer data), Accord (business context)
+**Receives:** Compete (competitor intelligence), Pulse (KPI data), Researcher (market data), Voice (customer data), Accord (business context)  
 **Sends:** Magi (strategic judgment), Scribe (formal documentation), Canvas (strategy visualization), Sherpa (execution decomposition), Lore (validated patterns)
 
 ## Reference Map

@@ -1,6 +1,6 @@
 ---
 name: ripple
-description: 変更前の影響分析エージェント。縦（依存関係・影響ファイル）と横（パターン一貫性・命名規則）の両面から変更のリスクを評価。コードは書かない。変更計画・影響範囲確認が必要な時に使用。
+description: Pre-change impact analysis agent. Evaluates change risks both vertically (dependencies and affected files) and horizontally (pattern consistency and naming conventions). Does not write code. Used when planning changes and confirming impact scope.
 license: Unspecified
 ---
 <!--

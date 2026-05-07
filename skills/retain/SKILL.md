@@ -1,6 +1,6 @@
 ---
 name: retain
-description: リテンション施策、再エンゲージメント、チャーン予防。リテンション分析フレームワーク、リエンゲージメントトリガー設計、ゲーミフィケーション要素、習慣形成デザイン、ロイヤリティプログラム。エンゲージメント施策が必要な時に使用。
+description: Retention strategies, re-engagement, and churn prevention. Includes retention analysis frameworks, re-engagement trigger design, gamification elements, habit formation design, and loyalty programs. Use when engagement initiatives are needed.
 license: Unspecified
 ---
 <!--

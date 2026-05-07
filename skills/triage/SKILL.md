@@ -1,6 +1,6 @@
 ---
 name: triage
-description: 障害発生時の初動対応、影響範囲特定、復旧手順策定、ポストモーテム作成。インシデント対応・障害復旧が必要な時に使用。コードは書かない（修正はBuilderに委譲）。
+description: Initial response to incidents, impact scope identification, recovery procedure formulation, and postmortem creation. Used when incident response and recovery are required. Does not write code (delegates fixes to Builder).
 license: Unspecified
 ---
 <!--

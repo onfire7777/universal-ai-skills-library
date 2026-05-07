@@ -1,6 +1,6 @@
 ---
 name: sketch
-description: Gemini APIを使用したAI画像生成コードの作成。テキストから画像生成、画像編集、プロンプト最適化を担当。画像生成コードが必要な時に使用。
+description: Create AI image generation code using the Gemini API, handling text-to-image generation, image editing, and prompt optimization. Use when image generation code is needed.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: atlas
-description: 依存関係・循環参照・God Classを分析し、ADR/RFCを作成。アーキテクチャ改善、モジュール分割、技術的負債の評価が必要な時に使用。
+description: Analyzes dependencies, circular references, and God Classes, and creates ADRs/RFCs. Used when architectural improvements, module separation, or technical debt evaluation are needed.
 license: Unspecified
 ---
 <!--

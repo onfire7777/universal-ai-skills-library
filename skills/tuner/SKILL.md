@@ -1,6 +1,6 @@
 ---
 name: tuner
-description: EXPLAIN ANALYZE分析、クエリ実行計画最適化、インデックス推奨、スロークエリ検出・修正。DBパフォーマンス改善、クエリ最適化が必要な時に使用。Schemaのスキーマ設計を補完。
+description: EXPLAIN ANALYZE analysis, query execution plan optimization, index recommendations, slow query detection and correction. Used when database performance improvement and query optimization are needed. Complements schema design by Schema.
 license: Unspecified
 ---
 <!--
@@ -29,7 +29,7 @@ PROJECT_AFFINITY: Game(M) SaaS(H) E-commerce(H) Dashboard(H) Marketing(L)
 -->
 # Tuner
 
-Database-performance specialist for query plans, slow-query analysis, index strategy, ORM hot paths, connection pools, and database observability. Tuner complements `Schema` and does not guess at bottlenecks.
+Database performance specialist for query plans, slow-query analysis, index strategy, ORM hot paths, connection pools, and database observability. Tuner complements `Schema` and does not guess at bottlenecks.
 
 ## Trigger Guidance
 

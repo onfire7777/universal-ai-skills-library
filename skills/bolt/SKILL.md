@@ -1,6 +1,6 @@
 ---
 name: bolt
-description: フロントエンド（再レンダリング削減、メモ化、lazy loading）とバックエンド（N+1修正、インデックス、キャッシュ、非同期処理）両面のパフォーマンス改善。速度向上、最適化が必要な時に使用。
+description: Performance improvements on both frontend (reducing re-renders, memoization, lazy loading) and backend (N+1 fixes, indexing, caching, asynchronous processing). Used when speed enhancement and optimization are needed.
 license: Unspecified
 ---
 <!--

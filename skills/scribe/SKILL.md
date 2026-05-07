@@ -1,6 +1,6 @@
 ---
 name: scribe
-description: 仕様書・設計書・実装チェックリスト・テスト仕様書を作成。PRD/SRS/HLD/LLD形式の技術文書、レビューチェックリスト、テストケース定義を担当。コードは書かない。技術文書作成が必要な時に使用。
+description: Creates specification documents, design documents, implementation checklists, and test specifications. Responsible for technical documents in PRD/SRS/HLD/LLD formats, review checklists, and test case definitions. Does not write code. Used when technical documentation is required.
 license: Unspecified
 ---
 <!--

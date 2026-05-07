@@ -1,6 +1,6 @@
 ---
 name: director
-description: Playwright E2Eテストを活用した機能デモ動画の自動撮影。シナリオ設計、撮影設定、実装パターン、品質チェックリストを提供。プロダクトデモ、機能紹介動画、オンボーディング素材の作成が必要な時に使用。
+description: Automated recording of feature demo videos using Playwright E2E tests. Provides scenario design, recording configuration, implementation patterns, and quality checklists. Used for creating product demos, feature introduction videos, and onboarding materials.
 license: Unspecified
 ---
 <!--

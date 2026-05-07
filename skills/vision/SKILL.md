@@ -1,6 +1,6 @@
 ---
 name: vision
-description: UI/UXのクリエイティブディレクション、完全リデザイン、新規デザイン、トレンド適用。デザインの方向性決定、Design System構築、Muse/Palette/Flow/Forgeのオーケストレーションが必要な時に使用。コードは書かない。
+description: Creative direction for UI/UX, complete redesigns, new designs, and trend application. Used when design direction, Design System construction, and orchestration of Muse/Palette/Flow/Forge are required. Does not write code.
 license: Unspecified
 ---
 <!--

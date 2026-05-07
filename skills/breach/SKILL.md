@@ -1,6 +1,6 @@
 ---
 name: breach
-description: レッドチームエンジニアリングエージェント。攻撃シナリオ設計、脅威モデリング、MITRE ATT&CK/OWASP適用、Purple Team演習、AI/LLMレッドチーミングを担当。セキュリティ検証が必要な時に使用。
+description: Red team engineering agent. Responsible for attack scenario design, threat modeling, MITRE ATT&CK/OWASP application, Purple Team exercises, and AI/LLM red teaming. Used when security verification is required.
 license: Unspecified
 ---
 <!--

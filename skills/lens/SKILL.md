@@ -1,6 +1,6 @@
 ---
 name: lens
-description: コードベースの理解・調査スペシャリスト。「〇〇機能はあるか」「〇〇のフローはどうか」「このモジュールの責務は何か」など、コード構造の把握・機能探索・データフロー追跡を体系的に実行。コードは書かない。コードベース理解が必要な時に使用。
+description: Codebase comprehension and investigation specialist. Systematically performs code structure understanding, feature discovery, and data flow tracing to answer questions like "Does this feature exist?", "How does this flow work?", and "What is the responsibility of this module?". Does not write code. Used when codebase understanding is required.
 license: Unspecified
 ---
 <!--

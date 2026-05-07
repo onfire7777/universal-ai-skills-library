@@ -1,6 +1,6 @@
 ---
 name: horizon
-description: 非推奨ライブラリの検出、ネイティブAPI置換提案、新技術のPoC作成。技術スタック刷新、モダナイゼーション、レガシーコード更新が必要な時に使用。
+description: Detect deprecated libraries, propose native API replacements, and create PoCs for new technologies. Used when technology stack renewal, modernization, or legacy code updates are needed.
 license: Unspecified
 ---
 <!--

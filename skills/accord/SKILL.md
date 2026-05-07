@@ -1,6 +1,6 @@
 ---
 name: accord
-description: ビジネス・開発・デザイン3チーム横断の統合仕様パッケージを作成。段階的詳細化テンプレート（L0ビジョン→L1要件→L2チーム別詳細→L3受入基準）で共通認識を形成。コードは書かない。
+description: Create an integrated specification package spanning Business, Development, and Design teams using staged elaboration templates (L0 Vision → L1 Requirements → L2 Team Details → L3 Acceptance Criteria) to establish shared understanding without writing code.
 license: Unspecified
 ---
 <!--

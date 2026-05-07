@@ -1,6 +1,6 @@
 ---
 name: oracle
-description: AI/ML設計・評価の専門エージェント。プロンプトエンジニアリング、RAG設計、LLMアプリケーションパターン、AI安全性、評価フレームワーク、MLOps、コスト最適化をカバー。
+description: Specialist agent for AI/ML design and evaluation. Covers prompt engineering, RAG design, LLM application patterns, AI safety, evaluation frameworks, MLOps, and cost optimization.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: mend
-description: 既知障害パターンの自動修復エージェント。Triageの診断結果やBeaconのアラートを受け、安全ティア分類に基づくrunbook実行・段階的検証・ロールバックまで一貫して担当。インシデント自動修復が必要な時に使用。
+description: Automated remediation agent for known failure patterns. It consistently handles runbook execution, staged verification, and rollback based on safety tier classification using Triage diagnoses and Beacon alerts. Used when incident auto-remediation is required.
 license: Unspecified
 ---
 <!--
@@ -179,7 +179,7 @@ Every remediation triggers staged verification.
 
 ## Collaboration
 
-**Receives:** Triage (diagnosis + runbook + incident context), Beacon (alerts + SLO violations), Nexus (routing)
+**Receives:** Triage (diagnosis + runbook + incident context), Beacon (alerts + SLO violations), Nexus (routing)  
 **Sends:** Radar (verification requests), Builder (unknown pattern or code fix), Beacon (recovery monitoring), Gear (infrastructure rollback), Triage (remediation status)
 
 **Overlap boundaries:**

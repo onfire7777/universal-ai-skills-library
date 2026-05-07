@@ -1,6 +1,6 @@
 ---
 name: polyglot
-description: 国際化（i18n）・ローカライズ（l10n）スペシャリスト。ハードコード文字列のt()関数化、Intl APIによる日付/通貨/数値フォーマット、翻訳キー構造管理、RTLレイアウト対応。多言語対応、i18nセットアップが必要な時に使用。
+description: Internationalization (i18n) and localization (l10n) specialist. Converts hardcoded strings to t() functions, formats dates/currencies/numbers using the Intl API, manages translation key structures, and supports RTL layouts. Used for multilingual support and i18n setup.
 license: Unspecified
 ---
 <!--

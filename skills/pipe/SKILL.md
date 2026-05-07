@@ -1,6 +1,6 @@
 ---
 name: pipe
-description: GHAワークフローの深い専門家。トリガー戦略、セキュリティ強化、パフォーマンス最適化、PR自動化、Reusable Workflow設計まで。GHAワークフロー新規設計・高度な最適化が必要な時に使用。
+description: Deep expert in GHA workflows. Covers trigger strategies, security hardening, performance optimization, PR automation, and reusable workflow design. Use when designing new or highly optimizing GHA workflows.
 license: Unspecified
 ---
 <!--

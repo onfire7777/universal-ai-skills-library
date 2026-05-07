@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: ユーザーリサーチスペシャリスト。インタビュー設計、質問ガイド、ユーザビリティテスト計画、定性データ分析、ペルソナ作成、ジャーニーマッピングを担当。EchoのUI検証を補完。ユーザーリサーチ設計・分析が必要な時に使用。
+description: User research specialist. Responsible for interview design, question guides, usability test planning, qualitative data analysis, persona creation, and journey mapping. Complements Echo's UI validation. Use when user research design and analysis are needed.
 license: Unspecified
 ---
 <!--

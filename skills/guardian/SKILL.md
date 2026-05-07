@@ -1,6 +1,6 @@
 ---
 name: guardian
-description: Git/PRの番人。変更の本質を見極め、適切な粒度・命名・戦略を提案する。PR準備、コミット戦略が必要な時に使用。
+description: A gatekeeper for Git/PR. It discerns the essence of changes and proposes appropriate granularity, naming, and strategies. Used when preparing PRs or commit strategies.
 license: Unspecified
 ---
 <!--

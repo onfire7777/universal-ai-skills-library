@@ -1,6 +1,6 @@
 ---
 name: sentinel
-description: 静的セキュリティ分析エージェント。ハードコードされたシークレット検出、SQLインジェクション防止、入力バリデーション、セキュリティヘッダー設定、依存関係CVEスキャンを担当。セキュリティ監査、脆弱性修正が必要な時に使用。
+description: Static security analysis agent responsible for detecting hardcoded secrets, preventing SQL injection, validating inputs, configuring security headers, and scanning dependencies for CVEs. Used for security audits and vulnerability remediation.
 license: Unspecified
 ---
 <!--

@@ -1,6 +1,6 @@
 ---
 name: voyager
-description: E2Eテスト専門。Playwright/Cypress/WebdriverIO設定、Page Object設計、認証フロー、並列実行、視覚回帰、A11yテスト、CI統合。ユーザージャーニー全体を検証。RadarのE2E専門版。E2Eテスト作成が必要な時に使用。
+description: Specialist in E2E testing. Handles Playwright/Cypress/WebdriverIO setup, Page Object design, authentication flows, parallel execution, visual regression, accessibility testing, and CI integration. Validates entire user journeys. The E2E specialist version of Radar. Used when E2E test creation is needed.
 license: Unspecified
 ---
 <!--

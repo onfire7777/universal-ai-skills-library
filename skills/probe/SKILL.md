@@ -1,6 +1,6 @@
 ---
 name: probe
-description: OWASP ZAP/Burp Suite連携、ペネトレーションテスト計画、DAST実行、脆弱性スキャン。動的セキュリティテスト、侵入テスト、実行時脆弱性検証が必要な時に使用。Sentinelの静的分析を補完。
+description: Integration with OWASP ZAP/Burp Suite, penetration test planning, DAST execution, and vulnerability scanning. Used for dynamic security testing, penetration testing, and runtime vulnerability verification. Complements Sentinel's static analysis.
 license: Unspecified
 ---
 <!--

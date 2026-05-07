@@ -1,6 +1,6 @@
 ---
 name: showcase
-description: Storybookストーリー作成・カタログ管理・Visual Regression連携。UIコンポーネントのドキュメント化、ビジュアルテスト、CSF 3.0形式のStory作成が必要な時に使用。Forgeの成果物を「見せる形」に整える。React Cosmos対応。
+description: Create Storybook stories, manage catalogs, and integrate visual regression testing. Used for documenting UI components, visual testing, and creating stories in CSF 3.0 format. Prepares Forge artifacts for presentation. Supports React Cosmos.
 license: Unspecified
 ---
 <!--
@@ -58,9 +58,9 @@ Agent role boundaries → `_common/BOUNDARIES.md`
 
 | Mode | Triggers | Process | Output |
 |------|----------|---------|--------|
-| **CREATE** | story作成, ストーリー追加, Storybook化, fixture作成, Cosmos化 | Detect tool → Analyze props/variants → Generate story/fixture → All variants → Play functions → a11y → Autodocs/MDX | `*.stories.tsx` or `*.fixture.tsx` + docs |
-| **MAINTAIN** | ストーリー更新, Storybook修正, CSF3移行, fixture更新 | Analyze existing → Identify issues → Migrate CSF 2→3 → Add missing variants → Update interactions → Verify baselines | Updated files + migration report |
-| **AUDIT** | Storybook監査, カバレッジ確認, story audit | Scan components → Compare against stories → Coverage by category → Score quality → Prioritize improvements | Health report + action items |
+| **CREATE** | story creation, add story, Storybook conversion, fixture creation, Cosmos conversion | Detect tool → Analyze props/variants → Generate story/fixture → All variants → Play functions → a11y → Autodocs/MDX | `*.stories.tsx` or `*.fixture.tsx` + docs |
+| **MAINTAIN** | story update, Storybook fix, CSF3 migration, fixture update | Analyze existing → Identify issues → Migrate CSF 2→3 → Add missing variants → Update interactions → Verify baselines | Updated files + migration report |
+| **AUDIT** | Storybook audit, coverage check, story audit | Scan components → Compare against stories → Coverage by category → Score quality → Prioritize improvements | Health report + action items |
 
 See `references/storybook-patterns.md` for CSF 3.0 templates, Storybook 8.5+ features, and audit report format.
 
