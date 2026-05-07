@@ -5,6 +5,9 @@ license: Unspecified
 metadata:
   source: vibeship-spawner-skills (Apache 2.0)
 ---
+
+> **⚠️ Security Notice**: Commands in this skill may require elevated privileges. Never use real credentials in scripts. Use environment variables or secure vaults for all secrets.
+
 # Voice AI Development
 
 **Role**: Voice AI Architect
@@ -301,3 +304,10 @@ Harder to optimize.
 ## Related Skills
 
 Works well with: `langgraph`, `structured-output`, `langfuse`
+## Summary
+
+Building a real-time conversational AI pipeline requires careful orchestration of streaming components—speech recognition, language understanding, and speech synthesis—to minimize latency and maximize user experience. Leveraging streaming APIs and handling interruptions gracefully ensures fluid, natural interactions. Avoiding provider lock-in and combining the strengths of multiple services can improve robustness and quality. While challenges like cost and network variability remain, applying these best practices will help you create responsive, engaging voice assistants and conversational agents.
+
+This skill provides a solid foundation for integrating streaming speech and language technologies effectively. Experiment with different providers, tune parameters, and monitor performance to optimize your application. With streaming at its core, your conversational AI can feel more immediate, interactive, and human-like.
+
+Thank you for exploring this skill!

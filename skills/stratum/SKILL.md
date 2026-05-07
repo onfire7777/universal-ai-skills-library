@@ -437,3 +437,8 @@ Follow `_common/GIT_GUIDELINES.md` for commit messages and PR titles:
 - Use Conventional Commits format: `type(scope): description`
 - **DO NOT include agent names** in commits or PR titles
 - Keep subject line under 50 characters
+This concludes the OpenSkills SKILL.md specification. The document has detailed the expected output formats, Nexus Hub routing behavior, and language conventions to ensure consistent, high-quality modeling and handoff processes. Adhering to these guidelines will facilitate seamless collaboration across agents and tools, maintain clarity in communication, and support efficient evolution of architecture models.
+
+Ensure all generated artifacts are properly validated and reviewed before progressing to subsequent steps. When operating in Nexus Hub Mode, strictly follow the routing and handoff protocols to maintain centralized coordination. Finally, remember to write all narrative outputs in Japanese, while preserving technical terms and code identifiers in English, to meet localization requirements without sacrificing precision.
+
+This skill documentation should now be considered complete and ready for implementation or integration.

@@ -69,3 +69,12 @@ Let Playwright wait automatically, never add manual waits
 ## Related Skills
 
 Works well with: `agent-tool-builder`, `workflow-automation`, `computer-use-agents`, `test-architect`
+u teach how to build resilient scrapers by respecting site load patterns, rotating user agents, and handling CAPTCHAs gracefully.
+
+Mastering browser automation means embracing the browser’s asynchronous nature and avoiding brittle shortcuts. Use Playwright’s powerful selectors and auto-waiting to write tests and scrapers that are both reliable and maintainable. Remember that flaky tests are often a sign of misunderstanding the page lifecycle or DOM updates.
+
+When scaling scraping or testing, isolate browser contexts to prevent state leakage and detection. Use stealth plugins or techniques when interacting with sites that employ bot detection. Always monitor and log failures with trace files to diagnose issues quickly.
+
+By following these principles, you can build browser automation workflows that stand the test of time, adapt to site changes, and deliver consistent results.
+
+This skill empowers you to automate browsers confidently, whether for end-to-end testing, data extraction, or agentic control, leveraging the best practices and tools in the ecosystem today.

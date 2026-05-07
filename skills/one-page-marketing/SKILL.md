@@ -3,7 +3,6 @@ name: one-page-marketing
 license: MIT
 description: Build a complete marketing plan covering the full customer journey from stranger to raving fan. Use when the user mentions "marketing plan", "target market", "USP", "lead nurture", "customer lifetime value", or "referral program". Covers the PVP Index, channel selection, and advocacy systems. For brand messaging, see storybrand-messaging. For conversion optimization, see cro-methodology.
 metadata:
-  metadata:
     author: wondelai
     version: 1.0.1
 ---

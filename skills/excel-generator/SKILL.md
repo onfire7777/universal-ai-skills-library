@@ -24,7 +24,7 @@ Before creating any Excel, think through:
 
 ### Feature ↔ User Value Pairs
 
-#### Help Users「Understand Data」
+#### Help Users"Understand Data"
 
 | Feature | User Value | When to Use |
 |---------|-----------|-------------|
@@ -35,7 +35,7 @@ Before creating any Excel, think through:
 | Color Scale | Heatmap effect, patterns pop out | Matrices, ranges, distributions |
 | Sparklines | See trend within a single cell | Summary rows with historical context |
 
-#### Help Users「Find What Matters」
+#### Help Users"Find What Matters"
 
 | Feature | User Value | When to Use |
 |---------|-----------|-------------|
@@ -45,7 +45,7 @@ Before creating any Excel, think through:
 | Bold/Color Emphasis | Visual distinction between primary and secondary | Summary rows, key metrics |
 | KEY INSIGHTS Section | Conclusions delivered directly | Analytical reports |
 
-#### Help Users「Save Time」
+#### Help Users"Save Time"
 
 | Feature | User Value | When to Use |
 |---------|-----------|-------------|
@@ -55,7 +55,7 @@ Before creating any Excel, think through:
 | Freeze Panes | Headers visible while scrolling | Tables with >10 rows |
 | Sheet Index with Links | Quick navigation, no guessing | Files with >3 sheets |
 
-#### Help Users「Use Directly」
+#### Help Users"Use Directly"
 
 | Feature | User Value | When to Use |
 |---------|-----------|-------------|
@@ -65,7 +65,7 @@ Before creating any Excel, think through:
 | Formulas (not hardcoded) | Change parameters, results update | Models, forecasts, adjustable scenarios |
 | Data Validation Dropdowns | Prevent input errors | Templates requiring user input |
 
-#### Help Users「Trust the Data」
+#### Help Users"Trust the Data"
 
 | Feature | User Value | When to Use |
 |---------|-----------|-------------|
@@ -75,7 +75,7 @@ Before creating any Excel, think through:
 | Professional Formatting | Looks reliable | All external-facing files |
 | Consistent Precision | No doubts about accuracy | All numeric values |
 
-#### Help Users「Gain Insights」
+#### Help Users"Gain Insights"
 
 | Feature | User Value | When to Use |
 |---------|-----------|-------------|

@@ -3,7 +3,6 @@ name: pragmatic-programmer
 license: MIT
 description: 'Apply meta-principles of software craftsmanship: DRY, orthogonality, tracer bullets, and design by contract. Use when the user mentions "best practices", "pragmatic approach", "broken windows", "tracer bullet", or "software craftsmanship". Covers estimation, domain languages, and reversibility. For code-level quality, see clean-code. For refactoring techniques, see refactoring-patterns.'
 metadata:
-  metadata:
     author: wondelai
     version: 1.0.0
 ---

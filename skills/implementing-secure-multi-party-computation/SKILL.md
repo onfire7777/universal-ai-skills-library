@@ -155,3 +155,14 @@ Multiple parties jointly train a machine learning model using SMPC to protect tr
 - GDPR Article 32(1) — Security measures
 - GDPR Recital 78 — Technical measures for data protection
 - ENISA Report: Data Protection Engineering (2022)
+## Further Reading and Resources
+
+- **ENISA Technical Guidelines on SMPC** — Comprehensive best practices for secure multi-party computation deployments.
+- **MP-SPDZ Documentation** — Detailed user guide and protocol descriptions for the MP-SPDZ framework.
+- **CrypTen Tutorials** — Hands-on examples for privacy-preserving machine learning using SMPC.
+- **Sharemind Platform Overview** — Enterprise-grade SMPC solution with compliance and scalability features.
+- **Academic Surveys** — Recent papers summarizing advances in SMPC protocols and applications.
+
+By carefully balancing security, performance, and regulatory compliance, SMPC enables collaborative data analysis without compromising privacy. This skill provides a foundation to design, implement, and govern SMPC solutions aligned with GDPR and industry best practices.
+
+```

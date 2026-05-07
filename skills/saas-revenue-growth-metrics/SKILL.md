@@ -627,3 +627,12 @@ See `examples/` folder for detailed scenarios. Mini examples below:
 - Adapted from `research/finance/Finance for Product Managers.md`
 - Consolidated from `research/finance/Finance_QuickRef.md`
 - Common mistakes from `research/finance/Finance_Metrics_Additions_Reference.md`
+---
+
+This concludes the key pitfalls and best practices for understanding and applying revenue and retention metrics in SaaS businesses. By carefully tracking these metrics, segmenting your analysis, and focusing on expansion-driven growth, you can build a more resilient and scalable subscription business.
+
+Remember, metrics are tools to inform decisions—not just numbers to report. Use them to identify risks early, optimize customer acquisition and retention strategies, and align your product roadmap with sustainable revenue growth.
+
+For ongoing learning, revisit the related skills and external frameworks listed above, and continuously refine your approach as your business evolves.
+
+Thank you for using this skill guide to deepen your understanding of SaaS revenue and retention metrics.
