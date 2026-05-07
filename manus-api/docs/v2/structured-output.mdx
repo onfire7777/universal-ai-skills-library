@@ -1,0 +1,420 @@
+---
+title: 'Structured Output'
+description: 'Get agent results in a specific JSON format'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+
+When you need the agent's result in a specific JSON format — for example, extracting entities, filling a form, or returning data to your application — use Structured Output. You provide a JSON Schema, and the agent guarantees a result conforming to that schema after the task completes.
+
+## Quick Start
+
+Pass `structured_output_schema` when creating a task:
+
+```bash
+curl -X POST https://api.manus.ai/v2/task.create \
+  -H 'x-manus-api-key: <your-api-key>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": {
+      "content": "What is the capital of France?"
+    },
+    "structured_output_schema": {
+      "type": "object",
+      "properties": {
+        "country": { "type": "string" },
+        "capital": { "type": "string" }
+      },
+      "required": ["country", "capital"],
+      "additionalProperties": false
+    }
+  }'
+```
+
+After the task completes, there are two ways to retrieve the result:
+
+### Polling via API
+
+Use [task.listMessages](https://open.manus.ai/docs/v2/task.listMessages) and look for the `structured_output_result` event:
+
+```bash
+curl 'https://api.manus.ai/v2/task.listMessages?task_id=<task_id>&order=asc' \
+  -H 'x-manus-api-key: <your-api-key>'
+```
+
+```json
+{
+  "type": "structured_output_result",
+  "structured_output_result": {
+    "success": true,
+    "value": {
+      "country": "France",
+      "capital": "Paris"
+    }
+  }
+}
+```
+
+### Push via Webhook
+
+If you have a [webhook](https://open.manus.ai/docs/v2/webhooks-overview) configured, the `task_stopped` callback includes the result in `task_detail.structured_output`:
+
+```json
+{
+  "event_id": "task_stopped_abc123_1714000000",
+  "event_type": "task_stopped",
+  "task_detail": {
+    "task_id": "abc123",
+    "task_title": "...",
+    "task_url": "...",
+    "message": "...",
+    "stop_reason": "finish",
+    "structured_output": {
+      "success": true,
+      "value": {
+        "country": "France",
+        "capital": "Paris"
+      },
+      "error": null
+    }
+  }
+}
+```
+
+## How It Works
+
+1. You provide a JSON Schema with your [task.create](https://open.manus.ai/docs/v2/task.create) or [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) request.
+2. The agent runs normally — browsing, searching, coding, etc.
+3. When the task finishes (`stop_reason: finish`), an extraction pass reads the conversation and produces a result matching your schema.
+4. The result is delivered via [task.listMessages](https://open.manus.ai/docs/v2/task.listMessages) and [webhook callback](https://open.manus.ai/docs/v2/webhooks-overview).
+
+<Note>
+The extraction is a post-processing step — it does not change how the agent works. The agent completes its task as usual, then a separate model extracts the structured result from the conversation.
+</Note>
+
+### Schema Lifecycle
+
+The schema works as **arm once, fire once**:
+
+```
+task.create / task.sendMessage (with schema)
+  │
+  ▼
+Schema Armed ◄──────────────── task.sendMessage (with new schema)
+  │
+  ├─ agent asks user (stop_reason: ask)
+  │   → schema stays armed
+  │   → user replies → agent continues
+  │   │
+  ├─ agent finishes (stop_reason: finish)
+  │   → extraction fires
+  │   → result delivered
+  │   │
+  │   ▼
+  │ Schema Consumed
+  │   │
+  │   ├─ task.sendMessage WITHOUT schema → no extraction
+  │   └─ task.sendMessage WITH schema   → re-armed (go back to top)
+```
+
+- **Armed** — passing `structured_output_schema` in [task.create](https://open.manus.ai/docs/v2/task.create) or [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) arms the schema for extraction.
+- **Not consumed on `ask`** — if the agent pauses to ask the user a question (`stop_reason: ask`), the schema stays armed. It will fire when the task eventually finishes.
+- **Fired on `finish`** — when the task completes (`stop_reason: finish`), extraction runs and the schema is consumed. The result is delivered via the events API and webhook.
+- **Re-arm to extract again** — after the schema is consumed, subsequent task completions will not trigger extraction. To extract again, pass a new `structured_output_schema` with your next [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage).
+
+## Schema Requirements
+
+The schema uses a strict subset of [JSON Schema](https://json-schema.org/) designed for reliable extraction. This ensures the output can always be deterministically validated and parsed.
+
+### Root Type
+
+The top-level schema must be `"type": "object"`. You cannot use a bare `string`, `array`, or other primitive as the root.
+
+### Supported Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `string` | Text value | `{ "type": "string" }` |
+| `number` | Floating-point number | `{ "type": "number" }` |
+| `integer` | Whole number | `{ "type": "integer" }` |
+| `boolean` | `true` or `false` | `{ "type": "boolean" }` |
+| `null` | Null value (typically used with nullable patterns) | `{ "type": "null" }` |
+| `object` | Nested object (must follow object rules below) | See below |
+| `array` | Array of items (must specify `items` schema) | `{ "type": "array", "items": { "type": "string" } }` |
+
+### Supported Keywords
+
+| Keyword | Usage | Example |
+|---------|-------|---------|
+| `enum` | Restrict a value to a fixed set of options | `{ "type": "string", "enum": ["low", "medium", "high"] }` |
+| `description` | Document the purpose of a field (does not affect validation) | `{ "type": "string", "description": "ISO 8601 date" }` |
+| `anyOf` | Union types, most commonly used for nullable fields | `{ "anyOf": [{ "type": "string" }, { "type": "null" }] }` |
+| Type arrays | Shorthand for nullable — equivalent to `anyOf` with `null` | `{ "type": ["string", "null"] }` |
+| `$ref` / `$defs` | Reuse schema definitions and define recursive structures | See example below |
+
+### Object Rules
+
+Every `object` in the schema — root or nested — must follow these two rules:
+
+1. **`additionalProperties` must be `false`** — Only explicitly defined properties are allowed. This prevents unexpected fields in the output.
+2. **`required` must list all properties** — Every property defined in `properties` must appear in the `required` array. Optional fields should use a nullable type instead (e.g., `{ "type": ["string", "null"] }`).
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "age": { "type": "integer" },
+    "nickname": { "type": ["string", "null"] }
+  },
+  "required": ["name", "age", "nickname"],
+  "additionalProperties": false
+}
+```
+
+### Schema Reuse with `$ref` / `$defs`
+
+Use `$defs` to define reusable sub-schemas and `$ref` to reference them. This is especially useful for recursive structures:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "root": { "$ref": "#/$defs/TreeNode" }
+  },
+  "required": ["root"],
+  "additionalProperties": false,
+  "$defs": {
+    "TreeNode": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TreeNode" }
+        }
+      },
+      "required": ["label", "children"],
+      "additionalProperties": false
+    }
+  }
+}
+```
+
+### Nesting Depth
+
+The maximum nesting depth for objects and arrays is **5 levels**. Schemas exceeding this limit will be rejected.
+
+### Unsupported Keywords
+
+The following JSON Schema keywords are **not supported** and will cause a validation error if included:
+
+| Category | Keywords |
+|----------|----------|
+| String constraints | `pattern`, `format`, `minLength`, `maxLength` |
+| Numeric constraints | `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf` |
+| Array constraints | `minItems`, `maxItems`, `uniqueItems` |
+| Composition (except `anyOf`) | `allOf`, `oneOf`, `not` |
+| Conditional | `if`, `then`, `else` |
+
+<Warning>
+Invalid schemas are rejected immediately with a descriptive error message (HTTP 400). See [Error Handling](#error-handling) for common error messages.
+</Warning>
+
+## Result Format
+
+The result always has three fields:
+
+| Field     | Type          | Description                                                  |
+|-----------|---------------|--------------------------------------------------------------|
+| `success` | boolean       | Whether the agent produced a meaningful result               |
+| `value`   | (your schema) | The extracted value. Always present and conforms to your schema. When `success` is `false`, contains a zero-value fallback (see [zero-value rules](#when-success-is-false) below) |
+| `error`   | string \| null | Error description when `success` is `false`. `null` when `success` is `true` |
+
+**When `success` is `true`:**
+
+The agent completed the task and `value` contains the extracted data:
+
+```json
+{
+  "success": true,
+  "value": { "country": "France", "capital": "Paris" },
+  "error": null
+}
+```
+
+**When `success` is `false`:**
+
+The extraction failed (e.g., the model call errored or the output didn't match the schema). `value` is a **zero-value fallback** that conforms to your schema's structure, and `error` explains what happened:
+
+```json
+{
+  "success": false,
+  "value": { "country": "", "capital": "" },
+  "error": "Failed to extract structured output"
+}
+```
+
+The zero-value rules by type:
+
+| Type | Zero value |
+|------|------------|
+| `string` | `""` |
+| `number` / `integer` | `0` |
+| `boolean` | `false` |
+| `null` | `null` |
+| `object` | Object with all properties set to their respective zero values |
+| `array` | `[]` |
+| `enum` | First value in the enum list |
+| Nullable (`["string", "null"]` / `anyOf` with `null`) | `null` |
+
+<Tip>
+The `value` is always safe to destructure — it matches your schema's structure even on failure. Your application should check `success` before treating `value` as meaningful data.
+</Tip>
+
+## Multi-turn Conversations
+
+The schema is consumed once per task stop. In a multi-turn conversation, you can attach a new `structured_output_schema` to any [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) call:
+
+```bash
+curl -X POST https://api.manus.ai/v2/task.sendMessage \
+  -H 'x-manus-api-key: <your-api-key>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "task_id": "<task_id>",
+    "message": {
+      "content": "Now find the track listing for Oasis - Definitely Maybe"
+    },
+    "structured_output_schema": {
+      "type": "object",
+      "properties": {
+        "album": { "type": "string" },
+        "artist": { "type": "string" },
+        "tracks": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["album", "artist", "tracks"],
+      "additionalProperties": false
+    }
+  }'
+```
+
+The behavior is:
+
+- Send a message **with** schema → schema armed → agent runs → finishes → extraction fires → schema consumed
+- Send a message **without** schema → agent runs → finishes → **no extraction** (previous schema was already consumed)
+- Send a message with a **new** schema → re-arms with the new schema, replacing any previous one
+- Agent pauses to ask a question (`stop_reason: ask`) → schema **not** consumed, remains armed for when the task finishes
+
+The extraction always reflects the final state of the conversation at the time the task finishes.
+
+## Examples
+
+### Simple extraction
+
+```json
+{
+  "message": {
+    "content": "How many career three-pointers has Ben Simmons made?"
+  },
+  "structured_output_schema": {
+    "type": "object",
+    "properties": {
+      "player": { "type": "string" },
+      "three_pointers_made": { "type": "integer" }
+    },
+    "required": ["player", "three_pointers_made"],
+    "additionalProperties": false
+  }
+}
+```
+
+### Nullable fields
+
+```json
+{
+  "message": {
+    "content": "Does The Three-Body Problem have a movie adaptation?"
+  },
+  "structured_output_schema": {
+    "type": "object",
+    "properties": {
+      "book": { "type": "string" },
+      "author": { "type": "string" },
+      "movie_title": { "type": ["string", "null"] }
+    },
+    "required": ["book", "author", "movie_title"],
+    "additionalProperties": false
+  }
+}
+```
+
+### Nested objects with enum
+
+```json
+{
+  "message": {
+    "content": "Recommend 3 movies directed by Christopher Nolan, include genre and release year"
+  },
+  "structured_output_schema": {
+    "type": "object",
+    "properties": {
+      "movies": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "genre": {
+              "type": "string",
+              "enum": ["action", "sci-fi", "thriller", "drama"]
+            },
+            "year": { "type": "integer" }
+          },
+          "required": ["title", "genre", "year"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": ["movies"],
+    "additionalProperties": false
+  }
+}
+```
+
+## Error Handling
+
+### Schema Validation Errors (HTTP 400)
+
+If the schema is invalid, the request is rejected immediately:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "invalid_argument",
+    "message": "structured_output_schema: .price: unsupported keyword \"minimum\""
+  }
+}
+```
+
+Common errors:
+
+| Scenario                                        | Error message                                      |
+|-------------------------------------------------|----------------------------------------------------|
+| Unsupported keyword                             | `.x: unsupported keyword "pattern"`                |
+| Object missing `additionalProperties: false`    | `"additionalProperties" must be set to false`      |
+| `required` doesn't list all properties          | `"required" must include all properties`           |
+| Missing `type` field                            | `must have a "type" field`                         |
+| Not a valid JSON Schema                         | `not a valid JSON Schema`                          |
+
+### Extraction Errors (in result)
+
+These appear as `success: false` with an error message. The `value` still contains a valid default conforming to your schema. Your application should check `success` before using `value`.
+
+| Error message | Meaning |
+|---|---|
+| `Failed to extract structured output` | The extraction model call failed |
+| `Extracted value does not conform to the provided schema` | The extraction produced output that doesn't match the schema |

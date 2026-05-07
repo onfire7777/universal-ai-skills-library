@@ -1,0 +1,22 @@
+---
+title: 'task.create'
+openapi: 'POST /v2/task.create'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Talk to an agent:** To send a message to an existing agent instead of creating a new task, use [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) with `agent-default-main_task` as `task_id`. See the [Agents](https://open.manus.ai/docs/v2/agents-overview) guide.
+
+**Structured Output:** Pass `structured_output_schema` to get the agent's result in a specific JSON format. See the [Structured Output](https://open.manus.ai/docs/v2/structured-output) guide.
+
+**Attach files:** Upload via [file.upload](https://open.manus.ai/docs/v2/file.upload) and pass the `file_id` in the message content, or use `file_url` / `file_data` directly.
+
+**Connectors:** Pass connector IDs in `message.connectors`. Get IDs from [connector.list](https://open.manus.ai/docs/v2/connector.list) or the [Connectors](https://open.manus.ai/docs/v2/connectors) guide. If omitted and `project_id` is set, the project's default connectors will be used.
+
+**Enable skills:** Pass skill IDs from [skill.list](https://open.manus.ai/docs/v2/skill.list) in `message.enable_skills` to control which skills are available for the agent. If omitted, the user's default enabled skills are loaded automatically.
+
+**Force skills:** Pass skill IDs in `message.force_skills` to ensure the agent invokes them. Forced skills are automatically available even if not listed in `enable_skills`.
+</Tip>

@@ -1,0 +1,20 @@
+---
+title: 'usage.teamLog'
+openapi: 'GET /v2/usage.teamLog'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Warning>
+**Team only:** This endpoint is only available to team users. Individual users will receive a `permission_denied` error.
+</Warning>
+
+<Tip>
+**Visibility:** Owner / Super Admin / Admin sees every team member's row. Member sees only their own row.
+</Tip>
+
+<Warning>
+**Data freshness:** Enterprise teams have T+1 latency — today's data becomes visible the next day because it is sourced from an offline sync table. Non-Enterprise teams aggregate in real time.
+</Warning>

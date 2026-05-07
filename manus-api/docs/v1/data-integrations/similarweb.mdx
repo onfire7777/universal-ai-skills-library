@@ -1,0 +1,241 @@
+---
+title: 'Similarweb'
+description: 'Access website traffic and digital market intelligence data'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+import { CodePrompt } from '/snippets/code-prompt.jsx'
+
+## Overview
+
+Manus integrates Similarweb data access directly into your workflow. Without additional configuration or API management, you can access comprehensive website analytics and digital market intelligence simply through natural language prompts.
+
+## How to Use
+
+Simply mention the data you need in your prompt. Manus will automatically use Similarweb to fetch the information when related info is detected.
+
+Traffic Analysis
+
+<CodePrompt>
+Show me monthly visits, bounce rate, and unique visitors for example.com over the last 6 months. Include month-over-month changes.
+</CodePrompt>
+
+Marketing Channels
+
+<CodePrompt>
+Break down the marketing channel mix for example.com. What percentage comes from direct, organic search, paid, social, referral, and display?
+</CodePrompt>
+
+Geographic Analysis
+
+<CodePrompt>
+Show me the top 10 countries by traffic share for example.com from October to December 2025. I need to understand their geographic footprint.
+</CodePrompt>
+
+## Available Endpoints
+
+The table below lists all supported endpoints. Click any endpoint name to view detailed API documentation and parameters:
+### Endpoint Overview
+
+<table>
+  <thead>
+    <tr>
+      <th align="left" width="5%">Type</th>
+      <th align="left" width="35%">Endpoint</th>
+      <th align="left" width="12%">Unit Cost (Credits)</th>
+      <th align="left" width="48%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/unique-visitors">Get Unique Visit</a></td>
+      <td>4</td>
+      <td>Total number of unique visitors to a domain within a specific timeframe</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/global-rank">Get Global Rank (Desktop+Mobile Web)</a></td>
+      <td>4</td>
+      <td>Website's ranking compared to all websites globally</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/visits">Get Total Visits (Desktop+Mobile Web)</a></td>
+      <td>4</td>
+      <td>Total number of visits to the website</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/bounce-rate">Get Bounce Rate (Desktop+Mobile Web)</a></td>
+      <td>4</td>
+      <td>Percentage of visitors who leave after viewing one page</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td><a href="https://developers.similarweb.com/reference/geography-total">Get Total Traffic by Country (Desktop+Mobile Web)</a></td>
+      <td>28</td>
+      <td>Geographic distribution of website traffic</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td><a href="https://developers.similarweb.com/reference/traffic-sources-overview">Get Traffic Sources by Marketing Channel (Desktop)</a></td>
+      <td>28</td>
+      <td>Breakdown of desktop traffic channels</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td><a href="https://developers.similarweb.com/reference/traffic-sources-overview-mobile-web">Get Traffic Sources by Marketing Channel (Mobile)</a></td>
+      <td>28</td>
+      <td>Breakdown of mobile traffic channels</td>
+    </tr>
+  </tbody>
+</table>
+
+### Data Details
+
+<table>
+  <thead>
+    <tr>
+      <th align="left" width="5%">Type</th>
+      <th align="left" width="35%">Endpoint</th>
+      <th align="left" width="10%">Regional Granularity</th>
+      <th align="left" width="50%">Accessible Information</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/unique-visitors">Get Unique Visit</a></td>
+      <td>Worldwide</td>
+      <td>Share of desktop-only UV; share of mobile web-only UV; share of UV across both mobile web and desktop</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/global-rank">Get Global Rank (Desktop+Mobile Web)</a></td>
+      <td>Worldwide</td>
+      <td>Monthly Global Rank</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/visits">Get Total Visits (Desktop+Mobile Web)</a></td>
+      <td>Worldwide</td>
+      <td>Total visits to the website across desktop and web mobile</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td><a href="https://developers.similarweb.com/reference/bounce-rate">Get Bounce Rate (Desktop+Mobile Web)</a></td>
+      <td>Worldwide</td>
+      <td>Monthly Bounce Rate</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td><a href="https://developers.similarweb.com/reference/geography-total">Get Total Traffic by Country (Desktop+Mobile Web)</a></td>
+      <td>By Country</td>
+      <td>Country Name, Country Ranking by share, Share of traffic by country, Total visits by country, Pages per visit by country, Average time by country, Bounce rate by country</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td><a href="https://developers.similarweb.com/reference/traffic-sources-overview">Get Traffic Sources by Marketing Channel (Desktop)</a></td>
+      <td>Worldwide</td>
+      <td>Estimated organic and paid desktop visits by channel (Organic Search, Paid Search, Direct, Display Ads, Email, Referrals and Social)</td>
+    </tr>
+    <tr>
+      <td>B</td>
+      <td><a href="https://developers.similarweb.com/reference/traffic-sources-overview-mobile-web">Get Traffic Sources by Marketing Channel (Mobile)</a></td>
+      <td>Worldwide</td>
+      <td>Estimated organic and paid mobile visits by channel (Organic Search, Paid Search, Direct, Display Ads, Email, Referrals and Social)</td>
+    </tr>
+  </tbody>
+</table>
+
+## Price Model
+
+This data integration follows Similarweb's multiplier-based pricing model, where costs are calculated by multiplying multiple factors. [Learn more about pricing →](https://developers.similarweb.com/docs/data-credits-unpublished-whats-new-in-v40)
+
+See the table below for detailed pricing factors:
+
+
+### Pricing Factors
+| Factor | Description | Multiplier |
+|--------|-------------|------------|
+| **Domains** | Number of unique domains requested | 1x per domain |
+| **Granularity** | Data resolution<br/>*Monthly data only* | 1x |
+| **Countries** | Number of countries queried<br/>*Global = 1x, specific countries might add cost* | 1x per country |
+| **Time Span** | Historical data range<br/>*Max: 12 months* | 1x per month |
+| **Unit Cost** | Base cost varies by endpoint category | Varies by endpoint |
+
+<Info>
+**Important Notes**
+- Data is available at **monthly granularity only**
+- Maximum **12 months** of historical data available
+- Available to **Pro plan users**
+- Consumes **paid subscription or add-on credits only**
+- **Available via Web interface only** (API-initiated sessions excluded)
+</Info>
+
+<Note>
+Manus automatically optimizes queries to minimize costs while delivering accurate results. Session Credits Usage is tracked in your dashboard.
+</Note>
+
+
+### Example Calculations
+
+<Tip>
+**Cost** = **Domains** x **Granularity** × **Countries** × **Time Span** x **Unit Cost**
+
+</Tip>
+
+<table>
+  <thead>
+    <tr>
+      <th align="left" width="15%">Endpoint</th>
+      <th align="left" width="40%">Prompt</th>
+      <th align="left" width="30%">Cost Calculation</th>
+      <th align="left" width="15%">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Unique Visit</strong></td>
+      <td>Show me unique visitors change for <code>example.com</code> over the last year</td>
+      <td>1 Domain × 1 Country × 12 Months × 4 Unit Cost</td>
+      <td><strong>48 Credits</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Geography</strong></td>
+      <td>Get traffic breakdown by country for <code>example.com</code> in the past month, and return only the top 5 countries with the highest traffic</td>
+      <td>1 Domain × 5 Countries × 1 Month × 28 Unit Cost</td>
+      <td><strong>140 Credits</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Market Channel</strong></td>
+      <td>Compare the organic search traffic on mobile web for <code>example1.com</code> and <code>example2.com</code> in the past 3 months</td>
+      <td>2 Domain × 1 Country × 3 Months × 28 Unit Cost</td>
+      <td><strong>168 Credits</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<Note>
+The above calculations reflect Data API costs only. Total session credits include additional charges for AI processing, computation, and other features used during the session.
+</Note>
+
+<Warning>
+Data accuracy is determined by Similarweb's statistical scope and algorithms. Estimates may vary by website. Always verify critical data with multiple sources.
+</Warning>
+
+
+## Reference
+
+- [Similarweb Developer Documentation](https://developers.similarweb.com/docs/similarweb-web-traffic-api)
+- [Similarweb Data Credits System](https://developers.similarweb.com/docs/data-credits-unpublished-whats-new-in-v40)
+- [Data Accuracy and Methodology](https://support.similarweb.com/hc/en-us/articles/360002219177-Similarweb-s-Data-Accuracy)
+
+---
+
+Need help with Similarweb data? Ask Manus in natural language and it will handle the technical details for you.

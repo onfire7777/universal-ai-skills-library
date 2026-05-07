@@ -1,0 +1,114 @@
+---
+title: 'Rate Limits'
+description: 'Per-user request limits for v2 endpoints'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+The Manus API enforces **per-user** rate limits on every v2 endpoint. All API keys that belong to the same user share a single counter, and limits are measured in requests per minute. There is currently no tier differentiation — the same limit applies regardless of subscription plan.
+
+## Limits by endpoint
+
+### Tasks
+
+| Endpoint | Limit |
+|---|---|
+| `task.create` | 10 / min |
+| `task.sendMessage` | 10 / min |
+| `task.detail` | 100 / min |
+| `task.list` | 100 / min |
+| `task.listMessages` | 100 / min |
+| `task.update` | 40 / min |
+| `task.stop` | 40 / min |
+| `task.delete` | 40 / min |
+| `task.confirmAction` | 40 / min |
+
+### Projects
+
+| Endpoint | Limit |
+|---|---|
+| `project.create` | 40 / min |
+| `project.list` | 100 / min |
+
+### Skills
+
+| Endpoint | Limit |
+|---|---|
+| `skill.list` | 100 / min |
+
+### Agents
+
+| Endpoint | Limit |
+|---|---|
+| `agent.list` | 100 / min |
+| `agent.detail` | 100 / min |
+| `agent.update` | 40 / min |
+
+### Files
+
+| Endpoint | Limit |
+|---|---|
+| `file.upload` | 40 / min |
+| `file.detail` | 100 / min |
+| `file.delete` | 40 / min |
+
+### Webhooks
+
+| Endpoint | Limit |
+|---|---|
+| `webhook.create` | 40 / min |
+| `webhook.list` | 100 / min |
+| `webhook.delete` | 40 / min |
+
+### Usage
+
+| Endpoint | Limit |
+|---|---|
+| `usage.list` | 600 / min |
+| `usage.teamStatistic` | 600 / min |
+| `usage.teamLog` | 600 / min |
+
+### Connectors
+
+| Endpoint | Limit |
+|---|---|
+| `connector.list` | 100 / min |
+
+### Browser
+
+| Endpoint | Limit |
+|---|---|
+| `browser.onlineList` | 100 / min |
+
+### Website
+
+| Endpoint | Limit |
+|---|---|
+| `website.status` | 100 / min |
+| `website.listCheckpoints` | 100 / min |
+| `website.publish` | 40 / min |
+| `website.update` | 40 / min |
+
+## Error response
+
+Requests that exceed the limit return HTTP `429` with the `rate_limited` error code:
+
+```json
+{
+  "ok": false,
+  "request_id": "req_abc123",
+  "error": {
+    "code": "rate_limited",
+    "message": "Rate limit exceeded. Please retry after a short backoff."
+  }
+}
+```
+
+## Best practices
+
+- **Back off on 429** with exponential delay plus jitter; don't retry immediately in a tight loop.
+- **Prefer webhooks over polling** for task progress — see [Webhooks](https://open.manus.ai/docs/v2/webhooks-overview). Each `task.listMessages` poll counts against the 100 / min limit for that endpoint.
+- **Use cursor pagination** (`cursor` + `next_cursor`) on list endpoints so a single logical read can span minutes without a burst.
+- **Cache stable values** such as the public key returned by [`webhook.publicKey`](https://open.manus.ai/docs/v2/webhook.publicKey) — it rarely changes.

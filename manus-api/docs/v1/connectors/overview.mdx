@@ -1,0 +1,47 @@
+---
+title: 'Overview'
+description: 'Connect your apps to Manus for AI-powered automation'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+Connectors allow Manus to access and control your other apps directly from your tasks.
+
+**Use cases:**
+- Have Manus read and respond to your Gmail messages
+- Let Manus schedule meetings in your Google Calendar
+- Enable Manus to search and update your Notion databases
+
+## Popular Connectors
+
+<CardGroup cols={3}>
+  <Card title="Gmail" href="/v1/connectors/gmail">
+    Connect your Gmail account to manage emails with AI assistance
+  </Card>
+  <Card title="Google Calendar" href="/v1/connectors/google-calendar">
+    Integrate with Google Calendar for intelligent scheduling
+  </Card>
+  <Card title="Notion" href="/v1/connectors/notion">
+    Connect your Notion workspace for AI-powered knowledge management
+  </Card>
+</CardGroup>
+
+## Setup
+
+You can set up your integrations from [manus.im](https://manus.im) using secure OAuth authentication. Each connector uses industry-standard OAuth protocols to ensure your data remains secure and private.
+
+## All Available Connectors
+
+<Card title="Supported Connectors">
+  The table below lists all supported connectors. We're constantly adding more. Click a connector's name for its documentation, or click its UUID to copy it.
+</Card>
+
+import { ConnectorTable } from '/snippets/ConnectorTable.jsx'
+
+<ConnectorTable />
+
+To use a connector, copy its UUID and include it in the `connectors` array of your API request. For an example, see the [Create Task](https://open.manus.ai/docs/v1/create-task) page.
+

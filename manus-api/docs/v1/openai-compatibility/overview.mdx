@@ -1,0 +1,791 @@
+---
+title: 'OpenAI SDK Compatibility'
+description: 'Use the OpenAI Python SDK with Manus'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+## Overview
+
+The OpenAI Responses API is a stateful API designed for long-running tasks that require asynchronous processing. We've made our API compatible with the Responses API, allowing you to use the OpenAI SDK with Manus for complex reasoning tasks, document analysis, and multi-step workflows.
+
+Manus handles the heavy lifting while you track progress asynchronously, making it perfect for automation, research, and complex applications.
+
+
+
+### Prerequisites
+
+Before you begin:
+
+1. [Sign up for a Manus account](http://manus.im/)
+2. [Generate your API key](http://manus.im/app?show_settings=integrations&app_name=api) from the dashboard
+3. Install Python 3.10 or higher
+
+## Installation
+
+Install the OpenAI Python SDK:
+
+```bash
+pip install openai==1.100.2
+```
+
+> **Note:** We've tested compatibility with OpenAI Python SDK versions up to `1.100.2`.
+
+Manus uses API key-based authentication via headers. Set up your client with these approaches:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.manus.im",
+    api_key="**",  # This can be any placeholder value
+    default_headers={
+        "API_KEY": "your-api-key"  # Your actual Manus API key
+    },
+)
+```
+
+<Note>
+The `api_key` parameter to the OpenAI client can be any placeholder value - Manus reads the actual API key from the `API_KEY` header.
+</Note>
+
+## Your First Task
+
+When working with Manus, tasks run asynchronously, meaning they don't block your program while they're being processed. Before we dive into the code, let's cover the different statuses a task can have:
+
+- **running**: The initial state when you first dispatch a task. It means the agent is actively working on your request.
+- **pending**: The agent has paused its work and is waiting for more input from a user. This often happens in interactive sessions.
+- **completed**: The task finished successfully, and the full results are now available to be retrieved.
+- **error**: The task could not be completed because it ran into an error.
+
+Polling involves periodically checking the task's status until it's either completed or encounters an error. This approach is straightforward and works well for many use cases. If you'd like to see how to setup a webhook with Manus, check out [our guide on how to do so](https://open.manus.ai/docs/v1/webhooks/overview).
+
+### Creating a Task
+
+First, Let's create a task using the Manus API. When you do this, you receive a response object that contains a unique id for your task. This id is crucial for tracking the task's status.
+
+
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url={BASE_URL},
+    api_key="**",  # This can be any placeholder value
+    default_headers={
+        "API_KEY": {API_KEY}  # Your actual Manus API key
+    },
+)
+
+# Create a simple task
+response = client.responses.create(
+    input=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": "What's the color of the sky?",
+                },
+            ],
+        }
+    ],
+    extra_body={
+        "task_mode": "agent",
+        "agent_profile": "manus-1.6",
+    },
+)
+
+print(f"Task created: {response.id}")
+# Task created: a5ej4FnVPLP8Vjvb6FoeAu
+print(f"Status: {response.status}")
+# Status: running
+print(f"Task URL: {response.metadata.get('task_url')}")
+# Task URL: https://manus.im/app/a5ej4FnVPLP8Vjvb6FoeAu
+```
+
+To find out about the status of your task, you can use the `retrieve` method to get the latest status of the task. This can be done with a simple while loop.
+```python
+# When task is done, get the complete response
+completed_response = client.responses.retrieve(response_id="m2rLPAbg5PW76A7GYWS72B")
+
+while completed_response.status === "running":
+    # Wait a few seconds before checking again to avoid spamming the API
+    time.sleep(5) 
+    
+    print(f"Checking status for task {task_id}...")
+    task_update = client.responses.retrieve(response_id=task_id)
+    current_status = task_update.status
+    print(f"Current status: {current_status}")
+
+print("Task is no longer running.")
+print(task_update)
+```
+
+Once the loop finishes, the task is completed, has failed or is pending your input. You can then inspect the final `Response` object to get the full conversation.
+
+The final result, including all messages from both the user and the assistant are contained in the output field.
+
+
+```python
+Response(
+    id='a5ej4FnVPLP8Vjvb6FoeAu',
+    object='response',
+    status='completed',
+    model='manus-1.6-agent',
+    createdAt='1760348691',
+    metadata={
+        'credit_usage': '12', 
+        'task_url': 'https://manus.im/app/a5ej4FnVPLP8Vjvb6FoeAu'
+    },
+    output=[
+        ResponseOutputMessage(
+            id='jxdOzAoH8RxKi45YJvww2a',
+            role='user',
+            content=[
+                ResponseOutputText(
+                    text="What's the color of the sky?"
+                )
+            ]
+        ),
+        ResponseOutputMessage(
+            id='lJLNeZP1bnHE0YsAPq3Vzd',
+            role='assistant',
+            content=[
+                ResponseOutputText(
+                    text='Understood, I will provide information about the color of the sky.'
+                ),
+                ResponseOutputText(
+                    annotations=None,
+                    text=None,
+                    type='output_file',
+                    logprobs=None,
+                    fileUrl='<file url goes here>',
+                    fileName='notion_benefits.md',
+                    mimeType='text/markdown'
+                )
+            ]
+        ),
+        //...other conversation messages go here
+    ]
+)
+```
+
+The most important field here is output, which contains the full conversation history as a list of ResponseOutputMessage objects. 
+
+Each message includes a role (user or assistant) and its content, allowing you to easily parse the entire interaction. You can see a full list of all of the output files and messages that Manus has generated in the output field of the Response object.
+
+## File Management
+
+The Files API allows you to manage file uploads separately from task creation. This is useful when you want to reuse files across multiple tasks or pre-upload large files.
+
+### Uploading Files
+
+To upload a file, first create a file record to get an upload URL, then upload your file to that URL:
+
+```python
+import requests
+from openai import BaseModel
+from typing import Literal
+
+class FileCreate(BaseModel):
+    id: str
+    object: Literal["file"]
+    filename: str
+    status: str
+    upload_url: str
+    upload_expires_at: str
+    created_at: str
+
+# Step 1: Create file record and get upload URL
+file_record = client.post(
+    "/files", 
+    body={"filename": "berkshire_letter_2024.pdf"}, 
+    cast_to=FileCreate
+)
+
+print(f"File ID: {file_record.id}")
+# File ID: file-abc123xyz
+print(f"Status: {file_record.status}")
+# Status: pending
+print(f"Upload URL: {file_record.upload_url}")
+
+# Step 2: Download and upload the file
+pdf_url = "https://www.berkshirehathaway.com/letters/2024ltr.pdf"
+pdf_response = requests.get(pdf_url)
+
+upload_response = requests.put(file_record.upload_url, data=pdf_response.content)
+upload_response.raise_for_status()
+
+print(f"File uploaded successfully: {file_record.id}")
+```
+
+<Note>
+The presigned upload URL expires in **3 minutes** for security. Complete your upload before it expires.
+</Note>
+
+<Warning>
+Uploaded files are automatically deleted after **48 hours**. Reference them in your tasks before they expire. If you'd like to delete them manually, you can do so using the Files API.
+</Warning>
+
+### File Status
+
+Files progress through the following states:
+
+- **`pending`**: File record created, waiting for upload to complete
+- **`uploaded`**: File successfully uploaded and ready to use in tasks
+- **`deleted`**: File has been deleted (manually or automatically after 48 hours)
+
+### Retrieving File Details
+
+Check the status and details of your uploaded file:
+
+```python
+# Get details for a specific file
+file = client.files.retrieve(file_id="file-abc123xyz")
+
+print(f"Filename: {file.filename}")
+# Filename: berkshire_letter_2024.pdf
+print(f"Status: {file.status}")
+# Status: uploaded
+print(f"Created: {file.created_at}")
+# Created: 1760348691
+```
+
+### Listing Files
+
+Retrieve all files you've uploaded:
+
+```python
+# Get all your files
+files = client.files.list()
+
+for file in files.data:
+    print(f"{file.id}: {file.filename} - {file.status}")
+# file-abc123xyz: berkshire_letter_2024.pdf - uploaded
+# file-def456uvw: report.docx - uploaded
+```
+
+### Deleting Files
+
+Remove files you no longer need:
+
+```python
+# Delete a specific file
+client.files.delete(file_id="file-abc123xyz")
+print("File deleted successfully")
+```
+
+<Warning>
+Deleting a file marks it as `deleted` and you will no longer be able to use the file in tasks.
+</Warning>
+
+
+## Working with Content
+
+### Text Input
+
+For simple text-based tasks, use `input_text`:
+
+```python
+response = client.responses.create(
+    input=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": "Explain quantum computing in simple terms.",
+                },
+            ],
+        }
+    ],
+    extra_body={
+        "task_mode": "agent",
+        "agent_profile": "manus-1.6",
+    },
+)
+```
+
+### Files
+
+Include various file types in your tasks using these methods:
+
+<Tabs>
+  <Tab title="File ID">
+    ```python
+    # Best approach - use pre-uploaded files via Files API
+    response = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": "Summarize the key points from Warren Buffett's letter.",
+                    },
+                    {
+                        "type": "input_file",
+                        "file_id": "file-abc123xyz",  # Reference pre-uploaded file
+                    },
+                ],
+            },
+        ],
+        extra_body={"task_mode": "agent", "agent_profile": "manus-1.6"},
+    )
+    ```
+  </Tab>
+  <Tab title="Public URL">
+    ```python
+    # Simple approach - just provide a public URL
+    response = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": "Analyze this document and summarize key points.",
+                    },
+                    {
+                        "type": "input_file",
+                        "file_url": "https://example.com/document.pdf",
+                    },
+                ],
+            },
+        ],
+        extra_body={"task_mode": "agent", "agent_profile": "manus-1.6"},
+    )
+    ```
+  </Tab>
+  <Tab title="Base64 Upload">
+    ```python
+    import base64
+
+    # For private files - encode and upload directly
+    with open("document.pdf", "rb") as f:
+        file_data = f.read()
+
+    base64_string = base64.b64encode(file_data).decode("utf-8")
+
+    response = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_file",
+                        "filename": "document.pdf",
+                        "file_data": f"data:application/pdf;base64,{base64_string}",
+                    },
+                    {
+                        "type": "input_text",
+                        "text": "Summarize this document.",
+                    },
+                ],
+            },
+        ],
+        extra_body={"task_mode": "agent", "agent_profile": "manus-1.6"},
+    )
+    ```
+  </Tab>
+</Tabs>
+
+**Supported file types:**
+- **Documents**: PDF, DOCX, TXT, MD
+- **Spreadsheets**: CSV, XLSX
+- **Code**: JSON, YAML, Python, JavaScript, and more
+
+<Note>
+When using base64, include the proper MIME type prefix (e.g., `data:application/pdf;base64,` for PDFs).
+</Note>
+
+### Images
+
+Include images for visual analysis using these methods:
+
+<Tabs>
+  <Tab title="Public URL">
+    ```python
+    # Use public image URLs directly
+    response = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": "What's in this image?",
+                    },
+                    {
+                        "type": "input_image",
+                        "image_url": "https://example.com/image.jpg",
+                    },
+                ],
+            },
+        ],
+        extra_body={"task_mode": "agent", "agent_profile": "manus-1.6"},
+    )
+    ```
+  </Tab>
+  <Tab title="Base64 Upload">
+    ```python
+    import base64
+    import requests
+
+    # For private images - download and encode
+    image_url = "https://example.com/image.jpg"
+    response = requests.get(image_url)
+    image_data = response.content
+
+    base64_string = base64.b64encode(image_data).decode("utf-8")
+
+    response = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": "Describe this image in detail.",
+                    },
+                    {
+                        "type": "input_image",
+                        "image_url": f"data:image/jpeg;base64,{base64_string}",
+                    },
+                ],
+            },
+        ],
+        extra_body={"task_mode": "agent", "agent_profile": "manus-1.6"},
+    )
+    ```
+  </Tab>
+</Tabs>
+
+**Supported image formats:**
+- PNG, JPEG/JPG, GIF, WebP
+
+<Note>
+For images, use `"type": "input_image"` and provide the URL via `image_url`. Include proper MIME type prefixes for base64 uploads.
+</Note>
+
+
+### Multi-turn Conversations
+
+Build sophisticated workflows by continuing conversations across multiple requests. Just use the `previous_response_id` or `task_id` to link to the previous conversation.
+
+<Info>
+**Context Preservation:** The agent remembers previous context, uploaded files, and intermediate results across conversation turns, enabling complex multi-step tasks.
+</Info>
+
+<Tabs>
+  <Tab title="Using previous_response_id">
+    ```python
+    # Initial request with image analysis
+    response = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": "What's in this image?"},
+                    {"type": "input_image", "image_url": "https://example.com/chart.png"},
+                ],
+            },
+        ],
+        extra_body={"task_mode": "agent", "agent_profile": "manus-1.6"},
+    )
+
+    response_id = response.id
+
+    # Continue the conversation
+    followup = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": "What does the data suggest about Q4 trends?"},
+                ],
+            },
+        ],
+        previous_response_id=response_id,  # Links to previous conversation
+        extra_body={"task_mode": "agent", "agent_profile": "manus-1.6"},
+    )
+    ```
+  </Tab>
+  <Tab title="Using task_id">
+    ```python
+    # Alternative approach using task_id in extra_body
+    followup = client.responses.create(
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": "Provide more analysis of the trends."},
+                ],
+            },
+        ],
+        extra_body={
+            "task_id": response_id,  # Reference the original task
+            "task_mode": "agent",
+            "agent_profile": "manus-1.6",
+        },
+    )
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+Use **either** `previous_response_id` **or** `task_id` in `extra_body`, but not both in the same request.
+</Warning>
+
+## Projects
+
+Projects allow you to organize tasks and apply consistent instructions across multiple tasks. When you assign a task to a project, the project's instruction is automatically applied.
+
+```python
+# Create a task within a project
+response = client.responses.create(
+    input=[
+        {
+            "role": "user",
+            "content": [{"type": "input_text", "text": "Analyze this quarterly report"}],
+        }
+    ],
+    extra_body={
+        "task_mode": "agent",
+        "agent_profile": "manus-1.6",
+        "project_id": "proj_abc123",  # Assign to a project
+    },
+)
+```
+
+<Info>
+Create and manage projects via the [Projects API](https://open.manus.ai/docs/v1/create-project). The project's instruction will be applied to all tasks created within it.
+</Info>
+
+## Task Management
+
+
+Retrieve all your tasks, including those created through the Manus webapp:
+
+```python
+# Get all your tasks
+response = client.get("/v1/tasks", cast_to=object)
+tasks = response.data
+
+for task in tasks:
+    print(f"{task.id}: {task.status} - {task.metadata.get('task_title', 'Untitled')}")
+```
+
+<Info>
+This returns **all** your tasks, not just API-created ones.
+</Info>
+
+### Filtering and Search
+
+Find specific tasks using these parameters:
+
+<Tabs>
+  <Tab title="By Status">
+    ```python
+    # Filter by task status
+    response = client.get(
+        "/v1/tasks?status=completed&status=running&limit=50",
+        cast_to=object
+    )
+    ```
+  </Tab>
+  <Tab title="By Search Query">
+    ```python
+    # Search by title or content
+    response = client.get(
+        "/v1/tasks?query=financial%20analysis&limit=20",
+        cast_to=object
+    )
+    ```
+  </Tab>
+  <Tab title="By Date Range">
+    ```python
+    import time
+
+    # Tasks from last 7 days
+    week_ago = int(time.time()) - (7 * 24 * 60 * 60)
+    response = client.get(
+        f"/v1/tasks?created_after={week_ago}&limit=50",
+        cast_to=object
+    )
+    ```
+  </Tab>
+</Tabs>
+
+**Response format:**
+- **`data`**: Array of task objects
+- **`first_id`**: ID of first task in results
+- **`last_id`**: ID of last task (for pagination)
+- **`has_more`**: Whether more tasks exist
+
+### Pagination
+
+Handle large numbers of tasks efficiently:
+
+```python
+from openai import BaseModel
+
+class TaskList(BaseModel):
+    data: list
+    first_id: str
+    last_id: str
+    has_more: bool
+
+all_tasks = []
+after_cursor = None
+
+while True:
+    url = f"/v1/tasks?limit=50&order=desc"
+    if after_cursor:
+        url += f"&after={after_cursor}"
+
+    response = client.get(url, cast_to=TaskList)
+    all_tasks.extend(response.data)
+
+    if not response.has_more:
+        break
+
+    after_cursor = response.last_id
+
+print(f"Total tasks: {len(all_tasks)}")
+```
+
+<Note>
+**Pagination Direction:** `order=desc` moves from newest → oldest, `order=asc` moves from oldest → newest.
+</Note>
+
+**Available Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `limit` | integer | Max tasks (1-1000, default: 100) |
+| `after` | string | Pagination cursor |
+| `order` | string | Sort direction: `"asc"` or `"desc"` |
+| `order_by` | string | Sort field: `"created_at"` or `"updated_at"` |
+| `query` | string | Search term |
+| `status` | array | Filter by status |
+| `created_after` | integer | Unix timestamp |
+| `created_before` | integer | Unix timestamp |
+
+### Deleting Tasks
+
+Remove completed tasks to keep your workspace organized:
+
+```python
+# Delete a specific task
+client.responses.delete(response_id="task_id_here")
+
+# Delete multiple tasks
+task_ids = ["id1", "id2", "id3"]
+for task_id in task_ids:
+    client.responses.delete(response_id=task_id)
+```
+
+<Warning>
+This permanently removes the task and all associated data. Save important outputs first!
+</Warning>
+
+### Updating Tasks
+
+Modify task settings after creation:
+
+```python
+# Update task properties
+client.put(
+    "/v1/tasks/task_id_here",
+    options={
+        "extra_headers": {"API_KEY": "your-api-key"},
+        "extra_body": {
+            "enable_shared": True,  # Enable public sharing
+            "enable_visible_in_task_list": False,  # Hide from list
+            "title": "Updated Title"  # Rename task
+        },
+    },
+)
+```
+
+**Useful for:**
+- Enabling sharing after task completion
+- Hiding/showing tasks in your workspace
+- Renaming tasks for better organization
+
+<Note>
+Update only the fields you want to change - others remain unchanged.
+</Note>
+
+## Sharing & Visibility
+
+### Public Sharing
+
+Make tasks accessible to others using shareable links:
+
+```python
+# Create task with public sharing
+response = client.responses.create(
+    input=[{"role": "user", "content": [{"type": "input_text", "text": "Research report"}]}],
+    extra_body={
+        "task_mode": "agent",
+        "agent_profile": "manus-1.6",
+        "create_shareable_link": True,  # Enable public access
+    },
+)
+
+# Access the shareable URL
+share_url = response.metadata.get('share_url')
+task_url = response.metadata.get('task_url')  # Your private URL
+
+print(f"Share with others: {share_url}")
+print(f"Your private access: {task_url}")
+```
+
+<Warning>
+Anyone with the share URL can view the task and its results. Only enable for non-sensitive content.
+</Warning>
+
+### Task Visibility
+
+Control which tasks appear in your workspace:
+
+```python
+# Hide tasks from your task list (useful for automation)
+response = client.responses.create(
+    input=[{"role": "user", "content": [{"type": "input_text", "text": "Automated process"}]}],
+    extra_body={
+        "task_mode": "agent",
+        "agent_profile": "manus-1.6",
+        "hide_in_task_list": True,  # Won't appear in your workspace
+    },
+)
+
+# Still accessible via direct URL
+print(f"Hidden task URL: {response.metadata.get('task_url')}")
+```
+
+### Best Practices
+
+**Workspace Management:**
+- Delete completed tasks you no longer need
+- Use `hide_in_task_list` for automated workflows to avoid clutter
+- Save important outputs before deleting tasks
+
+**Security:**
+- Only enable `create_shareable_link` for non-sensitive tasks
+- Be mindful of what information you're sharing publicly
+- Use environment variables for API keys in production
+
+**Performance:**
+- Use appropriate agent profiles (`manus-1.6-lite` for simple tasks, `manus-1.6` for general tasks, `manus-1.6-max` for complex analysis)
+- Monitor task status rather than polling constantly
+- Batch similar tasks when possible for efficiency
+
+**Error Handling:**
+- Always check task status before accessing results
+- Handle failed tasks gracefully in your applications
+- Save task IDs for debugging and monitoring

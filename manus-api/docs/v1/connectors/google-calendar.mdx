@@ -1,0 +1,51 @@
+---
+title: 'Google Calendar'
+description: 'Connect Manus to your Google Calendar for AI-powered scheduling and calendar management'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+# Google Calendar
+
+The Google Calendar connector allows Manus to manage your schedule. By connecting to your Google Calendar, you can delegate scheduling tasks, check your availability, find meeting slots, and coordinate with colleagues using natural language.
+
+## Use Cases
+
+- **Schedule Management**: Check your availability and upcoming meetings
+- **Meeting Coordination**: Find optimal times for meetings with colleagues
+- **Calendar Analysis**: Get insights about your schedule patterns
+- **Time Blocking**: Automatically schedule focus time and breaks
+
+## Example Usage
+
+With the Google Calendar connector, you can delegate scheduling tasks to Manus. The example below shows how to check tomorrow's schedule and find time for a new meeting in a single request.
+
+```bash
+curl --request POST \
+  --url https://api.manus.ai/v1/tasks \
+  --header 'API_KEY: <YOUR API KEY>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "prompt": "What meetings do I have tomorrow? Any chance I might be able to slot in a meeting with John?",
+  "mode": "fast",
+  "connectors": [
+    "dd5abf31-7ad3-4c0b-9b9a-f0a576645baf"
+  ]
+}'
+```
+
+## Setup
+
+To set up the Google Calendar connector, follow these steps:
+
+1. Go to your integrations page on [manus.im](https://manus.im).
+2. Click **Add Google Calendar Connector**.
+3. Complete the secure OAuth authentication.
+4. Your Google Calendar connector will be available with UUID: `dd5abf31-7ad3-4c0b-9b9a-f0a576645baf`.
+
+## Privacy & Security
+
+Manus connects to your Google Calendar using secure OAuth authentication. Your calendar data remains private, and you can revoke access at any time through your Google Account settings.

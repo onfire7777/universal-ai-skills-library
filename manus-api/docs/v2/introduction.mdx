@@ -1,0 +1,84 @@
+---
+title: 'Introduction'
+description: 'Integrate Manus AI agents into your workflows with the Manus API'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+
+<Warning>
+  **You are viewing API v2** — the latest version of the Manus API. API v1 has been deprecated and will be removed in the future. If you still need the v1 docs, see [API v1 documentation](https://open.manus.ai/docs/v1/overview).
+</Warning>
+
+# Manus API
+
+The Manus API allows you to programmatically create and manage AI agent tasks. Build automations, orchestrate multi-step workflows, and integrate Manus into your applications through a simple REST API.
+
+<Card title="Get your API key" icon="key" href="/v2/authentication">
+  Before making API calls, you'll need to create an API key. Head over to Authentication to get started.
+</Card>
+
+## What you can do
+
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check" href="/v2/create-task">
+    Create tasks, send follow-up messages, and retrieve results — full multi-turn conversation support
+  </Card>
+  <Card title="Projects" icon="folder" href="/v2/create-project">
+    Organize tasks with shared instructions that apply automatically
+  </Card>
+  <Card title="Files" icon="file" href="/v2/upload-file">
+    Upload files as task attachments — PDFs, images, CSVs, and more
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/v2/create-webhook">
+    Get real-time notifications when tasks complete or need input
+  </Card>
+  <Card title="Skills" icon="wand-magic-sparkles" href="/v2/list-skills">
+    Extend agent capabilities with built-in and custom skills
+  </Card>
+  <Card title="Agents" icon="robot" href="/v2/list-agents">
+    Manage and configure your custom agents
+  </Card>
+</CardGroup>
+
+## Base URL
+
+All API requests are made to:
+
+```
+https://api.manus.ai
+```
+
+## Response format
+
+All responses use a consistent wrapper:
+
+**Success:**
+```json
+{
+  "ok": true,
+  "request_id": "req_abc123",
+  ...
+}
+```
+
+**Error:**
+```json
+{
+  "ok": false,
+  "request_id": "req_abc123",
+  "error": {
+    "code": "invalid_argument",
+    "message": "task_id is required"
+  }
+}
+```
+
+| Error code | Description |
+|---|---|
+| `invalid_argument` | Missing or invalid request parameters |
+| `not_found` | The requested resource does not exist |
+| `permission_denied` | API key lacks permission for this action |
+| `rate_limited` | Too many requests — see [Rate Limits](https://open.manus.ai/docs/v2/rate-limits) for per-endpoint limits and backoff guidance |

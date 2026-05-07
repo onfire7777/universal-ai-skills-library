@@ -1,0 +1,25 @@
+---
+title: 'Get Tasks'
+openapi: 'GET /v1/tasks'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+Retrieve a list of tasks with optional filtering and pagination. This endpoint allows you to search, filter, and paginate through your tasks.
+
+## Query Parameters
+
+Use these parameters to filter and paginate through tasks:
+
+- **after**: Cursor for pagination (ID of the last task from previous page)
+- **limit**: Maximum number of tasks to return (default: 100, range: 1-1000)
+- **order**: Sort direction - "asc" or "desc" (default: "desc")
+- **orderBy**: Sort field - "created_at" or "updated_at" (default: "created_at")
+- **query**: Search term to filter by title and body content
+- **status**: Array of status values to filter by - "pending", "running", "completed", "failed"
+- **createdAfter**: Unix timestamp to filter tasks created after this time
+- **createdBefore**: Unix timestamp to filter tasks created before this time
+- **project_id**: Filter tasks by project ID - returns only tasks belonging to the specified project
