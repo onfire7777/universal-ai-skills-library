@@ -1,0 +1,43 @@
+---
+title: 'List Projects'
+openapi: 'GET /v1/projects'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+Retrieve a list of all projects in your account with optional pagination.
+
+## Query Parameters
+
+- **limit**: Maximum number of projects to return (default: 100, range: 1-1000)
+
+## Example Request
+
+```bash
+curl -X GET "https://api.manus.ai/v1/projects?limit=100" \
+  -H "API_KEY: your-api-key"
+```
+
+## Example Response
+
+```json
+{
+  "data": [
+    {
+      "id": "proj_abc123",
+      "name": "My Research Project",
+      "instruction": "You must always cite your sources",
+      "created_at": 1699900000
+    },
+    {
+      "id": "proj_def456",
+      "name": "Customer Support",
+      "instruction": "Be friendly and helpful",
+      "created_at": 1699800000
+    }
+  ]
+}
+```

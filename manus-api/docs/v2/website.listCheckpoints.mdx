@@ -1,0 +1,14 @@
+---
+title: 'website.listCheckpoints'
+openapi: 'GET /v2/website.listCheckpoints'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Live version:** Match `published_version_id` against `data[].version_id` to find which row is currently deployed. Use [website.publish](https://open.manus.ai/docs/v2/website.publish) to deploy the latest, or [website.status](https://open.manus.ai/docs/v2/website.status) to check deployment progress.
+
+**Checkpoint status ≠ publish state:** The per-checkpoint `status` only reflects whether the snapshot was generated successfully — for deployment state, see [website.status](https://open.manus.ai/docs/v2/website.status). See the [Website](https://open.manus.ai/docs/v2/website) guide.
+</Tip>

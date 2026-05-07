@@ -1,0 +1,58 @@
+---
+title: 'Create Project'
+openapi: 'POST /v1/projects'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+Create a new project to organize tasks and apply consistent instructions across multiple tasks.
+
+## Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | The name of the project |
+| `instruction` | string | No | Default instruction that will be applied to all tasks in this project |
+
+## Example Request
+
+```bash
+curl -X POST "https://api.manus.ai/v1/projects" \
+  -H "Content-Type: application/json" \
+  -H "API_KEY: your-api-key" \
+  -d '{
+    "name": "Research Project",
+    "instruction": "You must start every response with a summary of key findings"
+  }'
+```
+
+## Example Response
+
+```json
+{
+  "id": "proj_abc123",
+  "name": "Research Project",
+  "instruction": "You must start every response with a summary of key findings",
+  "created_at": 1699900000
+}
+```
+
+## Using Projects with Tasks
+
+Once you've created a project, you can assign tasks to it by including the `project_id` in your task creation request:
+
+```bash
+curl -X POST "https://api.manus.ai/v1/tasks" \
+  -H "Content-Type: application/json" \
+  -H "API_KEY: your-api-key" \
+  -d '{
+    "prompt": "Analyze this data",
+    "agent_profile": "manus-1.6",
+    "project_id": "proj_abc123"
+  }'
+```
+
+The project's instruction will be automatically applied to all tasks created within that project.

@@ -1,0 +1,12 @@
+---
+title: 'webhook.publicKey'
+openapi: 'GET /v2/webhook.publicKey'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Note>
+Cache the public key on your server. It rarely changes, and fetching it on every webhook request adds unnecessary latency. See the [Webhook Security](https://open.manus.ai/docs/v2/webhooks-security) guide for verification examples.
+</Note>

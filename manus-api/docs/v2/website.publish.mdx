@@ -1,0 +1,16 @@
+---
+title: 'website.publish'
+openapi: 'POST /v2/website.publish'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Deploys latest:** Always deploys the website's most recent checkpoint — there is no `version_id` parameter. Use [website.listCheckpoints](https://open.manus.ai/docs/v2/website.listCheckpoints) to inspect history.
+
+**Asynchronous:** Poll [website.status](https://open.manus.ai/docs/v2/website.status) until `publish_status` is `published` or `failed`.
+
+**Metadata-only change?** To change title or visibility without redeploying, use [website.update](https://open.manus.ai/docs/v2/website.update) instead. See the [Website](https://open.manus.ai/docs/v2/website) guide.
+</Tip>

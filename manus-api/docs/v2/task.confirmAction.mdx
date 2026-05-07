@@ -1,0 +1,14 @@
+---
+title: 'task.confirmAction'
+openapi: 'POST /v2/task.confirmAction'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Input format:** Depends on `waiting_for_event_type` from the `status_update` event. Check the `confirm_input_schema` field in the event for the expected JSON Schema. See the [Task Lifecycle](https://open.manus.ai/docs/v2/task-lifecycle#using-taskconfirmaction) guide for all event types and examples.
+
+**messageAskUser:** Use [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) instead — do not use this endpoint for agent questions.
+</Tip>

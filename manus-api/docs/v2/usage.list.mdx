@@ -1,0 +1,12 @@
+---
+title: 'usage.list'
+openapi: 'GET /v2/usage.list'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**All change types:** Each entry is a credit change at session granularity — consumption, refunds, subscription grants, and admin adjustments. `credits` is signed: negative values are consumption, positive values are refunds or grants. Inspect the `type` field to distinguish categories.
+</Tip>

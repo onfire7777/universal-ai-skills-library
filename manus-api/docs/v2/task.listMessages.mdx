@@ -1,0 +1,18 @@
+---
+title: 'task.listMessages'
+openapi: 'GET /v2/task.listMessages'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Shortcut:** Use `agent-default-main_task` as `task_id` to read the IM agent's conversation history.
+
+**Status handling:** Check `status_update` events — **`running`** → keep polling, **`stopped`** → read results, **`waiting`** → respond with [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) or [task.confirmAction](https://open.manus.ai/docs/v2/task.confirmAction), **`error`** → read error details.
+
+**Structured Output:** If the task was created with `structured_output_schema`, a `structured_output_result` event appears after the task stops. See the [Structured Output](https://open.manus.ai/docs/v2/structured-output) guide.
+
+See the [Task Lifecycle](https://open.manus.ai/docs/v2/task-lifecycle) guide for the complete flow.
+</Tip>

@@ -1,0 +1,104 @@
+---
+title: 'Authentication'
+description: 'Create and use API keys to authenticate with the Manus API'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+
+## Create an API key
+
+<Steps>
+  <Step title="Open API settings">
+    Go to [Manus API Integration settings](https://manus.im/app?show_settings=integrations&app_name=api) in the Manus webapp.
+  </Step>
+  <Step title="Generate a key">
+    Click **Create API Key** and give it a descriptive name (e.g. "production", "dev-testing"). Each account can have up to **50** API keys.
+  </Step>
+  <Step title="Copy and store securely">
+    Copy the key immediately — it will only be shown once. Store it in a secure location such as an environment variable or secrets manager.
+  </Step>
+</Steps>
+
+<Warning>
+  Keep your API keys secure and never share them publicly. Each key provides full access to your Manus account. If a key is compromised, revoke it immediately from the settings page.
+</Warning>
+
+<Tip>
+Rate limits apply **per user** (shared across all of your API keys). See [Rate Limits](https://open.manus.ai/docs/v2/rate-limits) for the per-endpoint numbers.
+</Tip>
+
+## Use the API key
+
+Include the key in the `x-manus-api-key` header with every request:
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl -X POST https://api.manus.ai/v2/task.create \
+      -H "Content-Type: application/json" \
+      -H "x-manus-api-key: $MANUS_API_KEY" \
+      -d '{
+        "message": {
+          "content": "hello"
+        }
+      }'
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import os
+    import requests
+
+    response = requests.post(
+        "https://api.manus.ai/v2/task.create",
+        headers={
+            "Content-Type": "application/json",
+            "x-manus-api-key": os.environ["MANUS_API_KEY"],
+        },
+        json={
+            "message": {
+                "content": "hello"
+            }
+        },
+    )
+    print(response.json())
+    ```
+  </Tab>
+  <Tab title="TypeScript">
+    ```typescript
+    const response = await fetch("https://api.manus.ai/v2/task.create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-manus-api-key": process.env.MANUS_API_KEY!,
+      },
+      body: JSON.stringify({
+        message: {
+          content: "hello",
+        },
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data);
+    ```
+  </Tab>
+</Tabs>
+
+## Authentication errors
+
+If the key is missing or invalid, the API returns:
+
+```json
+{
+  "ok": false,
+  "request_id": "req_abc123",
+  "error": {
+    "code": "permission_denied",
+    "message": "Invalid or missing API key"
+  }
+}
+```

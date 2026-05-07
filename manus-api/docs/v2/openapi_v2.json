@@ -1,0 +1,3321 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Manus OpenAPI v2",
+        "description": "API for integrating Manus into your workflow. All responses are wrapped with {\"ok\": true, \"request_id\": \"...\", ...} for success and {\"ok\": false, \"request_id\": \"...\", \"error\": {\"code\": \"...\", \"message\": \"...\"}} for errors.",
+        "version": "2.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://api.manus.ai"
+        }
+    ],
+    "security": [
+        {
+            "ApiKeyAuth": []
+        }
+    ],
+    "paths": {
+        "/v2/task.create": {
+            "post": {
+                "summary": "CreateTask",
+                "description": "Creates a new task. The task runs asynchronously. Poll for progress with [task.listMessages](https://open.manus.ai/docs/v2/task.listMessages), send follow-ups with [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage). See the [Task Lifecycle](https://open.manus.ai/docs/v2/task-lifecycle) guide for the complete flow.",
+                "operationId": "openapi.v2.OpenapiV2Service.CreateTask",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "$ref": "#/components/schemas/Message",
+                                        "description": "The message to start the task with. Contains the prompt text, optional file attachments, and connector/skill configuration."
+                                    },
+                                    "project_id": {
+                                        "type": "string",
+                                        "description": "Project ID to associate this task with. The project's instruction will be automatically applied. Use [project.list](https://open.manus.ai/docs/v2/project.list) to get available project IDs."
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "description": "Locale for the task output language (e.g., \"en\", \"zh-CN\", \"ja\"). Defaults to the user's account locale setting."
+                                    },
+                                    "interactive_mode": {
+                                        "type": "boolean",
+                                        "description": "When enabled, the agent may pause and ask follow-up questions if the input is insufficient. When disabled (default), the agent proceeds with best-effort execution without asking.",
+                                        "default": false
+                                    },
+                                    "hide_in_task_list": {
+                                        "type": "boolean",
+                                        "description": "When true, the task will not appear in the Manus webapp task list. The task is still accessible via the task_url in the response. Useful for automated/background tasks.",
+                                        "default": false
+                                    },
+                                    "share_visibility": {
+                                        "type": "string",
+                                        "enum": [
+                                            "private",
+                                            "team",
+                                            "public"
+                                        ],
+                                        "description": "Controls who can view the task. \"private\" (default) — only the task creator can view. \"team\" — all team members can view. \"public\" — anyone with the share_url can view without authentication.",
+                                        "default": "private"
+                                    },
+                                    "agent_profile": {
+                                        "type": "string",
+                                        "enum": [
+                                            "manus-1.6",
+                                            "manus-1.6-lite",
+                                            "manus-1.6-max"
+                                        ],
+                                        "description": "Agent profile to use for the task. \"manus-1.6\" (default) — standard capability. \"manus-1.6-lite\" — lightweight, faster responses. \"manus-1.6-max\" — maximum capability. Free personal accounts are downgraded to `manus-1.6-lite` regardless of the requested value.",
+                                        "default": "manus-1.6"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Custom title for the task. If not provided, a title will be auto-generated based on the input message."
+                                    },
+                                    "structured_output_schema": {
+                                        "type": "object",
+                                        "description": "JSON Schema for structured output extraction. When provided, the agent runs normally, then a post-processing step extracts a result conforming to your schema. The schema must follow the [Structured Output](https://open.manus.ai/docs/v2/structured-output) subset of JSON Schema: all object properties must be listed in `required`, and `additionalProperties` must be `false`. See the [Structured Output](https://open.manus.ai/docs/v2/structured-output) guide."
+                                    }
+                                },
+                                "required": [
+                                    "message"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task created successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request, useful for debugging."
+                                        },
+                                        "task_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for the created task. Use this to track, update, or delete the task."
+                                        },
+                                        "task_title": {
+                                            "type": "string",
+                                            "description": "Title for the task. Returns the custom title if one was provided in the request, otherwise an auto-generated title based on the input message."
+                                        },
+                                        "task_url": {
+                                            "type": "string",
+                                            "description": "URL to view the task in the Manus webapp (e.g., https://manus.im/app/{task_id})."
+                                        },
+                                        "share_url": {
+                                            "type": "string",
+                                            "description": "Publicly accessible URL for sharing. Only present when share_visibility is not \"private\"."
+                                        },
+                                        "share_visibility": {
+                                            "type": "string",
+                                            "enum": [
+                                                "private",
+                                                "team",
+                                                "public"
+                                            ],
+                                            "description": "The actual visibility state of the task."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.detail": {
+            "get": {
+                "summary": "GetTask",
+                "description": "Retrieves a task's status and metadata. Use [task.listMessages](https://open.manus.ai/docs/v2/task.listMessages) for the full event history, or [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) to continue the conversation.",
+                "operationId": "openapi.v2.OpenapiV2Service.GetTask",
+                "x-codeSamples": [
+                    {
+                        "lang": "bash",
+                        "label": "cURL",
+                        "source": "curl --request GET \\\n  --url 'https://api.manus.ai/v2/task.detail?task_id=<string>' \\\n  --header 'x-manus-api-key: <api-key>'"
+                    },
+                    {
+                        "lang": "python",
+                        "label": "Python",
+                        "source": "import requests\n\nurl = \"https://api.manus.ai/v2/task.detail\"\n\nheaders = {\n    \"x-manus-api-key\": \"<api-key>\"\n}\n\nresponse = requests.get(url, headers=headers, params={\"task_id\": \"<string>\"})\n\nprint(response.text)"
+                    },
+                    {
+                        "lang": "javascript",
+                        "label": "JavaScript",
+                        "source": "const options = {\n  method: 'GET',\n  headers: {'x-manus-api-key': '<api-key>'}\n};\n\nfetch('https://api.manus.ai/v2/task.detail?task_id=<string>', options)\n  .then(res => res.json())\n  .then(res => console.log(res))\n  .catch(err => console.error(err));"
+                    },
+                    {
+                        "lang": "php",
+                        "label": "PHP",
+                        "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, [\n  CURLOPT_URL => \"https://api.manus.ai/v2/task.detail?task_id=<string>\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => [\n    \"x-manus-api-key: <api-key>\"\n  ],\n]);\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+                    },
+                    {
+                        "lang": "go",
+                        "label": "Go",
+                        "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl := \"https://api.manus.ai/v2/task.detail?task_id=<string>\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-manus-api-key\", \"<api-key>\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := io.ReadAll(res.Body)\n\n\tfmt.Println(string(body))\n\n}"
+                    },
+                    {
+                        "lang": "java",
+                        "label": "Java",
+                        "source": "HttpResponse<String> response = Unirest.get(\"https://api.manus.ai/v2/task.detail?task_id=<string>\")\n  .header(\"x-manus-api-key\", \"<api-key>\")\n  .asString();"
+                    },
+                    {
+                        "lang": "ruby",
+                        "label": "Ruby",
+                        "source": "require 'uri'\nrequire 'net/http'\n\nurl = URI(\"https://api.manus.ai/v2/task.detail?task_id=<string>\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-manus-api-key\"] = '<api-key>'\n\nresponse = http.request(request)\nputs response.read_body"
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The unique identifier of the task to retrieve. Supports the shortcut `agent-default-main_task` for the IM agent's main task."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "task": {
+                                            "$ref": "#/components/schemas/Task",
+                                            "description": "The task object with current status and metadata."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.list": {
+            "get": {
+                "summary": "ListTasks",
+                "description": "Lists tasks with optional filtering and cursor-based pagination. Use `scope` to filter by task type, e.g. `agent_subtask` with `agent_id` for agent subtasks. See [task.detail](https://open.manus.ai/docs/v2/task.detail) for full details on a specific task.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListTasks",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Number of tasks to return per page. Default: 20, Max: 100."
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "Pagination cursor from the previous response's next_cursor field. Omit for the first page."
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "description": "Sort direction by creation time. \"desc\" (default) returns newest first, \"asc\" returns oldest first."
+                        }
+                    },
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "all",
+                                "agent_subtask",
+                                "project",
+                                "standard"
+                            ],
+                            "description": "Filter by task type. \"all\" (default) returns all tasks. \"standard\" returns regular tasks. \"project\" returns tasks within a project (requires project_id). \"agent_subtask\" returns subtasks created by an agent (requires agent_id)."
+                        }
+                    },
+                    {
+                        "name": "agent_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter tasks by agent. Required when scope=\"agent_subtask\". Supports the shortcut `agent-default` for the IM agent. Use [agent.list](https://open.manus.ai/docs/v2/agent.list) to get available agent IDs."
+                        }
+                    },
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "Filter tasks by project. Required when scope=\"project\". Use [project.list](https://open.manus.ai/docs/v2/project.list) to get available project IDs."
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tasks retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Task"
+                                            },
+                                            "description": "Array of task objects matching the filter criteria."
+                                        },
+                                        "has_more": {
+                                            "type": "boolean",
+                                            "description": "Whether there are more tasks beyond this page. If true, use next_cursor to fetch the next page."
+                                        },
+                                        "next_cursor": {
+                                            "type": "string",
+                                            "description": "Cursor to pass as the cursor parameter for the next page. Only present when has_more is true."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.stop": {
+            "post": {
+                "summary": "StopTask",
+                "description": "Stops a running task. The task status will change to `stopped`. A stopped task can still be resumed with [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage).",
+                "operationId": "openapi.v2.OpenapiV2Service.StopTask",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the running task to stop. Supports the shortcut `agent-default-main_task` for the IM agent's main task."
+                                    }
+                                },
+                                "required": [
+                                    "task_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task stopped successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.delete": {
+            "post": {
+                "summary": "DeleteTask",
+                "description": "Deletes a task permanently. If the task is still running, use [task.stop](https://open.manus.ai/docs/v2/task.stop) first.",
+                "operationId": "openapi.v2.OpenapiV2Service.DeleteTask",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the task to delete. Agent-related tasks cannot be deleted."
+                                    }
+                                },
+                                "required": [
+                                    "task_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task deleted successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "id": {
+                                            "type": "string",
+                                            "description": "The ID of the deleted task."
+                                        },
+                                        "deleted": {
+                                            "type": "boolean",
+                                            "description": "Always true when the deletion was successful."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.update": {
+            "post": {
+                "summary": "UpdateTask",
+                "description": "Updates a task's metadata (title, sharing, visibility). Use [task.detail](https://open.manus.ai/docs/v2/task.detail) to see the current values before updating.",
+                "operationId": "openapi.v2.OpenapiV2Service.UpdateTask",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the task to update. Supports the shortcut `agent-default-main_task` for the IM agent's main task."
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "New title for the task. Replaces the auto-generated title."
+                                    },
+                                    "share_visibility": {
+                                        "type": "string",
+                                        "enum": [
+                                            "private",
+                                            "team",
+                                            "public"
+                                        ],
+                                        "description": "Controls who can view the task. \"private\" — only the task creator can view. \"team\" — all team members can view. \"public\" — anyone with the share_url can view."
+                                    },
+                                    "enable_visible_in_task_list": {
+                                        "type": "boolean",
+                                        "description": "When true, the task appears in the Manus webapp task list. When false, hides the task from the list (still accessible via direct URL)."
+                                    }
+                                },
+                                "required": [
+                                    "task_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "task_id": {
+                                            "type": "string",
+                                            "description": "The ID of the updated task."
+                                        },
+                                        "task_title": {
+                                            "type": "string",
+                                            "description": "The current title of the task."
+                                        },
+                                        "task_url": {
+                                            "type": "string",
+                                            "description": "URL to view the task in the Manus webapp."
+                                        },
+                                        "share_url": {
+                                            "type": "string",
+                                            "description": "Public share URL. Only present when share_visibility is not \"private\"."
+                                        },
+                                        "share_visibility": {
+                                            "type": "string",
+                                            "enum": [
+                                                "private",
+                                                "team",
+                                                "public"
+                                            ],
+                                            "description": "The actual visibility state of the task."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.sendMessage": {
+            "post": {
+                "summary": "SendMessage",
+                "description": "Sends a follow-up message to a task for multi-turn conversation. Use this after [task.create](https://open.manus.ai/docs/v2/task.create) to continue talking, or to reply when `waiting_for_event_type` is `messageAskUser`. For other waiting types, use [task.confirmAction](https://open.manus.ai/docs/v2/task.confirmAction) instead.",
+                "operationId": "openapi.v2.OpenapiV2Service.SendMessage",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the task to send the message to. Supports the shortcut `agent-default-main_task` for the IM agent's main task."
+                                    },
+                                    "message": {
+                                        "$ref": "#/components/schemas/Message",
+                                        "description": "The follow-up message. Supports the same content formats as task.create (plain text or multi-part with files)."
+                                    },
+                                    "agent_profile": {
+                                        "type": "string",
+                                        "enum": [
+                                            "manus-1.6",
+                                            "manus-1.6-lite",
+                                            "manus-1.6-max"
+                                        ],
+                                        "description": "Agent profile to use for this turn. \"manus-1.6\" — standard capability. \"manus-1.6-lite\" — lightweight, faster responses. \"manus-1.6-max\" — maximum capability. Omit (or pass empty string) to keep the task's current profile; this endpoint does not default to `manus-1.6` like [task.create](https://open.manus.ai/docs/v2/task.create) does. Free personal accounts are downgraded to `manus-1.6-lite` regardless of the requested value."
+                                    },
+                                    "structured_output_schema": {
+                                        "type": "object",
+                                        "description": "JSON Schema for structured output extraction. Arms the schema for the next time this task finishes (`stop_reason: finish`). Sending a new schema replaces any previous one. Omitting this field leaves the current schema state unchanged — it does not clear an armed schema. See the [Structured Output](https://open.manus.ai/docs/v2/structured-output) guide."
+                                    }
+                                },
+                                "required": [
+                                    "task_id",
+                                    "message"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Message sent successfully. The task will resume processing.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "task_id": {
+                                            "type": "string",
+                                            "description": "The ID of the task the message was sent to."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.listMessages": {
+            "get": {
+                "summary": "ListMessages",
+                "description": "Lists event messages for a task with cursor-based pagination. Use this to poll for progress after [task.create](https://open.manus.ai/docs/v2/task.create) or [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage). See the [Task Lifecycle](https://open.manus.ai/docs/v2/task-lifecycle) guide for how to handle each status.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListMessages",
+                "x-codeSamples": [
+                    {
+                        "lang": "bash",
+                        "label": "cURL",
+                        "source": "curl --request GET \\\n  --url 'https://api.manus.ai/v2/task.listMessages?task_id=<string>&order=desc&limit=10' \\\n  --header 'x-manus-api-key: <api-key>'"
+                    },
+                    {
+                        "lang": "python",
+                        "label": "Python",
+                        "source": "import requests\n\nurl = \"https://api.manus.ai/v2/task.listMessages\"\n\nheaders = {\n    \"x-manus-api-key\": \"<api-key>\"\n}\n\nresponse = requests.get(url, headers=headers, params={\n    \"task_id\": \"<string>\",\n    \"order\": \"desc\",\n    \"limit\": \"10\"\n})\n\nprint(response.text)"
+                    },
+                    {
+                        "lang": "javascript",
+                        "label": "JavaScript",
+                        "source": "const options = {\n  method: 'GET',\n  headers: {'x-manus-api-key': '<api-key>'}\n};\n\nfetch('https://api.manus.ai/v2/task.listMessages?task_id=<string>&order=desc&limit=10', options)\n  .then(res => res.json())\n  .then(res => console.log(res))\n  .catch(err => console.error(err));"
+                    },
+                    {
+                        "lang": "php",
+                        "label": "PHP",
+                        "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, [\n  CURLOPT_URL => \"https://api.manus.ai/v2/task.listMessages?task_id=<string>&order=desc&limit=10\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => [\n    \"x-manus-api-key: <api-key>\"\n  ],\n]);\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+                    },
+                    {
+                        "lang": "go",
+                        "label": "Go",
+                        "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl := \"https://api.manus.ai/v2/task.listMessages?task_id=<string>&order=desc&limit=10\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-manus-api-key\", \"<api-key>\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := io.ReadAll(res.Body)\n\n\tfmt.Println(string(body))\n\n}"
+                    },
+                    {
+                        "lang": "java",
+                        "label": "Java",
+                        "source": "HttpResponse<String> response = Unirest.get(\"https://api.manus.ai/v2/task.listMessages?task_id=<string>&order=desc&limit=10\")\n  .header(\"x-manus-api-key\", \"<api-key>\")\n  .asString();"
+                    },
+                    {
+                        "lang": "ruby",
+                        "label": "Ruby",
+                        "source": "require 'uri'\nrequire 'net/http'\n\nurl = URI(\"https://api.manus.ai/v2/task.listMessages?task_id=<string>&order=desc&limit=10\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-manus-api-key\"] = '<api-key>'\n\nresponse = http.request(request)\nputs response.read_body"
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The unique identifier of the task to list messages for. Supports the shortcut `agent-default-main_task` for the IM agent's main task."
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Number of messages to return per page. Default: 50, Range: 1-200."
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "Pagination cursor from the previous response's next_cursor field. Omit for the first page."
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "description": "Sort direction by timestamp. \"desc\" (default) returns newest first, \"asc\" returns oldest first (chronological order)."
+                        }
+                    },
+                    {
+                        "name": "verbose",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "description": "When true, includes detailed events: tool_used (tools the agent invoked), plan_update (full plan snapshots), new_plan_step (individual step additions), and explanation (agent reasoning). Default: false — only returns user_message, assistant_message, error_message, status_update, and user_stop."
+                        }
+                    },
+                    {
+                        "name": "slides_format",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "html",
+                                "pptx"
+                            ],
+                            "description": "Format for slides attachments in the response. \"html\" (default) returns raw HTML slides. \"pptx\" auto-converts HTML slides to PowerPoint format."
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Messages retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "task_id": {
+                                            "type": "string",
+                                            "description": "The task ID these messages belong to."
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/TaskEvent"
+                                            },
+                                            "description": "Array of task event objects representing the conversation and agent activity."
+                                        },
+                                        "has_more": {
+                                            "type": "boolean",
+                                            "description": "Whether there are more messages beyond this page."
+                                        },
+                                        "next_cursor": {
+                                            "type": "string",
+                                            "description": "Cursor for fetching the next page. Only present when has_more is true."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/task.confirmAction": {
+            "post": {
+                "summary": "ConfirmAction",
+                "description": "Confirms a pending action to resume the task. Use when [task.listMessages](https://open.manus.ai/docs/v2/task.listMessages) shows `agent_status: \"waiting\"`. For `messageAskUser` events, use [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) instead. See the [Task Lifecycle](https://open.manus.ai/docs/v2/task-lifecycle#using-taskconfirmaction) guide for input formats.",
+                "operationId": "openapi.v2.OpenapiV2Service.ConfirmAction",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the task with a pending action. Supports the shortcut `agent-default-main_task` for the IM agent's main task."
+                                    },
+                                    "event_id": {
+                                        "type": "string",
+                                        "description": "The waiting_for_event_id value from the status_update event that triggered the confirmation request. This identifies which specific action to confirm."
+                                    },
+                                    "input": {
+                                        "type": "object",
+                                        "description": "Optional input data for the pending action. The expected schema is defined by the confirm_input_schema field in the status_update event. For simple confirmations, this can be omitted."
+                                    }
+                                },
+                                "required": [
+                                    "task_id",
+                                    "event_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Action confirmed successfully. The task will resume processing.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "task_id": {
+                                            "type": "string",
+                                            "description": "The ID of the task that was confirmed."
+                                        },
+                                        "confirmed": {
+                                            "type": "boolean",
+                                            "description": "Always true when the confirmation was accepted."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/project.create": {
+            "post": {
+                "summary": "CreateProject",
+                "description": "Creates a new project. Projects let you group related tasks and apply shared instructions. Pass the returned ID as `project_id` in [task.create](https://open.manus.ai/docs/v2/task.create) to create tasks within this project.",
+                "operationId": "openapi.v2.OpenapiV2Service.CreateProject",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Display name for the project."
+                                    },
+                                    "instruction": {
+                                        "type": "string",
+                                        "description": "Default instruction that will be automatically prepended to all tasks created within this project. Use this to enforce consistent behavior across related tasks (e.g., \"Always respond in formal English\" or \"Focus on financial analysis\")."
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Project created successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "project": {
+                                            "$ref": "#/components/schemas/Project",
+                                            "description": "The created project object."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/project.list": {
+            "get": {
+                "summary": "ListProjects",
+                "description": "Lists all projects. Use the returned IDs as `project_id` in [task.create](https://open.manus.ai/docs/v2/task.create) or [task.list](https://open.manus.ai/docs/v2/task.list).",
+                "operationId": "openapi.v2.OpenapiV2Service.ListProjects",
+                "responses": {
+                    "200": {
+                        "description": "Projects retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Project"
+                                            },
+                                            "description": "Array of project objects."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/skill.list": {
+            "get": {
+                "summary": "ListSkills",
+                "description": "Lists available skills. Includes project skills when project_id is provided. Use the returned IDs in `enable_skills` or `force_skills` of [task.create](https://open.manus.ai/docs/v2/task.create).",
+                "operationId": "openapi.v2.OpenapiV2Service.ListSkills",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "When provided, includes project-specific skills in addition to the user's global skills. Use [project.list](https://open.manus.ai/docs/v2/project.list) to get available project IDs."
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Skills retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Skill"
+                                            },
+                                            "description": "Array of skill objects. Use the id field when passing to enable_skills or force_skills in task.create."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/agent.list": {
+            "get": {
+                "summary": "ListAgents",
+                "description": "Lists all custom agents in your account. Use the returned IDs in [task.list](https://open.manus.ai/docs/v2/task.list) with `scope=agent_subtask` to view subtasks, or in [agent.detail](https://open.manus.ai/docs/v2/agent.detail) for full details. See the [Agents](https://open.manus.ai/docs/v2/agents-overview) guide.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListAgents",
+                "responses": {
+                    "200": {
+                        "description": "Agents retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Agent"
+                                            },
+                                            "description": "Array of agent objects."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/agent.detail": {
+            "get": {
+                "summary": "GetAgent",
+                "description": "Retrieves an agent's details including its nickname, description, and associated task. Use [agent.update](https://open.manus.ai/docs/v2/agent.update) to modify, or [task.list](https://open.manus.ai/docs/v2/task.list) with `scope=agent_subtask` to view this agent's subtasks.",
+                "operationId": "openapi.v2.OpenapiV2Service.GetAgent",
+                "x-codeSamples": [
+                    {
+                        "lang": "bash",
+                        "label": "cURL",
+                        "source": "curl --request GET \\\n  --url 'https://api.manus.ai/v2/agent.detail?agent_id=<string>' \\\n  --header 'x-manus-api-key: <api-key>'"
+                    },
+                    {
+                        "lang": "python",
+                        "label": "Python",
+                        "source": "import requests\n\nurl = \"https://api.manus.ai/v2/agent.detail\"\n\nheaders = {\n    \"x-manus-api-key\": \"<api-key>\"\n}\n\nresponse = requests.get(url, headers=headers, params={\"agent_id\": \"<string>\"})\n\nprint(response.text)"
+                    },
+                    {
+                        "lang": "javascript",
+                        "label": "JavaScript",
+                        "source": "const options = {\n  method: 'GET',\n  headers: {'x-manus-api-key': '<api-key>'}\n};\n\nfetch('https://api.manus.ai/v2/agent.detail?agent_id=<string>', options)\n  .then(res => res.json())\n  .then(res => console.log(res))\n  .catch(err => console.error(err));"
+                    },
+                    {
+                        "lang": "php",
+                        "label": "PHP",
+                        "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, [\n  CURLOPT_URL => \"https://api.manus.ai/v2/agent.detail?agent_id=<string>\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => [\n    \"x-manus-api-key: <api-key>\"\n  ],\n]);\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+                    },
+                    {
+                        "lang": "go",
+                        "label": "Go",
+                        "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl := \"https://api.manus.ai/v2/agent.detail?agent_id=<string>\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-manus-api-key\", \"<api-key>\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := io.ReadAll(res.Body)\n\n\tfmt.Println(string(body))\n\n}"
+                    },
+                    {
+                        "lang": "java",
+                        "label": "Java",
+                        "source": "HttpResponse<String> response = Unirest.get(\"https://api.manus.ai/v2/agent.detail?agent_id=<string>\")\n  .header(\"x-manus-api-key\", \"<api-key>\")\n  .asString();"
+                    },
+                    {
+                        "lang": "ruby",
+                        "label": "Ruby",
+                        "source": "require 'uri'\nrequire 'net/http'\n\nurl = URI(\"https://api.manus.ai/v2/agent.detail?agent_id=<string>\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-manus-api-key\"] = '<api-key>'\n\nresponse = http.request(request)\nputs response.read_body"
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "agent_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The unique identifier of the agent to retrieve."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Agent retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "agent": {
+                                            "$ref": "#/components/schemas/Agent",
+                                            "description": "The agent object with full details."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/agent.update": {
+            "post": {
+                "summary": "UpdateAgent",
+                "description": "Updates an agent's nickname and description. Use [agent.detail](https://open.manus.ai/docs/v2/agent.detail) to view current values before updating.",
+                "operationId": "openapi.v2.OpenapiV2Service.UpdateAgent",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "agent_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the agent to update."
+                                    },
+                                    "nickname": {
+                                        "type": "string",
+                                        "description": "New display name for the agent."
+                                    },
+                                    "about": {
+                                        "type": "string",
+                                        "description": "New description or bio for the agent."
+                                    }
+                                },
+                                "required": [
+                                    "agent_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Agent updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "agent": {
+                                            "$ref": "#/components/schemas/Agent",
+                                            "description": "The updated agent object."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/file.upload": {
+            "post": {
+                "summary": "UploadFile",
+                "description": "Creates a file record and returns a presigned upload URL. Upload the file content to the returned `upload_url` via PUT before it expires. Then use the `file.id` as `file_id` in [task.create](https://open.manus.ai/docs/v2/task.create) or [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) message content.",
+                "operationId": "openapi.v2.OpenapiV2Service.UploadFile",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "filename": {
+                                        "type": "string",
+                                        "description": "Name of the file to upload, including extension (e.g., \"report.pdf\", \"data.csv\"). The extension helps determine the file type."
+                                    }
+                                },
+                                "required": [
+                                    "filename"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "File record created successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "file": {
+                                            "$ref": "#/components/schemas/File",
+                                            "description": "The created file record. Status will be pending until the upload completes."
+                                        },
+                                        "upload_url": {
+                                            "type": "string",
+                                            "description": "Presigned S3 URL for uploading the file content. Send a PUT request with the file bytes as the body. Expires in 3 minutes."
+                                        },
+                                        "upload_expires_at": {
+                                            "type": "integer",
+                                            "format": "int64",
+                                            "description": "Unix timestamp (seconds) when the upload_url expires. Complete the upload before this time."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/file.detail": {
+            "get": {
+                "summary": "GetFile",
+                "description": "Retrieves a file's details including upload status, size, and expiration time. Check that `status` is `uploaded` before using the file in [task.create](https://open.manus.ai/docs/v2/task.create). Files expire 48 hours after upload.",
+                "operationId": "openapi.v2.OpenapiV2Service.GetFile",
+                "x-codeSamples": [
+                    {
+                        "lang": "bash",
+                        "label": "cURL",
+                        "source": "curl --request GET \\\n  --url 'https://api.manus.ai/v2/file.detail?file_id=<string>' \\\n  --header 'x-manus-api-key: <api-key>'"
+                    },
+                    {
+                        "lang": "python",
+                        "label": "Python",
+                        "source": "import requests\n\nurl = \"https://api.manus.ai/v2/file.detail\"\n\nheaders = {\n    \"x-manus-api-key\": \"<api-key>\"\n}\n\nresponse = requests.get(url, headers=headers, params={\"file_id\": \"<string>\"})\n\nprint(response.text)"
+                    },
+                    {
+                        "lang": "javascript",
+                        "label": "JavaScript",
+                        "source": "const options = {\n  method: 'GET',\n  headers: {'x-manus-api-key': '<api-key>'}\n};\n\nfetch('https://api.manus.ai/v2/file.detail?file_id=<string>', options)\n  .then(res => res.json())\n  .then(res => console.log(res))\n  .catch(err => console.error(err));"
+                    },
+                    {
+                        "lang": "php",
+                        "label": "PHP",
+                        "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, [\n  CURLOPT_URL => \"https://api.manus.ai/v2/file.detail?file_id=<string>\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => [\n    \"x-manus-api-key: <api-key>\"\n  ],\n]);\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+                    },
+                    {
+                        "lang": "go",
+                        "label": "Go",
+                        "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl := \"https://api.manus.ai/v2/file.detail?file_id=<string>\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-manus-api-key\", \"<api-key>\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := io.ReadAll(res.Body)\n\n\tfmt.Println(string(body))\n\n}"
+                    },
+                    {
+                        "lang": "java",
+                        "label": "Java",
+                        "source": "HttpResponse<String> response = Unirest.get(\"https://api.manus.ai/v2/file.detail?file_id=<string>\")\n  .header(\"x-manus-api-key\", \"<api-key>\")\n  .asString();"
+                    },
+                    {
+                        "lang": "ruby",
+                        "label": "Ruby",
+                        "source": "require 'uri'\nrequire 'net/http'\n\nurl = URI(\"https://api.manus.ai/v2/file.detail?file_id=<string>\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-manus-api-key\"] = '<api-key>'\n\nresponse = http.request(request)\nputs response.read_body"
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "file_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The unique identifier of the file to retrieve."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "file": {
+                                            "$ref": "#/components/schemas/FileDetail",
+                                            "description": "The file object with full details."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/file.delete": {
+            "post": {
+                "summary": "DeleteFile",
+                "description": "Deletes a file. Files are automatically deleted 48 hours after upload, so manual deletion is only needed for early cleanup.",
+                "operationId": "openapi.v2.OpenapiV2Service.DeleteFile",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "file_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the file to delete."
+                                    }
+                                },
+                                "required": [
+                                    "file_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "File deleted successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/webhook.create": {
+            "post": {
+                "summary": "CreateWebhook",
+                "description": "Creates a webhook for receiving task event notifications. Use [webhook.publicKey](https://open.manus.ai/docs/v2/webhook.publicKey) to get the key for verifying signatures. See the [Webhooks](https://open.manus.ai/docs/v2/webhooks-overview) guide for event types.",
+                "operationId": "openapi.v2.OpenapiV2Service.CreateWebhook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "description": "The HTTPS endpoint URL that will receive POST webhook notifications. Must be publicly accessible and return a 2xx status code."
+                                    }
+                                },
+                                "required": [
+                                    "url"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Webhook created successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "webhook": {
+                                            "$ref": "#/components/schemas/Webhook",
+                                            "description": "The created webhook object."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/webhook.list": {
+            "get": {
+                "summary": "ListWebhooks",
+                "description": "Lists all webhooks in your account. Use the returned IDs with [webhook.delete](https://open.manus.ai/docs/v2/webhook.delete) to remove a webhook.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListWebhooks",
+                "responses": {
+                    "200": {
+                        "description": "Webhooks retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Webhook"
+                                            },
+                                            "description": "Array of webhook objects."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/webhook.delete": {
+            "post": {
+                "summary": "DeleteWebhook",
+                "description": "Deletes a webhook. The endpoint will stop receiving notifications immediately. Use [webhook.list](https://open.manus.ai/docs/v2/webhook.list) to find the webhook ID.",
+                "operationId": "openapi.v2.OpenapiV2Service.DeleteWebhook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "webhook_id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the webhook to delete."
+                                    }
+                                },
+                                "required": [
+                                    "webhook_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Webhook deleted successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/browser.onlineList": {
+            "get": {
+                "summary": "ListOnlineBrowserClients",
+                "description": "Lists the user's online browser clients. Use the returned `client_id` with [task.confirmAction](https://open.manus.ai/docs/v2/task.confirmAction) when the agent triggers a `needConnectMyBrowser` waiting event. See the [Task Lifecycle](https://open.manus.ai/docs/v2/task-lifecycle#using-my-browser) guide.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListOnlineBrowserClients",
+                "responses": {
+                    "200": {
+                        "description": "Online browser clients retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/BrowserClient"
+                                            },
+                                            "description": "Array of online browser client objects."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/webhook.publicKey": {
+            "get": {
+                "summary": "GetWebhookPublicKey",
+                "description": "Gets the public key for verifying webhook signatures. See the [Webhook Security](https://open.manus.ai/docs/v2/webhooks-security) guide for verification examples.",
+                "operationId": "openapi.v2.OpenapiV2Service.GetWebhookPublicKey",
+                "responses": {
+                    "200": {
+                        "description": "Public key retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "public_key": {
+                                            "type": "string",
+                                            "description": "PEM-encoded RSA public key for verifying webhook signatures."
+                                        },
+                                        "algorithm": {
+                                            "type": "string",
+                                            "description": "Signature algorithm. Always \"RSA-SHA256\".",
+                                            "example": "RSA-SHA256"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/usage.list": {
+            "get": {
+                "summary": "ListUsage",
+                "description": "Lists the current user's credit change history at session granularity, sorted by change time (newest first).",
+                "operationId": "openapi.v2.OpenapiV2Service.ListUsage",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Number of records to return per page. Default: 20, Max: 100."
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "Pagination cursor from the previous response's next_cursor field. Omit for the first page."
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usage records retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UsageRecord"
+                                            },
+                                            "description": "Array of credit consumption records, one per task."
+                                        },
+                                        "has_more": {
+                                            "type": "boolean",
+                                            "description": "Whether there are more records beyond this page. If true, use next_cursor to fetch the next page."
+                                        },
+                                        "next_cursor": {
+                                            "type": "string",
+                                            "description": "Cursor to pass as the cursor parameter for the next page. Only present when has_more is true."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/usage.teamStatistic": {
+            "get": {
+                "summary": "GetTeamUsageStatistic",
+                "description": "Returns daily credit consumption totals for the team over a date range.",
+                "operationId": "openapi.v2.OpenapiV2Service.GetTeamUsageStatistic",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Filter start time as a Unix timestamp in seconds."
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Filter end time as a Unix timestamp in seconds."
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daily usage statistics retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/DailyStatistic"
+                                            },
+                                            "description": "Array of daily statistics sorted by date in ascending order."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/usage.teamLog": {
+            "get": {
+                "summary": "ListTeamUsageLog",
+                "description": "Lists team members' task counts and total credit consumption over the requested range — one row per user.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListTeamUsageLog",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Number of records to return per page. Default: 20, Max: 100."
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "Pagination cursor from the previous response's next_cursor field. Omit for the first page."
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Filter start time as a Unix timestamp in seconds."
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Filter end time as a Unix timestamp in seconds."
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "description": "Field to sort by. Default: `task_count`.",
+                            "enum": [
+                                "task_count",
+                                "credits"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "is_asc",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "description": "Sort in ascending order. Default: false (descending)."
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Team usage log retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/TeamUsageLog"
+                                            },
+                                            "description": "Array of per-user daily consumption records."
+                                        },
+                                        "has_more": {
+                                            "type": "boolean",
+                                            "description": "Whether there are more records beyond this page. If true, use next_cursor to fetch the next page."
+                                        },
+                                        "next_cursor": {
+                                            "type": "string",
+                                            "description": "Cursor to pass as the cursor parameter for the next page. Only present when has_more is true."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/connector.list": {
+            "get": {
+                "summary": "ListConnectors",
+                "description": "Lists connectors installed in the current user's account. Use the returned IDs in the `connectors` array of [task.create](https://open.manus.ai/docs/v2/task.create) or [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage). See the [Connectors](https://open.manus.ai/docs/v2/connectors) guide for setup.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListConnectors",
+                "responses": {
+                    "200": {
+                        "description": "Connectors retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ConnectorInfo"
+                                            },
+                                            "description": "Array of connectors installed in the user's account."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/website.status": {
+            "get": {
+                "summary": "GetWebsiteStatus",
+                "description": "Retrieves a website's publish status, live URL, and visibility. Use [website.listCheckpoints](https://open.manus.ai/docs/v2/website.listCheckpoints) to browse version history, or [website.publish](https://open.manus.ai/docs/v2/website.publish) to deploy changes. See the [Website](https://open.manus.ai/docs/v2/website) guide.",
+                "operationId": "openapi.v2.OpenapiV2Service.GetWebsiteStatus",
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Session UID. Mutually exclusive with `website_id` — exactly one must be provided. The session must contain exactly one website."
+                    },
+                    {
+                        "name": "website_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Unique website ID. Mutually exclusive with `task_id` — exactly one must be provided. Obtain from the response of `website.status` or `website.publish`."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Web status retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "website_id": {
+                                            "type": "string",
+                                            "description": "Unique website ID."
+                                        },
+                                        "publish_status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "unpublished",
+                                                "publishing",
+                                                "published",
+                                                "failed"
+                                            ],
+                                            "description": "`unpublished` — never published or has been taken down; call `website.publish` to bring it online. `publishing` — deployment in progress; poll again. `published` — live and `site_urls` is reachable. `failed` — last deployment failed."
+                                        },
+                                        "site_urls": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "description": "Public URLs where the live site can be reached, ordered from default to most specific: the space URL (`https://{space_id}.manus.space`, always present when published), an optional sub-domain URL (`https://{sub_domain}.manus.space`), and any active custom domains bound by the owner. All entries include the `https://` scheme. Returned as an empty array unless `publish_status` is `published`."
+                                        },
+                                        "version_id": {
+                                            "type": "string",
+                                            "description": "**Optional.** Checkpoint `version_id` currently deployed. Present only when the site has been published."
+                                        },
+                                        "status_updated_at": {
+                                            "type": "integer",
+                                            "format": "int64",
+                                            "description": "**Optional.** Last time the publish status changed (Unix seconds). Present only when the site has been published."
+                                        },
+                                        "visibility": {
+                                            "type": "string",
+                                            "enum": [
+                                                "public",
+                                                "team",
+                                                "private"
+                                            ],
+                                            "description": "Who can access the published site. `public` — anyone. `team` — current team members only (team accounts). `private` — owner and invited collaborators only."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/website.listCheckpoints": {
+            "get": {
+                "summary": "ListWebsiteCheckpoints",
+                "description": "Lists all checkpoints of a website, newest first. Match `published_version_id` against `data[].version_id` to identify the live checkpoint, or call [website.publish](https://open.manus.ai/docs/v2/website.publish) to deploy the latest. See the [Website](https://open.manus.ai/docs/v2/website) guide.",
+                "operationId": "openapi.v2.OpenapiV2Service.ListWebsiteCheckpoints",
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Session UID. Mutually exclusive with `website_id` — exactly one must be provided. The session must contain exactly one website."
+                    },
+                    {
+                        "name": "website_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Unique website ID. Mutually exclusive with `task_id` — exactly one must be provided. Obtain from the response of `website.status` or `website.publish`."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Checkpoints retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "website_id": {
+                                            "type": "string",
+                                            "description": "Unique website ID."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/WebsiteCheckpoint"
+                                            },
+                                            "description": "Checkpoints in reverse chronological order (newest first). Empty array if the site has no checkpoints yet."
+                                        },
+                                        "published_version_id": {
+                                            "type": "string",
+                                            "description": "**Optional.** `version_id` of the checkpoint currently published. Present only when the site has been published. Match against `data[].version_id` to find the live checkpoint."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/website.publish": {
+            "post": {
+                "summary": "PublishWebsite",
+                "description": "Deploys the latest checkpoint of a website and sets its visibility. Deployment is asynchronous — poll [website.status](https://open.manus.ai/docs/v2/website.status) until `publish_status` becomes `published` or `failed`. To change metadata (title, visibility) without redeploying, use [website.update](https://open.manus.ai/docs/v2/website.update) instead. See the [Website](https://open.manus.ai/docs/v2/website) guide.",
+                "operationId": "openapi.v2.OpenapiV2Service.PublishWebsite",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "Session UID. Mutually exclusive with `website_id` — exactly one must be provided."
+                                    },
+                                    "website_id": {
+                                        "type": "string",
+                                        "description": "Unique website ID. Mutually exclusive with `task_id` — exactly one must be provided."
+                                    },
+                                    "visibility": {
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "team"
+                                        ],
+                                        "description": "Who can access the published site. Defaults to `public` when omitted or sent as empty string. `team` is only available to team accounts. Sites may cap the maximum allowed visibility — requests that exceed it return `403 permission_denied`."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Publish triggered successfully. Deployment is still in progress — poll `website.status` for the final state.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        },
+                                        "website_id": {
+                                            "type": "string",
+                                            "description": "Unique website ID."
+                                        },
+                                        "version_id": {
+                                            "type": "string",
+                                            "description": "`version_id` of the checkpoint being deployed — always the latest checkpoint of the site."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/website.update": {
+            "post": {
+                "summary": "UpdateWebsite",
+                "description": "Updates a website's metadata (`title`, `visibility`). Unlike [website.publish](https://open.manus.ai/docs/v2/website.publish), this does not redeploy — only the metadata and CDN are refreshed.",
+                "operationId": "openapi.v2.OpenapiV2Service.UpdateWebsite",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "Session UID. Mutually exclusive with `website_id` — exactly one must be provided."
+                                    },
+                                    "website_id": {
+                                        "type": "string",
+                                        "description": "Unique website ID. Mutually exclusive with `task_id` — exactly one must be provided."
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "New title for the website. Omit to leave unchanged; an empty string is invalid."
+                                    },
+                                    "visibility": {
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "team"
+                                        ],
+                                        "description": "New visibility. Omit the field to leave it unchanged — sending an empty string is invalid. `team` is only available to team accounts and is subject to the same site visibility caps as `website.publish`."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Site updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true,
+                                            "description": "Whether the request was successful."
+                                        },
+                                        "request_id": {
+                                            "type": "string",
+                                            "description": "Unique identifier for this API request."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "4XX": {
+                        "description": "Error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "x-manus-api-key"
+            }
+        },
+        "schemas": {
+            "Message": {
+                "type": "object",
+                "description": "A message to send to a task.",
+                "properties": {
+                    "content": {
+                        "description": "String (plain text) or array of ContentPart objects.",
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ContentPart"
+                                }
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "connectors": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of connector IDs to enable for this task. Resolution order when omitted: 1) if the task belongs to a project, the project's default connectors are used; 2) otherwise, the user's default enabled connectors are used. Use [connector.list](https://open.manus.ai/docs/v2/connector.list) to get the connectors installed in your account."
+                    },
+                    "enable_skills": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Skill IDs to enable for this task. If empty or omitted, loads the skills the user has enabled in their account settings. Use [skill.list](https://open.manus.ai/docs/v2/skill.list) to retrieve available skill IDs."
+                    },
+                    "force_skills": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Skill IDs the agent must invoke during this task. Forced skills are automatically available even if not listed in enable_skills."
+                    }
+                },
+                "required": [
+                    "content"
+                ]
+            },
+            "ContentPart": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "title": "Text",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "text"
+                                ],
+                                "description": "Must be \"text\"."
+                            },
+                            "text": {
+                                "type": "string",
+                                "description": "The text content of the message."
+                            }
+                        },
+                        "required": [
+                            "type",
+                            "text"
+                        ]
+                    },
+                    {
+                        "type": "object",
+                        "title": "File",
+                        "description": "**Provide the file via one of: file_id, file_url, or file_data.**",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "file"
+                                ],
+                                "description": "Must be \"file\"."
+                            },
+                            "file_id": {
+                                "type": "string",
+                                "description": "ID of a previously uploaded file. Upload via [file.upload](https://open.manus.ai/docs/v2/file.upload) first to get the file ID."
+                            },
+                            "file_url": {
+                                "type": "string",
+                                "description": "Publicly accessible URL to the file. The agent will download it directly."
+                            },
+                            "file_data": {
+                                "type": "string",
+                                "description": "Base64 encoded file content. Format: `data:<mime_type>;base64,<encoded_content>` (e.g., `data:application/pdf;base64,JVBERi0...`)."
+                            },
+                            "filename": {
+                                "type": "string",
+                                "description": "Display name of the file including extension (e.g., \"report.pdf\"). Required when using file_data; recommended for file_url."
+                            },
+                            "mime_type": {
+                                "type": "string",
+                                "description": "MIME type of the file (e.g., \"application/pdf\", \"image/png\"). Optional; auto-detected from filename if omitted."
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    {
+                        "type": "object",
+                        "title": "Voice",
+                        "description": "**Provide the audio via one of: file_id, file_url, or file_data.**",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "voice"
+                                ],
+                                "description": "Must be \"voice\"."
+                            },
+                            "file_id": {
+                                "type": "string",
+                                "description": "ID of a previously uploaded audio file. Upload via [file.upload](https://open.manus.ai/docs/v2/file.upload) first to get the file ID."
+                            },
+                            "file_url": {
+                                "type": "string",
+                                "description": "Publicly accessible URL to the audio file. The agent will download and transcribe it."
+                            },
+                            "file_data": {
+                                "type": "string",
+                                "description": "Base64 encoded audio content. Format: `data:<mime_type>;base64,<encoded_content>` (e.g., `data:audio/wav;base64,UklGRi...`)."
+                            },
+                            "filename": {
+                                "type": "string",
+                                "description": "Display name of the audio file including extension (e.g., \"recording.wav\"). Required when using file_data."
+                            },
+                            "mime_type": {
+                                "type": "string",
+                                "description": "MIME type of the audio file (e.g., \"audio/wav\", \"audio/mp3\"). Optional; auto-detected from filename if omitted."
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    }
+                ]
+            },
+            "Task": {
+                "type": "object",
+                "description": "Represents a task with its current status and metadata.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the task."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "running",
+                            "stopped",
+                            "waiting",
+                            "error"
+                        ],
+                        "description": "Current task status. \"running\" — agent is actively working. \"stopped\" — task has finished or been stopped. \"waiting\" — agent is paused and waiting for user input or confirmation. \"error\" — task encountered an unrecoverable error."
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the task was created."
+                    },
+                    "updated_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the task was last updated."
+                    },
+                    "task_type": {
+                        "type": "string",
+                        "enum": [
+                            "standard",
+                            "project",
+                            "agent_subtask"
+                        ],
+                        "description": "Type of the task. \"standard\" — a regular standalone task. \"project\" — a task within a project. \"agent_subtask\" — a subtask created by an agent. Use [task.list](https://open.manus.ai/docs/v2/task.list) with `scope` to filter by task type."
+                    },
+                    "share_visibility": {
+                        "type": "string",
+                        "enum": [
+                            "private",
+                            "team",
+                            "public"
+                        ],
+                        "description": "Who can view the task. \"private\" — only the task creator. \"team\" — all team members. \"public\" — anyone with the share link."
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the task."
+                    },
+                    "credit_usage": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Total credits consumed by the task. Only present when the task has consumed credits."
+                    },
+                    "task_url": {
+                        "type": "string",
+                        "description": "URL to view the task in the Manus webapp (e.g., https://manus.im/app/{task_id})."
+                    },
+                    "created_by_api_key": {
+                        "type": "object",
+                        "nullable": true,
+                        "description": "The API key that created this task. Present when the task was created via the API; null or absent when created through the UI or other means. The name reflects the API key's current name, not a snapshot from creation time.",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "description": "The API key ID."
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "The current display name of the API key."
+                            }
+                        }
+                    },
+                    "agent_profile": {
+                        "type": "string",
+                        "enum": [
+                            "manus-1.6",
+                            "manus-1.6-lite",
+                            "manus-1.6-max"
+                        ],
+                        "description": "Agent profile most recently used by the task — reflects the latest turn (e.g. an [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) override), not just the value supplied at task creation. Omitted when this information is not available (e.g. older tasks)."
+                    }
+                }
+            },
+            "TaskEvent": {
+                "type": "object",
+                "description": "A task event representing a message, status change, or agent activity. Only one payload field (user_message, assistant_message, etc.) will be present, determined by the type field.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for this event."
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "user_message",
+                            "assistant_message",
+                            "error_message",
+                            "status_update",
+                            "tool_used",
+                            "plan_update",
+                            "new_plan_step",
+                            "explanation",
+                            "user_stop",
+                            "structured_output_result"
+                        ],
+                        "description": "Event type. Determines which payload field is present. tool_used, plan_update, new_plan_step, and explanation are only included when verbose=true. structured_output_result appears after task completion when a structured_output_schema was provided."
+                    },
+                    "timestamp": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when this event occurred."
+                    },
+                    "user_message": {
+                        "type": "object",
+                        "description": "Present when type=\"user_message\". Contains a message sent by the user.",
+                        "properties": {
+                            "content": {
+                                "type": "string",
+                                "description": "The text content of the user's message."
+                            },
+                            "message_type": {
+                                "type": "string",
+                                "enum": [
+                                    "text",
+                                    "voice"
+                                ],
+                                "description": "How the message was sent. \"text\" for typed input, \"voice\" for voice input."
+                            },
+                            "attachments": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/TaskAttachment"
+                                },
+                                "description": "Files or images the user attached to their message."
+                            }
+                        }
+                    },
+                    "assistant_message": {
+                        "type": "object",
+                        "description": "Present when type=\"assistant_message\". Contains a response from the agent.",
+                        "properties": {
+                            "content": {
+                                "type": "string",
+                                "description": "The text content of the agent's response."
+                            },
+                            "attachments": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/TaskAttachment"
+                                },
+                                "description": "Files, images, or slides the agent generated as output."
+                            }
+                        }
+                    },
+                    "error_message": {
+                        "type": "object",
+                        "description": "Present when type=\"error_message\". Indicates the task encountered an error.",
+                        "properties": {
+                            "error_type": {
+                                "type": "string",
+                                "description": "Category of the error."
+                            },
+                            "content": {
+                                "type": "string",
+                                "description": "Human-readable error description."
+                            }
+                        }
+                    },
+                    "status_update": {
+                        "type": "object",
+                        "description": "Present when type=\"status_update\". Indicates a change in the agent's processing state.",
+                        "properties": {
+                            "agent_status": {
+                                "type": "string",
+                                "enum": [
+                                    "running",
+                                    "stopped",
+                                    "waiting",
+                                    "error"
+                                ],
+                                "description": "The agent's current state. \"waiting\" means the agent needs user confirmation — check status_detail for the event to confirm."
+                            },
+                            "status_detail": {
+                                "type": "object",
+                                "description": "Additional details when agent_status is \"waiting\". Contains the event ID needed for task.confirmAction.",
+                                "properties": {
+                                    "waiting_for_event_id": {
+                                        "type": "string",
+                                        "description": "The event ID to pass as event_id when calling task.confirmAction."
+                                    },
+                                    "waiting_for_event_type": {
+                                        "type": "string",
+                                        "description": "Type of action awaiting confirmation (e.g., \"email_send\", \"calendar_create\")."
+                                    },
+                                    "waiting_description": {
+                                        "type": "string",
+                                        "description": "Human-readable description of what the agent is waiting for."
+                                    },
+                                    "confirm_input_schema": {
+                                        "type": "object",
+                                        "description": "JSON Schema defining the expected input format for the confirmation, if additional input is needed."
+                                    }
+                                }
+                            },
+                            "brief": {
+                                "type": "string",
+                                "description": "Short summary of the current agent activity."
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Detailed description of what the agent is doing."
+                            }
+                        }
+                    },
+                    "tool_used": {
+                        "type": "object",
+                        "description": "Present when type=\"tool_used\" (verbose=true only). Records a tool invocation by the agent.",
+                        "properties": {
+                            "tool": {
+                                "type": "string",
+                                "description": "Name of the tool that was used (e.g., \"browser\", \"code_executor\")."
+                            },
+                            "action_id": {
+                                "type": "string",
+                                "description": "Unique identifier for this tool action."
+                            },
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    "success",
+                                    "error",
+                                    "rollback"
+                                ],
+                                "description": "Result of the tool invocation."
+                            },
+                            "brief": {
+                                "type": "string",
+                                "description": "Short summary of the tool action."
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Detailed description of what the tool did."
+                            },
+                            "message": {
+                                "type": "object",
+                                "description": "Structured details of the tool invocation.",
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "description": "The specific action performed by the tool."
+                                    },
+                                    "param": {
+                                        "type": "string",
+                                        "description": "Parameters passed to the tool action."
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "plan_update": {
+                        "type": "object",
+                        "description": "Present when type=\"plan_update\" (verbose=true only). A full snapshot of the agent's current execution plan.",
+                        "properties": {
+                            "steps": {
+                                "type": "array",
+                                "description": "All steps in the current plan with their statuses.",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "todo",
+                                                "doing",
+                                                "done",
+                                                "failed"
+                                            ],
+                                            "description": "Current status of this plan step."
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "description": "Description of this plan step."
+                                        },
+                                        "started_at": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ],
+                                            "format": "int64",
+                                            "description": "Unix timestamp when this step started. Null if not yet started."
+                                        },
+                                        "end_at": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ],
+                                            "format": "int64",
+                                            "description": "Unix timestamp when this step finished. Null if not yet completed."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "new_plan_step": {
+                        "type": "object",
+                        "description": "Present when type=\"new_plan_step\" (verbose=true only). A new step was added to the plan.",
+                        "properties": {
+                            "step_id": {
+                                "type": "string",
+                                "description": "Unique identifier for the new plan step."
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "Description of the new plan step."
+                            }
+                        }
+                    },
+                    "explanation": {
+                        "type": "object",
+                        "description": "Present when type=\"explanation\" (verbose=true only). The agent's internal reasoning or thought process.",
+                        "properties": {
+                            "content": {
+                                "type": "string",
+                                "description": "The agent's explanation of its reasoning or approach."
+                            }
+                        }
+                    },
+                    "structured_output_result": {
+                        "type": "object",
+                        "description": "Present when type=\"structured_output_result\". Contains the extracted structured data. Appears after the status_update (stopped) event when the task was created with a structured_output_schema.",
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "description": "Whether the agent produced a meaningful result. When false, value contains schema-conforming defaults and error explains what happened."
+                            },
+                            "value": {
+                                "type": "object",
+                                "description": "The extracted value conforming to the schema provided in structured_output_schema. Always present and valid, even when success is false — see [zero-value rules](https://open.manus.ai/docs/v2/structured-output#when-success-is-false)."
+                            },
+                            "error": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "Error description when success is false. Null when success is true."
+                            }
+                        }
+                    }
+                }
+            },
+            "TaskAttachment": {
+                "type": "object",
+                "description": "A file or media attachment in a task message.",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "image",
+                            "file",
+                            "voice",
+                            "slides"
+                        ],
+                        "description": "Type of attachment. \"image\" for images, \"file\" for documents, \"voice\" for audio recordings, \"slides\" for presentation slides."
+                    },
+                    "filename": {
+                        "type": "string",
+                        "description": "Display name of the attachment file."
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "URL to download the attachment content."
+                    },
+                    "content_type": {
+                        "type": "string",
+                        "description": "MIME type of the attachment (e.g., \"application/pdf\", \"image/png\")."
+                    }
+                }
+            },
+            "Project": {
+                "type": "object",
+                "description": "A project for organizing tasks with shared instructions.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the project."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Display name of the project."
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the project was created."
+                    },
+                    "instruction": {
+                        "type": "string",
+                        "description": "Default instruction applied to all tasks in this project."
+                    }
+                }
+            },
+            "Skill": {
+                "type": "object",
+                "description": "A skill that extends the agent's capabilities.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the skill. Use this in enable_skills or force_skills when creating tasks."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Display name of the skill."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "What the skill does and when it's useful."
+                    },
+                    "owner_type": {
+                        "type": "string",
+                        "enum": [
+                            "personal",
+                            "official",
+                            "team",
+                            "project"
+                        ],
+                        "description": "Who owns the skill. \"personal\" — user-created skill. \"official\" — built-in system skill. \"team\" — team-shared skill. \"project\" — project-specific skill."
+                    },
+                    "creator_info": {
+                        "type": "object",
+                        "description": "Information about who created the skill.",
+                        "properties": {
+                            "user_id": {
+                                "type": "string",
+                                "description": "User ID of the skill creator."
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "Display name of the skill creator."
+                            }
+                        }
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the skill was created."
+                    },
+                    "updated_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the skill was last updated."
+                    }
+                }
+            },
+            "Agent": {
+                "type": "object",
+                "description": "A custom agent with its own identity (nickname and description) that can be customized for specific use cases. See the [Agents](https://open.manus.ai/docs/v2/agents-overview) guide.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the agent. Use this as `agent_id` in [task.list](https://open.manus.ai/docs/v2/task.list) (with `scope=agent_subtask`) to view this agent's subtasks."
+                    },
+                    "task_id": {
+                        "type": "string",
+                        "description": "The task ID associated with this agent's creation or configuration. Use [task.detail](https://open.manus.ai/docs/v2/task.detail) to view the associated task."
+                    },
+                    "nickname": {
+                        "type": "string",
+                        "description": "Display name of the agent. Can be updated via [agent.update](https://open.manus.ai/docs/v2/agent.update)."
+                    },
+                    "about": {
+                        "type": "string",
+                        "description": "Description or bio of the agent explaining its purpose and specialization. Can be updated via [agent.update](https://open.manus.ai/docs/v2/agent.update)."
+                    }
+                }
+            },
+            "File": {
+                "type": "object",
+                "description": "Basic file information returned in lists and upload responses.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the file. Use this as file_id when attaching to tasks."
+                    },
+                    "filename": {
+                        "type": "string",
+                        "description": "Name of the file."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "uploaded",
+                            "deleted",
+                            "error"
+                        ],
+                        "description": "File status. \"pending\" — waiting for upload. \"uploaded\" — ready to use. \"deleted\" — file has been deleted. \"error\" — upload failed."
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the file record was created."
+                    }
+                }
+            },
+            "FileDetail": {
+                "type": "object",
+                "description": "Full file information returned by file.detail.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the file."
+                    },
+                    "filename": {
+                        "type": "string",
+                        "description": "Name of the file."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "uploaded",
+                            "deleted",
+                            "error"
+                        ],
+                        "description": "File status. \"pending\" — waiting for upload. \"uploaded\" — ready to use. \"deleted\" — file has been deleted. \"error\" — upload failed."
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the file record was created."
+                    },
+                    "bytes": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "format": "int64",
+                        "description": "File size in bytes. Only available after upload is complete."
+                    },
+                    "content_type": {
+                        "type": "string",
+                        "description": "MIME type of the file (e.g., \"application/pdf\", \"text/csv\")."
+                    },
+                    "expires_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the file will be automatically deleted (48 hours after upload)."
+                    },
+                    "error_message": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Error description if the file status is \"error\"."
+                    }
+                }
+            },
+            "Webhook": {
+                "type": "object",
+                "description": "A webhook subscription for receiving task event notifications.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the webhook."
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "The endpoint URL receiving webhook POST notifications."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "description": "Webhook status. \"active\" — receiving notifications. \"inactive\" — paused."
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) when the webhook was created."
+                    }
+                }
+            },
+            "BrowserClient": {
+                "type": "object",
+                "description": "An online browser client connected to the user's account.",
+                "properties": {
+                    "client_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the browser client."
+                    },
+                    "client_name": {
+                        "type": "string",
+                        "description": "Display name of the browser client."
+                    },
+                    "ua": {
+                        "type": "string",
+                        "description": "User-Agent string of the browser."
+                    }
+                }
+            },
+            "ConnectorInfo": {
+                "type": "object",
+                "description": "Information about an available connector.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the connector. Use this as the connector ID when creating tasks."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Display name of the connector."
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "builtin",
+                            "byok",
+                            "mcp"
+                        ],
+                        "description": "Connector type. \"builtin\" — built-in connector provided by Manus. \"byok\" — bring-your-own-key connector. \"mcp\" — MCP (Model Context Protocol) connector."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Human-readable description of the connector's functionality."
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Category grouping for the connector (e.g., \"productivity\", \"communication\")."
+                    }
+                }
+            },
+            "UsageRecord": {
+                "type": "object",
+                "description": "A credit change record at session granularity. Covers consumption, refunds, subscription grants, and admin adjustments.",
+                "properties": {
+                    "task_id": {
+                        "type": "string",
+                        "description": "The task (session) ID this change is associated with."
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "The task title. Returns \"Deleted conversation\" if the session has been deleted."
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "description": "Credit change amount. Negative values represent consumption; positive values represent refunds or subscription/admin grants."
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "description": "Time of the most recent change as a Unix timestamp in seconds."
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Change type:\n\n- `cost` — credit consumption (task usage or admin deduction)\n- `refund` — credit returned after consumption (e.g., task failure rollback)\n- `grant` — credits gained (subscription grant, upgrade bonus, recurring issuance, credit pack purchase, admin compensation)",
+                        "enum": [
+                            "cost",
+                            "refund",
+                            "grant"
+                        ]
+                    },
+                    "collaborate_infos": {
+                        "type": "array",
+                        "description": "Per-collaborator credit breakdown for team tasks. Empty for personal tasks.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "user_id": {
+                                    "type": "string",
+                                    "description": "Collaborator's user ID."
+                                },
+                                "user_name": {
+                                    "type": "string",
+                                    "description": "Collaborator's display name."
+                                },
+                                "credits": {
+                                    "type": "integer",
+                                    "description": "Credits attributed to this collaborator for the task."
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "DailyStatistic": {
+                "type": "object",
+                "description": "Daily credit consumption total.",
+                "properties": {
+                    "date": {
+                        "type": "integer",
+                        "description": "Date as a Unix timestamp in seconds, representing 00:00:00 of that day."
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "description": "Total credits consumed on this day."
+                    }
+                }
+            },
+            "TeamUsageLog": {
+                "type": "object",
+                "description": "Per-user aggregated task count and credit consumption over the requested range. One row per team member.",
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "description": "Team member's user ID."
+                    },
+                    "user_name": {
+                        "type": "string",
+                        "description": "Team member's display name."
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Team member's email address."
+                    },
+                    "task_count": {
+                        "type": "integer",
+                        "description": "Number of tasks the member created within the requested range."
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "description": "Total credits consumed by this user within the requested range."
+                    }
+                }
+            },
+            "WebsiteCheckpoint": {
+                "type": "object",
+                "description": "A snapshot of a website (backed by a git commit).",
+                "properties": {
+                    "version_id": {
+                        "type": "string",
+                        "description": "Unique checkpoint version ID (the underlying git commit hash)."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Checkpoint description — the commit message written when the checkpoint was saved."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "success",
+                            "failed",
+                            "unspecified"
+                        ],
+                        "description": "Whether the checkpoint itself was generated successfully. This is independent of publish state — use `published_version_id` from `website.listCheckpoints` to identify the version currently live."
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Checkpoint creation time (Unix seconds)."
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "description": "Standard error response format returned when a request fails.",
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Always false for error responses."
+                    },
+                    "request_id": {
+                        "type": "string",
+                        "description": "Unique identifier for this API request, useful for debugging with support."
+                    },
+                    "error": {
+                        "type": "object",
+                        "description": "Error details.",
+                        "properties": {
+                            "code": {
+                                "type": "string",
+                                "description": "Machine-readable error code (e.g., \"invalid_argument\", \"not_found\", \"permission_denied\", \"rate_limited\")."
+                            },
+                            "message": {
+                                "type": "string",
+                                "description": "Human-readable error description explaining what went wrong."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

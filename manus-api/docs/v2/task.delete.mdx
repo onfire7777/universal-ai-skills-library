@@ -1,0 +1,13 @@
+---
+title: 'task.delete'
+openapi: 'POST /v2/task.delete'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+
+<Warning>
+This action is permanent. If the task is still running, use [task.stop](https://open.manus.ai/docs/v2/task.stop) to stop it first. Agent-related tasks (e.g. agent main tasks and subtasks) cannot be deleted.
+</Warning>

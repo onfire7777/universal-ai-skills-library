@@ -1,0 +1,24 @@
+---
+title: 'task.sendMessage'
+openapi: 'POST /v2/task.sendMessage'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Shortcut:** Use `agent-default-main_task` as `task_id` to send messages to the IM agent directly.
+
+**Structured Output:** Pass `structured_output_schema` to extract a JSON result when the task next finishes. A new schema replaces the previous one. See the [Structured Output](https://open.manus.ai/docs/v2/structured-output) guide.
+
+**Attach files:** Upload via [file.upload](https://open.manus.ai/docs/v2/file.upload) and pass the `file_id` in the message content, or use `file_url` / `file_data` directly.
+
+**Connectors:** Pass connector IDs in `message.connectors`. Get IDs from [connector.list](https://open.manus.ai/docs/v2/connector.list) or the [Connectors](https://open.manus.ai/docs/v2/connectors) guide. If omitted and `project_id` is set, the project's default connectors will be used.
+
+**Enable skills:** Pass skill IDs from [skill.list](https://open.manus.ai/docs/v2/skill.list) in `message.enable_skills` to control which skills are available for the agent. If omitted, the user's default enabled skills are loaded automatically.
+
+**Force skills:** Pass skill IDs in `message.force_skills` to ensure the agent invokes them. Forced skills are automatically available even if not listed in `enable_skills`.
+
+**Waiting events:** Use this endpoint to reply when the agent asks a question (`messageAskUser`). For other waiting types like `gmailSendAction` or `deployAction`, use [task.confirmAction](https://open.manus.ai/docs/v2/task.confirmAction) instead.
+</Tip>
