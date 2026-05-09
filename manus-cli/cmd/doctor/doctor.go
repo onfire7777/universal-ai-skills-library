@@ -35,15 +35,25 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 		check := func(name string, fn func() (string, error)) {
 			result, err := fn()
 			if err != nil {
-				red.Printf("  ✗ %-35s %s\n", name, err.Error())
+				red.Printf("  FAIL  %-35s %s\n", name, err.Error())
 				fail++
 			} else if result == "warn" {
-				yellow.Printf("  ! %-35s warning\n", name)
+				yellow.Printf("  WARN  %-35s warning\n", name)
 				warn++
 			} else {
-				green.Printf("  ✓ %-35s %s\n", name, result)
+				green.Printf("  OK    %-35s %s\n", name, result)
 				pass++
 			}
+		}
+		optional := func(name string, fn func() (string, error)) {
+			result, err := fn()
+			if err != nil {
+				yellow.Printf("  WARN  %-35s %s\n", name, err.Error())
+				warn++
+				return
+			}
+			green.Printf("  OK    %-35s %s\n", name, result)
+			pass++
 		}
 
 		bold.Println("Manus CLI Health Check")
@@ -97,8 +107,8 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 
 		// --- Skills ---
 		bold.Println("Skills:")
-		check("Skills Directory", func() (string, error) {
-			dir := platform.SkillsDir()
+		check("Repository Skills", func() (string, error) {
+			dir := filepath.Join(platform.RepoDir(), "skills")
 			if _, err := os.Stat(dir); err != nil {
 				return "", fmt.Errorf("not found: %s", dir)
 			}
@@ -130,10 +140,10 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 		fmt.Println()
 
 		// --- Agent Roots ---
-		bold.Println("Agent Roots:")
+		bold.Println("Agent Roots (optional physical copies):")
 		for _, root := range platform.AgentRoots() {
 			name := filepath.Base(filepath.Dir(root))
-			check(name, func() (string, error) {
+			optional(name, func() (string, error) {
 				if _, err := os.Stat(root); err != nil {
 					return "", fmt.Errorf("missing")
 				}
@@ -159,7 +169,7 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			}
 			for _, b := range mcpBridges {
 				bCopy := b
-				check(bCopy.name, func() (string, error) {
+				optional(bCopy.name, func() (string, error) {
 					out, _ := runner.RunCommandCapture("powershell", "-NoProfile", "-Command",
 						fmt.Sprintf(`try{$c=New-Object Net.Sockets.TcpClient;$c.Connect('127.0.0.1',%d);$c.Close();'UP'}catch{'DOWN'}`, bCopy.port))
 					if strings.TrimSpace(out) != "UP" {
@@ -193,23 +203,23 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 
 		// --- API Keys ---
 		bold.Println("API Keys:")
-		check("OPENROUTER_API_KEY", func() (string, error) {
+		optional("OPENROUTER_API_KEY", func() (string, error) {
 			if os.Getenv("OPENROUTER_API_KEY") != "" {
 				return "set", nil
 			}
 			return "", fmt.Errorf("not set")
 		})
-		check("OPENAI_API_KEY", func() (string, error) {
+		optional("OPENAI_API_KEY", func() (string, error) {
 			if os.Getenv("OPENAI_API_KEY") != "" {
 				return "set", nil
 			}
 			return "", fmt.Errorf("not set")
 		})
-		check("MANUS_API_KEY", func() (string, error) {
+		optional("MANUS_API_KEY", func() (string, error) {
 			if os.Getenv("MANUS_API_KEY") != "" {
 				return "set", nil
 			}
-			return "warn", nil
+			return "", fmt.Errorf("not set")
 		})
 
 		fmt.Println()

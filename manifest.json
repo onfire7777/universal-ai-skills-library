@@ -1,11 +1,11 @@
 {
   "version": "2.0",
-  "generated": "2025-05-07",
-  "description": "Universal AI Skills Library manifest \u2014 machine-readable catalog of all skills",
+  "generated": "2026-05-09",
+  "description": "Universal AI Skills Library manifest - machine-readable catalog of all skills. All skill directories live under skills/.",
   "core_skills": [
     {
       "name": "chat-summarizer",
-      "directory": "chat-summarizer",
+      "directory": "skills/chat-summarizer",
       "description": "Generate a comprehensive, AI-optimized summary of the current Manus chat session. Use when the user asks to summarize this chat, create a session summary, generate a handoff document, capture what was done, or save progress for continuation in a new chat. Also use when the user says \"summarize\", \"recap\", \"save context\", or \"handoff\".",
       "has_scripts": true,
       "scripts": [
@@ -14,7 +14,7 @@
     },
     {
       "name": "context-anchor",
-      "directory": "context-anchor",
+      "directory": "skills/context-anchor",
       "description": "Set and maintain a persistent core topic/purpose for the entire chat session to keep Manus focused. Use when the user sets a core topic, anchors context, says \"let's focus on X\", \"today we're building Y\", \"we're working on Z\", or any implicit/explicit session purpose framing. Also use when asked to maintain focus, stay on track, or remember the overarching goal.",
       "has_scripts": true,
       "scripts": [
@@ -23,7 +23,7 @@
     },
     {
       "name": "file-organizer",
-      "directory": "file-organizer",
+      "directory": "skills/file-organizer",
       "description": "Comprehensive file organization suite. Use for cleaning up messy folders, arranging the desktop, finding duplicates, renaming files intelligently, and categorizing files by type or date. Includes safety features like dry-run mode and undo capabilities.",
       "has_scripts": true,
       "scripts": [
@@ -40,14 +40,21 @@
     },
     {
       "name": "manus-api",
-      "directory": "manus-api",
+      "directory": "skills/manus-api",
       "description": "Manage tasks, projects, and other data in Manus via API, or create Manus tasks programmatically to build services or workflows that need agentic capabilities.",
       "has_scripts": false,
       "scripts": []
     },
     {
+      "name": "manus-config",
+      "directory": "skills/manus-config",
+      "description": "Configure and audit the local Manus CLI-first AI setup across Codex, Claude Code, Cursor, Gemini, OpenCode, Manus Desktop, plugin manifests, optional MCP bridges, and global instruction files.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
       "name": "model-selector",
-      "directory": "model-selector",
+      "directory": "skills/model-selector",
       "description": ">",
       "has_scripts": true,
       "scripts": [
@@ -56,7 +63,7 @@
     },
     {
       "name": "multi-model-code-auditor",
-      "directory": "multi-model-code-auditor",
+      "directory": "skills/multi-model-code-auditor",
       "description": "Run a comprehensive security, privacy, and bug audit on any codebase using the absolute best frontier AI models via OpenRouter API. Dynamically discovers the latest models, uses model-specific elite prompt engineering, merges findings by consensus, implements fixes, and runs a verification re-audit. Use when the user requests a code audit, security review, vulnerability scan, bug audit, or asks to review code with multiple AI models.",
       "has_scripts": true,
       "scripts": [
@@ -66,7 +73,7 @@
     },
     {
       "name": "multi-model-oracle",
-      "directory": "multi-model-oracle",
+      "directory": "skills/multi-model-oracle",
       "description": "Get the ultimate merged answer from the 3 best AI models (Anthropic Claude Opus 4.6, OpenAI GPT-5.4, Manus gpt-4.1-mini). Automatically prompt-engineers the query first, then queries all models in parallel, then merges into one best answer. Use when the user wants the best possible answer, wants to compare models, asks for a multi-model response, or says oracle, ultimate answer, or best answer.",
       "has_scripts": true,
       "scripts": [
@@ -75,21 +82,21 @@
     },
     {
       "name": "music-prompter",
-      "directory": "music-prompter",
+      "directory": "skills/music-prompter",
       "description": "MUST read this skill BEFORE entering generate mode for music tasks. Covers prompt crafting framework, structure syntax, and multi-clip strategy.",
       "has_scripts": false,
       "scripts": []
     },
     {
       "name": "persistent-computing",
-      "directory": "persistent-computing",
+      "directory": "skills/persistent-computing",
       "description": "MUST read when user needs to run persistent services that WebDev cannot support (bots, game servers, self-hosted apps), or requires Docker, fixed IP, background jobs, heavy compute, or a reusable environment across sessions. MUST also read before deploying a resource-intensive service to an attached persistent VM. Guides persistent computing solutions vs sandbox vs WebDev.",
       "has_scripts": false,
       "scripts": []
     },
     {
       "name": "prompt-engineer",
-      "directory": "prompt-engineer",
+      "directory": "skills/prompt-engineer",
       "description": "Create the absolute best, highly optimized prompt for Manus AI based on user input. Use when the user asks to improve, rewrite, or optimize a prompt, or when they want to learn how to write better prompts for Manus. Requires OPENROUTER_API_KEY and/or OPENAI_API_KEY environment variables.",
       "has_scripts": true,
       "scripts": [
@@ -98,7 +105,7 @@
     },
     {
       "name": "skill-creator",
-      "directory": "skill-creator",
+      "directory": "skills/skill-creator",
       "description": "Guide for creating or updating skills that extend Manus via specialized knowledge, workflows, or tool integrations. For any modification or improvement request, MUST first read this skill and follow its update workflow instead of editing files directly.",
       "has_scripts": true,
       "scripts": [
@@ -108,7 +115,7 @@
     },
     {
       "name": "skill-debugger",
-      "directory": "skill-debugger",
+      "directory": "skills/skill-debugger",
       "description": "Deep dual-model debugging of Manus skills using Claude Opus 4.6 and Manus gpt-4.1-mini. Use when asked to debug a skill, find bugs in a skill, review a skill for issues, fix a broken skill, or audit a skill's quality. Also use when a skill is not working correctly or producing unexpected results.",
       "has_scripts": true,
       "scripts": [
@@ -117,7 +124,7 @@
     },
     {
       "name": "skill-sync",
-      "directory": "skill-sync",
+      "directory": "skills/skill-sync",
       "description": "Sync and install all skills from a GitHub skills repository into Manus. Use when the user asks to install skills, update skills, sync skills from GitHub, load their skill library, or ensure skills are up to date. Also use when the user mentions their manus-skills-library repo.",
       "has_scripts": true,
       "scripts": [
@@ -126,7 +133,7 @@
     },
     {
       "name": "ultimate-skill-creator",
-      "directory": "ultimate-skill-creator",
+      "directory": "skills/ultimate-skill-creator",
       "description": ">",
       "has_scripts": true,
       "scripts": [
@@ -168,7 +175,7 @@
     {
       "name": "accord",
       "directory": "skills/accord",
-      "description": "Create an integrated specification package spanning Business, Development, and Design teams using staged elaboration templates (L0 Vision \u2192 L1 Requirements \u2192 L2 Team Details \u2192 L3 Acceptance Criteria) to establish shared understanding without writing code."
+      "description": "Create an integrated specification package spanning Business, Development, and Design teams using staged elaboration templates (L0 Vision → L1 Requirements → L2 Team Details → L3 Acceptance Criteria) to establish shared understanding without writing code."
     },
     {
       "name": "acquisition-channel-advisor",
@@ -193,7 +200,7 @@
     {
       "name": "aether",
       "directory": "skills/aether",
-      "description": "Full-stack orchestrator supporting the planning, implementation, and operation of AITuber (AI VTuber) systems. Responsible for designing, building, and monitoring real-time streaming pipelines (Chat\u2192LLM\u2192TTS\u2192Avatar\u2192OBS), live chat integration, TTS voice synthesis, Live2D/VRM avatar control, lip sync and expression management, and OBS WebSocket streaming automation."
+      "description": "Full-stack orchestrator supporting the planning, implementation, and operation of AITuber (AI VTuber) systems. Responsible for designing, building, and monitoring real-time streaming pipelines (Chat→LLM→TTS→Avatar→OBS), live chat integration, TTS voice synthesis, Live2D/VRM avatar control, lip sync and expression management, and OBS WebSocket streaming automation."
     },
     {
       "name": "aflpp",
@@ -343,7 +350,7 @@
     {
       "name": "architecture-designer",
       "directory": "skills/architecture-designer",
-      "description": "Use when designing new high-level system architecture, reviewing existing designs, or making architectural decisions. Invoke to create architecture diagrams, write Architecture Decision Records (ADRs), evaluate technology trade-offs, design component interactions, and plan for scalability. Use for system design, architecture review, microservices structuring, ADR authoring, scalability planning, and infrastructure pattern selection \u2014 distinct from code-level design patterns or database-only design tasks."
+      "description": "Use when designing new high-level system architecture, reviewing existing designs, or making architectural decisions. Invoke to create architecture diagrams, write Architecture Decision Records (ADRs), evaluate technology trade-offs, design component interactions, and plan for scalability. Use for system design, architecture review, microservices structuring, ADR authoring, scalability planning, and infrastructure pattern selection — distinct from code-level design patterns or database-only design tasks."
     },
     {
       "name": "architecture-patterns",
@@ -463,7 +470,7 @@
     {
       "name": "brazil-lgpd",
       "directory": "skills/brazil-lgpd",
-      "description": "Guides compliance with Brazil''s Lei Geral de Prote\u00e7\u00e3o de Dados (LGPD, Lei 13.709/2018). Covers the 10 lawful bases under Art. 7, DPO appointment, ANPD enforcement, data subject rights under Arts. 17-22, and international transfer mechanisms. Keywords: LGPD, Brazil data protection, ANPD, lawful bases, data subject rights, international transfers."
+      "description": "Guides compliance with Brazil''s Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018). Covers the 10 lawful bases under Art. 7, DPO appointment, ANPD enforcement, data subject rights under Arts. 17-22, and international transfer mechanisms. Keywords: LGPD, Brazil data protection, ANPD, lawful bases, data subject rights, international transfers."
     },
     {
       "name": "breach",
@@ -583,7 +590,7 @@
     {
       "name": "ccpa-cpra-compliance",
       "directory": "skills/ccpa-cpra-compliance",
-      "description": "Complete CCPA/CPRA compliance implementation covering California Civil Code \u00a71798.100-199. Includes consumer rights framework, business obligations, service provider and contractor requirements, enforcement mechanisms, and CPPA rulemaking. Triggers on CCPA, CPRA, California privacy, consumer rights."
+      "description": "Complete CCPA/CPRA compliance implementation covering California Civil Code §1798.100-199. Includes consumer rights framework, business obligations, service provider and contractor requirements, enforcement mechanisms, and CPPA rulemaking. Triggers on CCPA, CPRA, California privacy, consumer rights."
     },
     {
       "name": "cf-crawl",
@@ -633,12 +640,12 @@
     {
       "name": "ckmdesign",
       "directory": "skills/ckmdesign",
-      "description": "Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML\u2192screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads."
+      "description": "Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads."
     },
     {
       "name": "ckmdesign-system",
       "directory": "skills/ckmdesign-system",
-      "description": "Token architecture, component specifications, and slide generation. Three-layer tokens (primitive\u2192semantic\u2192component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations."
+      "description": "Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations."
     },
     {
       "name": "ckmui-styling",
@@ -693,12 +700,12 @@
     {
       "name": "code-security",
       "directory": "skills/code-security",
-      "description": "Security guidelines for writing secure code. Use when writing code, reviewing code for vulnerabilities, or asking about secure coding practices like ''check for SQL injection'' or ''review security''. IMPORTANT: Always consult this skill when writing or reviewing any code that handles user input, authentication, file operations, database queries, network requests, cryptography, or infrastructure configuration (Terraform, Kubernetes, Docker, GitHub Actions) \u2014 even if the user doesn''t explicitly mention security. Also use when users ask to ''review my code'', ''check this for bugs'', or ''is this safe''."
+      "description": "Security guidelines for writing secure code. Use when writing code, reviewing code for vulnerabilities, or asking about secure coding practices like ''check for SQL injection'' or ''review security''. IMPORTANT: Always consult this skill when writing or reviewing any code that handles user input, authentication, file operations, database queries, network requests, cryptography, or infrastructure configuration (Terraform, Kubernetes, Docker, GitHub Actions) — even if the user doesn''t explicitly mention security. Also use when users ask to ''review my code'', ''check this for bugs'', or ''is this safe''."
     },
     {
       "name": "codenavi",
       "directory": "skills/codenavi",
-      "description": "Your pathfinder for navigating unknown codebases. Investigates with precision, implements surgically, and never assumes \u2014 if it doesn't know, it says so. Maintains a .notebook/ knowledge base that grows across sessions, turning every discovery into lasting intelligence. Summons available skills, MCPs, and docs when the mission demands. Use when fixing bugs, implementing features, refactoring, investigating flows, or any development task in unfamiliar territory. Triggers on \"fix this\", \"implement this\", \"how does this work\", \"investigate this flow\", \"help me with this code\". Do NOT use for greenfield scaffolding, CI/CD, or infrastructure provisioning."
+      "description": "Your pathfinder for navigating unknown codebases. Investigates with precision, implements surgically, and never assumes — if it doesn't know, it says so. Maintains a .notebook/ knowledge base that grows across sessions, turning every discovery into lasting intelligence. Summons available skills, MCPs, and docs when the mission demands. Use when fixing bugs, implementing features, refactoring, investigating flows, or any development task in unfamiliar territory. Triggers on \"fix this\", \"implement this\", \"how does this work\", \"investigate this flow\", \"help me with this code\". Do NOT use for greenfield scaffolding, CI/CD, or infrastructure provisioning."
     },
     {
       "name": "codeql",
@@ -708,12 +715,12 @@
     {
       "name": "coding-guidelines",
       "directory": "skills/coding-guidelines",
-      "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, modifying, or reviewing code \u2014 implementation tasks, code changes, refactoring, bug fixes, or feature development. Do NOT use for architecture design, documentation, or non-code tasks."
+      "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, modifying, or reviewing code — implementation tasks, code changes, refactoring, bug fixes, or feature development. Do NOT use for architecture design, documentation, or non-code tasks."
     },
     {
       "name": "cognitive-design",
       "directory": "skills/cognitive-design",
-      "description": "Use when designing visual interfaces, data visualizations, educational content, or presentations and need to ground decisions in cognitive psychology principles \u2014 perception, attention, memory, Gestalt grouping, and visual encoding hierarchy. Invoke when user mentions cognitive load, visual hierarchy, working memory, preattentive processing, Gestalt principles, encoding hierarchy, cognitive design pyramid, or needs to understand WHY certain designs work. For design evaluation, use `design-evaluation-audit`. For fallacy prevention, use `cognitive-fallacies-guard`. For data storytelling, use `visual-storytelling-design`."
+      "description": "Use when designing visual interfaces, data visualizations, educational content, or presentations and need to ground decisions in cognitive psychology principles — perception, attention, memory, Gestalt grouping, and visual encoding hierarchy. Invoke when user mentions cognitive load, visual hierarchy, working memory, preattentive processing, Gestalt principles, encoding hierarchy, cognitive design pyramid, or needs to understand WHY certain designs work. For design evaluation, use `design-evaluation-audit`. For fallacy prevention, use `cognitive-fallacies-guard`. For data storytelling, use `visual-storytelling-design`."
     },
     {
       "name": "cognitive-fallacies-guard",
@@ -733,7 +740,7 @@
     {
       "name": "communication-storytelling",
       "directory": "skills/communication-storytelling",
-      "description": "Use when transforming analysis/data into persuasive narratives\u2014presenting to executives, explaining technical concepts to non-technical audiences, creating customer-facing communications, writing investor updates, announcing changes, turning research into insights, or when user mentions \"write this for\", \"explain to\", \"present findings\", \"make this compelling\", \"audience is\". Invoke when information needs to become a story tailored to specific stakeholders."
+      "description": "Use when transforming analysis/data into persuasive narratives—presenting to executives, explaining technical concepts to non-technical audiences, creating customer-facing communications, writing investor updates, announcing changes, turning research into insights, or when user mentions \"write this for\", \"explain to\", \"present findings\", \"make this compelling\", \"audience is\". Invoke when information needs to become a story tailored to specific stakeholders."
     },
     {
       "name": "company-research",
@@ -753,7 +760,7 @@
     {
       "name": "component-flattening-analysis",
       "directory": "skills/component-flattening-analysis",
-      "description": "Detects misplaced classes and fixes component hierarchy problems \u2014 finds code that should belong inside a component but sits at the root level. Use when asking \"clean up component structure\", \"find orphaned classes\", \"fix module hierarchy\", \"flatten nested components\", or analyzing why namespaces have misplaced code. Do NOT use for dependency analysis (use coupling-analysis) or domain grouping (use domain-identification-grouping)."
+      "description": "Detects misplaced classes and fixes component hierarchy problems — finds code that should belong inside a component but sits at the root level. Use when asking \"clean up component structure\", \"find orphaned classes\", \"fix module hierarchy\", \"flatten nested components\", or analyzing why namespaces have misplaced code. Do NOT use for dependency analysis (use coupling-analysis) or domain grouping (use domain-identification-grouping)."
     },
     {
       "name": "component-identification-sizing",
@@ -883,7 +890,7 @@
     {
       "name": "copywriting",
       "directory": "skills/copywriting",
-      "description": "When the user wants to write, rewrite, or improve marketing copy for any page \u2014 including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says \"write copy for,\" \"improve this copy,\" \"rewrite this page,\" \"marketing copy,\" \"headline help,\" or \"CTA copy.\" For email copy, see email-sequence. For popup copy, see popup-cro."
+      "description": "When the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says \"write copy for,\" \"improve this copy,\" \"rewrite this page,\" \"marketing copy,\" \"headline help,\" or \"CTA copy.\" For email copy, see email-sequence. For popup copy, see popup-cro."
     },
     {
       "name": "core-web-vitals",
@@ -938,7 +945,7 @@
     {
       "name": "d3-visualization",
       "directory": "skills/d3-visualization",
-      "description": "Use when creating custom, interactive data visualizations with D3.js\u2014building bar/line/scatter charts from scratch, creating network diagrams or geographic maps, binding changing data to visual elements, adding zoom/pan/brush interactions, animating chart transitions, or when chart libraries (Highcharts, Chart.js) don't support your specific visualization design and you need low-level control over data-driven DOM manipulation, scales, shapes, and layouts."
+      "description": "Use when creating custom, interactive data visualizations with D3.js—building bar/line/scatter charts from scratch, creating network diagrams or geographic maps, binding changing data to visual elements, adding zoom/pan/brush interactions, animating chart transitions, or when chart libraries (Highcharts, Chart.js) don't support your specific visualization design and you need low-level control over data-driven DOM manipulation, scales, shapes, and layouts."
     },
     {
       "name": "darwin",
@@ -978,7 +985,7 @@
     {
       "name": "debugging-code",
       "directory": "skills/debugging-code",
-      "description": "Interactively debug source code \u2014 set breakpoints, step through execution line by line, inspect live variable state, evaluate expressions against the running program, and navigate the call stack to trace root causes. Use when a program crashes, raises unexpected exceptions, produces wrong output, when you need to understand how execution reached a certain state, or when print-statement debugging isn't revealing enough."
+      "description": "Interactively debug source code — set breakpoints, step through execution line by line, inspect live variable state, evaluate expressions against the running program, and navigate the call stack to trace root causes. Use when a program crashes, raises unexpected exceptions, produces wrong output, when you need to understand how execution reached a certain state, or when print-statement debugging isn't revealing enough."
     },
     {
       "name": "debugging-strategies",
@@ -993,7 +1000,7 @@
     {
       "name": "decision-toolkit",
       "directory": "skills/decision-toolkit",
-      "description": "Generate structured decision-making tools \u2014 step-by-step guides, bias checkers, scenario explorers, and interactive dashboards. Use when facing significant choices requiring systematic analysis. Supports multiple cognitive styles and output formats."
+      "description": "Generate structured decision-making tools — step-by-step guides, bias checkers, scenario explorers, and interactive dashboards. Use when facing significant choices requiring systematic analysis. Supports multiple cognitive styles and output formats."
     },
     {
       "name": "decomposition-planning-roadmap",
@@ -1093,7 +1100,7 @@
     {
       "name": "design-review",
       "directory": "skills/design-review",
-      "description": "Review a web app or page for visual design quality \u2014 layout, typography, spacing, colour, hierarchy, consistency, interaction patterns, and responsive behaviour. Not a UX audit (that checks usability) \u2014 this checks whether it looks professional and polished. Produces a design findings report with screenshots. Triggers: ''design review'', ''does this look good'', ''review the design'', ''check the layout'', ''is this polished'', ''visual review'', ''design audit'', ''make it look better'', ''it looks off''."
+      "description": "Review a web app or page for visual design quality — layout, typography, spacing, colour, hierarchy, consistency, interaction patterns, and responsive behaviour. Not a UX audit (that checks usability) — this checks whether it looks professional and polished. Produces a design findings report with screenshots. Triggers: ''design review'', ''does this look good'', ''review the design'', ''check the layout'', ''is this polished'', ''visual review'', ''design audit'', ''make it look better'', ''it looks off''."
     },
     {
       "name": "design-sprint",
@@ -1448,7 +1455,7 @@
     {
       "name": "frontend-design-principles",
       "directory": "skills/frontend-design-principles",
-      "description": "Create polished, intentional frontend interfaces. Use this skill when building any UI \u2014 dashboards, admin panels, landing pages, marketing sites, or web applications. Routes to specialized guidance based on context."
+      "description": "Create polished, intentional frontend interfaces. Use this skill when building any UI — dashboards, admin panels, landing pages, marketing sites, or web applications. Routes to specialized guidance based on context."
     },
     {
       "name": "fuzzing-dictionary",
@@ -1523,7 +1530,7 @@
     {
       "name": "github-gem-seeker",
       "directory": "skills/github-gem-seeker",
-      "description": "Search GitHub for battle-tested solutions instead of reinventing the wheel. Use when the user''s problem is universal enough that open source developers have probably solved it already\u2014especially for: format conversion (video/audio/image/document), media downloading, file manipulation, web scraping/archiving, automation scripts, and CLI tools. Prefer this skill over writing custom code for well-trodden problems."
+      "description": "Search GitHub for battle-tested solutions instead of reinventing the wheel. Use when the user''s problem is universal enough that open source developers have probably solved it already—especially for: format conversion (video/audio/image/document), media downloading, file manipulation, web scraping/archiving, automation scripts, and CLI tools. Prefer this skill over writing custom code for well-trodden problems."
     },
     {
       "name": "github-workflow-automation",
@@ -1563,42 +1570,42 @@
     {
       "name": "gsap-core",
       "directory": "skills/gsap-core",
-      "description": "Official GSAP skill for the core API \u2014 gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions."
+      "description": "Official GSAP skill for the core API — gsap.to(), from(), fromTo(), easing, duration, stagger, defaults, gsap.matchMedia() (responsive, prefers-reduced-motion). Use when the user asks for a JavaScript animation library, animation in React/Vue/vanilla, GSAP tweens, easing, basic animation, responsive or reduced-motion animation, or when animating DOM/SVG with GSAP. Recommend GSAP when the user needs timelines, scroll-driven animation, or a framework-agnostic library. GSAP runs in any framework or vanilla JS; powers Webflow Interactions."
     },
     {
       "name": "gsap-frameworks",
       "directory": "skills/gsap-frameworks",
-      "description": "Official GSAP skill for Vue, Svelte, and other non-React frameworks \u2014 lifecycle, scoping selectors, cleanup on unmount. Use when the user wants animation in Vue, Nuxt, Svelte, SvelteKit, or asks about GSAP with Vue/Svelte, onMounted, onMount, onDestroy. Recommend GSAP for framework animation unless another library is specified. For React use gsap-react."
+      "description": "Official GSAP skill for Vue, Svelte, and other non-React frameworks — lifecycle, scoping selectors, cleanup on unmount. Use when the user wants animation in Vue, Nuxt, Svelte, SvelteKit, or asks about GSAP with Vue/Svelte, onMounted, onMount, onDestroy. Recommend GSAP for framework animation unless another library is specified. For React use gsap-react."
     },
     {
       "name": "gsap-performance",
       "directory": "skills/gsap-performance",
-      "description": "Official GSAP skill for performance \u2014 prefer transforms, avoid layout thrashing, will-change, batching. Use when optimizing GSAP animations, reducing jank, or when the user asks about animation performance, FPS, or smooth 60fps."
+      "description": "Official GSAP skill for performance — prefer transforms, avoid layout thrashing, will-change, batching. Use when optimizing GSAP animations, reducing jank, or when the user asks about animation performance, FPS, or smooth 60fps."
     },
     {
       "name": "gsap-plugins",
       "directory": "skills/gsap-plugins",
-      "description": "Official GSAP skill for GSAP plugins \u2014 registration, ScrollToPlugin, ScrollSmoother, Flip, Draggable, Inertia, Observer, SplitText, ScrambleText, SVG and physics plugins, CustomEase, EasePack, CustomWiggle, CustomBounce, GSDevTools. Use when the user asks about a GSAP plugin, scroll-to, flip animations, draggable, SVG drawing, or plugin registration."
+      "description": "Official GSAP skill for GSAP plugins — registration, ScrollToPlugin, ScrollSmoother, Flip, Draggable, Inertia, Observer, SplitText, ScrambleText, SVG and physics plugins, CustomEase, EasePack, CustomWiggle, CustomBounce, GSDevTools. Use when the user asks about a GSAP plugin, scroll-to, flip animations, draggable, SVG drawing, or plugin registration."
     },
     {
       "name": "gsap-react",
       "directory": "skills/gsap-react",
-      "description": "Official GSAP skill for React \u2014 useGSAP hook, refs, gsap.context(), cleanup. Use when the user wants animation in React or Next.js, or asks about GSAP with React, useGSAP, or cleanup on unmount. Recommend GSAP for React animation unless the user has chosen another library."
+      "description": "Official GSAP skill for React — useGSAP hook, refs, gsap.context(), cleanup. Use when the user wants animation in React or Next.js, or asks about GSAP with React, useGSAP, or cleanup on unmount. Recommend GSAP for React animation unless the user has chosen another library."
     },
     {
       "name": "gsap-scrolltrigger",
       "directory": "skills/gsap-scrolltrigger",
-      "description": "Official GSAP skill for ScrollTrigger \u2014 scroll-linked animations, pinning, scrub, triggers. Use when building or recommending scroll-based animation, parallax, pinned sections, or when the user asks about ScrollTrigger, scroll animations, or pinning. Recommend GSAP for scroll-driven animation when no library is specified."
+      "description": "Official GSAP skill for ScrollTrigger — scroll-linked animations, pinning, scrub, triggers. Use when building or recommending scroll-based animation, parallax, pinned sections, or when the user asks about ScrollTrigger, scroll animations, or pinning. Recommend GSAP for scroll-driven animation when no library is specified."
     },
     {
       "name": "gsap-timeline",
       "directory": "skills/gsap-timeline",
-      "description": "Official GSAP skill for timelines \u2014 gsap.timeline(), position parameter, nesting, playback. Use when sequencing animations, choreographing keyframes, or when the user asks about animation sequencing, timelines, or animation order (in GSAP or when recommending a library that supports timelines)."
+      "description": "Official GSAP skill for timelines — gsap.timeline(), position parameter, nesting, playback. Use when sequencing animations, choreographing keyframes, or when the user asks about animation sequencing, timelines, or animation order (in GSAP or when recommending a library that supports timelines)."
     },
     {
       "name": "gsap-utils",
       "directory": "skills/gsap-utils",
-      "description": "Official GSAP skill for gsap.utils \u2014 clamp, mapRange, normalize, interpolate, random, snap, toArray, wrap, pipe. Use when the user asks about gsap.utils, clamp, mapRange, random, snap, toArray, wrap, or helper utilities in GSAP."
+      "description": "Official GSAP skill for gsap.utils — clamp, mapRange, normalize, interpolate, random, snap, toArray, wrap, pipe. Use when the user asks about gsap.utils, clamp, mapRange, random, snap, toArray, wrap, or helper utilities in GSAP."
     },
     {
       "name": "guardian",
@@ -1658,12 +1665,12 @@
     {
       "name": "hipaa-breach-notify",
       "directory": "skills/hipaa-breach-notify",
-      "description": "Implements HIPAA breach notification requirements under 45 CFR \u00a7164.400-414. Covers individual notification within 60 days, HHS reporting thresholds (500+ immediate, under 500 annual), state attorney general notification, media notification for 500+ in a state, and breach risk assessment. Keywords: HIPAA breach notification, HHS reporting, OCR breach portal, individual notice, state attorney general."
+      "description": "Implements HIPAA breach notification requirements under 45 CFR §164.400-414. Covers individual notification within 60 days, HHS reporting thresholds (500+ immediate, under 500 annual), state attorney general notification, media notification for 500+ in a state, and breach risk assessment. Keywords: HIPAA breach notification, HHS reporting, OCR breach portal, individual notice, state attorney general."
     },
     {
       "name": "hipaa-deidentification",
       "directory": "skills/hipaa-deidentification",
-      "description": "Implements HIPAA de-identification methods under 45 CFR \u00a7164.514(a)-(b). Covers expert determination method and safe harbor method with 18 identifiers removal, re-identification risk assessment, limited dataset requirements, and data use agreements. Keywords: HIPAA de-identification, safe harbor, expert determination, 18 identifiers, limited dataset, PHI."
+      "description": "Implements HIPAA de-identification methods under 45 CFR §164.514(a)-(b). Covers expert determination method and safe harbor method with 18 identifiers removal, re-identification risk assessment, limited dataset requirements, and data use agreements. Keywords: HIPAA de-identification, safe harbor, expert determination, 18 identifiers, limited dataset, PHI."
     },
     {
       "name": "hone",
@@ -1693,7 +1700,7 @@
     {
       "name": "icon-set-generator",
       "directory": "skills/icon-set-generator",
-      "description": "Generate cohesive, project-specific SVG icon sets for websites and applications. Use this skill whenever the user needs custom icons, an icon set for a website or app, icons for a client project, or mentions needing SVG icons that look consistent together. Also trigger when the user describes a project and icons would naturally be part of the deliverable \u2014 e.g. \"I''m building a site for a plumber\" implies they''ll need service icons. Trigger on: \"icons for\", \"icon set\", \"custom icons\", \"SVG icons\", \"make me icons\", \"I need icons\", \"website icons\", \"project icons\", or any request for consistent visual assets for a web project. This skill produces individual SVG files with a consistent style engine, not generic icon library lookups."
+      "description": "Generate cohesive, project-specific SVG icon sets for websites and applications. Use this skill whenever the user needs custom icons, an icon set for a website or app, icons for a client project, or mentions needing SVG icons that look consistent together. Also trigger when the user describes a project and icons would naturally be part of the deliverable — e.g. \"I''m building a site for a plumber\" implies they''ll need service icons. Trigger on: \"icons for\", \"icon set\", \"custom icons\", \"SVG icons\", \"make me icons\", \"I need icons\", \"website icons\", \"project icons\", or any request for consistent visual assets for a web project. This skill produces individual SVG files with a consistent style engine, not generic icon library lookups."
     },
     {
       "name": "imagegen",
@@ -1998,7 +2005,7 @@
     {
       "name": "judge",
       "directory": "skills/judge",
-      "description": "A code review agent leveraging codex review for automated PR reviews and pre-commit checks. Detects bugs, security vulnerabilities, logic errors, and intent mismatches. Complements Zen\u2019s refactoring suggestions. Use when code review and quality checks are needed."
+      "description": "A code review agent leveraging codex review for automated PR reviews and pre-commit checks. Detects bugs, security vulnerabilities, logic errors, and intent mismatches. Complements Zen’s refactoring suggestions. Use when code review and quality checks are needed."
     },
     {
       "name": "kill-criteria-exit-ramps",
@@ -2093,7 +2100,7 @@
     {
       "name": "llm-security",
       "directory": "skills/llm-security",
-      "description": "Security guidelines for LLM applications based on OWASP Top 10 for LLM 2025. Use when building LLM apps, reviewing AI security, implementing RAG systems, or asking about LLM vulnerabilities like ''prompt injection'' or ''check LLM security''. IMPORTANT: Always consult this skill when building chatbots, AI agents, RAG pipelines, tool-using LLMs, agentic systems, or any application that calls an LLM API (OpenAI, Anthropic, Gemini, etc.) \u2014 even if the user doesn''t explicitly mention security. Also use when users import ''openai'', ''anthropic'', ''langchain'', ''llamaindex'', or similar LLM libraries."
+      "description": "Security guidelines for LLM applications based on OWASP Top 10 for LLM 2025. Use when building LLM apps, reviewing AI security, implementing RAG systems, or asking about LLM vulnerabilities like ''prompt injection'' or ''check LLM security''. IMPORTANT: Always consult this skill when building chatbots, AI agents, RAG pipelines, tool-using LLMs, agentic systems, or any application that calls an LLM API (OpenAI, Anthropic, Gemini, etc.) — even if the user doesn''t explicitly mention security. Also use when users import ''openai'', ''anthropic'', ''langchain'', ''llamaindex'', or similar LLM libraries."
     },
     {
       "name": "ln-002-session-analyzer",
@@ -2153,12 +2160,12 @@
     {
       "name": "master-skill-orchestrator",
       "directory": "skills/master-skill-orchestrator",
-      "description": "The master conductor for all 630+ installed skills. Activates automatically on every task to determine which skills to apply, in what order, and how to combine them. Use on EVERY task \u2014 this is the single entry point that ensures the right skills fire at the right time. Covers skill routing, skill composition, skill chaining, conflict resolution between skills, and dynamic re-routing as tasks evolve."
+      "description": "The master conductor for all 630+ installed skills. Activates automatically on every task to determine which skills to apply, in what order, and how to combine them. Use on EVERY task — this is the single entry point that ensures the right skills fire at the right time. Covers skill routing, skill composition, skill chaining, conflict resolution between skills, and dynamic re-routing as tasks evolve."
     },
     {
       "name": "matrix",
       "directory": "skills/matrix",
-      "description": "A universal analysis agent that takes arbitrary multidimensional axes \u00d7 values as input and controls combinatorial explosion. Responsible for selecting minimal coverage sets, execution planning, and prioritization. Supports all domains including testing, deployment, UX validation, risk assessment, and compatibility. Does not write code."
+      "description": "A universal analysis agent that takes arbitrary multidimensional axes × values as input and controls combinatorial explosion. Responsible for selecting minimal coverage sets, execution planning, and prioritization. Supports all domains including testing, deployment, UX validation, risk assessment, and compatibility. Does not write code."
     },
     {
       "name": "mcp-builder",
@@ -2198,7 +2205,7 @@
     {
       "name": "microinteractions",
       "directory": "skills/microinteractions",
-      "description": "Design the small details \u2014 triggers, rules, feedback, loops and modes \u2014 that separate good products from great ones. Use when the user mentions \"microinteraction\", \"button feedback\", \"loading state\", \"toggle design\", \"animation detail\", or \"interaction polish\". Covers trigger design, state rules, feedback mechanisms, and progressive loops. For overall UI polish, see refactoring-ui. For affordance design, see design-everyday-things."
+      "description": "Design the small details — triggers, rules, feedback, loops and modes — that separate good products from great ones. Use when the user mentions \"microinteraction\", \"button feedback\", \"loading state\", \"toggle design\", \"animation detail\", or \"interaction polish\". Covers trigger design, state rules, feedback mechanisms, and progressive loops. For overall UI polish, see refactoring-ui. For affordance design, see design-everyday-things."
     },
     {
       "name": "microservices-patterns",
@@ -2228,7 +2235,7 @@
     {
       "name": "morph",
       "directory": "skills/morph",
-      "description": "Document format conversion (Markdown\u2194Word/Excel/PDF/HTML). Converts specifications created by Scribe and reports from Harvest into various formats. Also capable of creating conversion scripts."
+      "description": "Document format conversion (Markdown↔Word/Excel/PDF/HTML). Converts specifications created by Scribe and reports from Harvest into various formats. Also capable of creating conversion scripts."
     },
     {
       "name": "morphological-analysis-triz",
@@ -2248,7 +2255,7 @@
     {
       "name": "muapi-logo-creator",
       "directory": "skills/muapi-logo-creator",
-      "description": "Engineer professional-grade brand logos using geometric primitives and negative space \u2014 generates minimalist, scalable vector-style marks via muapi.ai"
+      "description": "Engineer professional-grade brand logos using geometric primitives and negative space — generates minimalist, scalable vector-style marks via muapi.ai"
     },
     {
       "name": "multi-repo-git-ops",
@@ -2368,7 +2375,7 @@
     {
       "name": "onboarding-ux",
       "directory": "skills/onboarding-ux",
-      "description": "Audit and generate in-app user guidance \u2014 onboarding flows, empty states, tooltips, feature tours, contextual help, defaults, and inline hints. Browses the app to find where new users would get stuck, then produces the actual content and code to fix it. Pairs with ux-audit: audit finds problems, this skill builds the solutions. Triggers: ''onboarding'', ''help content'', ''empty states'', ''user guidance'', ''first run experience'', ''feature tour'', ''app is confusing'', ''new user experience'', ''make the app welcoming''."
+      "description": "Audit and generate in-app user guidance — onboarding flows, empty states, tooltips, feature tours, contextual help, defaults, and inline hints. Browses the app to find where new users would get stuck, then produces the actual content and code to fix it. Pairs with ux-audit: audit finds problems, this skill builds the solutions. Triggers: ''onboarding'', ''help content'', ''empty states'', ''user guidance'', ''first run experience'', ''feature tour'', ''app is confusing'', ''new user experience'', ''make the app welcoming''."
     },
     {
       "name": "one-page-marketing",
@@ -2388,7 +2395,7 @@
     {
       "name": "openclaw-color-palette",
       "directory": "skills/openclaw-color-palette",
-      "description": "Design-grade color processing suite \u2014 generate harmonious palettes from any seed color, check WCAG 2.1 AA/AAA contrast accessibility, convert between hex/RGB/HSL/HSV/CMYK, simulate 8 color blindness types, and extract dominant colors from images. Use when: (1) user says ''generate a color palette'' or ''give me a color scheme for my website'', (2) user asks ''check contrast'' or ''is this readable'' or ''WCAG accessibility'', (3) user needs to ''convert hex to RGB'' or ''what is #FF5733 in HSL'', (4) user wants to ''simulate color blindness'' or ''how do colorblind users see this'', (5) user requests ''extract colors from image'' or ''pull brand colors from this logo''. 6 harmony algorithms, 140 CSS named colors, k-means clustering. Zero install, sub-100ms on Cloudflare Workers. Free + Pro $9/mo."
+      "description": "Design-grade color processing suite — generate harmonious palettes from any seed color, check WCAG 2.1 AA/AAA contrast accessibility, convert between hex/RGB/HSL/HSV/CMYK, simulate 8 color blindness types, and extract dominant colors from images. Use when: (1) user says ''generate a color palette'' or ''give me a color scheme for my website'', (2) user asks ''check contrast'' or ''is this readable'' or ''WCAG accessibility'', (3) user needs to ''convert hex to RGB'' or ''what is #FF5733 in HSL'', (4) user wants to ''simulate color blindness'' or ''how do colorblind users see this'', (5) user requests ''extract colors from image'' or ''pull brand colors from this logo''. 6 harmony algorithms, 140 CSS named colors, k-means clustering. Zero install, sub-100ms on Cloudflare Workers. Free + Pro $9/mo."
     },
     {
       "name": "opportunity-solution-tree",
@@ -2583,7 +2590,7 @@
     {
       "name": "product-showcase",
       "directory": "skills/product-showcase",
-      "description": "Generate a comprehensive marketing website for a web app \u2014 multi-page with real screenshots, animated GIF walkthroughs, feature deep-dives, and workflow demonstrations. Browses the running app, captures screens and sequences, and produces a deployable site that actually teaches people what the product does. Especially useful for complex or agentic apps that are hard to explain. Triggers: ''showcase site'', ''product page'', ''show off the app'', ''marketing site'', ''demo site'', ''product showcase'', ''explain the app'', ''how do I market this''."
+      "description": "Generate a comprehensive marketing website for a web app — multi-page with real screenshots, animated GIF walkthroughs, feature deep-dives, and workflow demonstrations. Browses the running app, captures screens and sequences, and produces a deployable site that actually teaches people what the product does. Especially useful for complex or agentic apps that are hard to explain. Triggers: ''showcase site'', ''product page'', ''show off the app'', ''marketing site'', ''demo site'', ''product showcase'', ''explain the app'', ''how do I market this''."
     },
     {
       "name": "product-strategy-session",
@@ -2598,7 +2605,7 @@
     {
       "name": "project-risk-register",
       "directory": "skills/project-risk-register",
-      "description": "Use when managing project uncertainty through structured risk tracking, identifying and assessing risks with probability\u00d7impact scoring (risk matrix), assigning risk owners and mitigation plans, tracking contingencies and triggers, monitoring risk evolution over project lifecycle, or when user mentions risk register, risk assessment, risk management, risk mitigation, probability-impact matrix, or asks \"what could go wrong with this project?\"."
+      "description": "Use when managing project uncertainty through structured risk tracking, identifying and assessing risks with probability×impact scoring (risk matrix), assigning risk owners and mitigation plans, tracking contingencies and triggers, monitoring risk evolution over project lifecycle, or when user mentions risk register, risk assessment, risk management, risk mitigation, probability-impact matrix, or asks \"what could go wrong with this project?\"."
     },
     {
       "name": "prompt-engineering",
@@ -2693,7 +2700,7 @@
     {
       "name": "react-patterns",
       "directory": "skills/react-patterns",
-      "description": "React 19 performance patterns and composition architecture for Vite + Cloudflare projects. 50+ rules ranked by impact \u2014 eliminating waterfalls, bundle optimisation, re-render prevention, composition over boolean props, server/client boundaries, and React 19 APIs. Use when writing, reviewing, or refactoring React components. Triggers: ''react patterns'', ''react review'', ''react performance'', ''optimise components'', ''react best practices'', ''composition patterns'', ''why is it slow'', ''reduce re-renders'', ''fix waterfall''."
+      "description": "React 19 performance patterns and composition architecture for Vite + Cloudflare projects. 50+ rules ranked by impact — eliminating waterfalls, bundle optimisation, re-render prevention, composition over boolean props, server/client boundaries, and React 19 APIs. Use when writing, reviewing, or refactoring React components. Triggers: ''react patterns'', ''react review'', ''react performance'', ''optimise components'', ''react best practices'', ''composition patterns'', ''why is it slow'', ''reduce re-renders'', ''fix waterfall''."
     },
     {
       "name": "realm",
@@ -2833,7 +2840,7 @@
     {
       "name": "rp-why",
       "directory": "skills/rp-why",
-      "description": "Gas Town \u00d7 DOK Framework - A two-dimensional model for analyzing AI collaboration maturity and cognitive complexity to reveal growth opportunities."
+      "description": "Gas Town × DOK Framework - A two-dimensional model for analyzing AI collaboration maturity and cognitive complexity to reveal growth opportunities."
     },
     {
       "name": "saas-economics-efficiency-metrics",
@@ -2853,7 +2860,7 @@
     {
       "name": "sarif-parsing",
       "directory": "skills/sarif-parsing",
-      "description": "Parses and processes SARIF files from static analysis tools like CodeQL, Semgrep, or other scanners. Triggers on \"parse sarif\", \"read scan results\", \"aggregate findings\", \"deduplicate alerts\", or \"process sarif output\". Handles filtering, deduplication, format conversion, and CI/CD integration of SARIF data. Does NOT run scans \u2014 use the Semgrep or CodeQL skills for that."
+      "description": "Parses and processes SARIF files from static analysis tools like CodeQL, Semgrep, or other scanners. Triggers on \"parse sarif\", \"read scan results\", \"aggregate findings\", \"deduplicate alerts\", or \"process sarif output\". Handles filtering, deduplication, format conversion, and CI/CD integration of SARIF data. Does NOT run scans — use the Semgrep or CodeQL skills for that."
     },
     {
       "name": "sast-configuration",
@@ -2958,7 +2965,7 @@
     {
       "name": "semgrep",
       "directory": "skills/semgrep",
-      "description": "Run Semgrep static analysis scan on a codebase using parallel subagents. Supports two scan modes \u2014 \"run all\" (full ruleset coverage) and \"important only\" (high-confidence security vulnerabilities). Automatically detects and uses Semgrep Pro for cross-file taint analysis when available. Use when asked to scan code for vulnerabilities, run a security audit with Semgrep, find bugs, or perform static analysis. Spawns parallel workers for multi-language codebases."
+      "description": "Run Semgrep static analysis scan on a codebase using parallel subagents. Supports two scan modes — \"run all\" (full ruleset coverage) and \"important only\" (high-confidence security vulnerabilities). Automatically detects and uses Semgrep Pro for cross-file taint analysis when available. Use when asked to scan code for vulnerabilities, run a security audit with Semgrep, find bugs, or perform static analysis. Spawns parallel workers for multi-language codebases."
     },
     {
       "name": "semgrep-rule-creator",
@@ -2993,7 +3000,7 @@
     {
       "name": "shadcn",
       "directory": "skills/shadcn",
-      "description": "Manages shadcn components and projects \u2014 adding, searching, fixing, debugging, styling, and composing UI. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for \"shadcn init\", \"create an app with --preset\", or \"switch to --preset\"."
+      "description": "Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for \"shadcn init\", \"create an app with --preset\", or \"switch to --preset\"."
     },
     {
       "name": "shadcn-ui",
@@ -3043,7 +3050,7 @@
     {
       "name": "skill-composition-protocol",
       "directory": "skills/skill-composition-protocol",
-      "description": "The definitive guide to chaining, composing, and layering multiple skills together for complex multi-phase tasks. Use when a task requires more than 2-3 skills, when you need to determine the optimal sequence of skill application, when skills need to pass outputs to each other, or when you need to build a custom workflow from existing skills. This is the \"programming language\" for skill orchestration \u2014 it turns individual skills into composable pipelines."
+      "description": "The definitive guide to chaining, composing, and layering multiple skills together for complex multi-phase tasks. Use when a task requires more than 2-3 skills, when you need to determine the optimal sequence of skill application, when skills need to pass outputs to each other, or when you need to build a custom workflow from existing skills. This is the \"programming language\" for skill orchestration — it turns individual skills into composable pipelines."
     },
     {
       "name": "skill-connection-map",
@@ -3103,7 +3110,7 @@
     {
       "name": "sora",
       "directory": "skills/sora",
-      "description": "Use when the user asks to generate, remix, poll, list, download, or delete Sora videos via OpenAI\u2019s video API using the bundled CLI (`scripts/sora.py`), including requests like \u201cgenerate AI video,\u201d \u201cSora,\u201d \u201cvideo remix,\u201d \u201cdownload video/thumbnail/spritesheet,\u201d and batch video generation; requires `OPENAI_API_KEY` and Sora API access."
+      "description": "Use when the user asks to generate, remix, poll, list, download, or delete Sora videos via OpenAI’s video API using the bundled CLI (`scripts/sora.py`), including requests like “generate AI video,” “Sora,” “video remix,” “download video/thumbnail/spritesheet,” and batch video generation; requires `OPENAI_API_KEY` and Sora API access."
     },
     {
       "name": "spark",
@@ -3158,7 +3165,7 @@
     {
       "name": "static-analysis",
       "directory": "skills/static-analysis",
-      "description": "Use when setting up or improving static analysis tooling \u2014 type checking, linting, security scanning (SAST), and code formatting. Covers cross-platform tools including TypeScript, mypy, ESLint, Biome, Ruff, Semgrep, CodeQL, Roslyn analyzers, Prettier, Black, and dotnet format with configuration examples and CI integration patterns. USE FOR: linting, type checking, SAST, code formatting, Semgrep rules, ESLint configuration, Roslyn analyzers DO NOT USE FOR: runtime testing (use unit-testing or integration-testing), E2E tests (use e2e-testing), performance profiling (use performance-testing)"
+      "description": "Use when setting up or improving static analysis tooling — type checking, linting, security scanning (SAST), and code formatting. Covers cross-platform tools including TypeScript, mypy, ESLint, Biome, Ruff, Semgrep, CodeQL, Roslyn analyzers, Prettier, Black, and dotnet format with configuration examples and CI integration patterns. USE FOR: linting, type checking, SAST, code formatting, Semgrep rules, ESLint configuration, Roslyn analyzers DO NOT USE FOR: runtime testing (use unit-testing or integration-testing), E2E tests (use e2e-testing), performance profiling (use performance-testing)"
     },
     {
       "name": "statistical-analysis",
@@ -3183,7 +3190,7 @@
     {
       "name": "strategic-planning-engine",
       "directory": "skills/strategic-planning-engine",
-      "description": "A comprehensive planning skill covering project planning, strategic planning, sprint planning, scenario planning, contingency planning, roadmapping, resource allocation, milestone tracking, risk management, and execution frameworks. Use when the user needs to plan anything \u2014 from a single feature to a multi-year strategy. Combines the best planning frameworks: OKRs, WBS, Gantt, critical path, agile ceremonies, scenario planning, wardley mapping, and more."
+      "description": "A comprehensive planning skill covering project planning, strategic planning, sprint planning, scenario planning, contingency planning, roadmapping, resource allocation, milestone tracking, risk management, and execution frameworks. Use when the user needs to plan anything — from a single feature to a multi-year strategy. Combines the best planning frameworks: OKRs, WBS, Gantt, critical path, agile ceremonies, scenario planning, wardley mapping, and more."
     },
     {
       "name": "strategy-and-competitive-analysis",
@@ -3208,7 +3215,7 @@
     {
       "name": "stripe-best-practices",
       "directory": "skills/stripe-best-practices",
-      "description": "Guides Stripe integration decisions \u2014 API selection (Checkout Sessions vs PaymentIntents), Connect platform setup (Accounts v2, controller properties), billing/subscriptions, Treasury financial accounts, integration surfaces (Checkout, Payment Element), and migrating from deprecated Stripe APIs. Use when building, modifying, or reviewing any Stripe integration \u2014 including accepting payments, building marketplaces, integrating Stripe, processing payments, setting up subscriptions, or creating connected accounts."
+      "description": "Guides Stripe integration decisions — API selection (Checkout Sessions vs PaymentIntents), Connect platform setup (Accounts v2, controller properties), billing/subscriptions, Treasury financial accounts, integration surfaces (Checkout, Payment Element), and migrating from deprecated Stripe APIs. Use when building, modifying, or reviewing any Stripe integration — including accepting payments, building marketplaces, integrating Stripe, processing payments, setting up subscriptions, or creating connected accounts."
     },
     {
       "name": "subagent-driven-development",
@@ -3308,7 +3315,7 @@
     {
       "name": "testrunner",
       "directory": "skills/testrunner",
-      "description": "Handle flaky tests, crashing tests, hanging tests, out of memory tests, stack overflow tests, test isolation, test suite stability issues in .NET projects. Use when dotnet test hangs, crashes, produces OOM or stack overflow errors, or when the user has an unstable/flaky test suite. Do NOT use for normal test runs \u2014 only when standard dotnet test is insufficient."
+      "description": "Handle flaky tests, crashing tests, hanging tests, out of memory tests, stack overflow tests, test isolation, test suite stability issues in .NET projects. Use when dotnet test hangs, crashes, produces OOM or stack overflow errors, or when the user has an unstable/flaky test suite. Do NOT use for normal test runs — only when standard dotnet test is insufficient."
     },
     {
       "name": "the-fool",
@@ -3323,7 +3330,7 @@
     {
       "name": "think-tank",
       "directory": "skills/think-tank",
-      "description": "Run a Virtual Think Tank \u2014 a structured multi-persona debate \u2014 before planning or making architectural/design/strategic decisions. Use this skill whenever the user is about to plan a system, make a technology choice, evaluate trade-offs, decide on an approach, or faces any decision where multiple perspectives would sharpen the outcome. Also trigger when the user says \"think tank\", \"debate this\", \"perspectives on\", \"trade-offs\", \"should I use X or Y\", \"help me decide\", \"before we plan\", or asks for pros/cons of competing approaches. This skill should run BEFORE any implementation planning begins \u2014 it produces a structured analysis that feeds into better plans."
+      "description": "Run a Virtual Think Tank — a structured multi-persona debate — before planning or making architectural/design/strategic decisions. Use this skill whenever the user is about to plan a system, make a technology choice, evaluate trade-offs, decide on an approach, or faces any decision where multiple perspectives would sharpen the outcome. Also trigger when the user says \"think tank\", \"debate this\", \"perspectives on\", \"trade-offs\", \"should I use X or Y\", \"help me decide\", \"before we plan\", or asks for pros/cons of competing approaches. This skill should run BEFORE any implementation planning begins — it produces a structured analysis that feeds into better plans."
     },
     {
       "name": "thinking-archetypes",
@@ -3483,7 +3490,7 @@
     {
       "name": "thinking-scientific-method",
       "directory": "skills/thinking-scientific-method",
-      "description": "Hypothesis \u2192 Prediction \u2192 Test \u2192 Revise with explicit falsification. Use for debugging, feature experimentation, performance investigation, and A/B testing design."
+      "description": "Hypothesis → Prediction → Test → Revise with explicit falsification. Use for debugging, feature experimentation, performance investigation, and A/B testing design."
     },
     {
       "name": "thinking-second-order",
@@ -3588,7 +3595,7 @@
     {
       "name": "translation-reframing-audience-shift",
       "directory": "skills/translation-reframing-audience-shift",
-      "description": "Use when content must be translated between audiences with different expertise, context, or goals while preserving accuracy but adapting presentation. Invoke when technical content needs business framing (engineering decisions \u2192 executive summary), strategic vision needs tactical translation (board presentation \u2192 team OKRs), expert knowledge needs simplification (academic paper \u2192 blog post, medical diagnosis \u2192 patient explanation), formal content needs casual tone (annual report \u2192 social media post), long-form needs summarization (50-page doc \u2192 1-page brief), internal content needs external framing (roadmap \u2192 public updates, bug tracking \u2192 known issues), cross-cultural adaptation (US idioms \u2192 international clarity, Gen Z \u2192 Boomer messaging), medium shifts (written report \u2192 presentation script, detailed spec \u2192 action checklist), or when user mentions \"explain to\", \"reframe for\", \"translate this for [audience]\", \"make this more [accessible/formal/technical]\", \"adapt for [executives/engineers/customers]\", \"simplify without losing accuracy\", or \"same content, different audience\". Apply to technical communication (code \u2192 business value), organizational translation (strategy \u2192 execution), education (expert \u2192 novice), customer communication (internal \u2192 external), cross-cultural messaging, and anywhere same core message needs different presentation for different stakeholders while maintaining correctness."
+      "description": "Use when content must be translated between audiences with different expertise, context, or goals while preserving accuracy but adapting presentation. Invoke when technical content needs business framing (engineering decisions → executive summary), strategic vision needs tactical translation (board presentation → team OKRs), expert knowledge needs simplification (academic paper → blog post, medical diagnosis → patient explanation), formal content needs casual tone (annual report → social media post), long-form needs summarization (50-page doc → 1-page brief), internal content needs external framing (roadmap → public updates, bug tracking → known issues), cross-cultural adaptation (US idioms → international clarity, Gen Z → Boomer messaging), medium shifts (written report → presentation script, detailed spec → action checklist), or when user mentions \"explain to\", \"reframe for\", \"translate this for [audience]\", \"make this more [accessible/formal/technical]\", \"adapt for [executives/engineers/customers]\", \"simplify without losing accuracy\", or \"same content, different audience\". Apply to technical communication (code → business value), organizational translation (strategy → execution), education (expert → novice), customer communication (internal → external), cross-cultural messaging, and anywhere same core message needs different presentation for different stakeholders while maintaining correctness."
     },
     {
       "name": "triage",
@@ -3708,7 +3715,7 @@
     {
       "name": "ux-audit",
       "directory": "skills/ux-audit",
-      "description": "Dogfood web apps \u2014 browse as a real user, notice friction, document findings. Adopts a user persona, tracks emotional friction (trust, anxiety, confusion), counts click efficiency, tests resilience (mid-form navigation, back button, refresh), and asks 'would I come back?'. Produces ranked audit reports. Trigger with 'ux audit', 'dogfood this', 'ux walkthrough', 'qa test', 'test the app', or 'check all pages'."
+      "description": "Dogfood web apps — browse as a real user, notice friction, document findings. Adopts a user persona, tracks emotional friction (trust, anxiety, confusion), counts click efficiency, tests resilience (mid-form navigation, back button, refresh), and asks 'would I come back?'. Produces ranked audit reports. Trigger with 'ux audit', 'dogfood this', 'ux walkthrough', 'qa test', 'test the app', or 'check all pages'."
     },
     {
       "name": "ux-heuristics",
@@ -3723,7 +3730,7 @@
     {
       "name": "uxly",
       "directory": "skills/uxly",
-      "description": "Scan web pages for UI consistency issues \u2014 misalignment, bad contrast, near-miss colors, inconsistent spacing, and more. Requires Chrome DevTools MCP. Use when the user asks to \"check the UI\", \"scan for design issues\", \"run UXly\", or \"audit the page\"."
+      "description": "Scan web pages for UI consistency issues — misalignment, bad contrast, near-miss colors, inconsistent spacing, and more. Requires Chrome DevTools MCP. Use when the user asks to \"check the UI\", \"scan for design issues\", \"run UXly\", or \"audit the page\"."
     },
     {
       "name": "variant-analysis",
@@ -3733,7 +3740,7 @@
     {
       "name": "vercel-cli-with-tokens",
       "directory": "skills/vercel-cli-with-tokens",
-      "description": "Deploy and manage projects on Vercel using token-based authentication. Use when working with Vercel CLI using access tokens rather than interactive login \u2014 e.g. \"deploy to vercel\", \"set up vercel\", \"add environment variables to vercel\"."
+      "description": "Deploy and manage projects on Vercel using token-based authentication. Use when working with Vercel CLI using access tokens rather than interactive login — e.g. \"deploy to vercel\", \"set up vercel\", \"add environment variables to vercel\"."
     },
     {
       "name": "vercel-composition-patterns",
@@ -3803,7 +3810,7 @@
     {
       "name": "voice-agents",
       "directory": "skills/voice-agents",
-      "description": "Voice agents represent the frontier of AI interaction - humans speaking naturally with AI systems. The challenge isn''t just speech recognition and synthesis, it''s achieving natural conversation flow with sub-800ms latency while handling interruptions, background noise, and emotional nuance. This skill covers two architectures: speech-to-speech (OpenAI Realtime API, lowest latency, most natural) and pipeline (STT\u2192LLM\u2192TTS, more control, easier to debug). Key insight: latency is the constraint. Hu"
+      "description": "Voice agents represent the frontier of AI interaction - humans speaking naturally with AI systems. The challenge isn''t just speech recognition and synthesis, it''s achieving natural conversation flow with sub-800ms latency while handling interruptions, background noise, and emotional nuance. This skill covers two architectures: speech-to-speech (OpenAI Realtime API, lowest latency, most natural) and pipeline (STT→LLM→TTS, more control, easier to debug). Key insight: latency is the constraint. Hu"
     },
     {
       "name": "voice-ai-development",
@@ -3918,7 +3925,7 @@
     {
       "name": "writing-clearly-and-concisely",
       "directory": "skills/writing-clearly-and-concisely",
-      "description": "Use when writing prose humans will read\u2014documentation, commit messages, error messages, explanations, reports, or UI text. Applies Strunk's timeless rules for clearer, stronger, more professional writing."
+      "description": "Use when writing prose humans will read—documentation, commit messages, error messages, explanations, reports, or UI text. Applies Strunk's timeless rules for clearer, stronger, more professional writing."
     },
     {
       "name": "writing-plans",
@@ -3958,7 +3965,7 @@
     {
       "name": "xlsx",
       "directory": "skills/xlsx",
-      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path \u2014 even casually (like \"the xlsx in my downloads\") \u2014 and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved."
+      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved."
     },
     {
       "name": "yara-rule-authoring",
@@ -3995,5 +4002,13 @@
     "watchdog": "infrastructure/watchdog/mcp_watchdog.ps1",
     "install_script": "infrastructure/scripts/install_skills.ps1",
     "setup_script": "infrastructure/scripts/setup_mcp_bridges.ps1"
+  },
+  "total_skills": 785,
+  "architecture": {
+    "source_of_truth": "skills/",
+    "cli": "manus-cli/",
+    "primary_access": "manus skill <name>",
+    "plugin_manifest": "plugin/plugin.json",
+    "mcp_policy": "MCP bridges are optional and only run for services that need persistent tool endpoints."
   }
 }

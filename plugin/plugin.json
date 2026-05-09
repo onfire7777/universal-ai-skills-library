@@ -1,0 +1,37 @@
+{
+  "name": "manus",
+  "version": "2.0.0",
+  "description": "Universal CLI-first skill router and AI stack manager. Use one CLI to load 785 skills on demand, run audits, generate CLIs, and manage optional MCP bridges.",
+  "author": {
+    "name": "onfire7777",
+    "url": "https://github.com/onfire7777"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/onfire7777/manus-skills-library",
+  "repository": "https://github.com/onfire7777/manus-skills-library",
+  "keywords": [
+    "skills",
+    "router",
+    "mcp",
+    "audit",
+    "oracle",
+    "infrastructure",
+    "cli",
+    "universal",
+    "context-efficient"
+  ],
+  "commands": [],
+  "mcpServers": {},
+  "interface": {
+    "displayName": "Manus",
+    "shortDescription": "CLI-first universal skill router",
+    "longDescription": "Use `manus skill <name>` to load exactly one skill when needed. Skills stay in the repository under skills/ instead of being injected into always-loaded agent context.",
+    "developerName": "onfire7777",
+    "category": "skills",
+    "capabilities": [
+      "cli",
+      "skills",
+      "mcp-management"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # Universal AI Skills Library Installer
-# Installs 14 core skills + 770 library skills into the target skills directory
+# Installs the unified 785-skill library into the target skills directory
 #
 # Usage:
 #   From cloned repo:  bash install.sh [--target /path/to/skills]
@@ -25,7 +25,7 @@ done
 
 echo "============================================================"
 echo "  Universal AI Skills Library Installer"
-echo "  14 Core Skills + 770 Library Skills"
+echo "  785 Unified Skills"
 echo "============================================================"
 echo ""
 echo "  Target directory: $TARGET_DIR"
@@ -33,44 +33,17 @@ echo ""
 
 mkdir -p "$TARGET_DIR"
 
-CORE_SKILLS=(
-    chat-summarizer
-    context-anchor
-    file-organizer
-    manus-api
-    model-selector
-    multi-model-code-auditor
-    multi-model-oracle
-    music-prompter
-    persistent-computing
-    prompt-engineer
-    skill-creator
-    skill-debugger
-    skill-sync
-    ultimate-skill-creator
-)
-
-echo "[1/4] Installing 14 core skills..."
-CORE_COUNT=0
-for skill in "${CORE_SKILLS[@]}"; do
-    if [ -d "$SCRIPT_DIR/$skill" ]; then
-        cp -r "$SCRIPT_DIR/$skill" "$TARGET_DIR/"
-        CORE_COUNT=$((CORE_COUNT + 1))
-    fi
-done
-echo "      Done: $CORE_COUNT core skills installed"
-
-echo "[2/4] Installing 770 library skills..."
+echo "[1/3] Installing unified skills..."
 if [ -d "$SCRIPT_DIR/skills" ]; then
     cp -r "$SCRIPT_DIR/skills/"* "$TARGET_DIR/"
-    LIB_COUNT=$(find "$SCRIPT_DIR/skills" -maxdepth 1 -mindepth 1 -type d | wc -l)
-    echo "      Done: $LIB_COUNT library skills installed"
+    SKILL_COUNT=$(find "$SCRIPT_DIR/skills" -maxdepth 1 -mindepth 1 -type d | wc -l)
+    echo "      Done: $SKILL_COUNT skills installed"
 else
     echo "      ERROR: skills/ directory not found. Run from repo root."
     exit 1
 fi
 
-echo "[3/4] Verifying installation..."
+echo "[2/3] Verifying installation..."
 TOTAL=$(find "$TARGET_DIR" -maxdepth 2 -name "SKILL.md" -type f | wc -l)
 EMPTY=$(find "$TARGET_DIR" -maxdepth 2 -name "SKILL.md" -empty | wc -l)
 
@@ -87,8 +60,10 @@ if [ "$EMPTY" -gt 0 ]; then
     echo ""
 fi
 
-echo "[4/4] Post-install notes:"
+echo "[3/3] Post-install notes:"
 echo "  - Skills are now active in: $TARGET_DIR"
+echo "  - Use CLI-first loading: manus skill <name>"
+echo "  - Keep agent instruction files as indexes, not full skill bodies"
 echo "  - For Windows cross-platform install: infrastructure/scripts/install_skills.ps1"
 echo "  - For MCP bridge setup: infrastructure/scripts/setup_mcp_bridges.ps1"
 echo ""
