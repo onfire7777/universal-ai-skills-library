@@ -34,30 +34,31 @@ import (
 	"github.com/onfire7777/manus-cli/cmd/web"
 )
 
-const Version = "1.0.0"
+const Version = "2.0.0"
 
 var rootCmd = &cobra.Command{
 	Use:   "manus",
 	Short: "Unified AI Skills & Infrastructure CLI",
-	Long: `manus — The complete unified CLI for managing AI skills, MCP bridges,
+	Long: `manus - The complete unified CLI for managing AI skills, MCP bridges,
 multi-model auditing, oracle queries, file organization, model selection,
 Manus API integration, CLI generation, database management, email,
 Hugging Face, Google Workspace, automation, and more.
 
-Consolidates 14 core skills, 770+ library skills, 4 MCP bridges,
+Consolidates 785 repo skills, 4 optional MCP bridges,
 6 MCP connectors (Supabase, HuggingFace, Make, Gmail, SkillSeekers, MemPalace),
 multi-model code auditor, multi-model oracle, file organizer,
 model selector, music prompter, chat summarizer, skill debugger,
 context anchoring, internet skill finder, GitHub gem seeker,
 SimilarWeb analytics, persistent computing, CLI Printing Press,
-and Manus API v2 into one unified tool.`,
+and Manus API v2 into one context-efficient tool.`,
 	Version: Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		bold := color.New(color.Bold, color.FgCyan)
-		bold.Println("manus — Unified AI Skills & Infrastructure CLI v" + Version)
+		bold.Println("manus - Unified AI Skills & Infrastructure CLI v" + Version)
 		fmt.Println()
 		fmt.Println("Core Commands:")
-		fmt.Println("  skills      Manage 784+ AI skills (install, list, validate, search)")
+		fmt.Println("  skill       Load one skill on demand: manus skill <name>")
+		fmt.Println("  skills      Manage 785 AI skills (install, list, validate, search)")
 		fmt.Println("  mcp         Control MCP bridge infrastructure (start, stop, status, logs)")
 		fmt.Println("  audit       Run multi-model security/code audits (6 frontier models)")
 		fmt.Println("  oracle      Query multiple AI models and get merged answers")

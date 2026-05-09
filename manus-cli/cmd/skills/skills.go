@@ -3,8 +3,10 @@ package skills
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/fatih/color"
@@ -14,35 +16,58 @@ import (
 	"github.com/onfire7777/manus-cli/internal/runner"
 )
 
-// Cmd is the top-level skills command group.
+type manifestSkill struct {
+	Name        string `json:"name"`
+	Directory   string `json:"directory"`
+	Description string `json:"description"`
+}
+
+type skillManifest struct {
+	CoreSkills    []manifestSkill `json:"core_skills"`
+	LibrarySkills []manifestSkill `json:"library_skills"`
+}
+
+// Cmd is the top-level skills command group. It also backs the singular
+// "skill" alias so agents can use `manus skill <name>` as the context-light path.
 var Cmd = &cobra.Command{
-	Use:   "skills",
-	Short: "Manage 784+ AI skills (install, sync, create, validate, debug, search)",
-	Long: `Manage the complete AI skills library — 14 core skills with scripts,
-770+ library skills, universal installation across 8 agent platforms,
-creation, debugging, validation, and synchronization.`,
+	Use:     "skills [skill-name]",
+	Aliases: []string{"skill"},
+	Short:   "Load and manage 785 AI skills on demand",
+	Long: `Load and manage the unified skills library.
+
+The source of truth is repo-local skills/. Agents should call:
+  manus skill <name>
+
+That prints only the requested SKILL.md instead of injecting the full library
+into always-loaded context.`,
+	Args: cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) == 0 {
+			return cmd.Help()
+		}
+		return printSkill(args[0])
+	},
+}
+
+var readCmd = &cobra.Command{
+	Use:     "read <skill-name>",
+	Aliases: []string{"load", "show"},
+	Short:   "Print one SKILL.md by name",
+	Args:    cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return printSkill(args[0])
+	},
 }
 
 var installCmd = &cobra.Command{
 	Use:   "install [--target DIR]",
-	Short: "Install all skills to target directory and propagate to all agent roots",
+	Short: "Install all repo skills to a target skills directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		target, _ := cmd.Flags().GetString("target")
 		if target == "" {
 			target = platform.SkillsDir()
 		}
-		fmt.Printf("Installing skills to %s...\n", target)
-		repoDir := platform.RepoDir()
-		installScript := filepath.Join(repoDir, "install.sh")
-		if _, err := os.Stat(installScript); err == nil {
-			return runner.RunCommand("bash", installScript, "--target", target)
-		}
-		// Windows fallback
-		psScript := filepath.Join(repoDir, "infrastructure", "scripts", "install_skills.ps1")
-		if _, err := os.Stat(psScript); err == nil {
-			return runner.RunPowerShell(psScript, "-Target", target)
-		}
-		return fmt.Errorf("install script not found in %s", repoDir)
+		return installAllSkills(target)
 	},
 }
 
@@ -50,24 +75,16 @@ var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Sync skills from GitHub repo and propagate to all agent roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		scriptPath := filepath.Join(platform.SkillsDir(), "skill-sync", "scripts", "sync_skills.py")
-		if _, err := os.Stat(scriptPath); err != nil {
-			scriptPath = filepath.Join(platform.RepoDir(), "skill-sync", "scripts", "sync_skills.py")
-		}
-		return runner.RunPython(scriptPath)
+		return runner.RunPython(skillScriptPath("skill-sync", "scripts", "sync_skills.py"))
 	},
 }
 
 var createCmd = &cobra.Command{
 	Use:   "create <name>",
-	Short: "Create a new skill using the 6-step skill-creator pipeline",
+	Short: "Create a new skill using the skill-creator pipeline",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		scriptPath := filepath.Join(platform.SkillsDir(), "skill-creator", "scripts", "init_skill.py")
-		if _, err := os.Stat(scriptPath); err != nil {
-			scriptPath = filepath.Join(platform.RepoDir(), "skill-creator", "scripts", "init_skill.py")
-		}
-		return runner.RunPython(scriptPath, args[0])
+		return runner.RunPython(skillScriptPath("skill-creator", "scripts", "init_skill.py"), args[0])
 	},
 }
 
@@ -76,47 +93,29 @@ var validateCmd = &cobra.Command{
 	Short: "Validate a skill's structure and SKILL.md",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		scriptPath := filepath.Join(platform.SkillsDir(), "skill-creator", "scripts", "quick_validate.py")
-		if _, err := os.Stat(scriptPath); err != nil {
-			scriptPath = filepath.Join(platform.RepoDir(), "skill-creator", "scripts", "quick_validate.py")
-		}
-		return runner.RunPython(scriptPath, args[0])
+		return runner.RunPython(skillScriptPath("skill-creator", "scripts", "quick_validate.py"), args[0])
 	},
 }
 
 var debugCmd = &cobra.Command{
 	Use:   "debug <skill-dir>",
-	Short: "Deep dual-model debugging of a skill (Claude Opus + GPT-4.1-mini)",
+	Short: "Run deep dual-model debugging for one skill",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		scriptPath := filepath.Join(platform.SkillsDir(), "skill-debugger", "scripts", "debug_skill.py")
-		if _, err := os.Stat(scriptPath); err != nil {
-			scriptPath = filepath.Join(platform.RepoDir(), "skill-debugger", "scripts", "debug_skill.py")
-		}
-		return runner.RunPython(scriptPath, args[0])
+		return runner.RunPython(skillScriptPath("skill-debugger", "scripts", "debug_skill.py"), args[0])
 	},
 }
 
 var listCmd = &cobra.Command{
 	Use:   "list [--core | --library | --all]",
-	Short: "List installed skills",
+	Short: "List skills from manifest.json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		coreOnly, _ := cmd.Flags().GetBool("core")
 		libraryOnly, _ := cmd.Flags().GetBool("library")
 
-		manifestPath := filepath.Join(platform.RepoDir(), "manifest.json")
-		data, err := os.ReadFile(manifestPath)
+		manifest, err := loadManifest()
 		if err != nil {
-			// Fallback: scan skills directory
-			return listFromDirectory(platform.SkillsDir(), coreOnly, libraryOnly)
-		}
-
-		var manifest struct {
-			CoreSkills    []struct{ Name, Description string } `json:"core_skills"`
-			LibrarySkills []struct{ Name, Description string } `json:"library_skills"`
-		}
-		if err := json.Unmarshal(data, &manifest); err != nil {
-			return listFromDirectory(platform.SkillsDir(), coreOnly, libraryOnly)
+			return listFromDirectory(repoSkillsDir())
 		}
 
 		bold := color.New(color.Bold)
@@ -132,8 +131,7 @@ var listCmd = &cobra.Command{
 				fmt.Printf("  %-35s %s\n", s.Name, truncate(s.Description, 55))
 			}
 		}
-		total := len(manifest.CoreSkills) + len(manifest.LibrarySkills)
-		fmt.Printf("\nTotal: %d skills\n", total)
+		fmt.Printf("\nTotal: %d skills\n", len(manifest.CoreSkills)+len(manifest.LibrarySkills))
 		return nil
 	},
 }
@@ -144,29 +142,22 @@ var searchCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.ToLower(strings.Join(args, " "))
-		manifestPath := filepath.Join(platform.RepoDir(), "manifest.json")
-		data, err := os.ReadFile(manifestPath)
+		manifest, err := loadManifest()
 		if err != nil {
-			return fmt.Errorf("manifest not found: %w", err)
+			return err
 		}
-
-		var manifest struct {
-			CoreSkills    []struct{ Name, Description string } `json:"core_skills"`
-			LibrarySkills []struct{ Name, Description string } `json:"library_skills"`
-		}
-		json.Unmarshal(data, &manifest)
 
 		bold := color.New(color.Bold)
 		var matches int
 		bold.Println("Search results:")
 		for _, s := range manifest.CoreSkills {
-			if strings.Contains(strings.ToLower(s.Name), query) || strings.Contains(strings.ToLower(s.Description), query) {
+			if matchesSkill(s, query) {
 				fmt.Printf("  [CORE] %-30s %s\n", s.Name, truncate(s.Description, 50))
 				matches++
 			}
 		}
 		for _, s := range manifest.LibrarySkills {
-			if strings.Contains(strings.ToLower(s.Name), query) || strings.Contains(strings.ToLower(s.Description), query) {
+			if matchesSkill(s, query) {
 				fmt.Printf("  [LIB]  %-30s %s\n", s.Name, truncate(s.Description, 50))
 				matches++
 			}
@@ -178,25 +169,23 @@ var searchCmd = &cobra.Command{
 
 var propagateCmd = &cobra.Command{
 	Use:   "propagate",
-	Short: "Propagate all skills to all 8 agent platform roots",
+	Short: "Copy repo skills to all configured agent skill roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		src := platform.SkillsDir()
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		src := repoSkillsDir()
 		roots := platform.AgentRoots()
 		bold := color.New(color.Bold)
-		bold.Println("Propagating skills to all agent roots...")
+		bold.Println("Propagating repo skills to agent roots...")
 		for _, root := range roots {
-			os.MkdirAll(root, 0755)
-			entries, _ := os.ReadDir(src)
-			count := 0
-			for _, e := range entries {
-				if e.IsDir() {
-					srcPath := filepath.Join(src, e.Name())
-					dstPath := filepath.Join(root, e.Name())
-					runner.RunCommand("cp", "-r", srcPath, dstPath)
-					count++
-				}
+			count, err := copySkills(src, root, dryRun)
+			if err != nil {
+				return err
 			}
-			fmt.Printf("  %s — %d skills\n", root, count)
+			if dryRun {
+				fmt.Printf("  %s - would copy %d skills\n", root, count)
+			} else {
+				fmt.Printf("  %s - copied %d skills\n", root, count)
+			}
 		}
 		return nil
 	},
@@ -204,40 +193,29 @@ var propagateCmd = &cobra.Command{
 
 var ultimateCmd = &cobra.Command{
 	Use:   "ultimate <name>",
-	Short: "Run the full 6-stage ultimate skill creation pipeline",
-	Long: `Execute the comprehensive six-stage pipeline:
-  1. skill-creator — Full creation process
-  2. prompt-engineer — Deep SKILL.md optimization
-  3. master-skill-orchestrator — Domain analysis triage
-  4. skill-connection-map — Connection discovery
-  5. skill-debugger — Dual-model debug cycle
-  6. skill-sync — Push to GitHub + install`,
+	Short: "Run the full ultimate skill creation preflight",
+	Long: `Run the comprehensive skill creation preflight.
+
+The interactive design stages still belong inside an AI session; this command
+keeps the CLI side focused on local validation and available tooling.`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		preflight := filepath.Join(platform.SkillsDir(), "ultimate-skill-creator", "scripts", "preflight_check.py")
-		if _, err := os.Stat(preflight); err != nil {
-			preflight = filepath.Join(platform.RepoDir(), "ultimate-skill-creator", "scripts", "preflight_check.py")
-		}
-		fmt.Println("Running pre-flight check...")
+		preflight := skillScriptPath("ultimate-skill-creator", "scripts", "preflight_check.py")
+		fmt.Println("Running preflight check...")
 		if err := runner.RunPython(preflight); err != nil {
-			return fmt.Errorf("pre-flight check failed: %w", err)
+			return fmt.Errorf("preflight check failed: %w", err)
 		}
-		fmt.Println("Pre-flight passed. Starting 6-stage pipeline for:", args[0])
-		fmt.Println("(Pipeline requires interactive AI agent — use within Claude Code or Manus)")
+		fmt.Println("Preflight passed. Start AI-assisted pipeline for:", args[0])
 		return nil
 	},
 }
 
 var promptCmd = &cobra.Command{
 	Use:   "prompt <text>",
-	Short: "Optimize a prompt using multi-model prompt engineering",
+	Short: "Optimize a prompt using prompt-engineer",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		scriptPath := filepath.Join(platform.SkillsDir(), "prompt-engineer", "scripts", "optimize_prompt.py")
-		if _, err := os.Stat(scriptPath); err != nil {
-			scriptPath = filepath.Join(platform.RepoDir(), "prompt-engineer", "scripts", "optimize_prompt.py")
-		}
-		return runner.RunPython(scriptPath, strings.Join(args, " "))
+		return runner.RunPython(skillScriptPath("prompt-engineer", "scripts", "optimize_prompt.py"), strings.Join(args, " "))
 	},
 }
 
@@ -246,11 +224,7 @@ var anchorCmd = &cobra.Command{
 	Short: "Set a persistent context anchor for the session",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		scriptPath := filepath.Join(platform.SkillsDir(), "context-anchor", "scripts", "anchor.py")
-		if _, err := os.Stat(scriptPath); err != nil {
-			scriptPath = filepath.Join(platform.RepoDir(), "context-anchor", "scripts", "anchor.py")
-		}
-		return runner.RunPython(scriptPath, strings.Join(args, " "))
+		return runner.RunPython(skillScriptPath("context-anchor", "scripts", "anchor.py"), strings.Join(args, " "))
 	},
 }
 
@@ -259,15 +233,11 @@ var summarizeCmd = &cobra.Command{
 	Short: "Generate a comprehensive chat session summary",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		output, _ := cmd.Flags().GetString("output")
-		scriptPath := filepath.Join(platform.SkillsDir(), "chat-summarizer", "scripts", "format_summary.py")
-		if _, err := os.Stat(scriptPath); err != nil {
-			scriptPath = filepath.Join(platform.RepoDir(), "chat-summarizer", "scripts", "format_summary.py")
-		}
 		pyArgs := []string{}
 		if output != "" {
 			pyArgs = append(pyArgs, "--output", output)
 		}
-		return runner.RunPython(scriptPath, pyArgs...)
+		return runner.RunPython(skillScriptPath("chat-summarizer", "scripts", "format_summary.py"), pyArgs...)
 	},
 }
 
@@ -276,8 +246,10 @@ func init() {
 	listCmd.Flags().Bool("core", false, "Show only core skills")
 	listCmd.Flags().Bool("library", false, "Show only library skills")
 	listCmd.Flags().Bool("all", true, "Show all skills (default)")
+	propagateCmd.Flags().Bool("dry-run", false, "Show target roots without copying")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
 
+	Cmd.AddCommand(readCmd)
 	Cmd.AddCommand(installCmd)
 	Cmd.AddCommand(syncCmd)
 	Cmd.AddCommand(createCmd)
@@ -292,6 +264,197 @@ func init() {
 	Cmd.AddCommand(summarizeCmd)
 }
 
+func printSkill(name string) error {
+	skillPath, err := findSkillMarkdown(name)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Reading: %s\n", name)
+	fmt.Printf("Base directory: %s\n\n", filepath.Dir(skillPath))
+	data, err := os.ReadFile(skillPath)
+	if err != nil {
+		return err
+	}
+	fmt.Print(string(data))
+	if len(data) > 0 && data[len(data)-1] != '\n' {
+		fmt.Println()
+	}
+	return nil
+}
+
+func findSkillMarkdown(name string) (string, error) {
+	key := strings.ToLower(strings.TrimSpace(name))
+	if key == "" {
+		return "", fmt.Errorf("skill name is required")
+	}
+	if manifest, err := loadManifest(); err == nil {
+		for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
+			if strings.ToLower(s.Name) == key {
+				return skillMarkdownFromDirectory(s.Directory)
+			}
+		}
+	}
+
+	candidates := []string{
+		filepath.Join(repoSkillsDir(), name, "SKILL.md"),
+		filepath.Join(platform.SkillsDir(), name, "SKILL.md"),
+		filepath.Join(platform.RepoDir(), name, "SKILL.md"),
+	}
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("skill %q not found; try `manus skill search %s`", name, name)
+}
+
+func skillMarkdownFromDirectory(directory string) (string, error) {
+	clean := filepath.Clean(directory)
+	if strings.HasPrefix(clean, "..") || filepath.IsAbs(clean) {
+		return "", fmt.Errorf("unsafe skill directory in manifest: %s", directory)
+	}
+	repo := platform.RepoDir()
+	candidates := []string{filepath.Join(repo, clean, "SKILL.md")}
+	if !strings.HasPrefix(clean, "skills"+string(os.PathSeparator)) && clean != "skills" {
+		candidates = append([]string{filepath.Join(repoSkillsDir(), clean, "SKILL.md")}, candidates...)
+	}
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("skill markdown not found for manifest directory %s", directory)
+}
+
+func installAllSkills(target string) error {
+	count, err := copySkills(repoSkillsDir(), target, false)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Installed %d skills to %s\n", count, target)
+	return nil
+}
+
+func copySkills(srcRoot, dstRoot string, dryRun bool) (int, error) {
+	entries, err := os.ReadDir(srcRoot)
+	if err != nil {
+		return 0, fmt.Errorf("cannot read skills directory %s: %w", srcRoot, err)
+	}
+	if !dryRun {
+		if err := os.MkdirAll(dstRoot, 0755); err != nil {
+			return 0, err
+		}
+	}
+	count := 0
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		src := filepath.Join(srcRoot, entry.Name())
+		if _, err := os.Stat(filepath.Join(src, "SKILL.md")); err != nil {
+			continue
+		}
+		count++
+		if dryRun {
+			continue
+		}
+		if err := copyDir(src, filepath.Join(dstRoot, entry.Name())); err != nil {
+			return count, err
+		}
+	}
+	return count, nil
+}
+
+func copyDir(src, dst string) error {
+	info, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("source is not a directory: %s", src)
+	}
+	if err := os.MkdirAll(dst, info.Mode()); err != nil {
+		return err
+	}
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+		if entry.IsDir() {
+			if err := copyDir(srcPath, dstPath); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := copyFile(srcPath, dstPath); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	info, err := in.Stat()
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
+		return err
+	}
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, info.Mode())
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return err
+}
+
+func loadManifest() (skillManifest, error) {
+	data, err := os.ReadFile(filepath.Join(platform.RepoDir(), "manifest.json"))
+	if err != nil {
+		return skillManifest{}, fmt.Errorf("manifest not found: %w", err)
+	}
+	var manifest skillManifest
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		return skillManifest{}, err
+	}
+	return manifest, nil
+}
+
+func repoSkillsDir() string {
+	return filepath.Join(platform.RepoDir(), "skills")
+}
+
+func skillScriptPath(skill string, elems ...string) string {
+	parts := append([]string{skill}, elems...)
+	candidates := []string{
+		filepath.Join(append([]string{platform.SkillsDir()}, parts...)...),
+		filepath.Join(append([]string{repoSkillsDir()}, parts...)...),
+		filepath.Join(append([]string{platform.RepoDir()}, parts...)...),
+	}
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+	}
+	return candidates[0]
+}
+
+func matchesSkill(s manifestSkill, query string) bool {
+	return strings.Contains(strings.ToLower(s.Name), query) ||
+		strings.Contains(strings.ToLower(s.Description), query)
+}
+
 func truncate(s string, max int) string {
 	if len(s) <= max {
 		return s
@@ -299,21 +462,24 @@ func truncate(s string, max int) string {
 	return s[:max-3] + "..."
 }
 
-func listFromDirectory(dir string, coreOnly, libraryOnly bool) error {
+func listFromDirectory(dir string) error {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return fmt.Errorf("cannot read skills directory %s: %w", dir, err)
 	}
-	count := 0
-	for _, e := range entries {
-		if e.IsDir() {
-			skillMd := filepath.Join(dir, e.Name(), "SKILL.md")
-			if _, err := os.Stat(skillMd); err == nil {
-				fmt.Printf("  %s\n", e.Name())
-				count++
-			}
+	names := []string{}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		if _, err := os.Stat(filepath.Join(dir, entry.Name(), "SKILL.md")); err == nil {
+			names = append(names, entry.Name())
 		}
 	}
-	fmt.Printf("\nTotal: %d skills found in %s\n", count, dir)
+	sort.Strings(names)
+	for _, name := range names {
+		fmt.Printf("  %s\n", name)
+	}
+	fmt.Printf("\nTotal: %d skills found in %s\n", len(names), dir)
 	return nil
 }
