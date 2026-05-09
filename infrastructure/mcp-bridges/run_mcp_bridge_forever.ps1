@@ -8,6 +8,7 @@
     AUDIT-004: Pinned mcp-proxy version via MCP_PROXY_VERSION env var (CWE-494)
     AUDIT-005: Process verification before skipping startup (CWE-20)
     AUDIT-008: Sensitive data redacted from log output (CWE-532)
+    CMD-FIX:   Use Start-Process -NoNewWindow to prevent cmd.exe flash from npx.cmd
 #>
 [CmdletBinding()]
 param(
@@ -26,7 +27,6 @@ Set-StrictMode -Version Latest
 # AUDIT-004: Pin mcp-proxy version to prevent supply-chain attacks
 $McpProxyVersion = $env:MCP_PROXY_VERSION
 if ([string]::IsNullOrWhiteSpace($McpProxyVersion)) {
-    # Default to a known-good version if env var not set
     $McpProxyVersion = '6.4.6'
 }
 
@@ -43,8 +43,14 @@ $env:PYTHONIOENCODING = 'utf-8'
 $env:PYTHONUTF8 = '1'
 
 # Remove the --% stop-parsing artifact that PowerShell passes as a literal string
-# when scheduled tasks use --% in -File mode arguments
 $CleanArgs = @($CommandArgs | Where-Object { $_ -ne '--%' })
+
+# Helper: quote a path if it contains spaces
+function Quote-IfNeeded {
+    param([string]$s)
+    if ($s -match '\s') { return "`"$s`"" }
+    return $s
+}
 
 # AUDIT-002: Log rotation helper with error fallback
 function Write-BridgeLog {
@@ -57,7 +63,6 @@ function Write-BridgeLog {
         }
         Add-Content -LiteralPath $LogPath -Value $Value -ErrorAction Stop
     } catch {
-        # Fallback: write to %TEMP% if primary log path fails (symlink attack mitigation)
         $fallback = Join-Path $env:TEMP 'manus-mcp-bridge.log'
         $errorLine = "[{0}] [LOGGING-ERROR] {1} :: {2}" -f (Get-Date -Format o), $_.Exception.Message, $Value
         Add-Content -LiteralPath $fallback -Value $errorLine -ErrorAction SilentlyContinue
@@ -65,7 +70,7 @@ function Write-BridgeLog {
 }
 
 while ($true) {
-    # AUDIT-005: Verify the listener is actually our mcp-proxy process, not a port hijacker
+    # AUDIT-005: Verify the listener is actually our mcp-proxy process
     $listener = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
         Where-Object { $_.LocalAddress -in @('127.0.0.1', '::1', '0.0.0.0') } |
         Select-Object -First 1
@@ -90,25 +95,60 @@ while ($true) {
     $timestamp = Get-Date -Format o
     Write-BridgeLog "[$timestamp] starting $Name on 127.0.0.1:$Port (mcp-proxy@$McpProxyVersion)"
 
-    # SECURITY: --host 127.0.0.1 ensures no external network access
-    # AUDIT-004: Pinned package version
-    $proxyArgs = @(
+    # CMD-FIX: Use Start-Process -NoNewWindow with output redirection
+    # This prevents npx.cmd from spawning a visible cmd.exe window
+    # Quote the Command and each CommandArg to handle paths with spaces (e.g. "C:\Program Files\...")
+    $quotedCommand = Quote-IfNeeded $Command
+    $quotedCleanArgs = @($CleanArgs | ForEach-Object { Quote-IfNeeded $_ })
+
+    # Build the argument list as an array for Start-Process
+    # This preserves proper quoting of each argument
+    $proxyArgList = @(
         '--yes',
         '--package', "mcp-proxy@$McpProxyVersion",
         'mcp-proxy',
         '--host', '127.0.0.1',
         '--port', "$Port",
         '--',
-        $Command
-    ) + $CleanArgs
+        $quotedCommand
+    ) + $quotedCleanArgs
 
-    & $npx.Source @proxyArgs 2>&1 | ForEach-Object {
-        # AUDIT-008: Redact sensitive data (tokens, API keys) from log output
-        $line = "$_" -replace '(Bearer\s+|token[=:]\s*|api[_-]?key[=:]\s*|password[=:]\s*)[^\s"'']+', '$1[REDACTED]'
-        Write-BridgeLog $line
+    $stdoutFile = Join-Path $env:TEMP "mcp-bridge-$Name-stdout.log"
+    $stderrFile = Join-Path $env:TEMP "mcp-bridge-$Name-stderr.log"
+
+    # Remove stale output files
+    Remove-Item $stdoutFile -Force -ErrorAction SilentlyContinue
+    Remove-Item $stderrFile -Force -ErrorAction SilentlyContinue
+
+    # Start npx with -NoNewWindow to prevent any visible console window
+    $process = Start-Process -FilePath $npx.Source `
+        -ArgumentList $proxyArgList `
+        -NoNewWindow `
+        -PassThru `
+        -RedirectStandardOutput $stdoutFile `
+        -RedirectStandardError $stderrFile
+
+    # Wait for the process to exit
+    $process.WaitForExit()
+    $exitCode = $process.ExitCode
+
+    # Capture and log output with redaction
+    if (Test-Path $stdoutFile) {
+        Get-Content $stdoutFile -ErrorAction SilentlyContinue | ForEach-Object {
+            $line = "$_" -replace '(Bearer\s+|token[=:]\s*|api[_-]?key[=:]\s*|password[=:]\s*)[^\s"'']+', '$1[REDACTED]'
+            Write-BridgeLog $line
+        }
+        Remove-Item $stdoutFile -Force -ErrorAction SilentlyContinue
+    }
+    if (Test-Path $stderrFile) {
+        Get-Content $stderrFile -ErrorAction SilentlyContinue | ForEach-Object {
+            $line = "$_" -replace '(Bearer\s+|token[=:]\s*|api[_-]?key[=:]\s*|password[=:]\s*)[^\s"'']+', '$1[REDACTED]'
+            Write-BridgeLog "[stderr] $line"
+        }
+        Remove-Item $stderrFile -Force -ErrorAction SilentlyContinue
     }
 
     $timestamp = Get-Date -Format o
-    Write-BridgeLog "[$timestamp] $Name exited with code $LASTEXITCODE; restarting in 2s"
+    Write-BridgeLog "[$timestamp] $Name exited with code $exitCode; restarting in 2s"
     Start-Sleep -Seconds 2
 }
