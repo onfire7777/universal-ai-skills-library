@@ -26,11 +26,11 @@ var listCmd = &cobra.Command{
 			return fmt.Errorf("local scheduled task listing is currently implemented for Windows")
 		}
 		tasks := []string{
-			"Manus-SkillSeekersMcp",
-			"Manus-MemPalaceMcp",
-			"Manus-ContextModeMcp",
-			"Manus-LightPandaMcp",
-			"Manus-McpWatchdog",
+			"UniversalAI-SkillSeekersMcp",
+			"UniversalAI-MemPalaceMcp",
+			"UniversalAI-ContextModeMcp",
+			"UniversalAI-LightpandaMcp",
+			"UniversalAI-McpWatchdog",
 		}
 		for _, task := range tasks {
 			fmt.Println("==", task, "==")

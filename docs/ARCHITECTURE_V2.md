@@ -17,7 +17,7 @@ Compatibility names remain only where they identify a real adapter or preserve i
 - `manus.exe` remains a legacy executable alias.
 - `manus-api` remains the Manus API adapter.
 - `.manus` remains the Manus client compatibility root.
-- Existing Windows scheduled task names remain stable until bridges are re-registered.
+- Optional MCP bridges use neutral `UniversalAI-*` Windows task names.
 
 ## Rationale
 
@@ -58,6 +58,9 @@ universal-ai-skills-library/
 | Repo | `universal-ai-skills-library` | `manus-skills-library` redirect or local fallback |
 | Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |
 | API adapter | `manus-api` | N/A, platform-specific by design |
+| MCP task prefix | `UniversalAI-*` | old `Manus-*` tasks are cleanup-only compatibility targets |
+| MCP runtime dir | `C:\ProgramData\universal-ai-mcps` | old `C:\ProgramData\manus-mcps` is historical log/cache data |
+| Local tool dir | `C:\Users\burni\.universal-ai\tools` | `C:\Users\burni\.manus\tools` may be a compatibility junction |
 
 Detailed compatibility rules live in `docs/UNIVERSAL_COMPATIBILITY.md`.
 
@@ -68,4 +71,6 @@ Detailed compatibility rules live in `docs/UNIVERSAL_COMPATIBILITY.md`.
 - `skill-router skill manus-config` still resolves as a legacy alias.
 - `manifest.json` matches the actual `skills/` tree.
 - Local AI instruction files mention the router, not embedded skill tables.
+- Optional MCP bridges use neutral `UniversalAI-*` task names.
+- Lightpanda is skipped cleanly when Docker Desktop Linux engine is off.
 - GitHub remote is current with the universal naming contract.

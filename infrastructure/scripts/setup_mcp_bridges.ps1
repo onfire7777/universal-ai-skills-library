@@ -1,10 +1,10 @@
 # Universal MCP Bridge Setup Script
-# Run this script as Administrator to set up all MCP bridges and watchdog
+# Run this script to set up optional local MCP bridges and the watchdog
 # This configures Windows Scheduled Tasks for persistent, auto-healing MCP services
 
 param(
-    [string]$InstallDir = "C:\ProgramData\manus-mcps",
-    [string]$ToolsDir = "$env:USERPROFILE\.manus\tools"
+    [string]$InstallDir = "C:\ProgramData\universal-ai-mcps",
+    [string]$ToolsDir = "$env:USERPROFILE\.universal-ai\tools"
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,7 +22,9 @@ $scriptRoot = Split-Path -Parent $PSScriptRoot
 Copy-Item "$scriptRoot\mcp-bridges\bridge_skill_seekers.ps1" "$ToolsDir\" -Force
 Copy-Item "$scriptRoot\mcp-bridges\bridge_mempalace.ps1" "$ToolsDir\" -Force
 Copy-Item "$scriptRoot\mcp-bridges\bridge_context_mode.ps1" "$ToolsDir\" -Force
-Write-Host "  Installed 3 bridge scripts to $ToolsDir"
+Copy-Item "$scriptRoot\mcp-bridges\bridge_lightpanda.ps1" "$ToolsDir\" -Force
+Copy-Item "$scriptRoot\mcp-bridges\run_mcp_bridge_forever.ps1" "$ToolsDir\" -Force
+Write-Host "  Installed 4 bridge scripts and runner to $ToolsDir"
 
 # 3. Install watchdog
 Write-Host "[3/6] Installing watchdog..." -ForegroundColor Yellow
@@ -34,39 +36,57 @@ Write-Host "  Installed watchdog to $InstallDir"
 Write-Host "[4/6] Creating bridge scheduled tasks..." -ForegroundColor Yellow
 
 $bridges = @(
-    @{ Name = "Manus-SkillSeekersMcp"; Script = "$ToolsDir\bridge_skill_seekers.ps1" },
-    @{ Name = "Manus-MemPalaceMcp"; Script = "$ToolsDir\bridge_mempalace.ps1" },
-    @{ Name = "Manus-ContextModeMcp"; Script = "$ToolsDir\bridge_context_mode.ps1" }
+    @{ Name = "UniversalAI-SkillSeekersMcp"; Script = "$ToolsDir\bridge_skill_seekers.ps1" },
+    @{ Name = "UniversalAI-MemPalaceMcp"; Script = "$ToolsDir\bridge_mempalace.ps1" },
+    @{ Name = "UniversalAI-ContextModeMcp"; Script = "$ToolsDir\bridge_context_mode.ps1" },
+    @{ Name = "UniversalAI-LightpandaMcp"; Script = "$ToolsDir\bridge_lightpanda.ps1" }
 )
+
+$legacyTasks = @(
+    "Manus-SkillSeekersMcp",
+    "Manus-MemPalaceMcp",
+    "Manus-ContextModeMcp",
+    "Manus-LightPandaMcp",
+    "Manus-LightpandaMcp",
+    "Manus-McpWatchdog"
+)
+
+foreach ($legacyTask in $legacyTasks) {
+    Unregister-ScheduledTask -TaskName $legacyTask -Confirm:$false -ErrorAction SilentlyContinue
+}
 
 foreach ($bridge in $bridges) {
     # Remove existing task
     Unregister-ScheduledTask -TaskName $bridge.Name -Confirm:$false -ErrorAction SilentlyContinue
-    
-    # Create new task
-    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$($bridge.Script)`""
-    $trigger = New-ScheduledTaskTrigger -AtLogOn
-    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RestartInterval (New-TimeSpan -Minutes 1) -RestartCount 3
-    
-    Register-ScheduledTask -TaskName $bridge.Name -Action $action -Trigger $trigger -Settings $settings -RunLevel Highest -Description "MCP Bridge: $($bridge.Name)" | Out-Null
+
+    # Create new task with schtasks.exe for stable quoting across Windows hosts.
+    $action = "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$($bridge.Script)`""
+    & schtasks.exe /Create /TN $bridge.Name /TR $action /SC ONCE /ST 23:59 /F | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to create scheduled task: $($bridge.Name)"
+    }
     Write-Host "  Created task: $($bridge.Name)"
 }
 
 # 5. Create watchdog scheduled task (every 5 minutes, hidden)
 Write-Host "[5/6] Creating watchdog scheduled task..." -ForegroundColor Yellow
-Unregister-ScheduledTask -TaskName "Manus-McpWatchdog" -Confirm:$false -ErrorAction SilentlyContinue
+Unregister-ScheduledTask -TaskName "UniversalAI-McpWatchdog" -Confirm:$false -ErrorAction SilentlyContinue
 
-schtasks /Create /TN "Manus-McpWatchdog" /TR "wscript.exe `"$InstallDir\run_hidden.vbs`" `"$InstallDir\mcp_watchdog.ps1`"" /SC MINUTE /MO 5 /F | Out-Null
+schtasks /Create /TN "UniversalAI-McpWatchdog" /TR "wscript.exe `"$InstallDir\run_hidden.vbs`" `"$InstallDir\mcp_watchdog.ps1`"" /SC MINUTE /MO 5 /F | Out-Null
 Write-Host "  Created watchdog task (every 5 minutes, hidden)"
 
 # 6. Start everything
 Write-Host "[6/6] Starting all services..." -ForegroundColor Yellow
 foreach ($bridge in $bridges) {
+    if (($bridge.Name -eq "UniversalAI-LightpandaMcp") -and (-not (Test-Path "\\.\pipe\dockerDesktopLinuxEngine"))) {
+        Write-Host "  Skipped: $($bridge.Name) (Docker Desktop Linux engine not running)"
+        continue
+    }
     Start-ScheduledTask -TaskName $bridge.Name
     Write-Host "  Started: $($bridge.Name)"
 }
-Start-ScheduledTask -TaskName "Manus-McpWatchdog"
-Write-Host "  Started: Manus-McpWatchdog"
+Start-ScheduledTask -TaskName "UniversalAI-McpWatchdog"
+Write-Host "  Started: UniversalAI-McpWatchdog"
 
 Write-Host ""
 Write-Host "=== Setup Complete ===" -ForegroundColor Green

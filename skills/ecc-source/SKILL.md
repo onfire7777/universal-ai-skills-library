@@ -20,4 +20,4 @@ Default local policy:
 - Prefer portable `SKILL.md` directories for cross-AI reuse.
 - Skip existing skills instead of overwriting them.
 - Treat `C:\Users\burni\.ecc\integration-receipt.json` as the install receipt.
-- Verify with `npx openskills read ecc-source`, `ecc --help`, JSON validation, and runtime health checks before claiming completion.
+- Verify with `skill-router skill ecc-source`, `ecc --help`, JSON validation, and runtime health checks before claiming completion.

@@ -158,14 +158,16 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 		if runtime.GOOS == "windows" {
 			bold.Println("MCP Bridges:")
 			type bridgeInfo struct {
-				name string
-				port int
+				name         string
+				port         int
+				optional     bool
+				requiresPath string
 			}
 			mcpBridges := []bridgeInfo{
-				{"skill-seekers", 8875},
-				{"mempalace", 8876},
-				{"context-mode", 8877},
-				{"lightpanda", 8878},
+				{name: "skill-seekers", port: 8875},
+				{name: "mempalace", port: 8876},
+				{name: "context-mode", port: 8877},
+				{name: "lightpanda", port: 8878, optional: true, requiresPath: `\\.\pipe\dockerDesktopLinuxEngine`},
 			}
 			for _, b := range mcpBridges {
 				bCopy := b
@@ -173,6 +175,9 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 					out, _ := runner.RunCommandCapture("powershell", "-NoProfile", "-Command",
 						fmt.Sprintf(`try{$c=New-Object Net.Sockets.TcpClient;$c.Connect('127.0.0.1',%d);$c.Close();'UP'}catch{'DOWN'}`, bCopy.port))
 					if strings.TrimSpace(out) != "UP" {
+						if bCopy.optional && bCopy.requiresPath != "" && !pathExists(bCopy.requiresPath) {
+							return fmt.Sprintf("skipped; optional dependency unavailable: %s", bCopy.requiresPath), nil
+						}
 						return "", fmt.Errorf("port %d not listening", bCopy.port)
 					}
 					return fmt.Sprintf("port %d UP", bCopy.port), nil
@@ -181,7 +186,7 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			fmt.Println()
 
 			bold.Println("Scheduled Tasks:")
-			tasks := []string{"Manus-SkillSeekersMcp", "Manus-MemPalaceMcp", "Manus-ContextModeMcp", "Manus-LightPandaMcp", "Manus-McpWatchdog"}
+			tasks := []string{"UniversalAI-SkillSeekersMcp", "UniversalAI-MemPalaceMcp", "UniversalAI-ContextModeMcp", "UniversalAI-LightpandaMcp", "UniversalAI-McpWatchdog"}
 			for _, t := range tasks {
 				tCopy := t
 				check(tCopy, func() (string, error) {
@@ -249,6 +254,20 @@ func findPP() string {
 		return goBin
 	}
 	return ""
+}
+
+func pathExists(path string) bool {
+	if path == "" {
+		return true
+	}
+	if runtime.GOOS == "windows" {
+		escaped := strings.ReplaceAll(path, "'", "''")
+		out, _ := runner.RunCommandCapture("powershell", "-NoProfile", "-Command",
+			fmt.Sprintf(`if (Test-Path '%s') { 'YES' } else { 'NO' }`, escaped))
+		return strings.TrimSpace(out) == "YES"
+	}
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 func contains(s, substr string) bool {

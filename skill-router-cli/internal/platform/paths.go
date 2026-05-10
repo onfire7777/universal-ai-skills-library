@@ -50,8 +50,7 @@ func MCPDir() string {
 		return d
 	}
 	if runtime.GOOS == "windows" {
-		// Legacy installed bridge path. Keep this stable unless bridges are re-registered.
-		return `C:\ProgramData\manus-mcps`
+		return `C:\ProgramData\universal-ai-mcps`
 	}
 	return filepath.Join(HomeDir(), ".skill-router-mcps")
 }
