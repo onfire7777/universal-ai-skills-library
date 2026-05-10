@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-skills-aliases/v1",
-  "generated_at": "2026-05-10T01:06:18.285431+00:00",
+  "generated_at": "2026-05-10T10:30:26.6324437-07:00",
   "description": "Legacy lookup aliases preserved after universal skill id normalization. Canonical skill ids are kebab-case top-level directories under skills/.",
   "aliases": {
     "ahrefs-automation": [
@@ -221,6 +221,12 @@
     ],
     "productboard-automation": [
       "Productboard Automation"
+    ],
+    "printable-cards": [
+      "card-creator",
+      "card creator",
+      "greeting-card-creator",
+      "manus-card-creator"
     ],
     "public-param-golden": [
       "pp-public-param-golden"

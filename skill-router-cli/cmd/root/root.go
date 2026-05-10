@@ -60,7 +60,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println()
 		fmt.Println("Core Commands:")
 		fmt.Println("  skill       Load one skill on demand: skill-router skill <name>")
-		fmt.Println("  skills      Manage 1,804 AI skills (install, list, validate, search)")
+		fmt.Println("  skills      Manage canonical and local external AI skills on demand")
 		fmt.Println("  mcp         Control MCP bridge infrastructure (start, stop, status, logs)")
 		fmt.Println("  audit       Run multi-model security/code audits (6 frontier models)")
 		fmt.Println("  oracle      Query multiple AI models and get merged answers")

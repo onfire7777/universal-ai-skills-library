@@ -11,7 +11,7 @@ universal-ai-skills-library/
 ├── README.md
 ├── manifest.json
 ├── skill-router-cli/       # Go CLI source for the universal router
-├── skills/                 # Source-of-truth skill corpus: 1,804 canonical skills
+├── skills/                 # Source-of-truth skill corpus: 1,805 canonical skills
 ├── plugin/                 # Universal plugin metadata plus Codex/Claude adapters
 ├── infrastructure/         # Optional persistent MCP bridge scripts
 └── docs/                   # Architecture, compatibility, and migration notes
@@ -23,6 +23,7 @@ universal-ai-skills-library/
 skill-router skill <name>
 skill-router skill search <query>
 skill-router skill list
+skill-router skills sources
 ```
 
 `manus` remains a legacy compatibility executable for existing local rules and scripts. New docs and local setup should prefer `skill-router`.
@@ -46,8 +47,12 @@ C:\Users\burni\go\bin\manus.exe       # compatibility alias
 
 ```bash
 skill-router skill <name>          # Print one SKILL.md
-skill-router skill search <query>  # Search manifest names and descriptions
+skill-router skill search <query>  # Search canonical skills plus read-only local external roots
+skill-router skill search --refresh <query> # Rebuild external index before searching
 skill-router skill list            # List all skills from manifest.json
+skill-router skills list --external # Include unique local external skills without copying them
+skill-router skills sources         # Show read-only external skill roots
+skill-router skills sources --refresh # Refresh the local external skill index
 skill-router doctor                # Check local AI stack health
 skill-router sync matrix           # Read-only agent support matrix
 skill-router skills validate-manifest # Validate manifest.json against skills/
@@ -82,6 +87,19 @@ Use neutral names for universal capabilities and platform names only for adapter
 
 Detailed policy: `docs/UNIVERSAL_COMPATIBILITY.md`.
 
+## Redundancy Policy
+
+The canonical library keeps one physical copy per canonical skill ID under `skills/`.
+Legacy names resolve through aliases, not duplicate directories. For example,
+`card-creator` resolves to the existing full `printable-cards` skill.
+
+Installed Claude, Codex, Manus-compatible, and other AI skill roots are integrated
+as read-only external sources. The router can search and load unique local skills
+from those roots, but the repo does not bulk-copy third-party caches or marketplace
+checkouts into `skills/`. The external index is cached locally at
+`%USERPROFILE%\.skill-router\external-skills-index.json` and can be refreshed with
+`skill-router skills sources --refresh`.
+
 ## MCP Policy
 
 The router should be the default path. MCP bridges are optional adapters for services that need persistent endpoints or shared state:
@@ -111,11 +129,14 @@ skill-router --version
 skill-router skill universal-ai-config
 skill-router skill search debugging
 skill-router skills validate-manifest
+skill-router skills sources
 skill-router sync matrix
 skill-router doctor
 ```
 
-Expected current corpus size: 1,804 canonical skills.
+Expected current corpus size: 1,805 canonical skills. `validate-manifest` fails on
+duplicate names, duplicate directories, unsafe paths, missing `SKILL.md` files,
+unindexed canonical directories, and identical canonical `SKILL.md` content.
 
 ## Install mode safety
 
