@@ -45,7 +45,7 @@ npm test
 
 ## Skill Work
 
-- Use `npx openskills read skill-security-auditor` before accepting or installing a skill.
-- Use `npx openskills read skill-judge` when evaluating SKILL.md quality.
-- Use `npx openskills read skill-seekers` when generating or packaging skills from external sources.
+- Use `skill-router skill skill-security-auditor` before accepting or installing a skill.
+- Use `skill-router skill skill-judge` when evaluating SKILL.md quality.
+- Use `skill-router skill skill-seekers` when generating or packaging skills from external sources.
 - Use project-local English overrides for usability fixes instead of mutating global skill roots first.

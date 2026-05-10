@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Keep one local MCP HTTP bridge alive for Manus.
+  Keep one local MCP HTTP bridge alive for universal AI clients.
   Security: binds to 127.0.0.1 only. Includes log rotation (10MB max).
 
   Audit fixes applied:
@@ -63,7 +63,7 @@ function Write-BridgeLog {
         }
         Add-Content -LiteralPath $LogPath -Value $Value -ErrorAction Stop
     } catch {
-        $fallback = Join-Path $env:TEMP 'manus-mcp-bridge.log'
+        $fallback = Join-Path $env:TEMP 'universal-ai-mcp-bridge.log'
         $errorLine = "[{0}] [LOGGING-ERROR] {1} :: {2}" -f (Get-Date -Format o), $_.Exception.Message, $Value
         Add-Content -LiteralPath $fallback -Value $errorLine -ErrorAction SilentlyContinue
     }

@@ -16,17 +16,19 @@ import (
 
 // Bridge definitions — all MCP bridges in the infrastructure.
 type Bridge struct {
-	Name    string
-	Port    int
-	Task    string
-	LogFile string
+	Name         string
+	Port         int
+	Task         string
+	LogFile      string
+	Optional     bool
+	RequiresPath string
 }
 
 var bridges = []Bridge{
-	{Name: "skill-seekers", Port: 8875, Task: "Manus-SkillSeekersMcp", LogFile: "skill-seekers-mcp-bridge.log"},
-	{Name: "mempalace", Port: 8876, Task: "Manus-MemPalaceMcp", LogFile: "mempalace-mcp-bridge.log"},
-	{Name: "context-mode", Port: 8877, Task: "Manus-ContextModeMcp", LogFile: "context-mode-mcp-bridge.log"},
-	{Name: "lightpanda", Port: 8878, Task: "Manus-LightPandaMcp", LogFile: "lightpanda-mcp-bridge.log"},
+	{Name: "skill-seekers", Port: 8875, Task: "UniversalAI-SkillSeekersMcp", LogFile: "skill-seekers-mcp.log"},
+	{Name: "mempalace", Port: 8876, Task: "UniversalAI-MemPalaceMcp", LogFile: "mempalace-mcp.log"},
+	{Name: "context-mode", Port: 8877, Task: "UniversalAI-ContextModeMcp", LogFile: "context-mode-mcp.log"},
+	{Name: "lightpanda", Port: 8878, Task: "UniversalAI-LightpandaMcp", LogFile: "lightpanda-mcp.log", Optional: true, RequiresPath: `\\.\pipe\dockerDesktopLinuxEngine`},
 }
 
 // Cmd is the top-level mcp command group.
@@ -49,6 +51,7 @@ var statusCmd = &cobra.Command{
 
 		bold.Println("MCP Bridge Status:")
 		fmt.Println()
+		yellow := color.New(color.FgYellow)
 		fmt.Printf("  %-18s %-8s %-10s %s\n", "BRIDGE", "PORT", "STATUS", "LOG")
 		fmt.Printf("  %-18s %-8s %-10s %s\n", "------", "----", "------", "---")
 
@@ -58,6 +61,8 @@ var statusCmd = &cobra.Command{
 			statusStr := ""
 			if status {
 				statusStr = green.Sprint("UP")
+			} else if b.Optional && b.RequiresPath != "" && !pathExists(b.RequiresPath) {
+				statusStr = yellow.Sprint("SKIPPED")
 			} else {
 				statusStr = red.Sprint("DOWN")
 			}
@@ -234,9 +239,27 @@ func checkPort(port int) bool {
 	return strings.Contains(out, fmt.Sprintf(":%d ", port))
 }
 
+func pathExists(path string) bool {
+	if path == "" {
+		return true
+	}
+	if runtime.GOOS == "windows" {
+		escaped := strings.ReplaceAll(path, "'", "''")
+		out, _ := runner.RunCommandCapture("powershell", "-NoProfile", "-Command",
+			fmt.Sprintf(`if (Test-Path '%s') { 'YES' } else { 'NO' }`, escaped))
+		return strings.TrimSpace(out) == "YES"
+	}
+	_, err := os.Stat(path)
+	return err == nil
+}
+
 func startBridge(b Bridge) error {
 	if checkPort(b.Port) {
 		fmt.Printf("  %s (port %d) — already running\n", b.Name, b.Port)
+		return nil
+	}
+	if b.Optional && b.RequiresPath != "" && !pathExists(b.RequiresPath) {
+		fmt.Printf("  %s — skipped (optional dependency unavailable: %s)\n", b.Name, b.RequiresPath)
 		return nil
 	}
 	launchScript := filepath.Join(platform.MCPDir(), fmt.Sprintf("launch_%s.ps1", strings.ReplaceAll(b.Name, "-", "_")))

@@ -65,7 +65,7 @@ def http_api(url: str) -> dict | list | None:
     """Make GitHub API request via HTTP (with optional token)."""
     req = urllib.request.Request(url)
     req.add_header("Accept", "application/vnd.github.v3+json")
-    req.add_header("User-Agent", "Manus-Skill-Finder")
+    req.add_header("User-Agent", "UniversalAI-Skill-Finder")
     if GITHUB_TOKEN:
         req.add_header("Authorization", f"token {GITHUB_TOKEN}")
     try:

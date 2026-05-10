@@ -52,7 +52,7 @@ $platforms = @(
     @{ Name = "Codex";          Path = "$env:USERPROFILE\.codex\skills" },
     @{ Name = "OpenCode";       Path = "$env:USERPROFILE\.opencode\skills" },
     @{ Name = "Gemini CLI";     Path = "$env:USERPROFILE\.gemini\skills" },
-    @{ Name = "Manus Local";    Path = "$env:USERPROFILE\.manus\skills" }
+    @{ Name = "Manus-compatible"; Path = "$env:USERPROFILE\.manus\skills" }
 )
 
 # ─── Install function ─────────────────────────────────────────────────────────

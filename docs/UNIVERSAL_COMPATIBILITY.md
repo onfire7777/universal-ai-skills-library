@@ -7,6 +7,9 @@ This repository is a universal AI skills setup. The default interface is platfor
 - Primary command: `skill-router skill <name>`
 - Legacy command: `manus skill <name>`
 - Universal setup skill: `universal-ai-config`
+- Optional MCP runtime directory: `C:\ProgramData\universal-ai-mcps`
+- Optional MCP scheduled task prefix: `UniversalAI-*`
+- Local tools directory: `%USERPROFILE%\.universal-ai\tools`
 - Current corpus: 1,804 canonical skills, with legacy/display aliases stored in `manifest.json` and `docs/compatibility_aliases.json`
 
 ## Naming Rules
@@ -16,6 +19,8 @@ Use universal names for shared infrastructure:
 - `Universal AI Skills`
 - `skill-router`
 - `universal-ai-config`
+- `UniversalAI-*` for optional local scheduled tasks
+- `.universal-ai\tools` for local bridge helpers and shared utility scripts
 - `skills/`
 - `plugin/`
 
@@ -25,6 +30,9 @@ Use provider or client names only when they identify a real compatibility surfac
 - Clients: Codex, Claude Code, Gemini CLI, Cursor, OpenCode
 - Adapters: Claude Code hooks, Codex review, Manus UI deployer, Lightpanda CDP, MemPalace MCP
 - Models: exact model IDs used by scripts or user-facing model benchmarks
+
+Legacy `.manus\tools` may remain only as a compatibility junction to
+`.universal-ai\tools`.
 
 ## Context Policy
 
@@ -60,3 +68,5 @@ Prefer CLI execution for local, one-shot workflows. Use MCP only when a workflow
 - browser/CDP automation: Lightpanda MCP
 
 If the CLI can do the work without a long-running service, do not add or start an MCP server.
+Lightpanda is optional and Docker-backed; when Docker Desktop Linux engine is off,
+the watchdog skips Lightpanda instead of restart-looping it.

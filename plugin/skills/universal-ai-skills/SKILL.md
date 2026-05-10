@@ -20,5 +20,4 @@ Optional local MCP endpoints:
 - Skill Seekers: `http://127.0.0.1:8875/mcp`
 - MemPalace: `http://127.0.0.1:8876/mcp`
 - Context Mode: `http://127.0.0.1:8877/mcp`
-- Lightpanda: `http://127.0.0.1:8878/mcp`
-
+- Lightpanda: `http://127.0.0.1:8878/mcp` when Docker Desktop Linux engine is running; otherwise it is skipped.

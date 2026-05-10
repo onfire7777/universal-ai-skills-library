@@ -1,6 +1,6 @@
-# MCP Bridge Watchdog - Ensures all 4 MCP services are always running
+# MCP Bridge Watchdog - keeps required MCP services running and skips optional ones when dependencies are off
 # Runs every 5 minutes via scheduled task. Checks port availability and restarts if needed.
-# Location: C:\ProgramData\manus-mcps\mcp_watchdog.ps1
+# Location: C:\ProgramData\universal-ai-mcps\mcp_watchdog.ps1
 #
 # Audit fixes applied:
 #   AUDIT-003: Process verification instead of raw TCP connect (CWE-400)
@@ -8,7 +8,7 @@
 #   AUDIT-010: Task stop errors logged instead of silently discarded (CWE-391)
 #   AUDIT-011: Regex pattern match variable usage fixed (CWE-754)
 
-$LogFile = "C:\ProgramData\manus-mcps\watchdog.log"
+$LogFile = "C:\ProgramData\universal-ai-mcps\watchdog.log"
 $MaxLogSize = 1MB
 
 # Rotate log if too large
@@ -88,16 +88,20 @@ function Restart-McpService {
 
 # AUDIT-009: Include LightPanda (port 8878) in monitoring
 $services = @(
-    @{ Name = 'Skill Seekers'; Port = 8875; Task = 'Manus-SkillSeekersMcp' },
-    @{ Name = 'MemPalace';     Port = 8876; Task = 'Manus-MemPalaceMcp' },
-    @{ Name = 'Context Mode';  Port = 8877; Task = 'Manus-ContextModeMcp' },
-    @{ Name = 'LightPanda';    Port = 8878; Task = 'Manus-LightpandaMcp' }
+    @{ Name = 'Skill Seekers'; Port = 8875; Task = 'UniversalAI-SkillSeekersMcp'; Optional = $false },
+    @{ Name = 'MemPalace';     Port = 8876; Task = 'UniversalAI-MemPalaceMcp'; Optional = $false },
+    @{ Name = 'Context Mode';  Port = 8877; Task = 'UniversalAI-ContextModeMcp'; Optional = $false },
+    @{ Name = 'LightPanda';    Port = 8878; Task = 'UniversalAI-LightpandaMcp'; Optional = $true; RequiresDockerPipe = "\\.\pipe\dockerDesktopLinuxEngine" }
 )
 
 $allHealthy = $true
 
 foreach ($svc in $services) {
     if (-not (Test-Port -Port $svc.Port)) {
+        if ($svc.Optional -and $svc.ContainsKey('RequiresDockerPipe') -and (-not (Test-Path $svc.RequiresDockerPipe))) {
+            Write-Log "SKIP: $($svc.Name) (port $($svc.Port)) is optional and Docker Desktop Linux engine is not running."
+            continue
+        }
         $allHealthy = $false
         Restart-McpService -TaskName $svc.Task -Port $svc.Port -ServiceName $svc.Name
     }
@@ -117,6 +121,6 @@ if ($allHealthy) {
         }
     }
     if ($shouldLog) {
-        Write-Log "HEALTH: All services OK (8875, 8876, 8877, 8878 listening)"
+        Write-Log "HEALTH: Required services OK (8875, 8876, 8877 listening). Optional LightPanda may be skipped when Docker is off."
     }
 }
