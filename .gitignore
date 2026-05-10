@@ -35,3 +35,4 @@ node_modules/
 # Virtual environments
 venv/
 .venv/
+plugin-codex/skills/
