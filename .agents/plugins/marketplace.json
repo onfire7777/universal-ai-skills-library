@@ -1,0 +1,20 @@
+{
+  "name": "universal-ai-skills",
+  "interface": {
+    "displayName": "Universal AI Skills"
+  },
+  "plugins": [
+    {
+      "name": "universal-ai-skills",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
