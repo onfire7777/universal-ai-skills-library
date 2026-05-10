@@ -7,7 +7,9 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -28,19 +30,39 @@ type skillManifest struct {
 	LibrarySkills []manifestSkill `json:"library_skills"`
 }
 
+type externalSkillRoot struct {
+	ID   string
+	Path string
+}
+
+type externalSkill struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	SourceID    string `json:"sourceId"`
+	Path        string `json:"path"`
+}
+
+type externalSkillsCache struct {
+	Version       int             `json:"version"`
+	GeneratedUnix int64           `json:"generatedUnix"`
+	Skills        []externalSkill `json:"skills"`
+}
+
 // Cmd is the top-level skills command group. It also backs the singular
 // "skill" alias so agents can use `skill-router skill <name>` as the context-light path.
 var Cmd = &cobra.Command{
 	Use:     "skills [skill-name]",
 	Aliases: []string{"skill"},
-	Short:   "Load and manage 1,804 AI skills on demand",
+	Short:   "Load and manage canonical and local external AI skills on demand",
 	Long: `Load and manage the unified skills library.
 
 The source of truth is repo-local skills/. Agents should call:
   skill-router skill <name>
 
 That prints only the requested SKILL.md instead of injecting the full library
-into always-loaded context.`,
+into always-loaded context. Local Claude/Codex/agent skill roots are searched
+read-only after the canonical library, so unique installed skills stay available
+without duplicating thousands of third-party skill bodies in the repo.`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
@@ -113,6 +135,7 @@ var listCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		coreOnly, _ := cmd.Flags().GetBool("core")
 		libraryOnly, _ := cmd.Flags().GetBool("library")
+		includeExternal, _ := cmd.Flags().GetBool("external")
 
 		manifest, err := loadManifest()
 		if err != nil {
@@ -133,6 +156,17 @@ var listCmd = &cobra.Command{
 			}
 		}
 		fmt.Printf("\nTotal: %d skills\n", len(manifest.CoreSkills)+len(manifest.LibrarySkills))
+		if includeExternal {
+			external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
+			if err != nil {
+				return err
+			}
+			bold.Printf("\nLocal External Skills (%d unique, read-only):\n", len(external))
+			for _, s := range external {
+				fmt.Printf("  [%-18s] %-35s %s\n", s.SourceID, s.Name, truncate(s.Description, 55))
+			}
+			fmt.Printf("\nCombined available: %d skills\n", len(manifest.CoreSkills)+len(manifest.LibrarySkills)+len(external))
+		}
 		return nil
 	},
 }
@@ -143,6 +177,7 @@ var searchCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.ToLower(strings.Join(args, " "))
+		refreshExternal, _ := cmd.Flags().GetBool("refresh")
 		manifest, err := loadManifest()
 		if err != nil {
 			return err
@@ -163,7 +198,45 @@ var searchCmd = &cobra.Command{
 				matches++
 			}
 		}
+		external, err := findExternalSkills(canonicalSkillKeys(manifest), refreshExternal)
+		if err != nil {
+			return err
+		}
+		for _, s := range external {
+			if matchesExternalSkill(s, query) {
+				fmt.Printf("  [EXT:%-16s] %-30s %s\n", s.SourceID, s.Name, truncate(s.Description, 50))
+				matches++
+			}
+		}
 		fmt.Printf("\n%d matches found.\n", matches)
+		return nil
+	},
+}
+
+var sourcesCmd = &cobra.Command{
+	Use:   "sources",
+	Short: "Show read-only local external skill roots",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		refreshExternal, _ := cmd.Flags().GetBool("refresh")
+		manifest, _ := loadManifest()
+		canonical := canonicalSkillKeys(manifest)
+		bold := color.New(color.Bold)
+		bold.Println("Local external skill sources:")
+		for _, root := range externalSkillRoots() {
+			total, unique := countExternalRootSkills(root, canonical)
+			status := "missing"
+			if _, err := os.Stat(root.Path); err == nil {
+				status = "ready"
+			}
+			fmt.Printf("  %-18s %-7s total=%-5d unique=%-5d %s\n", root.ID, status, total, unique, root.Path)
+		}
+		if refreshExternal {
+			external, err := findExternalSkills(canonical, true)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("\nRefreshed external skill index: %d unique skills\n", len(external))
+		}
 		return nil
 	},
 }
@@ -247,6 +320,9 @@ func init() {
 	listCmd.Flags().Bool("core", false, "Show only core skills")
 	listCmd.Flags().Bool("library", false, "Show only library skills")
 	listCmd.Flags().Bool("all", true, "Show all skills (default)")
+	listCmd.Flags().Bool("external", false, "Also list unique skills from local external roots")
+	searchCmd.Flags().Bool("refresh", false, "Refresh local external skill index before searching")
+	sourcesCmd.Flags().Bool("refresh", false, "Refresh local external skill index after scanning sources")
 	propagateCmd.Flags().Bool("dry-run", false, "Show target roots without copying")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
 
@@ -258,6 +334,7 @@ func init() {
 	Cmd.AddCommand(debugCmd)
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(searchCmd)
+	Cmd.AddCommand(sourcesCmd)
 	Cmd.AddCommand(propagateCmd)
 	Cmd.AddCommand(ultimateCmd)
 	Cmd.AddCommand(promptCmd)
@@ -309,6 +386,11 @@ func findSkillMarkdown(name string) (string, error) {
 	}
 	for _, candidate := range candidates {
 		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+	if manifest, err := loadManifest(); err == nil {
+		if candidate, ok := findExternalSkillMarkdown(key, canonicalSkillKeys(manifest)); ok {
 			return candidate, nil
 		}
 	}
@@ -470,6 +552,298 @@ func matchesSkill(s manifestSkill, query string) bool {
 		}
 	}
 	return len(strings.Fields(normalizedQuery)) > 0
+}
+
+func matchesExternalSkill(s externalSkill, query string) bool {
+	haystack := strings.ToLower(s.Name + " " + s.Description + " " + s.SourceID)
+	haystack = strings.NewReplacer("-", " ", "_", " ", ":", " ").Replace(haystack)
+	normalizedQuery := strings.NewReplacer("-", " ", "_", " ", ":", " ").Replace(query)
+	if strings.Contains(haystack, normalizedQuery) {
+		return true
+	}
+	for _, token := range strings.Fields(normalizedQuery) {
+		if !strings.Contains(haystack, token) {
+			return false
+		}
+	}
+	return len(strings.Fields(normalizedQuery)) > 0
+}
+
+func canonicalSkillKeys(manifest skillManifest) map[string]bool {
+	keys := map[string]bool{}
+	for _, skill := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
+		keys[strings.ToLower(strings.TrimSpace(skill.Name))] = true
+		for _, alias := range skill.Aliases {
+			keys[strings.ToLower(strings.TrimSpace(alias))] = true
+		}
+	}
+	return keys
+}
+
+func externalSkillRoots() []externalSkillRoot {
+	home := platform.HomeDir()
+	roots := []externalSkillRoot{
+		{ID: "agent", Path: filepath.Join(home, ".agent", "skills")},
+		{ID: "claude-skills", Path: filepath.Join(home, ".claude", "skills")},
+		{ID: "claude-market", Path: filepath.Join(home, ".claude", "plugins", "marketplaces")},
+		{ID: "claude-cache", Path: filepath.Join(home, ".claude", "plugins", "cache")},
+		{ID: "claude-repos", Path: filepath.Join(home, ".claude", "skills-repos")},
+		{ID: "codex-skills", Path: filepath.Join(home, ".codex", "skills")},
+		{ID: "codex-cache", Path: filepath.Join(home, ".codex", "plugins", "cache")},
+		{ID: "manus-compat", Path: filepath.Join(home, ".manus", "skills")},
+		{ID: "gemini", Path: filepath.Join(home, ".gemini", "skills")},
+		{ID: "cursor", Path: filepath.Join(home, ".cursor", "skills")},
+		{ID: "opencode", Path: filepath.Join(home, ".config", "opencode", "skills")},
+		{ID: "kiro", Path: filepath.Join(home, ".kiro", "skills")},
+	}
+	if extra := os.Getenv("SKILL_ROUTER_EXTERNAL_SKILL_ROOTS"); extra != "" {
+		for i, path := range filepath.SplitList(extra) {
+			if strings.TrimSpace(path) == "" {
+				continue
+			}
+			roots = append(roots, externalSkillRoot{
+				ID:   fmt.Sprintf("extra-%d", i+1),
+				Path: path,
+			})
+		}
+	}
+	seen := map[string]bool{}
+	deduped := []externalSkillRoot{}
+	for _, root := range roots {
+		abs, err := filepath.Abs(root.Path)
+		if err == nil {
+			root.Path = abs
+		}
+		key := strings.ToLower(filepath.Clean(root.Path))
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		deduped = append(deduped, root)
+	}
+	return deduped
+}
+
+func findExternalSkills(canonical map[string]bool, refresh bool) ([]externalSkill, error) {
+	if !refresh {
+		if cached, ok := readExternalSkillsCache(canonical); ok {
+			return cached, nil
+		}
+	}
+	seen := map[string]bool{}
+	skills := []externalSkill{}
+	for _, root := range externalSkillRoots() {
+		if _, err := os.Stat(root.Path); err != nil {
+			continue
+		}
+		err := filepath.WalkDir(root.Path, func(path string, entry os.DirEntry, err error) error {
+			if err != nil {
+				return nil
+			}
+			if entry.IsDir() {
+				name := entry.Name()
+				if name == ".git" || name == "node_modules" || name == "__pycache__" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if !strings.EqualFold(entry.Name(), "SKILL.md") {
+				return nil
+			}
+			name, description := readSkillFrontmatter(path)
+			if name == "" {
+				name = filepath.Base(filepath.Dir(path))
+			}
+			key := strings.ToLower(strings.TrimSpace(name))
+			if key == "" || canonical[key] || seen[key] {
+				return nil
+			}
+			seen[key] = true
+			skills = append(skills, externalSkill{
+				Name:        name,
+				Description: description,
+				SourceID:    root.ID,
+				Path:        path,
+			})
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	sort.Slice(skills, func(i, j int) bool {
+		return strings.ToLower(skills[i].Name) < strings.ToLower(skills[j].Name)
+	})
+	_ = writeExternalSkillsCache(skills)
+	return skills, nil
+}
+
+func findExternalSkillMarkdown(key string, canonical map[string]bool) (string, bool) {
+	if canonical[key] {
+		return "", false
+	}
+	if external, err := findExternalSkills(canonical, false); err == nil {
+		for _, skill := range external {
+			if strings.ToLower(strings.TrimSpace(skill.Name)) == key || strings.ToLower(filepath.Base(filepath.Dir(skill.Path))) == key {
+				if _, err := os.Stat(skill.Path); err == nil {
+					return skill.Path, true
+				}
+			}
+		}
+	}
+	for _, root := range externalSkillRoots() {
+		if _, err := os.Stat(root.Path); err != nil {
+			continue
+		}
+		var found string
+		_ = filepath.WalkDir(root.Path, func(path string, entry os.DirEntry, err error) error {
+			if err != nil || found != "" {
+				return nil
+			}
+			if entry.IsDir() {
+				name := entry.Name()
+				if name == ".git" || name == "node_modules" || name == "__pycache__" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if !strings.EqualFold(entry.Name(), "SKILL.md") {
+				return nil
+			}
+			dirName := strings.ToLower(filepath.Base(filepath.Dir(path)))
+			frontmatterName, _ := readSkillFrontmatter(path)
+			if dirName == key || strings.ToLower(strings.TrimSpace(frontmatterName)) == key {
+				found = path
+			}
+			return nil
+		})
+		if found != "" {
+			return found, true
+		}
+	}
+	return "", false
+}
+
+func readExternalSkillsCache(canonical map[string]bool) ([]externalSkill, bool) {
+	data, err := os.ReadFile(externalSkillsCachePath())
+	if err != nil {
+		return nil, false
+	}
+	var cache externalSkillsCache
+	if err := json.Unmarshal(data, &cache); err != nil || cache.Version != 1 {
+		return nil, false
+	}
+	if time.Since(time.Unix(cache.GeneratedUnix, 0)) > externalSkillsCacheTTL() {
+		return nil, false
+	}
+	filtered := []externalSkill{}
+	seen := map[string]bool{}
+	for _, skill := range cache.Skills {
+		key := strings.ToLower(strings.TrimSpace(skill.Name))
+		if key == "" || canonical[key] || seen[key] {
+			continue
+		}
+		seen[key] = true
+		filtered = append(filtered, skill)
+	}
+	return filtered, true
+}
+
+func writeExternalSkillsCache(skills []externalSkill) error {
+	cachePath := externalSkillsCachePath()
+	if err := os.MkdirAll(filepath.Dir(cachePath), 0755); err != nil {
+		return err
+	}
+	cache := externalSkillsCache{
+		Version:       1,
+		GeneratedUnix: time.Now().Unix(),
+		Skills:        skills,
+	}
+	data, err := json.MarshalIndent(cache, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(cachePath, data, 0644)
+}
+
+func externalSkillsCachePath() string {
+	return filepath.Join(platform.ConfigDir(), "external-skills-index.json")
+}
+
+func externalSkillsCacheTTL() time.Duration {
+	if raw := os.Getenv("SKILL_ROUTER_EXTERNAL_CACHE_TTL_MINUTES"); raw != "" {
+		if minutes, err := strconv.Atoi(raw); err == nil && minutes > 0 {
+			return time.Duration(minutes) * time.Minute
+		}
+	}
+	return 12 * time.Hour
+}
+
+func readSkillFrontmatter(path string) (string, string) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", ""
+	}
+	lines := strings.Split(string(data), "\n")
+	if len(lines) == 0 || strings.TrimSpace(lines[0]) != "---" {
+		return "", ""
+	}
+	name := ""
+	description := ""
+	for _, line := range lines[1:] {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "---" {
+			break
+		}
+		key, value, ok := strings.Cut(trimmed, ":")
+		if !ok {
+			continue
+		}
+		value = strings.Trim(strings.TrimSpace(value), `"'`)
+		switch strings.ToLower(strings.TrimSpace(key)) {
+		case "name":
+			name = value
+		case "description":
+			description = value
+		}
+	}
+	return name, description
+}
+
+func countExternalRootSkills(root externalSkillRoot, canonical map[string]bool) (int, int) {
+	if _, err := os.Stat(root.Path); err != nil {
+		return 0, 0
+	}
+	total := 0
+	unique := 0
+	seen := map[string]bool{}
+	_ = filepath.WalkDir(root.Path, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if entry.IsDir() {
+			name := entry.Name()
+			if name == ".git" || name == "node_modules" || name == "__pycache__" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.EqualFold(entry.Name(), "SKILL.md") {
+			return nil
+		}
+		total++
+		name, _ := readSkillFrontmatter(path)
+		if name == "" {
+			name = filepath.Base(filepath.Dir(path))
+		}
+		key := strings.ToLower(strings.TrimSpace(name))
+		if key != "" && !canonical[key] && !seen[key] {
+			seen[key] = true
+			unique++
+		}
+		return nil
+	})
+	return total, unique
 }
 
 func hasAlias(s manifestSkill, key string) bool {

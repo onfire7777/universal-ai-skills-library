@@ -1,6 +1,8 @@
 package skills
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -19,6 +21,7 @@ type manifestValidation struct {
 	TotalSkills      int      `json:"totalSkills"`
 	DuplicateNames   []string `json:"duplicateNames,omitempty"`
 	DuplicateDirs    []string `json:"duplicateDirs,omitempty"`
+	DuplicateContent []string `json:"duplicateContent,omitempty"`
 	UnsafeDirs       []string `json:"unsafeDirs,omitempty"`
 	MissingSkillMD   []string `json:"missingSkillMd,omitempty"`
 	UnindexedTopDirs []string `json:"unindexedTopDirs,omitempty"`
@@ -42,6 +45,7 @@ var validateManifestCmd = &cobra.Command{
 		fmt.Printf("Manifest: %d core + %d library = %d skills\n", result.CoreSkills, result.LibrarySkills, result.TotalSkills)
 		printValidationList("Duplicate names", result.DuplicateNames)
 		printValidationList("Duplicate directories", result.DuplicateDirs)
+		printValidationList("Duplicate SKILL.md content", result.DuplicateContent)
 		printValidationList("Unsafe directories", result.UnsafeDirs)
 		printValidationList("Missing SKILL.md", result.MissingSkillMD)
 		printValidationList("Unindexed top-level skills", result.UnindexedTopDirs)
@@ -73,6 +77,7 @@ func validateManifest() (manifestValidation, error) {
 	nameSeen := map[string]bool{}
 	dirSeen := map[string]bool{}
 	manifestDirs := map[string]bool{}
+	contentHashes := map[string][]string{}
 	for _, skill := range all {
 		name := strings.ToLower(strings.TrimSpace(skill.Name))
 		dir := filepath.ToSlash(filepath.Clean(skill.Directory))
@@ -92,9 +97,21 @@ func validateManifest() (manifestValidation, error) {
 			result.UnsafeDirs = append(result.UnsafeDirs, skill.Directory)
 			continue
 		}
-		if _, err := os.Stat(filepath.Join(platform.RepoDir(), filepath.FromSlash(dir), "SKILL.md")); err != nil {
+		skillPath := filepath.Join(platform.RepoDir(), filepath.FromSlash(dir), "SKILL.md")
+		if _, err := os.Stat(skillPath); err != nil {
 			result.MissingSkillMD = append(result.MissingSkillMD, skill.Directory)
+		} else if data, err := os.ReadFile(skillPath); err == nil {
+			sum := sha256.Sum256(data)
+			contentHashes[hex.EncodeToString(sum[:])] = append(contentHashes[hex.EncodeToString(sum[:])], skill.Name)
 		}
+	}
+
+	for _, names := range contentHashes {
+		if len(names) <= 1 {
+			continue
+		}
+		sort.Strings(names)
+		result.DuplicateContent = append(result.DuplicateContent, strings.Join(names, ", "))
 	}
 
 	entries, err := os.ReadDir(repoSkillsDir())
@@ -112,10 +129,11 @@ func validateManifest() (manifestValidation, error) {
 
 	sort.Strings(result.DuplicateNames)
 	sort.Strings(result.DuplicateDirs)
+	sort.Strings(result.DuplicateContent)
 	sort.Strings(result.UnsafeDirs)
 	sort.Strings(result.MissingSkillMD)
 	sort.Strings(result.UnindexedTopDirs)
-	result.OK = len(result.DuplicateNames) == 0 && len(result.DuplicateDirs) == 0 && len(result.UnsafeDirs) == 0 && len(result.MissingSkillMD) == 0 && len(result.UnindexedTopDirs) == 0
+	result.OK = len(result.DuplicateNames) == 0 && len(result.DuplicateDirs) == 0 && len(result.DuplicateContent) == 0 && len(result.UnsafeDirs) == 0 && len(result.MissingSkillMD) == 0 && len(result.UnindexedTopDirs) == 0
 	if !result.OK {
 		return result, fmt.Errorf("manifest validation failed")
 	}

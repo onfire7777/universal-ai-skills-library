@@ -10,7 +10,8 @@ This repository is a universal AI skills setup. The default interface is platfor
 - Optional MCP runtime directory: `C:\ProgramData\universal-ai-mcps`
 - Optional MCP scheduled task prefix: `UniversalAI-*`
 - Local tools directory: `%USERPROFILE%\.universal-ai\tools`
-- Current corpus: 1,804 canonical skills, with legacy/display aliases stored in `manifest.json` and `docs/compatibility_aliases.json`
+- Current corpus: 1,805 canonical skills, with legacy/display aliases stored in `manifest.json` and `docs/compatibility_aliases.json`
+- Local external skill roots: searchable and loadable read-only through `skill-router`; not copied into `skills/` unless intentionally promoted.
 
 ## Naming Rules
 
@@ -48,6 +49,8 @@ Full skill bodies are loaded only when needed:
 ```bash
 skill-router skill search <query>
 skill-router skill <name>
+skill-router skills sources
+skill-router skills sources --refresh
 ```
 
 ## Alias Policy
@@ -57,6 +60,27 @@ Legacy display names, old underscore ids, and source-specific names may resolve 
 aliases through the router, but they must not become separate canonical skill ids.
 Aliases that collide with an existing canonical skill id are recorded in
 `docs/compatibility_aliases.json` as disabled collision aliases.
+
+## Redundancy Policy
+
+Canonical skill directories must be unique by ID and content. Do not create a new
+top-level skill directory for an old name when an alias can preserve compatibility.
+Example: `card-creator` is an alias for `printable-cards`, because the full card
+creator skill already exists there.
+
+Third-party caches and marketplaces under Claude, Codex, Manus-compatible, and
+other AI roots remain read-only external sources. This keeps the universal setup
+comprehensive without committing thousands of duplicated upstream skill bodies.
+Promote an external skill into `skills/` only when it is curated, renamed if
+needed, audited, and added to `manifest.json`.
+
+The router stores the external source index under
+`%USERPROFILE%\.skill-router\external-skills-index.json`. Refresh it after adding
+or removing external skill roots.
+
+Use `skill-router skills validate-manifest` before completion. It fails on
+duplicate names, duplicate directories, duplicate canonical `SKILL.md` content,
+unsafe paths, missing skill files, and unindexed canonical directories.
 
 ## Runtime Policy
 

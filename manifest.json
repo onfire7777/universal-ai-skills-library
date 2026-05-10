@@ -54,6 +54,13 @@
       "scripts": []
     },
     {
+      "name": "universal-ai-skills",
+      "directory": "skills/universal-ai-skills",
+      "description": "Operating rule for the Universal AI Skills Router. Use this to keep skill loading context-light and cross-compatible across Codex, Claude Code, Cursor, Gemini, OpenCode, and Manus compatibility surfaces.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
       "name": "model-selector",
       "directory": "skills/model-selector",
       "description": "Set and manage the preferred backbone LLM for compatible AI-agent workflows. Supports manual model selection, automatic best-model selection based on task type, and a cached/refreshable leaderboard of the latest frontier models from OpenRouter. Toggle on/off via chat commands. Use when the user says \"model-selector\", \"set model\", \"change model\", \"best model\", \"auto model\", \"switch model\", \"model-selector on\", \"model-selector off\", \"list models\", \"show models\", \"model status\", \"recommend model\", \"refresh models\", or asks which AI model to use for a task.",
@@ -9258,6 +9265,12 @@
       "name": "printable-cards",
       "directory": "skills/printable-cards",
       "description": "Create beautiful printable foldable greeting cards (birthday, thank you, etc.) as PDFs. Use when the user asks to make, design, or create a printable card, greeting card, birthday card, or foldable card for someone.",
+      "aliases": [
+        "card-creator",
+        "card creator",
+        "greeting-card-creator",
+        "manus-card-creator"
+      ],
       "has_scripts": true,
       "scripts": [
         "clean_cover_image.py",

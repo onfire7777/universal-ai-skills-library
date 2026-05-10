@@ -75,6 +75,32 @@ func TestValidateManifestDetectsProblems(t *testing.T) {
 	}
 }
 
+func TestValidateManifestDetectsDuplicateContent(t *testing.T) {
+	repo := t.TempDir()
+	t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
+	for _, name := range []string{"alpha", "beta"} {
+		dir := filepath.Join(repo, "skills", name)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte("# same skill body\n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	writeManifest(t, repo, `{
+		"core_skills": [{"name":"alpha","directory":"skills/alpha","description":"Alpha"}],
+		"library_skills": [{"name":"beta","directory":"skills/beta","description":"Beta"}]
+	}`)
+
+	result, err := validateManifest()
+	if err == nil {
+		t.Fatalf("expected duplicate content validation error, got nil: %#v", result)
+	}
+	if len(result.DuplicateContent) == 0 {
+		t.Fatalf("expected duplicate content finding: %#v", result)
+	}
+}
+
 func TestIsUnsafeManifestDir(t *testing.T) {
 	unsafe := []string{"", "..", "../x", "..\\x"}
 	for _, dir := range unsafe {
