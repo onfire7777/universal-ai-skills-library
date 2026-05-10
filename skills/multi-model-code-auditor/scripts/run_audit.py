@@ -669,7 +669,7 @@ def query_model(model_info: dict, payload: str, api_key: str,
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://manus.im",
+        "HTTP-Referer": "https://github.com/onfire7777/universal-ai-skills-library",
     }
 
     body = {

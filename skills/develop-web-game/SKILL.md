@@ -1,6 +1,6 @@
 ---
 name: develop-web-game
-description: 'Use when Codex is building or iterating on a web game (HTML/JS) and needs a reliable development + testing loop: implement small changes, run a Playwright-based test script with short input bursts and intentional pauses, inspect screenshots/text, and review console errors with render_game_to_text.'
+description: 'Use when an AI coding agent is building or iterating on a web game (HTML/JS) and needs a reliable development + testing loop: implement small changes, run a Playwright-based test script with short input bursts and intentional pauses, inspect screenshots/text, and review console errors with render_game_to_text. Includes Codex install-path defaults as a compatibility adapter.'
 license: Unspecified
 metadata:
   author: openai
@@ -17,7 +17,7 @@ export WEB_GAME_CLIENT="$CODEX_HOME/skills/develop-web-game/scripts/web_game_pla
 export WEB_GAME_ACTIONS="$CODEX_HOME/skills/develop-web-game/references/action_payloads.json"
 ```
 
-User-scoped skills install under `$CODEX_HOME/skills` (default: `~/.codex/skills`).
+User-scoped skills commonly install under `$CODEX_HOME/skills` (default: `~/.codex/skills`) in Codex-compatible setups. Other clients can point `WEB_GAME_CLIENT` and `WEB_GAME_ACTIONS` at the same files in their own skill root.
 
 ## Workflow
 

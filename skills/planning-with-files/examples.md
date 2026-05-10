@@ -199,4 +199,4 @@ Success!
 → Now make the decision       # Goals are fresh in context
 ```
 
-This is why Manus can handle ~50 tool calls without losing track. The plan file acts as a "goal refresh" mechanism.
+This is why long-running agents can handle many tool calls without losing track. The plan file acts as a "goal refresh" mechanism.

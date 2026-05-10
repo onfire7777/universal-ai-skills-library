@@ -1,11 +1,11 @@
 ---
 name: planning-with-files
-description: Transforms workflow to use Manus-style persistent markdown files for planning, progress tracking, and knowledge storage. Use when starting complex tasks, multi-step projects, research tasks, or when the user mentions planning, organizing work, tracking progress, or wants structured output.
+description: Transforms workflow to use agent-friendly persistent markdown files for planning, progress tracking, and knowledge storage. Use when starting complex tasks, multi-step projects, research tasks, or when the user mentions planning, organizing work, tracking progress, or wants structured output.
 license: Unspecified
 ---
 # Planning with Files
 
-Work like Manus: Use persistent markdown files as your "working memory on disk."
+Work like a long-running AI agent: use persistent markdown files as your "working memory on disk."
 
 ## Quick Start
 
@@ -153,7 +153,7 @@ Every error goes in the "Errors Encountered" section. This builds knowledge for 
 See [reference.md](reference.md) for:
 - Attention manipulation techniques
 - Error recovery patterns
-- Context optimization from Manus
+- Context optimization from agentic systems
 
 See [examples.md](examples.md) for:
 - Real task examples

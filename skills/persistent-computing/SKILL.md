@@ -1,6 +1,6 @@
 ---
 name: persistent-computing
-description: "MUST read when user needs to run persistent services that WebDev cannot support (bots, game servers, self-hosted apps), or requires Docker, fixed IP, background jobs, heavy compute, or a reusable environment across sessions. MUST also read before deploying a resource-intensive service to an attached persistent VM. Guides persistent computing solutions vs sandbox vs WebDev."
+description: "MUST read when a task needs persistent services, Docker, fixed IPs, background jobs, heavy compute, reusable environments, or always-on infrastructure beyond the current AI sandbox. Covers local desktop, managed cloud computer, and third-party cloud options, including Manus compatibility where relevant."
 ---
 
 # Persistent Computing

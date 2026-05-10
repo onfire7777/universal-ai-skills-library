@@ -1,0 +1,503 @@
+{
+  "schema": "universal-ai-skills-aliases/v1",
+  "generated_at": "2026-05-10T01:06:18.285431+00:00",
+  "description": "Legacy lookup aliases preserved after universal skill id normalization. Canonical skill ids are kebab-case top-level directories under skills/.",
+  "aliases": {
+    "ahrefs-automation": [
+      "Ahrefs Automation"
+    ],
+    "anthropic-administrator-automation": [
+      "anthropic_administrator-automation"
+    ],
+    "apify-automation": [
+      "Apify Automation"
+    ],
+    "apollo-automation": [
+      "Apollo Automation"
+    ],
+    "ashby-automation": [
+      "Ashby Automation"
+    ],
+    "attio-automation": [
+      "Attio Automation"
+    ],
+    "banner-design": [
+      "ckm-banner-design",
+      "ckm:banner-design"
+    ],
+    "braintree-automation": [
+      "Braintree Automation"
+    ],
+    "brand": [
+      "ckm-brand",
+      "ckm:brand"
+    ],
+    "brutalist-skill": [
+      "industrial-brutalist-ui"
+    ],
+    "capsule-crm-automation": [
+      "Capsule CRM Automation",
+      "capsule_crm-automation"
+    ],
+    "clockify-automation": [
+      "Clockify Automation"
+    ],
+    "cloudinary-automation": [
+      "Cloudinary Automation"
+    ],
+    "coinbase-automation": [
+      "Coinbase Automation"
+    ],
+    "compression-runtime": [
+      "bundled-compression-runtime"
+    ],
+    "conducting-internal-network-penetration-test": [
+      "conducting-internal-network-p-your-password-test",
+      "conducting-internal-network-p<YOUR_PASSWORD>-test"
+    ],
+    "contentful-automation": [
+      "Contentful Automation"
+    ],
+    "customerio-automation": [
+      "customer-io-automation",
+      "Customer.io Automation"
+    ],
+    "design": [
+      "ckm-design",
+      "ckm:design"
+    ],
+    "design-system": [
+      "ckm-design-system",
+      "ckm:design-system"
+    ],
+    "docker-hub-automation": [
+      "Docker Hub Automation",
+      "docker_hub-automation"
+    ],
+    "dynamics365-automation": [
+      "Dynamics 365 Automation",
+      "dynamics-365-automation"
+    ],
+    "elevenlabs-automation": [
+      "ElevenLabs Automation"
+    ],
+    "eventbrite-automation": [
+      "Eventbrite Automation"
+    ],
+    "excel-automation": [
+      "Excel Automation"
+    ],
+    "facebook-automation": [
+      "Facebook Automation"
+    ],
+    "fillout-forms-automation": [
+      "fillout_forms-automation"
+    ],
+    "firecrawl-automation": [
+      "Firecrawl Automation"
+    ],
+    "freshbooks-automation": [
+      "FreshBooks Automation"
+    ],
+    "gong-automation": [
+      "Gong Automation"
+    ],
+    "google-admin-automation": [
+      "google_admin-automation"
+    ],
+    "google-classroom-automation": [
+      "google_classroom-automation"
+    ],
+    "google-maps-automation": [
+      "google_maps-automation"
+    ],
+    "google-search-console-automation": [
+      "google_search_console-automation"
+    ],
+    "gorgias-automation": [
+      "Gorgias Automation"
+    ],
+    "gpt-tasteskill": [
+      "gpt-taste"
+    ],
+    "groqcloud-automation": [
+      "GroqCloud Automation"
+    ],
+    "gumroad-automation": [
+      "Gumroad Automation"
+    ],
+    "harvest-automation": [
+      "Harvest Automation"
+    ],
+    "heygen-automation": [
+      "HeyGen Automation"
+    ],
+    "html-ppt-presenter-mode-reveal": [
+      "html-ppt-presenter-mode"
+    ],
+    "hunter-automation": [
+      "Hunter Automation"
+    ],
+    "image-to-code-skill": [
+      "image-to-code"
+    ],
+    "instantly-automation": [
+      "Instantly Automation"
+    ],
+    "jotform-automation": [
+      "Jotform Automation"
+    ],
+    "kommo-automation": [
+      "Kommo Automation"
+    ],
+    "launch-darkly-automation": [
+      "launch_darkly-automation",
+      "LaunchDarkly Automation",
+      "launchdarkly-automation"
+    ],
+    "lemlist-automation": [
+      "Lemlist Automation"
+    ],
+    "lemon-squeezy-automation": [
+      "Lemon Squeezy Automation",
+      "lemon_squeezy-automation"
+    ],
+    "lever-automation": [
+      "Lever Automation"
+    ],
+    "mailerlite-automation": [
+      "MailerLite Automation"
+    ],
+    "many-chat-automation": [
+      "many_chat-automation"
+    ],
+    "microsoft-clarity-automation": [
+      "Microsoft Clarity Automation",
+      "microsoft_clarity-automation"
+    ],
+    "minimalist-skill": [
+      "minimalist-ui"
+    ],
+    "mistral-ai-automation": [
+      "Mistral AI Automation",
+      "mistral_ai-automation"
+    ],
+    "neon-automation": [
+      "Neon Automation"
+    ],
+    "netsuite-automation": [
+      "NetSuite Automation"
+    ],
+    "new-relic-automation": [
+      "New Relic Automation",
+      "new_relic-automation"
+    ],
+    "omnisend-automation": [
+      "Omnisend Automation"
+    ],
+    "onesignal-rest-api-automation": [
+      "onesignal_rest_api-automation"
+    ],
+    "openai-automation": [
+      "OpenAI Automation"
+    ],
+    "output-skill": [
+      "full-output-enforcement"
+    ],
+    "pandadoc-automation": [
+      "PandaDoc Automation"
+    ],
+    "phantombuster-automation": [
+      "PhantomBuster Automation"
+    ],
+    "printing-press-golden": [
+      "pp-printing-press-golden"
+    ],
+    "printing-press-rich-auth": [
+      "pp-printing-press-rich"
+    ],
+    "prismic-automation": [
+      "Prismic Automation"
+    ],
+    "productboard-automation": [
+      "Productboard Automation"
+    ],
+    "public-param-golden": [
+      "pp-public-param-golden"
+    ],
+    "quickbooks-automation": [
+      "QuickBooks Automation"
+    ],
+    "ramp-automation": [
+      "Ramp Automation"
+    ],
+    "redesign-skill": [
+      "redesign-existing-projects"
+    ],
+    "replicate-automation": [
+      "Replicate Automation"
+    ],
+    "ring-central-automation": [
+      "ring_central-automation",
+      "RingCentral Automation",
+      "ringcentral-automation"
+    ],
+    "semrush-automation": [
+      "SEMrush Automation"
+    ],
+    "share-point-automation": [
+      "share_point-automation",
+      "SharePoint Automation",
+      "sharepoint-automation"
+    ],
+    "shortcut-automation": [
+      "Shortcut Automation"
+    ],
+    "similarweb-digitalrank-api-automation": [
+      "similarweb_digitalrank_api-automation"
+    ],
+    "skill-seekers": [
+      "skill-builder"
+    ],
+    "slides": [
+      "ckm-slides",
+      "ckm:slides"
+    ],
+    "snowflake-automation": [
+      "Snowflake Automation"
+    ],
+    "soft-skill": [
+      "high-end-visual-design"
+    ],
+    "spotify-automation": [
+      "Spotify Automation"
+    ],
+    "stitch-skill": [
+      "stitch-design-taste"
+    ],
+    "survey-monkey-automation": [
+      "survey_monkey-automation",
+      "SurveyMonkey Automation",
+      "surveymonkey-automation"
+    ],
+    "taste-skill": [
+      "design-taste-frontend"
+    ],
+    "toggl-automation": [
+      "Toggl Automation"
+    ],
+    "ui-styling": [
+      "ckm-ui-styling",
+      "ckm:ui-styling"
+    ],
+    "uploadcare-automation": [
+      "Uploadcare Automation"
+    ],
+    "wave-accounting-automation": [
+      "Wave Accounting Automation",
+      "wave_accounting-automation"
+    ],
+    "webex-automation": [
+      "Webex Automation"
+    ],
+    "workday-automation": [
+      "Workday Automation"
+    ],
+    "xero-automation": [
+      "Xero Automation"
+    ],
+    "zoho-bigin-automation": [
+      "zoho_bigin-automation"
+    ],
+    "zoho-books-automation": [
+      "Zoho Books Automation",
+      "zoho_books-automation"
+    ],
+    "zoho-desk-automation": [
+      "Zoho Desk Automation",
+      "zoho_desk-automation"
+    ],
+    "zoho-inventory-automation": [
+      "zoho_inventory-automation"
+    ],
+    "zoho-invoice-automation": [
+      "zoho_invoice-automation"
+    ],
+    "zoho-mail-automation": [
+      "zoho_mail-automation"
+    ]
+  },
+  "merged_directories": [
+    {
+      "legacy_directory": "anthropic_administrator-automation",
+      "canonical_directory": "anthropic-administrator-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "capsule_crm-automation",
+      "canonical_directory": "capsule-crm-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "docker_hub-automation",
+      "canonical_directory": "docker-hub-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "fillout_forms-automation",
+      "canonical_directory": "fillout-forms-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "google_admin-automation",
+      "canonical_directory": "google-admin-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "google_classroom-automation",
+      "canonical_directory": "google-classroom-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "google_maps-automation",
+      "canonical_directory": "google-maps-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "google_search_console-automation",
+      "canonical_directory": "google-search-console-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "launch_darkly-automation",
+      "canonical_directory": "launch-darkly-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "lemon_squeezy-automation",
+      "canonical_directory": "lemon-squeezy-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "many_chat-automation",
+      "canonical_directory": "many-chat-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "microsoft_clarity-automation",
+      "canonical_directory": "microsoft-clarity-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "mistral_ai-automation",
+      "canonical_directory": "mistral-ai-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "new_relic-automation",
+      "canonical_directory": "new-relic-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "onesignal_rest_api-automation",
+      "canonical_directory": "onesignal-rest-api-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "ring_central-automation",
+      "canonical_directory": "ring-central-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "share_point-automation",
+      "canonical_directory": "share-point-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "similarweb_digitalrank_api-automation",
+      "canonical_directory": "similarweb-digitalrank-api-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "survey_monkey-automation",
+      "canonical_directory": "survey-monkey-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "wave_accounting-automation",
+      "canonical_directory": "wave-accounting-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "zoho_bigin-automation",
+      "canonical_directory": "zoho-bigin-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "zoho_books-automation",
+      "canonical_directory": "zoho-books-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "zoho_desk-automation",
+      "canonical_directory": "zoho-desk-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "zoho_inventory-automation",
+      "canonical_directory": "zoho-inventory-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "zoho_invoice-automation",
+      "canonical_directory": "zoho-invoice-automation",
+      "preserved_variant": true
+    },
+    {
+      "legacy_directory": "zoho_mail-automation",
+      "canonical_directory": "zoho-mail-automation",
+      "preserved_variant": true
+    }
+  ],
+  "disabled_colliding_aliases": {
+    "claude-native-algorithmic-art": [
+      "algorithmic-art"
+    ],
+    "claude-native-brand-guidelines": [
+      "brand-guidelines"
+    ],
+    "claude-native-canvas-design": [
+      "canvas-design"
+    ],
+    "claude-native-claude-api": [
+      "claude-api"
+    ],
+    "claude-native-code-review": [
+      "code-review"
+    ],
+    "claude-native-docx": [
+      "docx"
+    ],
+    "claude-native-mcp-builder": [
+      "mcp-builder"
+    ],
+    "claude-native-theme-factory": [
+      "theme-factory"
+    ],
+    "claude-native-web-artifacts-builder": [
+      "web-artifacts-builder"
+    ],
+    "claude-native-webapp-testing": [
+      "webapp-testing"
+    ],
+    "claude-native-xlsx": [
+      "xlsx"
+    ],
+    "saas-landing-skill": [
+      "saas-landing"
+    ],
+    "template": [
+      "template-skill"
+    ]
+  }
+}

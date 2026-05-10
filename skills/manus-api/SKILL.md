@@ -1,11 +1,11 @@
 ---
 name: manus-api
-description: Manage tasks, projects, and other data in Manus via API, or create Manus tasks programmatically to build services or workflows that need agentic capabilities.
+description: Manus API compatibility adapter. Manage tasks, projects, and other data in Manus via API, or create Manus tasks programmatically when a workflow specifically needs Manus-hosted agentic capabilities.
 ---
 
 # Manus API Integration Guide
 
-Use this skill when building or troubleshooting integrations that call the Manus API, automate Manus agents, retrieve generated results, manage projects/files/webhooks/connectors/agents/usage, request structured JSON outputs, or publish websites created by Manus tasks.
+Use this compatibility adapter when building or troubleshooting integrations that call the Manus API, automate Manus agents, retrieve generated results, manage projects/files/webhooks/connectors/agents/usage, request structured JSON outputs, or publish websites created by Manus tasks.
 
 This file is the **routing and decision guide**. Keep implementation details in the embedded official docs under `docs/`. When a user asks for exact request bodies, response schemas, validation rules, rate limits, or endpoint-specific edge cases, open the relevant `docs/v2/*.mdx` file instead of relying on this overview.
 

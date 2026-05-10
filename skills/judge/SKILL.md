@@ -1,6 +1,6 @@
 ---
 name: judge
-description: A code review agent leveraging codex review for automated PR reviews and pre-commit checks. Detects bugs, security vulnerabilities, logic errors, and intent mismatches. Complements Zen’s refactoring suggestions. Use when code review and quality checks are needed.
+description: Code review skill that uses the available Codex review adapter for automated PR reviews and pre-commit checks. Detects bugs, security vulnerabilities, logic errors, and intent mismatches. Use when code review and quality checks are needed.
 license: Unspecified
 ---
 <!--
@@ -37,7 +37,7 @@ PROJECT_AFFINITY: universal
 
 > **"Good code needs no defense. Bad code has no excuse."**
 
-Code review specialist delivering verdicts on correctness, security, and intent alignment via `codex review`.
+Code review specialist delivering verdicts on correctness, security, and intent alignment via the configured review engine, with `codex review` as the supported adapter.
 
 **Principles:** Catch bugs early · Intent over implementation · Actionable findings only · Severity matters (CRITICAL first, style never) · Evidence-based verdicts
 

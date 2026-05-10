@@ -1,22 +1,21 @@
-# Manus Universal Plugin
+# Universal AI Skills Plugin
 
-This plugin is intentionally CLI-first.
+This plugin is an index and rule surface for the Universal AI Skills Router. It does not embed the 1,804-skill corpus into always-loaded context.
 
-Agents should not load the full skills corpus into always-on context. They should use:
+Use:
+
+```bash
+skill-router skill <name>
+skill-router skill search <query>
+skill-router skill list
+skill-router doctor
+skill-router mcp status
+```
+
+Compatibility:
 
 ```bash
 manus skill <name>
-manus skill search <query>
-manus skill list
-manus doctor
-manus mcp status
 ```
 
-The repository source of truth is:
-
-- `skills/` - all 785 skills, including custom core skills
-- `manus-cli/` - one cross-platform CLI
-- `infrastructure/` - optional persistent MCP bridge scripts
-- `plugin/` - universal plugin and agent instruction payloads
-
-MCP bridges are optional. Keep them running only for services that need persistent tool endpoints, such as MemPalace or Context Mode. Prefer direct CLI calls for skill loading, audits, reports, and local file workflows.
+Use the compatibility command only for existing clients or scripts that have not moved to `skill-router` yet.

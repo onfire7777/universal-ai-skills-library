@@ -22,11 +22,11 @@ The system classifies queries into 7 categories, each triggering different optim
 
 Each model receives a prompt variant optimized for its architecture:
 
-**Anthropic Claude Opus 4.6**: Leverage its strength in nuanced multi-perspective analysis. Prompts emphasize considering edge cases, acknowledging uncertainty, and providing balanced viewpoints. Works best with explicit thinking structure.
+**Reasoning model**: Leverage its strength in nuanced multi-perspective analysis. Prompts emphasize considering edge cases, acknowledging uncertainty, and providing balanced viewpoints. Works best with explicit thinking structure.
 
 **OpenAI GPT-5.4**: Leverage its strength in systematic coverage and technical precision. Prompts emphasize completeness, structured output, and concrete examples. Works best with clear format specifications.
 
-**Manus gpt-4.1-mini**: Leverage its speed and efficiency. Prompts are more concise, emphasizing directness and actionability. Used as the prompt engineering engine itself (meta-level) and as the merge engine.
+**Fast synthesis model**: Leverage its speed and efficiency. Prompts are concise, emphasizing directness and actionability. Used as the prompt engineering engine itself (meta-level) and as the merge engine.
 
 ## Techniques Applied
 

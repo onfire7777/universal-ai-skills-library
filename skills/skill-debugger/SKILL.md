@@ -1,11 +1,11 @@
 ---
 name: skill-debugger
-description: Deep dual-model debugging of Manus skills using Claude Opus 4.6 and Manus gpt-4.1-mini. Use when asked to debug a skill, find bugs in a skill, review a skill for issues, fix a broken skill, or audit a skill's quality. Also use when a skill is not working correctly or producing unexpected results.
+description: Deep dual-model debugging of AI skills using reasoning model and fast synthesis model. Use when asked to debug a skill, find bugs in a skill, review a skill for issues, fix a broken skill, or audit a skill's quality. Also use when a skill is not working correctly or producing unexpected results.
 ---
 
 # Skill Debugger
 
-Debug Manus skills using two complementary AI models in parallel: **Claude Opus 4.6** (deep code reasoning, security, logic bugs) and **Manus gpt-4.1-mini** (structural integrity, integration quality, trigger accuracy). Findings are merged by consensus — issues confirmed by both models get elevated confidence.
+Debug AI skills using two complementary AI models in parallel: **reasoning model** (deep code reasoning, security, logic bugs) and **fast synthesis model** (structural integrity, integration quality, trigger accuracy). Findings are merged by consensus — issues confirmed by both models get elevated confidence.
 
 ## When to Use
 
@@ -38,7 +38,7 @@ python3 /home/ubuntu/skills/skill-debugger/scripts/debug_skill.py <skill-name> -
 Single-model mode (when one API is unavailable):
 ```bash
 python3 /home/ubuntu/skills/skill-debugger/scripts/debug_skill.py <skill-name> --model claude
-python3 /home/ubuntu/skills/skill-debugger/scripts/debug_skill.py <skill-name> --model manus
+python3 /home/ubuntu/skills/skill-debugger/scripts/debug_skill.py <skill-name> --model fast
 ```
 
 Debug by path (for skills not in the standard directory):
@@ -73,13 +73,13 @@ python3 /home/ubuntu/skills/skill-debugger/scripts/debug_skill.py <skill-name>
 
 The debugger examines five dimensions, with each model contributing its strengths:
 
-| Dimension | Claude Focus | Manus Focus |
+| Dimension | Reasoning Model Focus | Fast Model Focus |
 |---|---|---|
 | Structural | File existence, path correctness | Frontmatter quality, trigger accuracy |
 | Scripts | Logic bugs, security, edge cases | Import errors, argument parsing, output format |
 | Robustness | Race conditions, resource leaks, memory | Missing error handling, hardcoded paths |
 | Security | Command injection, path traversal, key exposure | Input validation, unsafe deserialization |
-| Integration | API contract violations | Manus-specific conventions, instruction clarity |
+| Integration | API contract violations | platform-specific conventions, instruction clarity |
 
 ## Prompt Engineering
 
@@ -87,6 +87,6 @@ The debugger uses elite prompt engineering techniques documented in `references/
 
 ## Requirements
 
-- `OPENROUTER_API_KEY` environment variable (for Claude Opus 4.6)
-- `OPENAI_API_KEY` environment variable (for Manus gpt-4.1-mini)
+- `OPENROUTER_API_KEY` environment variable (for reasoning model)
+- `OPENAI_API_KEY` environment variable (for fast synthesis model)
 - Python packages: `requests`, `openai` (auto-installed if missing)

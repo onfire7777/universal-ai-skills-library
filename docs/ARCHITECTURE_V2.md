@@ -1,81 +1,71 @@
-# Architecture v2
+# Universal AI Skills Router Architecture
 
-## Goal
+## Decision
 
-Make the AI setup fully available without loading every skill into every agent context.
+Use a universal, CLI-first router as the stable core for the user's AI skill ecosystem.
 
-## Decisions
+Primary names:
 
-1. `skills/` is the only skill source of truth.
-2. `manus-cli/` is the only normal runtime router.
-3. `plugin/` is metadata and compact instructions, not another skill copy.
-4. MCP bridges are optional and reserved for persistent endpoints.
-5. Local AI clients should carry small operating rules that point to `manus`.
+- Product: Universal AI Skills Router
+- CLI source: `skill-router-cli/`
+- Primary binary: `skill-router`
+- Source-of-truth corpus: `skills/`
+- Universal setup skill: `universal-ai-config`
 
-## Runtime Paths
+Compatibility names remain only where they identify a real adapter or preserve installed clients:
 
-```text
-%USERPROFILE%\manus-skills-library\skills       source corpus
-%USERPROFILE%\manus-skills-library\manus-cli   CLI source
-%USERPROFILE%\go\bin\manus.exe                 installed CLI
-C:\ProgramData\manus-mcps                       optional bridge logs/scripts
-```
+- `manus.exe` remains a legacy executable alias.
+- `manus-api` remains the Manus API adapter.
+- `.manus` remains the Manus client compatibility root.
+- Existing Windows scheduled task names remain stable until bridges are re-registered.
 
-## Skill Loading
+## Rationale
 
-Preferred:
+The previous layout worked technically but mixed a universal router with Manus-branded names. That violated separation of concerns: the universal core and platform adapters were coupled in naming, docs, plugin metadata, and local instructions.
 
-```bash
-manus skill <name>
-manus skill search <query>
-```
+The revised design follows ports and adapters:
 
-Fallback:
+- Core domain: skills, manifest, router commands, context-light loading rules.
+- Ports: CLI commands and compact plugin instructions.
+- Adapters: Codex, Claude Code, Cursor, Gemini, OpenCode, Manus API, MCP bridges.
+- Infrastructure: scheduled tasks, Docker-backed Lightpanda, bridge scripts, local binaries.
 
-```bash
-npx openskills read <name>
-```
+## Operating Model
 
-Do not copy full skill bodies into `AGENTS.md`, `CLAUDE.md`, Cursor rules, or other always-loaded instruction files.
+1. Load skills on demand with `skill-router skill <name>`.
+2. Search before loading with `skill-router skill search <query>`.
+3. Keep global agent instructions as indexes only.
+4. Treat MCP bridges as optional persistent adapters.
+5. Keep compatibility aliases but avoid using them in new docs unless the target is platform-specific.
 
-## MCP Policy
-
-Use direct CLI for:
-
-- skill loading
-- skill search
-- audits
-- local report generation
-- file organization
-- command orchestration
-
-Use MCP for:
-
-- MemPalace durable memory
-- Context Mode indexed long-output routing
-- Skill Seekers dynamic skill generation workflows
-- Lightpanda persistent browser/CDP workflows
-
-If an MCP endpoint is down but the equivalent CLI works, the system remains usable.
-
-## Local Client Surfaces
-
-Each AI client should get the same compact rule:
+## Directory Contract
 
 ```text
-Use `manus skill <name>` to load skills on demand.
-Use `manus skill search <query>` when the skill name is unknown.
-Keep always-loaded instructions compact.
-MCP bridges are optional and only needed for persistent endpoint workflows.
+universal-ai-skills-library/
+├── skill-router-cli/       # Go router source
+├── skills/                 # All skill bodies and resources
+├── plugin/                 # Universal plugin metadata and client adapters
+├── infrastructure/         # Optional bridge setup/runtime scripts
+└── docs/                   # Architecture, compatibility, migration, and audit notes
 ```
 
-## Verification
+## Naming Contract
 
-```bash
-manus --version
-manus skill persistent-computing
-manus skill search debugger
-manus skill list
-manus mcp status
-go test ./...
-```
+| Surface | Primary Name | Compatibility Name |
+|---|---|---|
+| CLI binary | `skill-router` | `manus` |
+| Setup skill | `universal-ai-config` | `manus-config` CLI lookup alias |
+| Repo | `universal-ai-skills-library` | `manus-skills-library` redirect or local fallback |
+| Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |
+| API adapter | `manus-api` | N/A, platform-specific by design |
+
+Detailed compatibility rules live in `docs/UNIVERSAL_COMPATIBILITY.md`.
+
+## Done Criteria
+
+- `skill-router --version` works.
+- `skill-router skill universal-ai-config` prints the renamed skill.
+- `skill-router skill manus-config` still resolves as a legacy alias.
+- `manifest.json` matches the actual `skills/` tree.
+- Local AI instruction files mention the router, not embedded skill tables.
+- GitHub remote is current with the universal naming contract.

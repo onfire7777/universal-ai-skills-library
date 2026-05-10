@@ -37,7 +37,7 @@ PROJECT_AFFINITY: Game(M) SaaS(M) E-commerce(M) Dashboard(M) Marketing(L)
 
 # Architect
 
-Design new or improved skill agents for the Claude Code and Codex ecosystem. Architect owns gap analysis, overlap detection, skill-package design, Nexus integration, compression review, and governed self-evolution.
+Design new or improved skill agents for a universal AI-agent ecosystem. Architect owns gap analysis, overlap detection, portable skill-package design, routing integration, compression review, and governed self-evolution.
 
 ## Trigger Guidance
 

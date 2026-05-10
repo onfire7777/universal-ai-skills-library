@@ -1,6 +1,6 @@
 ---
 name: arena
-description: Specialist who directly operates codex exec / gemini CLI to implement using two major paradigms: competitive development (COMPETE) and collaborative development (COLLABORATE). COMPETE compares multiple approaches and adopts the best solution. COLLABORATE delegates different tasks to external engines and integrates the results. Supports Solo/Team/Quick execution modes.
+description: External-engine orchestration adapter that directly operates Codex CLI and Gemini CLI using two paradigms: competitive development (COMPETE) and collaborative development (COLLABORATE). COMPETE compares multiple approaches and adopts the best solution. COLLABORATE delegates different tasks to external engines and integrates the results. Supports Solo/Team/Quick execution modes.
 license: Unspecified
 ---
 <!--

@@ -3,7 +3,7 @@
 
 4-Stage Pipeline:
   1. Prompt Engineering: Analyze intent, optimize the query, create model-specific variants
-  2. Parallel Query: Send to Anthropic's best, OpenAI's best, and Manus simultaneously
+  2. Parallel Query: Send to Anthropic's best, OpenAI's best, and the fast synthesis model simultaneously
   3. Intelligent Merge: Extract strongest elements, resolve contradictions, unify
   4. Output: Deliver the ultimate merged answer
 
@@ -47,7 +47,7 @@ def _check_openai():
     """Check if the openai package is available."""
     if OpenAI is None:
         print(
-            "WARNING: 'openai' package not installed. Manus model and prompt "
+            "WARNING: 'openai' package not installed. fast synthesis model and prompt "
             "engineering will be unavailable.\n"
             "Install with: pip3 install openai",
             file=sys.stderr,
@@ -65,7 +65,7 @@ def _check_env_keys():
         )
     if not os.environ.get("OPENAI_API_KEY"):
         warnings.append(
-            "OPENAI_API_KEY not set — Manus model and prompt engineering will be unavailable"
+            "OPENAI_API_KEY not set — fast synthesis model and prompt engineering will be unavailable"
         )
     for w in warnings:
         _log(f"WARNING: {w}")
@@ -80,9 +80,9 @@ def _log(msg: str):
 # ─── Configuration ──────────────────────────────────────────────────────────
 
 # Model IDs — the latest best models as of April 2026
-ANTHROPIC_MODEL = "anthropic/claude-opus-4.6"
+ANTHROPIC_MODEL = os.environ.get("ORACLE_REASONING_MODEL", "anthropic/claude-opus-4.6")
 OPENAI_MODEL = "openai/gpt-5.4"
-MANUS_MODEL = "gpt-4.1-mini"
+FAST_MODEL = "gpt-4.1-mini"
 
 # API endpoints
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -191,7 +191,7 @@ def build_model_strength_description(model_name: str) -> str:
     """Describe each model's strengths for the prompt engineer."""
     strengths = {
         "anthropic": (
-            "Anthropic Claude Opus 4.6 — excels at nuanced reasoning, creative writing, "
+            "Reasoning model - excels at nuanced reasoning, creative writing, "
             "philosophical depth, careful analysis, safety-aware responses, and long-form "
             "structured output. Particularly strong at considering multiple perspectives "
             "and acknowledging uncertainty."
@@ -202,7 +202,7 @@ def build_model_strength_description(model_name: str) -> str:
             "following complex instructions. Particularly strong at systematic "
             "problem-solving and comprehensive coverage."
         ),
-        "manus": (
+        "fast": (
             "GPT-4.1-mini — fast and efficient, good at structured tasks, concise "
             "answers, and practical advice. Best used for clear, direct responses "
             "that prioritize actionability over depth."
@@ -211,7 +211,7 @@ def build_model_strength_description(model_name: str) -> str:
     for key, desc in strengths.items():
         if key in model_name.lower():
             return desc
-    return strengths["manus"]
+    return strengths["fast"]
 
 
 def _engineer_single_variant(client, model_key: str, model_id: str,
@@ -228,7 +228,7 @@ def _engineer_single_variant(client, model_key: str, model_id: str,
 
     try:
         response = client.chat.completions.create(
-            model=MANUS_MODEL,
+            model=FAST_MODEL,
             messages=[
                 {"role": "system", "content": PROMPT_ENGINEER_SYSTEM},
                 {"role": "user", "content": engineer_prompt},
@@ -251,15 +251,15 @@ def _engineer_single_variant(client, model_key: str, model_id: str,
 
 
 def prompt_engineer(query: str, intent: str) -> dict:
-    """Stage 1: Use Manus model to prompt-engineer the user's query IN PARALLEL.
+    """Stage 1: Use fast synthesis model to prompt-engineer the user's query IN PARALLEL.
 
-    Returns dict with keys: anthropic_prompt, openai_prompt, manus_prompt, reasoning
+    Returns dict with keys: anthropic_prompt, openai_prompt, fast_prompt, reasoning
     """
     if not _check_openai() or not os.environ.get("OPENAI_API_KEY"):
         return {
             "anthropic_prompt": query,
             "openai_prompt": query,
-            "manus_prompt": query,
+            "fast_prompt": query,
             "reasoning": "Prompt engineering skipped: openai package or API key not available.",
         }
 
@@ -269,7 +269,7 @@ def prompt_engineer(query: str, intent: str) -> dict:
     models_info = [
         ("anthropic", ANTHROPIC_MODEL),
         ("openai", OPENAI_MODEL),
-        ("manus", MANUS_MODEL),
+        ("fast", FAST_MODEL),
     ]
 
     # Parallelize the 3 prompt engineering calls
@@ -294,7 +294,7 @@ def prompt_engineer(query: str, intent: str) -> dict:
                 results[f"{model_key}_prompt"] = query
 
     # Ensure all keys exist
-    for key in ["anthropic_prompt", "openai_prompt", "manus_prompt"]:
+    for key in ["anthropic_prompt", "openai_prompt", "fast_prompt"]:
         if key not in results:
             results[key] = query
 
@@ -327,7 +327,7 @@ def query_openrouter(model_id: str, prompt: str, intent: str) -> dict:
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://manus.im",
+        "HTTP-Referer": "https://github.com/onfire7777/universal-ai-skills-library",
         "X-Title": "Multi-Model Oracle",
     }
     payload = {
@@ -400,14 +400,14 @@ def query_openrouter(model_id: str, prompt: str, intent: str) -> dict:
             return {"model": model_id, "success": False, "error": str(e)}
 
 
-def query_manus(prompt: str, intent: str) -> dict:
-    """Query the Manus built-in model via OpenAI-compatible API."""
+def query_fast_model(prompt: str, intent: str) -> dict:
+    """Query the fast synthesis model via OpenAI-compatible API."""
     if not _check_openai():
-        return {"model": MANUS_MODEL, "success": False,
+        return {"model": FAST_MODEL, "success": False,
                 "error": "openai package not installed"}
 
     if not os.environ.get("OPENAI_API_KEY"):
-        return {"model": MANUS_MODEL, "success": False,
+        return {"model": FAST_MODEL, "success": False,
                 "error": "OPENAI_API_KEY not set"}
 
     system_messages = {
@@ -425,7 +425,7 @@ def query_manus(prompt: str, intent: str) -> dict:
     try:
         t0 = time.time()
         response = client.chat.completions.create(
-            model=MANUS_MODEL,
+            model=FAST_MODEL,
             messages=[
                 {"role": "system", "content": system_msg},
                 {"role": "user", "content": prompt},
@@ -437,7 +437,7 @@ def query_manus(prompt: str, intent: str) -> dict:
         content = response.choices[0].message.content.strip()
         usage = response.usage
         return {
-            "model": MANUS_MODEL,
+            "model": FAST_MODEL,
             "success": True,
             "content": content,
             "elapsed": round(elapsed, 1),
@@ -445,7 +445,7 @@ def query_manus(prompt: str, intent: str) -> dict:
             "tokens_out": usage.completion_tokens if usage else 0,
         }
     except Exception as e:
-        return {"model": MANUS_MODEL, "success": False, "error": str(e)}
+        return {"model": FAST_MODEL, "success": False, "error": str(e)}
 
 
 def query_all_models(prompts: dict, intent: str) -> list:
@@ -462,13 +462,13 @@ def query_all_models(prompts: dict, intent: str) -> list:
             OPENAI_MODEL, prompts["openai_prompt"], intent
         )
 
-    def _query_manus():
-        return query_manus(prompts["manus_prompt"], intent)
+    def _query_fast_model():
+        return query_fast_model(prompts["fast_prompt"], intent)
 
     tasks = {
-        "Anthropic Claude Opus 4.6": _query_anthropic,
+        "Reasoning model": _query_anthropic,
         "OpenAI GPT-5.4": _query_openai,
-        "Manus gpt-4.1-mini": _query_manus,
+        "Fast synthesis model": _query_fast_model,
     }
 
     _log("  Querying models in parallel...")
@@ -555,7 +555,7 @@ def merge_responses(query: str, results: list, intent: str) -> str:
     for attempt in range(MERGE_MAX_RETRIES + 1):
         try:
             response = client.chat.completions.create(
-                model=MANUS_MODEL,
+                model=FAST_MODEL,
                 messages=[
                     {"role": "system", "content": MERGE_SYSTEM},
                     {"role": "user", "content": merge_prompt},
@@ -621,7 +621,7 @@ def format_output(
         lines.append("PROMPT ENGINEERING")
         lines.append("-" * 70)
         lines.append(f"Reasoning: {prompts.get('reasoning', 'N/A')}")
-        for key in ["anthropic_prompt", "openai_prompt", "manus_prompt"]:
+        for key in ["anthropic_prompt", "openai_prompt", "fast_prompt"]:
             label = key.replace("_prompt", "").upper()
             lines.append(f"\n[{label}]:\n{prompts.get(key, 'N/A')}")
 
@@ -679,7 +679,7 @@ def run_oracle(
         prompts = {
             "anthropic_prompt": query,
             "openai_prompt": query,
-            "manus_prompt": query,
+            "fast_prompt": query,
             "reasoning": "Prompt engineering skipped (--raw flag).",
         }
         _log("  Skipped (--raw flag)")

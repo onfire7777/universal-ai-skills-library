@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Skill Sync — Clone/pull a GitHub skills repo and install all skills into Manus.
+"""Skill Sync - clone/pull a GitHub skills repo and install portable AI skills.
 
 Handles:
   - Cloning the repo if not present, pulling if it exists
@@ -35,10 +35,18 @@ from pathlib import Path
 # ─── Constants ───────────────────────────────────────────────────────────────
 
 # DBG-003 FIX: Configurable via env vars instead of hardcoded paths
-SKILLS_DIR = Path(os.environ.get("MANUS_SKILLS_DIR", "/home/ubuntu/skills"))
-CACHE_DIR = Path(os.environ.get("MANUS_SKILL_SYNC_CACHE", "/home/ubuntu/.skill-sync-cache"))
+SKILLS_DIR = Path(
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or "/home/ubuntu/skills"
+)
+CACHE_DIR = Path(
+    os.environ.get("SKILL_ROUTER_SYNC_CACHE")
+    or os.environ.get("MANUS_SKILL_SYNC_CACHE")
+    or "/home/ubuntu/.skill-sync-cache"
+)
 STATE_FILE = CACHE_DIR / "sync_state.json"
-DEFAULT_REPO = "onfire7777/manus-skills-library"
+DEFAULT_REPO = "onfire7777/universal-ai-skills-library"
 
 # DBG-010 FIX: Max file size for hashing (skip files larger than 50MB)
 MAX_HASH_FILE_SIZE = 50 * 1024 * 1024
@@ -340,19 +348,19 @@ def sync_skill(skill: dict, state: dict, dry_run: bool = False,
             return "skipped"
 
         if src_hash == prev_hash and dest_hash == prev_hash:
-            # Source unchanged AND dest unchanged — skip
+            # Source unchanged AND dest unchanged - skip
             return "skipped"
 
         if dest_hash != prev_hash and src_hash != prev_hash and not force:
-            # Both source and dest changed — local modification detected
+            # Both source and dest changed - local modification detected
             # Don't overwrite unless --force
             return "skipped (locally modified)"
 
         if src_hash == prev_hash:
-            # Source unchanged but dest was modified locally — keep local version
+            # Source unchanged but dest was modified locally - keep local version
             return "skipped (local changes preserved)"
 
-        # Source changed — update
+        # Source changed - update
         if dry_run:
             return "would update"
 
@@ -370,7 +378,7 @@ def sync_skill(skill: dict, state: dict, dry_run: bool = False,
         }
         return "updated"
     else:
-        # New skill — install
+        # New skill - install
         if dry_run:
             return "would install"
 
@@ -394,7 +402,7 @@ def sync_skill(skill: dict, state: dict, dry_run: bool = False,
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Sync skills from a GitHub repo into Manus skill directory",
+        description="Sync skills from a GitHub repo into the target skill directory",
     )
     parser.add_argument("--repo", default=DEFAULT_REPO,
                         help=f"GitHub repo to sync from (default: {DEFAULT_REPO})")
@@ -475,7 +483,7 @@ def main():
 
     # Step 3: Sync each skill
     # DBG-004 FIX: Wrap in try/finally to save state even on crash
-    print(f"\n{'DRY RUN — ' if args.dry_run else ''}Syncing skills to {SKILLS_DIR}...")
+    print(f"\n{'DRY RUN - ' if args.dry_run else ''}Syncing skills to {SKILLS_DIR}...")
     results = {"installed": 0, "updated": 0, "skipped": 0, "invalid": 0, "error": 0}
     details = []
 
@@ -532,7 +540,7 @@ def main():
                               if e.is_dir() and (e / "SKILL.md").exists()])
     else:
         total_installed = 0
-    print(f"  Total skills in Manus: {total_installed}")
+    print(f"  Total installed skills: {total_installed}")
     print(f"{'─' * 60}")
 
     # Write detailed report
@@ -541,7 +549,7 @@ def main():
         report_path = CACHE_DIR / "last_sync_report.txt"
         try:
             with open(report_path, "w") as f:
-                f.write(f"Skill Sync Report — {datetime.now(timezone.utc).isoformat()}\n")
+                f.write(f"Skill Sync Report - {datetime.now(timezone.utc).isoformat()}\n")
                 f.write(f"Repo: {args.repo}\n")
                 f.write(f"Commit: {commit}\n\n")
                 for name, status in details:

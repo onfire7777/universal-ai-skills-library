@@ -1,19 +1,19 @@
 ---
 name: multi-model-oracle
-description: Get the ultimate merged answer from the 3 best AI models (Anthropic Claude Opus 4.6, OpenAI GPT-5.4, Manus gpt-4.1-mini). Automatically prompt-engineers the query first, then queries all models in parallel, then merges into one best answer. Use when the user wants the best possible answer, wants to compare models, asks for a multi-model response, or says oracle, ultimate answer, or best answer.
+description: Get a merged answer from a configured multi-model pool. Automatically prompt-engineers the query first, queries available models in parallel, and merges results into one best answer. Use when the user wants a best-effort answer, model comparison, multi-model response, oracle answer, or consensus synthesis.
 ---
 
 # Multi-Model Oracle
 
-Query the 3 best frontier AI models in parallel, with automatic prompt engineering and intelligent response merging. The pipeline: optimize the prompt, query all models, merge into one ultimate answer.
+Query a configured frontier-model pool in parallel, with automatic prompt engineering and intelligent response merging. The pipeline: optimize the prompt, query available models, merge into one best-effort answer.
 
 ## Models
 
 | Model | Provider | Strengths |
 |---|---|---|
-| Claude Opus 4.6 | Anthropic (OpenRouter) | Nuanced reasoning, creative depth, multi-perspective analysis |
-| GPT-5.4 | OpenAI (OpenRouter) | Technical precision, breadth, systematic coverage, code |
-| gpt-4.1-mini | Manus (built-in) | Fast, efficient, structured tasks, prompt engineering engine |
+| Reasoning model | OpenRouter or configured provider | Nuanced reasoning, creative depth, multi-perspective analysis |
+| Coding model | OpenRouter or configured provider | Technical precision, breadth, systematic coverage, code |
+| Fast synthesis model | OpenAI-compatible provider | Efficient prompt engineering, normalization, and merge synthesis |
 
 ## Quick Start
 
@@ -70,20 +70,20 @@ The merged answer is printed to stdout and optionally saved to a file. Present t
 
 ## Pipeline Stages
 
-**Stage 1 — Prompt Engineering**: Detects query intent (code, creative, analysis, research, reasoning, practical, general), then uses gpt-4.1-mini to create 3 model-specific prompt variants optimized for each model's strengths.
+**Stage 1 - Prompt Engineering**: Detects query intent (code, creative, analysis, research, reasoning, practical, general), then uses the configured fast synthesis model to create model-specific prompt variants optimized for each model role.
 
-**Stage 1.5 — Parallel Prompt Engineering**: The 3 model-specific prompt variants are generated in parallel via ThreadPoolExecutor for faster startup.
+**Stage 1.5 - Parallel Prompt Engineering**: The model-specific prompt variants are generated in parallel via ThreadPoolExecutor for faster startup.
 
-**Stage 2 — Parallel Query**: Sends all 3 prompts simultaneously via ThreadPoolExecutor. Each model has retry logic (2 retries with exponential backoff) and 180s timeout. If a model fails, the pipeline continues with remaining models.
+**Stage 2 - Parallel Query**: Sends prompts simultaneously via ThreadPoolExecutor. Each model has retry logic (2 retries with exponential backoff) and 180s timeout. If a model fails, the pipeline continues with remaining models.
 
-**Stage 3 — Intelligent Merge**: Feeds all successful responses to gpt-4.1-mini with a merge prompt that extracts the strongest elements, resolves contradictions, eliminates redundancy, and produces a unified answer that reads as if from a single expert. Has its own retry logic (2 retries) with concatenation fallback if merge fails.
+**Stage 3 - Intelligent Merge**: Feeds all successful responses to the configured fast synthesis model with a merge prompt that extracts the strongest elements, resolves contradictions, eliminates redundancy, and produces a unified answer that reads as if from a single expert. Has its own retry logic (2 retries) with concatenation fallback if merge fails.
 
-**Stage 4 — Output**: Formats the final result with metadata (models used, timing, token counts).
+**Stage 4 - Output**: Formats the final result with metadata (models used, timing, token counts).
 
 ## Requirements
 
-- `OPENROUTER_API_KEY` environment variable (for Claude Opus 4.6 and GPT-5.4)
-- `OPENAI_API_KEY` environment variable (for Manus gpt-4.1-mini)
+- `OPENROUTER_API_KEY` environment variable for OpenRouter-backed model roles
+- `OPENAI_API_KEY` environment variable for OpenAI-compatible synthesis models
 - Python packages: `requests`, `openai`
 
 ## Prompt Engineering Reference

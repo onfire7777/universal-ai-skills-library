@@ -152,7 +152,8 @@ For ambiguous names, prefix the skill directory with the language: `ts-new-compo
 Before generating or updating skills, inspect:
 
 1. Project `.claude/skills/`
-2. Project `.agents/skills/`
+2. Project `.agent/skills/` or `.agents/skills/`
+3. OpenSkills-compatible skill roots when configured
 3. Project `CLAUDE.md`
 4. Ecosystem agents, to avoid overlapping core functions
 
@@ -168,7 +169,7 @@ A skill already exists if any of these are true:
 
 Both directories must stay identical.
 
-1. List skills in `.claude/skills/` and `.agents/skills/`
+1. List skills in configured cross-AI skill roots
 2. Find orphans that exist in only one directory
 3. Copy the orphan to the missing directory before new generation
 4. Report every sync repair

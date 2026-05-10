@@ -1,11 +1,11 @@
-# Manus Claude Code Plugin Rule
+# Universal AI Skills Claude Code Plugin Rule
 
-Use the Manus CLI as the skill router:
+Use the Universal AI Skills Router as the skill loader:
 
 ```bash
-manus skill <name>
-manus skill search <query>
-manus doctor
+skill-router skill <name>
+skill-router skill search <query>
+skill-router doctor
 ```
 
-Keep Claude Code context compact. Do not inject the full skills list or full skill bodies unless a specific skill is needed for the current task.
+Keep context compact. Load only the skill needed for the current task. Use MCP bridges only when a persistent endpoint is required.

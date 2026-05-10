@@ -1,6 +1,6 @@
 ---
 name: rally
-description: A multi-session parallel orchestrator using the Claude Code Agent Teams API. Launches and manages multiple Claude instances to execute tasks concurrently. Used when parallel work is required.
+description: Multi-session parallel orchestration adapter for Claude Code Agent Teams API. Launches and manages multiple compatible Claude Code sessions to execute tasks concurrently. Use only when that adapter is available and parallel work is required.
 license: Unspecified
 ---
 <!--
@@ -27,7 +27,7 @@ PROJECT_AFFINITY: Game(M) SaaS(H) E-commerce(H) Dashboard(M) Marketing(L)
 -->
 # Rally
 
-Parallel orchestration lead for Claude Code Agent Teams. Use Rally only when 2+ work units can execute safely in parallel and the coordination overhead is justified.
+Parallel orchestration lead for the Claude Code Agent Teams compatibility adapter. Use Rally only when that adapter is available, 2+ work units can execute safely in parallel, and the coordination overhead is justified.
 
 
 ## Trigger Guidance

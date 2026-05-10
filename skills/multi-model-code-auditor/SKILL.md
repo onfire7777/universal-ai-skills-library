@@ -5,7 +5,7 @@ description: Run a comprehensive security, privacy, and bug audit on any codebas
 
 # Multi-Model Code Auditor — Elite Edition
 
-Audit any codebase by sending it to the best available frontier models (GPT-5.x, Claude Opus/Sonnet 4.x, Gemini 3.x/2.5 Pro, o4-mini, Codex, DeepSeek), each with model-specific prompt engineering optimized for their strengths. Findings are cross-compared, deduplicated by multi-signal similarity, merged by selecting the best description and fix from each cluster, and ranked by consensus. After fixes are applied, a verification re-audit confirms all issues are resolved.
+Audit any codebase by sending it to a configured pool of frontier model roles (coding, reasoning, security, fast triage, and verification), each with model-specific prompt engineering optimized for its strengths. Findings are cross-compared, deduplicated by multi-signal similarity, merged by selecting the best description and fix from each cluster, and ranked by consensus. After fixes are applied, a verification re-audit confirms all issues are resolved.
 
 ## When to Use
 

@@ -1,6 +1,6 @@
 ---
 name: skill-sync
-description: Sync and install all skills from a GitHub skills repository into Manus. Use when the user asks to install skills, update skills, sync skills from GitHub, load their skill library, or ensure skills are up to date. Also use when the user mentions their manus-skills-library repo.
+description: Sync and install skills from a GitHub skills repository into a local or global AI skill root. Use when the user asks to install skills, update skills, sync skills from GitHub, load a skill library, or ensure cross-AI skill roots are up to date.
 ---
 
 # Skill Sync
@@ -15,7 +15,7 @@ Run the sync script:
 python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py
 ```
 
-Default repo: `onfire7777/manus-skills-library`. The script handles everything automatically.
+Default repo: `onfire7777/universal-ai-skills-library`. The script handles everything automatically.
 
 ## Commands
 
@@ -52,10 +52,10 @@ python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --validate-only
 
 The script tracks content hashes to avoid unnecessary overwrites:
 
-- **Source unchanged, dest unchanged** — skipped (already up-to-date)
-- **Source changed, dest unchanged** — updated from repo
-- **Source unchanged, dest changed** — skipped (local changes preserved)
-- **Both changed** — skipped unless `--force` is used
+- **Source unchanged, dest unchanged** - skipped (already up-to-date)
+- **Source changed, dest unchanged** - updated from repo
+- **Source unchanged, dest changed** - skipped (local changes preserved)
+- **Both changed** - skipped unless `--force` is used
 
 ## State File
 
@@ -67,9 +67,9 @@ Paths can be overridden via environment variables or CLI flags:
 
 | Setting | Default | Override |
 |---|---|---|
-| Skills directory | `/home/ubuntu/skills` | `MANUS_SKILLS_DIR` env var or `--skills-dir` flag |
-| Cache directory | `/home/ubuntu/.skill-sync-cache` | `MANUS_SKILL_SYNC_CACHE` env var or `--cache-dir` flag |
+| Skills directory | `/home/ubuntu/skills` | `SKILL_ROUTER_SKILLS_DIR`, legacy `MANUS_SKILLS_DIR`, or `--skills-dir` |
+| Cache directory | `/home/ubuntu/.skill-sync-cache` | `SKILL_ROUTER_SYNC_CACHE`, legacy `MANUS_SKILL_SYNC_CACHE`, or `--cache-dir` |
 
 ## After Syncing
 
-Skills are immediately available to Manus after syncing — no restart needed. Manus reads skills from `/home/ubuntu/skills/` at the start of each task based on the `name` and `description` in each SKILL.md frontmatter.
+Skills are immediately available to compatible AI clients after syncing. Agents route skills from the target skill root using the `name` and `description` in each `SKILL.md` frontmatter.
