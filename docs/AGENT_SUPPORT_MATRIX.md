@@ -7,7 +7,7 @@ skill-router skill search <query>
 skill-router skill <name>
 ```
 
-Agent roots should usually contain a small `universal-ai-skills` wrapper instead of a physical copy of all 1,804 skills.
+Agent roots should usually contain a small `universal-ai-skills` wrapper instead of a physical copy of all 1,805 canonical skills.
 
 ## Read-only matrix
 

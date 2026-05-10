@@ -56,7 +56,7 @@
     {
       "name": "universal-ai-skills",
       "directory": "skills/universal-ai-skills",
-      "description": "Operating rule for the Universal AI Skills Router. Use this to keep skill loading context-light and cross-compatible across Codex, Claude Code, Cursor, Gemini, OpenCode, and Manus compatibility surfaces.",
+      "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically. This skill routes through the `skill-router` CLI instead of relying on the native client skill list.",
       "has_scripts": false,
       "scripts": []
     },

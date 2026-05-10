@@ -213,6 +213,21 @@ var searchCmd = &cobra.Command{
 	},
 }
 
+var RouteCmd = &cobra.Command{
+	Use:   "route <prompt>",
+	Short: "Pick and load the best skill for a prompt",
+	Long: `Pick and load the best skill for a natural-language prompt.
+
+This is the automatic CLI routing path for agents. It scores canonical skills
+first, including aliases such as card-creator -> printable-cards, then searches
+read-only local external roots only when needed.`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		prompt := strings.Join(args, " ")
+		return routePrompt(prompt)
+	},
+}
+
 var sourcesCmd = &cobra.Command{
 	Use:   "sources",
 	Short: "Show read-only local external skill roots",
@@ -334,6 +349,7 @@ func init() {
 	Cmd.AddCommand(debugCmd)
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(searchCmd)
+	Cmd.AddCommand(RouteCmd)
 	Cmd.AddCommand(sourcesCmd)
 	Cmd.AddCommand(propagateCmd)
 	Cmd.AddCommand(ultimateCmd)
@@ -567,6 +583,136 @@ func matchesExternalSkill(s externalSkill, query string) bool {
 		}
 	}
 	return len(strings.Fields(normalizedQuery)) > 0
+}
+
+func routePrompt(prompt string) error {
+	manifest, err := loadManifest()
+	if err != nil {
+		return err
+	}
+	type candidate struct {
+		name     string
+		score    int
+		external bool
+	}
+	best := candidate{}
+	bestMeta := candidate{}
+	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
+		score := scoreManifestSkill(prompt, s)
+		next := candidate{name: s.Name, score: score}
+		if isMetaRoutingSkill(s.Name) {
+			if score > bestMeta.score {
+				bestMeta = next
+			}
+			continue
+		}
+		if score > best.score {
+			best = next
+		}
+	}
+	if best.score < 25 {
+		external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
+		if err != nil {
+			return err
+		}
+		for _, s := range external {
+			score := scoreExternalSkill(prompt, s)
+			if score > best.score {
+				best = candidate{name: s.Name, score: score, external: true}
+			}
+		}
+	}
+	if isRouterMaintenancePrompt(prompt) && bestMeta.score >= best.score {
+		best = bestMeta
+	}
+	if best.score == 0 && bestMeta.score > 0 {
+		best = bestMeta
+	}
+	if best.score == 0 {
+		return fmt.Errorf("no skill matched prompt; try `skill-router skill search %s`", prompt)
+	}
+	source := "canonical"
+	if best.external {
+		source = "external"
+	}
+	fmt.Printf("Route: %s (%s, score %d)\n\n", best.name, source, best.score)
+	return printSkill(best.name)
+}
+
+func scoreManifestSkill(prompt string, s manifestSkill) int {
+	haystacks := []struct {
+		text   string
+		weight int
+	}{
+		{s.Name, 100},
+		{strings.Join(s.Aliases, " "), 95},
+		{s.Description, 35},
+	}
+	return scoreText(prompt, haystacks)
+}
+
+func isMetaRoutingSkill(name string) bool {
+	switch strings.ToLower(strings.TrimSpace(name)) {
+	case "universal-ai-skills", "universal-ai-config", "universal-ai-setup", "skill-router":
+		return true
+	default:
+		return false
+	}
+}
+
+func isRouterMaintenancePrompt(prompt string) bool {
+	normalized := normalizeForMatch(prompt)
+	return strings.Contains(normalized, "skill router") ||
+		strings.Contains(normalized, "router setup") ||
+		strings.Contains(normalized, "universal ai skills setup") ||
+		strings.Contains(normalized, "universal ai skills router")
+}
+
+func scoreExternalSkill(prompt string, s externalSkill) int {
+	return scoreText(prompt, []struct {
+		text   string
+		weight int
+	}{
+		{s.Name, 90},
+		{s.Description, 30},
+		{s.SourceID, 5},
+	})
+}
+
+func scoreText(prompt string, haystacks []struct {
+	text   string
+	weight int
+}) int {
+	query := normalizeForMatch(prompt)
+	tokens := strings.Fields(query)
+	if len(tokens) == 0 {
+		return 0
+	}
+	score := 0
+	for _, h := range haystacks {
+		text := normalizeForMatch(h.text)
+		if text == "" {
+			continue
+		}
+		if strings.Contains(query, text) || strings.Contains(text, query) {
+			score += h.weight
+		}
+		for _, token := range tokens {
+			if len(token) < 3 {
+				continue
+			}
+			if strings.Contains(text, token) {
+				score += h.weight / 6
+			}
+		}
+	}
+	return score
+}
+
+func normalizeForMatch(value string) string {
+	value = strings.ToLower(value)
+	value = strings.NewReplacer("-", " ", "_", " ", ":", " ", "'", "", "\"", "").Replace(value)
+	return strings.Join(strings.Fields(value), " ")
 }
 
 func canonicalSkillKeys(manifest skillManifest) map[string]bool {

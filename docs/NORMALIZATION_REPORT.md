@@ -3,15 +3,15 @@
 **Date:** 2026-05-09
 **Pipeline:** universal router architecture pass
 **Source of truth:** `skills/`
-**Current corpus:** 1,804 canonical skills, all with `SKILL.md`
+**Current corpus:** 1,805 canonical skills, all with `SKILL.md`
 **Access model:** on-demand loading through `skill-router skill <name>` with `manus skill <name>` kept only as a legacy alias.
 
 ## Ledger
 
 | Bucket | Count |
 |---|---:|
-| Current skill directories | 1,804 |
-| Directories with `SKILL.md` | 1,804 |
+| Current skill directories | 1,805 |
+| Directories with `SKILL.md` | 1,805 |
 | Missing `SKILL.md` | 0 |
 | Legacy/display aliases preserved | 125 |
 | Underscore duplicate directories merged | 26 |
@@ -33,8 +33,8 @@
 A current corpus check reports all skill directories have a `SKILL.md`:
 
 ```
-skill directories: 1,804
-directories with SKILL.md: 1,804
+skill directories: 1,805
+directories with SKILL.md: 1,805
 missing SKILL.md: 0
 ```
 
