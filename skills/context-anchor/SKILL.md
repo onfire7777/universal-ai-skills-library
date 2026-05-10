@@ -1,11 +1,11 @@
 ---
 name: context-anchor
-description: Set and maintain a persistent core topic/purpose for the entire chat session to keep Manus focused. Use when the user sets a core topic, anchors context, says "let's focus on X", "today we're building Y", "we're working on Z", or any implicit/explicit session purpose framing. Also use when asked to maintain focus, stay on track, or remember the overarching goal.
+description: Set and maintain a persistent core topic or purpose for the entire AI session. Use when the user sets a core topic, anchors context, says "let's focus on X", "today we're building Y", "we're working on Z", or asks the assistant to stay on track across a long task.
 ---
 
 # Context Anchor
 
-Persistent attention anchoring for Manus sessions. Externalizes the core session purpose to `~/.context_anchor.md` and enforces periodic recitation to maintain deep focus across 50+ tool calls, preventing cognitive drift from tangential requests.
+Persistent attention anchoring for long AI sessions. Externalizes the core session purpose to `~/.context_anchor.md` and enforces periodic recitation to maintain focus across many tool calls, preventing drift from tangential requests.
 
 ## Activation
 
@@ -34,7 +34,7 @@ python3 /home/ubuntu/skills/context-anchor/scripts/anchor.py check "Should I add
 
 This is the most critical behavior. You MUST enforce periodic recitation to keep the anchor in your active attention window.
 
-**Every 5-10 tool calls** (aim for ~7), run `anchor.py show` and mentally reaffirm: "My core focus is [anchor topic]." If a `todo.md` also exists, recite both together — anchor first (WHY), then todo (WHAT). If 10 tool calls elapse without recitation, force an immediate refresh.
+**Every 5-10 tool calls** (aim for ~7), run `anchor.py show` and mentally reaffirm: "My core focus is [anchor topic]." If a `todo.md` also exists, recite both together - anchor first (WHY), then todo (WHAT). If 10 tool calls elapse without recitation, force an immediate refresh.
 
 On recitation failure (file missing or inaccessible), fall back to your last known anchor from memory. Log the failure silently and retry next interval. Notify the user only if the anchor file is persistently unavailable.
 
@@ -44,7 +44,7 @@ When the user sends a request that diverges from the anchor:
 
 1. Run `anchor.py check "user's request"` if relevance is unclear.
 2. If the score is below 5/10 (divergent), acknowledge: "I notice this diverges from our core focus on [anchor topic]. I'll handle this, then return to the main thread."
-3. Fulfill the request completely — the user always has final authority over the anchor.
+3. Fulfill the request completely - the user always has final authority over the anchor.
 4. After completing the tangent, explicitly restate the anchor: "Returning to our core focus: [anchor topic]."
 
 Never refuse a user request because of the anchor. The anchor is a guide, not a constraint.
@@ -72,8 +72,8 @@ The anchor and `todo.md` are complementary:
 
 | File | Purpose | Contains |
 |---|---|---|
-| `~/.context_anchor.md` | WHY — the overarching purpose | Core topic, objectives, boundaries, success criteria |
-| `todo.md` | WHAT — the specific tasks | Current tasks, progress, next steps |
+| `~/.context_anchor.md` | WHY - the overarching purpose | Core topic, objectives, boundaries, success criteria |
+| `todo.md` | WHAT - the specific tasks | Current tasks, progress, next steps |
 
 When both exist, recite them together during periodic recitation. On anchor changes, review `todo.md` to ensure task alignment with the updated purpose.
 

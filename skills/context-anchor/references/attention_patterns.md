@@ -2,7 +2,7 @@
 
 ## Why Anchoring Works
 
-Manus operates in an agent loop where each tool call consumes attention. After 20-50 tool calls, earlier context fades from the model's effective attention window. The anchor file acts as externalized memory that can be re-read to restore focus, mirroring the `todo.md` recitation pattern from Manus's own context engineering research.
+Long-running AI agents operate in an agent loop where each tool call consumes attention. After 20-50 tool calls, earlier context fades from the model's effective attention window. The anchor file acts as externalized memory that can be re-read to restore focus, mirroring the `todo.md` recitation pattern from the agent's own context engineering research.
 
 ## Recitation Schedule
 
@@ -14,14 +14,14 @@ Manus operates in an agent loop where each tool call consumes attention. After 2
 
 ## Drift Detection Patterns
 
-**Pattern 1 — Pre-Task Alignment Check**
+**Pattern 1 - Pre-Task Alignment Check**
 Before starting any new sub-task or responding to a new user message, mentally compare the task against the anchor. If alignment is unclear, run `anchor.py check "description of the sub-task"` to get a scored assessment.
 
-**Pattern 2 — Post-Completion Reflection**
+**Pattern 2 - Post-Completion Reflection**
 After completing a major deliverable, re-read the anchor and ask: "Does this output serve the core topic? Did I drift?" If drift occurred, note it and course-correct.
 
-**Pattern 3 — Tangent Acknowledgment**
-When the user sends a message that diverges from the anchor, acknowledge the divergence explicitly: "I notice this diverges from our core focus on [anchor topic]. I'll handle this, then return to the main thread." This keeps both Manus and the user aware of the anchor.
+**Pattern 3 - Tangent Acknowledgment**
+When the user sends a message that diverges from the anchor, acknowledge the divergence explicitly: "I notice this diverges from our core focus on [anchor topic]. I'll handle this, then return to the main thread." This keeps both the agent and the user aware of the anchor.
 
 ## Integration with todo.md
 
@@ -41,14 +41,14 @@ If a user explicitly asks for something outside the anchor's boundaries:
 3. If yes, use `anchor.py update` to evolve the anchor
 4. If no, handle the request as a one-off and return to the anchor
 
-Never silently ignore the anchor. Never refuse a user request because of the anchor — the anchor is a guide, not a constraint. The user always has final authority.
+Never silently ignore the anchor. Never refuse a user request because of the anchor - the anchor is a guide, not a constraint. The user always has final authority.
 
 ## Advanced: Multi-Layer Anchoring
 
 For complex projects, the anchor can define layers:
 
-- **Layer 1 — Mission**: The overarching goal (e.g., "Build a SaaS analytics platform")
-- **Layer 2 — Phase**: The current project phase (e.g., "Phase 2: Backend API development")
-- **Layer 3 — Sprint**: The immediate focus (e.g., "Implementing user authentication endpoints")
+- **Layer 1 - Mission**: The overarching goal (e.g., "Build a SaaS analytics platform")
+- **Layer 2 - Phase**: The current project phase (e.g., "Phase 2: Backend API development")
+- **Layer 3 - Sprint**: The immediate focus (e.g., "Implementing user authentication endpoints")
 
 Use `anchor.py update --refine` to narrow focus as the project progresses, while preserving the broader mission context.

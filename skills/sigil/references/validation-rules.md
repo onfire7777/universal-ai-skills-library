@@ -156,6 +156,6 @@ Full minimum:
 
 ### Sync Status
 - `.claude/skills/*/SKILL.md`: [count]
-- `.agents/skills/*/SKILL.md`: [count]
+- `.agent/skills/*/SKILL.md` or other configured roots: [count]
 - Sync: IN_SYNC | DRIFT_REPAIRED | PARTIAL_FAIL
 ```

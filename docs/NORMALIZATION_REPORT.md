@@ -1,57 +1,46 @@
-# Skills Library Normalization Report
+# Universal Skills Corpus Report
 
-**Date:** 2026-04-25
-**Pipeline:** `pipeline.py`
-**Source:** `skills/` (849 folders)
-**Output:** `skills/` (773 normalized skills)
+**Date:** 2026-05-09
+**Pipeline:** universal router architecture pass
+**Source of truth:** `skills/`
+**Current corpus:** 1,804 canonical skills, all with `SKILL.md`
+**Access model:** on-demand loading through `skill-router skill <name>` with `manus skill <name>` kept only as a legacy alias.
 
 ## Ledger
 
 | Bucket | Count |
 |---|---:|
-| Input folders | 849 |
-| Missing `SKILL.md` (dropped) | 3 |
-| Missing required field after repair (dropped) | 0 |
-| Empty body (dropped) | 0 |
-| Duplicate name/body (canonical kept) | 73 |
-| **Final cleaned skills** | **773** |
-| YAML repaired (recovered) | 1 |
-| Description synthesized from body | 2 |
+| Current skill directories | 1,804 |
+| Directories with `SKILL.md` | 1,804 |
+| Missing `SKILL.md` | 0 |
+| Legacy/display aliases preserved | 125 |
+| Underscore duplicate directories merged | 26 |
+| Current source-of-truth location | `skills/` |
+| Router source | `skill-router-cli/` |
+| Universal setup skill | `universal-ai-config` |
 
 ## What was done
 
-1. **Audit pass** — every `SKILL.md` parsed; missing files, broken YAML, missing required fields, and empty bodies all enumerated.
-2. **YAML repair** — common breakage fixed automatically:
-   - Unquoted colons in scalar values (e.g. `description: Use when: ...`)
-   - `@`-prefixed and version-operator items in flow sequences (e.g. `[@motion-canvas/core>=3.0.0]`)
-3. **Description synthesis** — for skills missing the `description` field but with a non-empty body, the first non-heading paragraph (≤ 250 chars) was promoted to `description`.
-4. **Dedup** — grouped by normalized name (kebab) and by body content hash. Canonical winner per group selected deterministically:
-   1. kebab-case folder name beats spaces/TitleCase
-   2. shorter folder name beats longer
-   3. longer body beats shorter
-   4. alphabetical tiebreak
-5. **Normalize** — every output `SKILL.md` re-emitted via `yaml.safe_dump`, guaranteeing valid YAML. Required fields (`name` kebab, `description` single-line, `license`) promoted to top-level frontmatter; all other fields preserved under a `metadata:` block. Body preserved verbatim.
+1. **Universal naming pass** - default surfaces now use `Universal AI Skills`, `skill-router`, and `universal-ai-config`.
+2. **Compatibility boundary pass** - product names such as Codex, Claude Code, OpenAI, Anthropic, Manus, and Gemini remain only where they identify a real provider, API, model, client, or compatibility adapter.
+3. **Context efficiency pass** - global instructions and plugin manifests are index-only; full skill bodies are loaded on demand.
+4. **Router pass** - `skill-router-cli/` is the canonical CLI source; `manus` remains a compatibility executable and lookup alias.
+5. **Full-corpus import pass** - archived local skill roots were merged into `skills/` so the universal repo, not individual AI roots, is the complete source of truth.
+6. **Alias pass** - legacy display names and old source names were retained as manifest aliases when they do not collide with canonical skill ids.
 
 ## Verification
 
-A re-audit of the cleaned output reports **zero defects**:
+A current corpus check reports all skill directories have a `SKILL.md`:
 
 ```
-Total defects: 0
-  no_skill_md: 0
-  no_frontmatter: 0
-  unparseable: 0
-  missing_name: 0
-  missing_description: 0
-  empty_body: 0
-  name_not_kebab: 0
-  duplicate names: 0
-  duplicate bodies: 0
+skill directories: 1,804
+directories with SKILL.md: 1,804
+missing SKILL.md: 0
 ```
 
 ## Format
 
-Every skill conforms to the **Anthropic Agent Skill Format** (also adopted by Manus, Cursor, etc.):
+Every skill uses the portable `SKILL.md` package shape:
 
 ```yaml
 ---
@@ -71,15 +60,12 @@ metadata:           # optional, preserves source-specific fields
 ...
 ```
 
-## Reports
+## Reports and Manifests
 
-- `MANIFEST.json` — structured decision log (every dropped folder + reason)
-- `DROPPED.md` — human-readable drop log
+- `manifest.json` - current skill index consumed by the router/plugin.
+- `docs/DROPPED.md` - historical source normalization ledger, retained for provenance.
+- `docs/ARCHITECTURE_V2.md` - current universal architecture.
 
 ## Out of scope
 
-This audit verified `SKILL.md` correctness only. Scripts inside `scripts/` directories were copied verbatim and were **not** runtime-tested.
-
-## Symlinks
-
-The source `ui-ux-pro-max/` skill contained dead symlinks pointing to `../../../src/ui-ux-pro-max/` (a path that doesn't exist in the repo). The `SKILL.md` itself was preserved; the dead links were skipped. No data lost.
+This report verifies corpus presence, naming boundaries, and router architecture. Individual third-party provider APIs, model pricing, and optional runtime adapters still require live checks when a task depends on current external behavior.

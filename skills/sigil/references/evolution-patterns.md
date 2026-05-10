@@ -134,5 +134,5 @@ Use when several skills overlap heavily.
 | [name] | [score]/12 | [score]/12 | [+/-N] |
 
 ### Sync Status
-- All updated skills synced to `.claude/skills/` and `.agents/skills/`: YES/NO
+- All updated skills synced to configured cross-AI skill roots: YES/NO
 ```

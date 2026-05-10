@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # Universal AI Skills Library Installer
-# Installs the unified 785-skill library into the target skills directory
+# Installs the unified 1,804-skill library into the target skills directory
 #
 # Usage:
 #   From cloned repo:  bash install.sh [--target /path/to/skills]
-#   One-liner:         git clone https://github.com/onfire7777/manus-skills-library.git /tmp/msl && bash /tmp/msl/install.sh
+#   One-liner:         git clone https://github.com/onfire7777/universal-ai-skills-library.git /tmp/uask && bash /tmp/uask/install.sh
 #
 # Supported platforms: Linux, macOS, WSL
 # Target AI platforms: Claude Code, Codex CLI, OpenCode, Gemini CLI, Manus
@@ -25,7 +25,7 @@ done
 
 echo "============================================================"
 echo "  Universal AI Skills Library Installer"
-echo "  785 Unified Skills"
+echo "  1,804 Unified Skills"
 echo "============================================================"
 echo ""
 echo "  Target directory: $TARGET_DIR"
@@ -62,7 +62,7 @@ fi
 
 echo "[3/3] Post-install notes:"
 echo "  - Skills are now active in: $TARGET_DIR"
-echo "  - Use CLI-first loading: manus skill <name>"
+echo "  - Use router-first loading: skill-router skill <name>"
 echo "  - Keep agent instruction files as indexes, not full skill bodies"
 echo "  - For Windows cross-platform install: infrastructure/scripts/install_skills.ps1"
 echo "  - For MCP bridge setup: infrastructure/scripts/setup_mcp_bridges.ps1"

@@ -1,0 +1,9 @@
+{
+  "name": "bundled-compression-runtime-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Utilities for bundled compression runtime",
+  "scripts": {
+    "test": "npx -y bun test"
+  }
+}

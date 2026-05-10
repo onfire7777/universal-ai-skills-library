@@ -1,6 +1,6 @@
 ---
 name: vibe-security
-description: This skill helps Claude write secure web applications. Use when working on any web application to ensure security best practices are followed.
+description: This skill helps AI coding agents write secure web applications. Use when working on any web application to ensure security best practices are followed.
 license: Unspecified
 ---
 # Secure Coding Guide for Web Applications

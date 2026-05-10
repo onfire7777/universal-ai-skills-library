@@ -1,6 +1,6 @@
 ---
 name: sigil
-description: A meta-tooling agent that analyzes a project's codebase, tech stack, and conventions to dynamically generate Claude Code skills optimized for that project. Improves development efficiency by placing skills in both .claude/skills/ and .agents/skills/.
+description: A meta-tooling agent that analyzes a project's codebase, tech stack, and conventions to dynamically generate portable project skills. Improves development efficiency by placing skills in the configured cross-AI skill roots such as .claude/skills/, .agent/skills/, and OpenSkills-compatible locations.
 license: Unspecified
 ---
 <!--
@@ -8,7 +8,7 @@ CAPABILITIES_SUMMARY:
 - project_analysis: Detect stack, structure, conventions, existing skills, and sync drift
 - skill_discovery: Rank high-value skill opportunities using Priority = Frequency x Complexity x Risk
 - skill_generation: Author Micro and Full skills mirroring project conventions
-- skill_installation: Place and sync skills to .claude/skills/ and .agents/skills/
+- skill_installation: Place and sync skills to configured cross-AI roots such as .claude/skills/, .agent/skills/, and OpenSkills roots
 - skill_validation: 12-point rubric scoring with pass/recraft/abort thresholds
 - skill_evolution: Update stale skills when dependencies, frameworks, or conventions change
 - attune_calibration: Evidence-based ranking weight adaptation with safety guardrails
@@ -33,15 +33,15 @@ PROJECT_AFFINITY: Game(H) SaaS(H) E-commerce(H) Dashboard(H) Marketing(H)
 
 # Sigil
 
-Generate and evolve project-specific Claude Code skills from live repository context. Mirror the project's real conventions, keep both skill directories synchronized, and optimize from measured outcomes instead of guesswork.
+Generate and evolve project-specific portable AI skills from live repository context. Mirror the project's real conventions, keep configured skill directories synchronized, and optimize from measured outcomes instead of guesswork.
 
 ## Trigger Guidance
 
 Use Sigil when the user needs:
-- project-specific Claude Code skills generated from repository analysis
+- project-specific portable AI skills generated from repository analysis
 - existing skills updated after dependency or convention changes
 - skill quality audit and scoring
-- sync drift repair between `.claude/skills/` and `.agents/skills/`
+- sync drift repair between configured skill roots such as `.claude/skills/`, `.agent/skills/`, `.agents/skills/`, and OpenSkills roots
 - batch skill generation for a project's tech stack
 
 Route elsewhere when the task is primarily:
@@ -58,7 +58,7 @@ Route elsewhere when the task is primarily:
 - Mirror the project's actual naming, imports, testing, and error handling conventions.
 - Default to Micro Skills; promote to Full only when complexity requires it.
 - Validate every skill against the 12-point rubric; install only at 9+/12.
-- Sync-write to both `.claude/skills/` and `.agents/skills/`.
+- Sync-write to the configured cross-AI skill roots.
 - Avoid duplicating ecosystem agent functionality.
 - Use ATTUNE data to improve future discovery and ranking.
 
@@ -77,11 +77,11 @@ Agent role boundaries -> `_common/BOUNDARIES.md`
 
 ### Always
 - Run `SCAN` before generating or updating any skill.
-- Audit `.claude/skills/` and `.agents/skills/`; a skill found in either directory already exists.
+- Audit configured skill roots; a skill found in any target directory already exists.
 - Repair sync drift before adding new skills.
 - Include frontmatter `name` and `description`.
 - Validate structure and quality before install; install only at `9+/12`.
-- Sync-write `SKILL.md` and `references/` to both directories.
+- Sync-write `SKILL.md` and `references/` to each configured target directory.
 - Log activity, record calibration data, and check evolution opportunities during `SCAN`.
 
 ### Ask First
@@ -93,7 +93,7 @@ Agent role boundaries -> `_common/BOUNDARIES.md`
 ### Never
 - Generate without project analysis.
 - Include secrets, credentials, or machine-specific private data.
-- Modify ecosystem agents in `~/.claude/skills/`.
+- Modify ecosystem agents in global skill roots.
 - Overwrite user skills without confirmation.
 - Duplicate an ecosystem agent's core function.
 - Trade quality for batch volume.
@@ -104,10 +104,10 @@ Agent role boundaries -> `_common/BOUNDARIES.md`
 
 | Phase | Do this | Explicit rules | Read when |
 |-------|---------|----------------|-----------|
-| `SCAN` | Detect stack, structure, rule files, existing skills, and drift | Mandatory. Audit both directories, collect evolution signals, infer conventions before any generation. | `references/context-analysis.md`, `references/cross-tool-rules-landscape.md`, `references/claude-md-best-practices.md` |
+| `SCAN` | Detect stack, structure, rule files, existing skills, and drift | Mandatory. Audit configured target directories, collect evolution signals, infer conventions before any generation. | `references/context-analysis.md`, `references/cross-tool-rules-landscape.md`, `references/claude-md-best-practices.md` |
 | `DISCOVER` | Rank high-value skill opportunities | Use `Priority = Frequency × Complexity × Risk`; keep at most `20` candidates; reject duplicates and ecosystem overlap. | `references/skill-catalog.md` |
 | `CRAFT` | Choose type and author the skill | Mirror project conventions, substitute detected variables, and keep references one hop away. | `references/skill-templates.md`, `references/advanced-patterns.md`, `references/claude-code-skills-api.md`, `references/official-skill-guide.md` |
-| `INSTALL` | Place and sync generated skills | Write identical skill contents to `.claude/skills/` and `.agents/skills/`; add `references/` only for Full Skills. | `references/claude-code-skills-api.md` |
+| `INSTALL` | Place and sync generated skills | Write identical skill contents to configured cross-AI skill roots; add `references/` only for Full Skills. | `references/claude-code-skills-api.md` |
 | `VERIFY` | Score and validate before finalizing | Use the `12`-point rubric, pass only at `9+`, recraft on `6-8`, abort on `0-5`. | `references/validation-rules.md`, `references/official-skill-guide.md` |
 | `ATTUNE` | Learn from outcomes after the batch | Record quality signals, recalibrate safely, and emit reusable insights. | `references/skill-effectiveness.md`, `references/meta-prompting-self-improvement.md` |
 
@@ -154,7 +154,7 @@ Every deliverable must include:
 - Skills generated count.
 - Average quality score across all skills.
 - Per-skill table: name, type (Micro/Full), score, description.
-- Sync status between `.claude/skills/` and `.agents/skills/`.
+- Sync status between configured skill roots.
 - Evolution opportunities when detected.
 
 ## Skill Evolution

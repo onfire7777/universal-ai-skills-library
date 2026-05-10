@@ -1,11 +1,11 @@
 ---
 name: skill-deployer
-description: Deploy and manage skills in Manus project UI via the gRPC-web API. Packages skills as zips, uploads/deletes/syncs per-project skill sets, and curates domain-relevant skills using LLM analysis. Use when needing to make filesystem skills visible in the Manus UI sidebar or synchronize skill sets across projects.
+description: Manus UI compatibility adapter for deploying skills through the gRPC-web API. Packages skills as zips, uploads/deletes/syncs per-project skill sets, and curates domain-relevant skills using LLM analysis. Use only when filesystem skills must be visible in the Manus UI sidebar or synchronized across Manus projects.
 license: Unspecified
 ---
 # Skill Deployer
 
-Deploy skills from the sandbox filesystem into the **Manus project UI** — making them visible in the project sidebar, available as slash commands, and persistent across tasks. This is the only way to make filesystem skills (`/home/ubuntu/skills/`) appear in the Manus interface.
+Deploy skills from the sandbox filesystem into the **Manus project UI** - making them visible in the project sidebar, available as slash commands, and persistent across tasks. This is a compatibility adapter; universal cross-AI setups should use `skill-router skill <name>` and OpenSkills-style sync instead.
 
 ## How It Works
 

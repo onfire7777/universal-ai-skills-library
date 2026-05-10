@@ -1,7 +1,7 @@
 ---
 name: model-selector
 description: >
-  Set and manage the default AI model Manus uses as its backbone LLM. Supports manual model
+  Set and manage the preferred backbone LLM for compatible AI-agent workflows. Supports manual model
   selection, automatic best-model selection based on task type, and a cached/refreshable leaderboard
   of the latest frontier models from OpenRouter. Toggle on/off via chat commands. Use when the user
   says "model-selector", "set model", "change model", "best model", "auto model", "switch model",
@@ -11,7 +11,7 @@ description: >
 
 # Model Selector
 
-Control which AI model Manus uses as its backbone LLM. Two modes: **manual** (user picks a specific model) or **auto** (dynamically selects the best model based on task category via keyword detection).
+Control the preferred backbone LLM for compatible AI-agent workflows. Two modes: **manual** (user picks a specific model) or **auto** (dynamically selects the best model based on task category via keyword detection).
 
 ## Commands
 
@@ -20,7 +20,7 @@ Control which AI model Manus uses as its backbone LLM. Two modes: **manual** (us
 | `/model-selector set <model_id>` | Set a specific model (e.g., `anthropic/claude-opus-4.6`). Validates against cache; warns if unknown but accepts (supports private models). |
 | `/model-selector auto [task]` | Auto-select best model. If task provided, detects category via keywords and selects top-ranked model. |
 | `/model-selector on` | Enable model selection. |
-| `/model-selector off` | Disable (Manus uses its default backbone model). |
+| `/model-selector off` | Disable (the active client uses its default backbone model). |
 | `/model-selector status` | Show current config: enabled state, mode, model, reason, cache freshness. |
 | `/model-selector refresh` | Force-refresh cached model leaderboard from OpenRouter API. Rate limit: max 1 per minute. |
 | `/model-selector list [category]` | List top models by category (coding/reasoning/research/creative/math/general/all) with pricing. |
@@ -33,12 +33,12 @@ All commands are executed by running the CLI script:
 python3 scripts/model_selector.py <command> [args]
 ```
 
-The script path is relative to this skill's directory. The absolute path in the Manus sandbox is:
+The script path is relative to this skill's directory. A common installed-skill path is:
 ```bash
 python3 /home/ubuntu/skills/model-selector/scripts/model_selector.py <command> [args]
 ```
 
-When a user sends a command (e.g., `/model-selector auto build a website`), Manus should:
+When a user sends a command (e.g., `/model-selector auto build a website`), the active AI client should:
 1. Parse the command and arguments from the user message.
 2. Invoke the CLI script via shell with the appropriate command and arguments.
 3. Read the script output and report the result to the user.
@@ -76,13 +76,13 @@ When a user sends a command (e.g., `/model-selector auto build a website`), Manu
 
 Auto mode classifies tasks into six categories by word-boundary regex matching: **coding**, **reasoning**, **research**, **creative**, **math**, or **general** (fallback). Each category has a curated ranking of the best models based on benchmark data. No AI classification is used — keyword detection is deterministic, fast, and credit-free. Specialized categories always win ties over "general".
 
-### Manus Integration
+### Agent Integration
 
-At the start of each task, Manus should:
+At the start of each task, a compatible client should:
 1. Read `~/.model_selector_config.json`.
 2. If `enabled` is `true`, note the `last_selected_model` and `mode`.
 3. Use this model preference when making decisions about which LLM to invoke as the backbone.
-4. If `enabled` is `false`, config is missing, or config is corrupted, use the default backbone model.
+4. If `enabled` is `false`, config is missing, or config is corrupted, use the client's default backbone model.
 
 Other skills' model preferences remain unaffected.
 
@@ -119,7 +119,7 @@ Other skills' model preferences remain unaffected.
 ## Requirements
 
 - `OPENROUTER_API_KEY` environment variable (for cache refresh and model validation).
-- `requests` Python package (pre-installed in Manus sandbox).
+- `requests` Python package.
 
 ## Benchmark Reference
 
@@ -134,4 +134,4 @@ Only read this file when the user asks about specific benchmark data, model comp
 - Uses **word-boundary regex task detection** exclusively — no AI classification to avoid extra costs.
 - Cache refresh rate-limited: max 1 per minute, auto-refresh every 24 hours.
 - Manual model settings preserved unless explicitly changed by user.
-- Graceful degradation: if disabled or config/cache unavailable, Manus uses its default model.
+- Graceful degradation: if disabled or config/cache unavailable, the active client uses its default model.

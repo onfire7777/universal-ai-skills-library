@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Context Anchor — Persistent session focus management for Manus AI.
+Context Anchor - Persistent session focus management for AI agent.
 
 Commands:
     set     Create or overwrite the context anchor
@@ -126,7 +126,7 @@ def _insert_into_section(content, section_header, new_item, numbered=False):
 
         if in_section and not inserted:
             if line.startswith("##"):
-                # End of section — insert before next heading
+                # End of section - insert before next heading
                 if numbered:
                     new_lines.append(f"{section_items + 1}. {new_item}")
                 else:
@@ -228,7 +228,7 @@ def cmd_set(args):
         print(content)
         print("=" * 60)
         print(f"  Anchor saved to: {ANCHOR_FILE}")
-        print("  Manus will re-read this file periodically to stay focused.")
+        print("  The agent should re-read this file periodically to stay focused.")
         print("=" * 60)
     else:
         sys.exit(1)
@@ -426,7 +426,7 @@ def cmd_update(args):
                 continue
             if in_core and not replaced:
                 if line.startswith("##"):
-                    # End of Core Topic section — insert new topic
+                    # End of Core Topic section - insert new topic
                     new_lines.append("")
                     new_lines.append(new_topic)
                     new_lines.append("")
@@ -514,7 +514,7 @@ def cmd_clear(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Context Anchor — Persistent session focus management for Manus AI",
+        description="Context Anchor - Persistent session focus management for AI agent",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__
     )

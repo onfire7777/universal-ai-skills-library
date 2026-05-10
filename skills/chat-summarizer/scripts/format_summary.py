@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Validate, format, and enhance a chat session summary.
 
-Takes a raw Markdown summary (produced by Manus following SKILL.md instructions)
+Takes a raw Markdown summary (produced by the agent following SKILL.md instructions)
 and:
   1. Validates all 7 required sections are present and non-empty
   2. Checks that referenced file paths actually exist on disk
   3. Generates a compact JSON version for programmatic consumption
-  4. Produces a "handoff prompt" — a dense paragraph for pasting into a new chat
+  4. Produces a "handoff prompt" - a dense paragraph for pasting into a new chat
   5. Optionally enriches with AI-generated continuation recommendations
 
 Usage:
@@ -47,7 +47,7 @@ SECTION_DESCRIPTIONS = {
     "CONTINUATION_CONTEXT": "What the next AI needs to know to continue seamlessly",
 }
 
-# AI model to use for enrichment — must be available in Manus sandbox
+# AI model to use for enrichment - must be available in compatible agent sandbox
 ENRICH_MODEL = "gpt-4.1-mini"
 
 
@@ -67,7 +67,7 @@ def parse_summary(text: str) -> dict:
     current_content = []
 
     for line in text.splitlines():
-        # Match ## headings — flexible: allows mixed case, numbers,
+        # Match ## headings - flexible: allows mixed case, numbers,
         # single words, and optional numbering prefix like "1."
         heading_match = re.match(
             r"^##\s+(?:\d+\.\s+)?([A-Z][A-Za-z0-9_]+(?:[_ ][A-Za-z0-9_]+)*)\s*$",
@@ -225,7 +225,7 @@ def to_json(sections: dict, metadata: dict) -> dict:
 def generate_handoff(sections: dict) -> str:
     """Generate a dense handoff prompt for pasting into a new chat.
 
-    This is the most critical output — it's a single block of text optimized
+    This is the most critical output - it's a single block of text optimized
     for maximum context transfer in minimum tokens. An AI reading this should
     be able to continue the work seamlessly.
 
@@ -344,7 +344,7 @@ def enrich_with_ai(sections: dict) -> str:
     """Use the local AI model to generate continuation recommendations.
 
     DBG-004 FIX: Uses the ENRICH_MODEL constant (gpt-4.1-mini) which is
-    confirmed available in the Manus sandbox.
+    confirmed available in the compatible agent sandbox.
     DBG-007 FIX: Clear error messages for missing dependencies with
     actionable guidance.
     """
@@ -360,7 +360,7 @@ def enrich_with_ai(sections: dict) -> str:
     if not api_key:
         return (
             "AI enrichment unavailable: OPENAI_API_KEY not set. "
-            "This is pre-configured in the Manus sandbox environment."
+            "This is pre-configured in compatible agent sandbox environments."
         )
 
     client = OpenAI()
@@ -401,7 +401,7 @@ def enrich_with_ai(sections: dict) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate and format a Manus chat session summary"
+        description="Validate and format a the agent chat session summary"
     )
     parser.add_argument("summary_file", help="Path to the summary Markdown file")
     parser.add_argument(
@@ -445,7 +445,7 @@ def main():
         sys.exit(1)
 
     # DBG-005 FIX: Default output dir is /home/ubuntu (where SKILL.md tells
-    # Manus to save chat_summary.md), not the input file's parent dir.
+    # the agent to save chat_summary.md), not the input file's parent dir.
     # This ensures handoff_prompt.txt and chat_summary.json land in the
     # same directory as the summary file by default.
     if args.output_dir:

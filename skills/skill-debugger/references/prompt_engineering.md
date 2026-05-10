@@ -5,12 +5,12 @@ This reference documents the elite prompt engineering techniques applied in the 
 ## Techniques by Category
 
 ### 1. Role Priming
-- Claude: "senior software reliability engineer specializing in Python tooling and AI agent frameworks"
-- Manus: "expert Manus skill analyst" — leverages platform-specific knowledge
+- reasoning model: "senior software reliability engineer specializing in Python tooling and AI agent frameworks"
+- the agent: "expert AI skill analyst" — leverages platform-specific knowledge
 
 ### 2. Complementary Expertise Assignment
-- Claude focuses on: deep code reasoning, security, race conditions, resource leaks
-- Manus focuses on: structural integrity, integration quality, trigger accuracy
+- reasoning model focuses on: deep code reasoning, security, race conditions, resource leaks
+- the agent focuses on: structural integrity, integration quality, trigger accuracy
 - This avoids redundant analysis and maximizes coverage
 
 ### 3. Chain-of-Thought Enforcement
@@ -43,12 +43,12 @@ This reference documents the elite prompt engineering techniques applied in the 
 
 ## Model-Specific Optimizations
 
-### Claude Opus 4.6
+### reasoning model
 - Stronger at: multi-file reasoning, security analysis, subtle logic bugs
 - Prompt emphasizes: code-level analysis, security, robustness edge cases
-- Uses: longer, more detailed system prompt (Claude handles long context well)
+- Uses: longer, more detailed system prompt (reasoning model handles long context well)
 
-### Manus gpt-4.1-mini
-- Stronger at: understanding Manus platform conventions, structural analysis
+### fast synthesis model
+- Stronger at: understanding portable skill conventions, structural analysis
 - Prompt emphasizes: SKILL.md quality, integration issues, trigger accuracy
 - Uses: more focused prompt (smaller context window budget)

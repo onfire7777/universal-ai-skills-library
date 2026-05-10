@@ -172,10 +172,10 @@ Rules:
 ### Required Layout
 
 - `.claude/skills/[skill-name]/SKILL.md`
-- `.agents/skills/[skill-name]/SKILL.md`
+- `.agent/skills/[skill-name]/SKILL.md` or another configured OpenSkills-compatible root
 - Full Skills may add:
   - `.claude/skills/[skill-name]/references/[topic].md`
-  - `.agents/skills/[skill-name]/references/[topic].md`
+  - `.agent/skills/[skill-name]/references/[topic].md` or another configured OpenSkills-compatible root
 
 ### Naming Rules
 

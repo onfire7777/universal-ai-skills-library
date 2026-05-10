@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Prompt Engineer — Manus-Optimized Prompt Optimizer
+Prompt Engineer - Agent-Optimized Prompt Optimizer
 
 Takes a user's raw prompt/idea and transforms it into the best possible
-Manus-optimized prompt using multi-model AI analysis and Manus-specific
+agent-optimized prompt using multi-model AI analysis and agent-specific
 context engineering principles.
 
 Usage:
@@ -56,8 +56,8 @@ OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 MODELS = {
-    "opus": {
-        "name": "Anthropic Claude Opus 4",
+    "reasoning": {
+        "name": "Reasoning model",
         "id": "anthropic/claude-opus-4",
         "provider": "openrouter",
         "strengths": "nuanced reasoning, edge cases, multi-perspective analysis",
@@ -69,7 +69,7 @@ MODELS = {
         "strengths": "technical precision, systematic coverage, structured output",
     },
     "mini": {
-        "name": "Manus gpt-4.1-mini",
+        "name": "Fast synthesis model (gpt-4.1-mini)",
         "id": "gpt-4.1-mini",
         "provider": "openai",
         "strengths": "speed, efficiency, prompt engineering, structured tasks",
@@ -94,7 +94,7 @@ INTENT_CATEGORIES = {
     "agent_task": {
         "description": "Multi-step autonomous task requiring tool use, research, file creation, or web interaction",
         "keywords": ["build", "create", "deploy", "research", "analyze", "automate", "organize", "manage", "monitor", "plan", "develop", "design", "implement"],
-        "optimization": "Structure as agent-first prompt with clear end-goal, deliverables, constraints, and success criteria. Leverage Manus tools (shell, browser, file system, search, code execution). Use imperative language.",
+        "optimization": "Structure as agent-first prompt with clear end-goal, deliverables, constraints, and success criteria. Leverage available tools (shell, browser, file system, search, code execution). Use imperative language.",
     },
     "code_development": {
         "description": "Software development, debugging, code review, or technical implementation",
@@ -163,7 +163,7 @@ def detect_mode(prompt: str) -> str:
 def strip_code_fences(text: str) -> str:
     """Remove markdown code fences from model output."""
     text = text.strip()
-    # Handle multiple code blocks — extract content from the first one
+    # Handle multiple code blocks - extract content from the first one
     match = re.match(r'^```(?:json)?\s*\n?(.*?)\n?```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
@@ -208,7 +208,7 @@ def call_openrouter(model_id: str, system_prompt: str, user_prompt: str,
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://manus.im",
+        "HTTP-Referer": "https://github.com/onfire7777/universal-ai-skills-library",
         "X-Title": "Prompt Engineer Skill",
     }
     payload = {
@@ -278,10 +278,10 @@ def call_model(model_key: str, system_prompt: str, user_prompt: str,
 # Core prompt engineering pipeline
 # ---------------------------------------------------------------------------
 
-ANALYSIS_SYSTEM_PROMPT = """You are an elite prompt engineering analyst specializing in Manus AI.
+ANALYSIS_SYSTEM_PROMPT = """You are an elite prompt engineering analyst specializing in AI agent.
 Your job is to analyze a user's raw prompt and produce a structured analysis.
 
-Manus AI is an autonomous AI agent (not a chatbot) that:
+AI agent is an autonomous AI agent (not a chatbot) that:
 - Operates in a sandboxed Linux VM with internet access
 - Has tools: shell, file system, browser, search, code execution, image generation, slides, scheduling
 - Works in an agent loop: Analyze → Think → Select tool → Execute → Observe → Iterate
@@ -300,46 +300,46 @@ Analyze the prompt and output valid JSON with these fields:
   "missing_elements": ["list of what's missing"],
   "ambiguities": ["list of unclear aspects"],
   "strengths": ["what's already good"],
-  "manus_tools_needed": ["which Manus tools this task likely needs"],
+  "agent_tools_needed": ["which available tools this task likely needs"],
   "suggested_structure": "brief description of optimal prompt structure",
   "complexity_level": "simple|moderate|complex|expert"
 }
 
 Output ONLY the JSON, no other text."""
 
-OPTIMIZER_SYSTEM_PROMPT = """You are the world's best prompt engineer, specializing in crafting perfect prompts for Manus AI.
+OPTIMIZER_SYSTEM_PROMPT = """You are the world's best prompt engineer, specializing in crafting perfect prompts for AI agent.
 
-## Manus AI Context Engineering Principles (from official Manus engineering team):
+## AI agent context engineering principles:
 
 1. **One-Shot Density**: Credit usage grows multiplicatively with follow-ups. Pack everything into ONE dense, thorough prompt. Even "change the color to green" costs nearly as much as the original prompt.
 
-2. **Agent-First Thinking**: Manus is an autonomous agent, not a chatbot. Prompts should leverage multi-step execution, tool use, file creation, web research, and structured outputs. Use phrases like "Take ownership", "Guide step by step", "Track progress".
+2. **Agent-First Thinking**: A capable AI coding agent is an autonomous agent, not a chatbot. Prompts should leverage multi-step execution, tool use, file creation, web research, and structured outputs. Use phrases like "Take ownership", "Guide step by step", "Track progress".
 
-3. **Imperative Clarity**: Be imperative and specific. Manus is an "unfocused lens" — with enough adjustment, you get a clear picture. Vague prompts waste credits and produce poor results.
+3. **Imperative Clarity**: Be imperative and specific. Vague prompts waste credits and produce poor results.
 
-4. **Structured Deliverables**: Always specify the exact output format, file types, structure, and quality standards expected. Manus excels at producing structured, reusable deliverables.
+4. **Structured Deliverables**: Always specify the exact output format, file types, structure, and quality standards expected. A capable AI agent excels at producing structured, reusable deliverables.
 
-5. **Context as Memory**: Manus uses the file system as externalized memory. For complex tasks, instruct it to create planning files (todo.md), save intermediate results, and organize outputs in clear directory structures.
+5. **Context as Memory**: A capable AI agent can use the file system as externalized memory. For complex tasks, instruct it to create planning files (todo.md), save intermediate results, and organize outputs in clear directory structures.
 
 6. **Error Prevention**: Most errors are preventable through prompting alone. Specify constraints, edge cases, fallback behaviors, and validation criteria upfront.
 
-7. **Leverage Manus Tools**: Explicitly reference capabilities when relevant: shell commands, Python code, web browsing, search, file operations, image generation, slides, scheduling, MCP integrations, GitHub, Google Drive.
+7. **Leverage Available Tools**: Explicitly reference capabilities when relevant: shell commands, Python code, web browsing, search, file operations, image generation, slides, scheduling, MCP integrations, GitHub, Google Drive.
 
 ## Your Task:
-Transform the user's raw prompt into the BEST possible Manus-optimized prompt. The optimized prompt must be:
+Transform the user's raw prompt into the BEST possible agent-optimized prompt. The optimized prompt must be:
 - Dense and self-contained (one-shot ready)
 - Specific with clear deliverables and success criteria
 - Structured with logical sections
-- Agent-aware (leveraging Manus's multi-step capabilities)
+- Agent-aware (leveraging the agent's multi-step capabilities)
 - Credit-efficient (preventing errors and loops)
 
-Output ONLY the optimized prompt text, ready to paste into Manus. No meta-commentary."""
+Output ONLY the optimized prompt text, ready to paste into an AI agent. No meta-commentary."""
 
 DEEP_OPTIMIZER_SYSTEM_PROMPT = """You are the world's foremost prompt engineer. You have deep expertise in:
 
-1. **Manus AI Architecture**: Agent loop (Analyze → Think → Select tool → Execute → Observe → Iterate), sandbox VM, tool ecosystem (shell, browser, file, search, code, image gen, slides, scheduling, MCP, GitHub, Google Drive), Skills system, Projects system.
+1. **AI agent Architecture**: Agent loop (Analyze → Think → Select tool → Execute → Observe → Iterate), sandbox VM, tool ecosystem (shell, browser, file, search, code, image gen, slides, scheduling, MCP, GitHub, Google Drive), Skills system, Projects system.
 
-2. **Context Engineering** (from Manus's own engineering team):
+2. **Context Engineering** (from the agent's own engineering team):
    - KV-Cache optimization: stable prefixes, append-only context, deterministic serialization
    - File system as context: unlimited, persistent, externalized memory
    - Attention manipulation: todo.md recitation to keep goals in recent attention
@@ -362,16 +362,16 @@ DEEP_OPTIMIZER_SYSTEM_PROMPT = """You are the world's foremost prompt engineer. 
    - One-shot density: pack everything into a single prompt
    - Prevent loops: specify validation and fallback behaviors
    - Reduce tool calls: batch related operations
-   - Explicit permissions: tell Manus when to ask vs. decide autonomously
+   - Explicit permissions: tell the agent when to ask vs. decide autonomously
 
 ## Your Task:
-You will receive a raw prompt AND an analysis of that prompt. Transform it into the absolute best possible Manus-optimized prompt. Apply every relevant technique. The result should be a masterpiece of prompt engineering — dense, clear, structured, agent-aware, and credit-efficient.
+You will receive a raw prompt AND an analysis of that prompt. Transform it into a strong agent-optimized prompt. Apply relevant techniques so the result is dense, clear, structured, agent-aware, and credit-efficient.
 
 Structure the optimized prompt with clear sections:
 - **Objective**: What to accomplish (1-2 sentences)
 - **Context**: Background information and constraints
 - **Requirements**: Specific deliverables with quality standards
-- **Process**: How to approach the task (leveraging Manus tools)
+- **Process**: How to approach the task (leveraging available tools)
 - **Output Format**: Exact structure of expected deliverables
 - **Success Criteria**: How to verify the task is complete
 - **Constraints**: What to avoid, edge cases, error handling
@@ -386,12 +386,12 @@ Score each on these dimensions (1-10):
 3. Actionability: How actionable is the prompt for an AI agent?
 4. Completeness: Does it cover all necessary aspects?
 5. Efficiency: Will it minimize wasted effort and credits?
-6. Manus-Optimization: How well does it leverage Manus's specific capabilities?
+6. Agent-Optimization: How well does it leverage the agent's specific capabilities?
 
 Output valid JSON:
 {
-  "original_scores": {"clarity": N, "specificity": N, "actionability": N, "completeness": N, "efficiency": N, "manus_optimization": N, "total": N},
-  "optimized_scores": {"clarity": N, "specificity": N, "actionability": N, "completeness": N, "efficiency": N, "manus_optimization": N, "total": N},
+  "original_scores": {"clarity": N, "specificity": N, "actionability": N, "completeness": N, "efficiency": N, "agent_optimization": N, "total": N},
+  "optimized_scores": {"clarity": N, "specificity": N, "actionability": N, "completeness": N, "efficiency": N, "agent_optimization": N, "total": N},
   "improvement_percentage": N,
   "key_improvements": ["list of specific improvements made"],
   "remaining_suggestions": ["any further improvements possible"]
@@ -419,7 +419,7 @@ def analyze_prompt(raw_prompt: str, available_models: list) -> dict:
             "missing_elements": ["Could not parse AI analysis"],
             "ambiguities": [],
             "strengths": [],
-            "manus_tools_needed": [],
+            "agent_tools_needed": [],
             "suggested_structure": "standard",
             "complexity_level": "moderate",
         }
@@ -440,7 +440,7 @@ def optimize_prompt(raw_prompt: str, analysis: dict, depth: str = "standard",
 - Missing: {', '.join(analysis.get('missing_elements', []))}
 - Ambiguities: {', '.join(analysis.get('ambiguities', []))}
 - Strengths: {', '.join(analysis.get('strengths', []))}
-- Tools Needed: {', '.join(analysis.get('manus_tools_needed', []))}
+- Tools Needed: {', '.join(analysis.get('agent_tools_needed', []))}
 - Complexity: {analysis.get('complexity_level', 'moderate')}
 
 ## Raw Prompt to Optimize:
@@ -493,7 +493,7 @@ def merge_optimizations(results: dict, raw_prompt: str, analysis: dict,
     for i, (key, text) in enumerate(valid_results.items(), 1):
         model_info = MODELS.get(key, {})
         version_texts.append(
-            f"## Optimized Version {i} ({model_info.get('name', key)} — {model_info.get('strengths', 'general')}):\n{text}"
+            f"## Optimized Version {i} ({model_info.get('name', key)} - {model_info.get('strengths', 'general')}):\n{text}"
         )
 
     merge_prompt = f"""You have {len(valid_results)} different optimized versions of the same prompt, each created by a different AI model.
@@ -513,7 +513,7 @@ Your job is to merge them into ONE ultimate optimized prompt that takes the best
 1. Extract the strongest elements from each version
 2. Resolve any contradictions by choosing the most specific/actionable option
 3. Eliminate redundancy without losing important details
-4. Ensure the final prompt is dense, one-shot ready, and Manus-optimized
+4. Ensure the final prompt is dense, one-shot ready, and agent-optimized
 5. Structure with clear sections (Objective, Context, Requirements, Process, Output Format, Success Criteria, Constraints)
 6. The result should read as a single, coherent, masterfully crafted prompt
 
@@ -561,7 +561,7 @@ def compare_prompts(raw_prompt: str, optimized_prompt: str, available_models: li
 # ---------------------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser(
-        description="Manus-Optimized Prompt Engineer — Transform any prompt into the best possible Manus prompt"
+        description="Agent-Optimized Prompt Engineer - transform any prompt into the best possible agent prompt"
     )
     parser.add_argument("prompt", nargs="?", help="The raw prompt to optimize")
     parser.add_argument("--file", "-f", help="Read prompt from a file")
@@ -608,7 +608,7 @@ def main():
     # Validate API keys and determine available models
     available_models = []
     if OPENROUTER_API_KEY:
-        available_models.extend(["opus", "gpt"])
+        available_models.extend(["reasoning", "gpt"])
     if OPENAI_API_KEY:
         available_models.append("mini")
 
@@ -622,7 +622,7 @@ def main():
 
     start_time = time.time()
     print(f"\n{'='*70}")
-    print(f"  MANUS PROMPT ENGINEER — Optimizing Your Prompt")
+    print("  AGENT PROMPT ENGINEER - Optimizing Your Prompt")
     print(f"  Depth: {args.depth} | Mode: {args.mode} | Models: {len(available_models)}")
     print(f"{'='*70}\n")
 
@@ -633,9 +633,9 @@ def main():
         analysis["mode"] = args.mode
 
     if args.show_analysis:
-        print(f"\n{'─'*50}")
+        print(f"\n{'-'*50}")
         print("  PROMPT ANALYSIS")
-        print(f"{'─'*50}")
+        print(f"{'-'*50}")
         for key, value in analysis.items():
             if isinstance(value, list):
                 print(f"  {key}: {', '.join(str(v) for v in value) if value else '(none)'}")
@@ -656,9 +656,9 @@ def main():
         if args.show_individual:
             for model_key, result in results.items():
                 model_info = MODELS.get(model_key, {})
-                print(f"\n{'─'*50}")
+                print(f"\n{'-'*50}")
                 print(f"  {model_info.get('name', model_key)} Optimization:")
-                print(f"{'─'*50}")
+                print(f"{'-'*50}")
                 print(result)
                 print()
 
@@ -682,14 +682,14 @@ def main():
     print(optimized)
 
     if comparison and "error" not in comparison:
-        print(f"\n{'─'*50}")
+        print(f"\n{'-'*50}")
         print("  IMPROVEMENT SCORES")
-        print(f"{'─'*50}")
+        print(f"{'-'*50}")
         orig = comparison.get("original_scores", {})
         opt = comparison.get("optimized_scores", {})
         print(f"  {'Dimension':<22} {'Original':>10} {'Optimized':>10} {'Change':>10}")
-        print(f"  {'─'*52}")
-        for dim in ["clarity", "specificity", "actionability", "completeness", "efficiency", "manus_optimization"]:
+        print(f"  {'-'*52}")
+        for dim in ["clarity", "specificity", "actionability", "completeness", "efficiency", "agent_optimization"]:
             o = orig.get(dim, "?")
             n = opt.get(dim, "?")
             change = ""
@@ -704,11 +704,11 @@ def main():
                 print(f"    + {imp}")
         print()
 
-    print(f"\n{'─'*50}")
+    print(f"\n{'-'*50}")
     print(f"  Completed in {elapsed:.1f}s | Depth: {args.depth} | Mode: {analysis.get('mode', 'auto')}")
     print(f"  Intent: {analysis.get('intent', 'unknown')} | Complexity: {analysis.get('complexity_level', 'unknown')}")
     print(f"  Models available: {', '.join(available_models)}")
-    print(f"{'─'*50}\n")
+    print(f"{'-'*50}\n")
 
     # Save to file if requested (with error handling)
     if args.output:

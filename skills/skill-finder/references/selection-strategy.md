@@ -25,7 +25,7 @@ When two skills give contradictory instructions:
 
 - **5.0+**: Strong match — use the skill confidently
 - **3.0-5.0**: Partial match — the skill may be useful but consider rephrasing the query first
-- **Below 3.0**: Weak match — unlikely to be relevant; proceed with base Manus capabilities
+- **Below 3.0**: Weak match - unlikely to be relevant; proceed with base model capabilities
 
 ## When No Skills Match
 
@@ -33,4 +33,4 @@ If `find_skills.py` returns no results or all scores are below 3.0 after retries
 1. Try rephrasing the query with different keywords
 2. Try breaking the task into sub-tasks and searching each
 3. Consider using `internet-skill-finder` to search GitHub for new skills to install
-4. Proceed without a skill — Manus's base capabilities handle most tasks
+4. Proceed without a skill - the base model handles most tasks

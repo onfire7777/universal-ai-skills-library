@@ -1,0 +1,18 @@
+{
+  "sourceRepository": "https://github.com/bradtraversy/design-resources-for-developers",
+  "sourceCommit": "6d9884e7260076e0eced4ac9f3be7665a91a9476",
+  "sourceBranch": "master",
+  "resourceCount": 1084,
+  "categoryCount": 33,
+  "readmeBytes": 153508,
+  "filesIncluded": [
+    "SKILL.md",
+    "references/source-readme.md",
+    "references/contributing.md",
+    "references/license.txt",
+    "references/category-index.md",
+    "references/catalog.md",
+    "references/resources.json",
+    "scripts/search_design_resources.py"
+  ]
+}

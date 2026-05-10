@@ -1,7 +1,7 @@
 ---
 name: ultimate-skill-creator
 description: >
-  The definitive end-to-end pipeline for creating the highest quality Manus skills. Orchestrates
+  The definitive end-to-end pipeline for creating the highest quality portable AI skills. Orchestrates
   six individual skills in sequence — each run fully, separately, and in its entirety — to produce
   elite, production-grade skills. Use when the user explicitly requests the full pipeline, says
   "ultimate skill", "ultimate skill creator", "ultimate skill creation", "best skill", "best skill
@@ -12,7 +12,7 @@ description: >
 
 # Ultimate Skill Creator
 
-Execute a comprehensive six-stage pipeline to create, optimize, triage, connect, debug, and deploy a production-grade Manus skill. Each stage runs a fully independent skill through its complete workflow — no shortcuts, no combining, no skipping.
+Execute a comprehensive six-stage pipeline to create, optimize, triage, connect, debug, and deploy a production-grade portable AI skill. Each stage runs a fully independent skill through its complete workflow — no shortcuts, no combining, no skipping.
 
 ## Pipeline Overview
 
@@ -163,10 +163,10 @@ Execute the full deployment. Replace `$SKILL_NAME` with the actual skill name. V
 1. **Push to GitHub**:
    ```bash
    # Ensure repo exists
-   if [ ! -d /tmp/manus-skills-library ]; then
-     gh repo clone onfire7777/manus-skills-library /tmp/manus-skills-library
+   if [ ! -d /tmp/universal-ai-skills-library ]; then
+     gh repo clone onfire7777/universal-ai-skills-library /tmp/universal-ai-skills-library
    fi
-   cd /tmp/manus-skills-library
+   cd /tmp/universal-ai-skills-library
    git pull --rebase || { git rebase --abort; git pull --no-rebase; }
 
    # Guard against empty skill name
@@ -177,7 +177,7 @@ Execute the full deployment. Replace `$SKILL_NAME` with the actual skill name. V
    rm -rf "${SKILL_NAME}"
    cp -r "/home/ubuntu/skills/${SKILL_NAME}" .
    git add -A "${SKILL_NAME}/"
-   git diff --cached --quiet || git commit -m "feat: ${SKILL_NAME} — created via ultimate-skill-creator pipeline"
+   git diff --cached --quiet || git commit -m "feat: ${SKILL_NAME} - created via ultimate-skill-creator pipeline"
    git push || { echo "ERROR: git push failed"; exit 1; }
    ```
    If `git push` fails, report the error to the user with the git error message and suggest manual resolution.

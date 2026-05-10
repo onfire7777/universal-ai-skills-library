@@ -16,14 +16,14 @@ Determine which patterns to apply based on the task type:
 
 ## Optimization Checklist
 
-Apply to every prompt before sending to Manus:
+Apply to every prompt before sending to an AI agent:
 
 1. **Objective**: Is the goal stated in 1-2 clear sentences?
 2. **Deliverables**: Are exact outputs specified (file types, names, structure)?
 3. **Context**: Is all necessary background provided?
 4. **Constraints**: Are boundaries and exclusions defined?
 5. **Format**: Is the output format explicitly specified?
-6. **Tools**: Are relevant Manus tools referenced?
+6. **Tools**: Are relevant available tools referenced?
 7. **Validation**: Are success criteria defined?
 8. **Error Handling**: Are fallback behaviors specified?
 9. **One-Shot**: Is everything packed into a single prompt?
@@ -37,7 +37,7 @@ Remove: unnecessary pleasantries, chatbot-style phrasing, ambiguous language.
 
 ### Code Development
 Add: language, framework, error handling, testing requirements, architecture, deployment target.
-Remove: implementation details Manus can figure out, over-specification of obvious patterns.
+Remove: implementation details the agent can infer, over-specification of obvious patterns.
 
 ### Content Creation
 Add: tone, audience, style, format, length, structure, examples of desired quality.

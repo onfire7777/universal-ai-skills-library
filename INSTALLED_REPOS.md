@@ -6,10 +6,10 @@ This document catalogs all repositories in the `onfire7777` GitHub account that 
 
 | Repository | Purpose | Status |
 |:---|:---|:---|
-| [manus-skills-library](https://github.com/onfire7777/manus-skills-library) | **Primary repo** — 770+ skills, infrastructure configs, MCP bridges, universal setup | Active |
-| [manus-skills-organized](https://github.com/onfire7777/manus-skills-organized) | Browse-friendly view of skills organized into 14 numbered categories | Active |
-| [manus-skills-marketplace](https://github.com/onfire7777/manus-skills-marketplace) | Claude Code plugin marketplace — 770 skills bundled into 14 themed plugins | Active |
-| [manus-ultimate-stack](https://github.com/onfire7777/manus-ultimate-stack) | Universal AI stack configuration and orchestration | Active |
+| [universal-ai-skills-library](https://github.com/onfire7777/universal-ai-skills-library) | **Primary repo** - universal skill corpus, skill-router CLI, plugin metadata, optional MCP bridge configs | Active |
+| [manus-skills-organized](https://github.com/onfire7777/manus-skills-organized) | Legacy browse-friendly view of skills organized into 14 numbered categories | Compatibility |
+| [manus-skills-marketplace](https://github.com/onfire7777/manus-skills-marketplace) | Legacy themed plugin marketplace; superseded by the universal router/plugin model | Compatibility |
+| [manus-ultimate-stack](https://github.com/onfire7777/manus-ultimate-stack) | Legacy local stack launcher and Manus-compatible orchestration | Compatibility |
 
 ## Application Repositories
 
@@ -46,21 +46,20 @@ The following AI platforms are installed on the desktop and configured to use sk
 
 | Platform | Skills Root | Config File |
 |:---|:---|:---|
-| Claude Desktop | `%APPDATA%\Claude\skills\` | `%APPDATA%\Claude\claude_desktop_config.json` |
-| Claude Code (CLI) | `~/.claude/skills/` | `~/.claude/settings.json` |
-| Cursor | `~/.cursor/skills/` | `~/.cursor/mcp.json` |
-| Codex | `~/.codex/skills/` | `~/.codex/config.json` |
-| OpenCode | `~/.opencode/skills/` | `~/.opencode/config.json` |
-| Gemini CLI | `~/.gemini/skills/` | `~/.gemini/settings.json` |
-| Manus (cloud) | Synced via GitHub | Connected via MCP bridges |
+| Codex | `~/.codex/skills/` or router on PATH | `~/.codex/AGENTS.md`, `~/.codex/config.toml` |
+| Claude Code | `~/.claude/skills/` or router on PATH | `~/.claude/CLAUDE.md`, `~/.claude/settings.json` |
+| Cursor | `~/.cursor/skills/` or OpenSkills index | `~/.cursor/rules/` |
+| Gemini CLI | `~/.gemini/skills/` or router on PATH | `~/.gemini/GEMINI.md` |
+| OpenCode | `~/.config/opencode/AGENTS.md` or router on PATH | `~/.config/opencode/AGENTS.md` |
+| Manus compatibility | `skill-deployer` or Manus API adapter only when needed | `~/.manus/` |
 
 ## Installation
 
-To install all skills across all platforms, run:
+To install the universal router and keep skills context-light, run:
 
 ```powershell
 # From the repo root
-.\install.sh  # or on Windows: powershell -File infrastructure\scripts\install_skills.ps1
+.\install.sh
 ```
 
-This will symlink or copy skills to all detected AI platform roots automatically.
+New automation should prefer `skill-router skill <name>` and avoid copying the full corpus into every always-loaded instruction file.

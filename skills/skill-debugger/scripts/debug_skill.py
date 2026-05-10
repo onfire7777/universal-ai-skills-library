@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Skill Debugger — Deep dual-model analysis of Manus skills.
+"""Skill Debugger — Deep dual-model analysis of AI skills.
 
-Uses Manus's built-in model (gpt-4.1-mini) for structural/integration analysis
-and Claude Opus 4.6 via OpenRouter for deep code reasoning and bug detection.
+Uses the fast synthesis model (gpt-4.1-mini) for structural/integration analysis
+and reasoning model via OpenRouter for deep code reasoning and bug detection.
 Merges findings by consensus and generates a prioritized fix plan.
 
 Usage:
@@ -10,8 +10,8 @@ Usage:
     python3 debug_skill.py <skill-name> --fix              # Debug + auto-fix
     python3 debug_skill.py <skill-name> --deep             # Extended analysis
     python3 debug_skill.py /path/to/skill-dir              # Debug by path
-    python3 debug_skill.py <skill-name> --model claude     # Claude only
-    python3 debug_skill.py <skill-name> --model manus      # Manus only
+    python3 debug_skill.py <skill-name> --model claude     # reasoning model only
+    python3 debug_skill.py <skill-name> --model fast       # fast synthesis model only
 """
 
 import argparse
@@ -34,7 +34,7 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 # Best available models
 CLAUDE_MODEL = "anthropic/claude-opus-4.6"
-MANUS_MODEL = "gpt-4.1-mini"
+FAST_MODEL = "gpt-4.1-mini"
 
 # Retry configuration
 MAX_RETRIES = 3
@@ -45,7 +45,7 @@ READ_TIMEOUT = 300
 # ─── Prompt Engineering ─────────────────────────────────────────────────────
 
 def build_claude_system_prompt(deep: bool = False) -> str:
-    """Build the Claude Opus system prompt using elite prompt engineering.
+    """Build the reasoning model system prompt using elite prompt engineering.
 
     Techniques used:
     - Role priming: Expert persona with specific domain expertise
@@ -70,13 +70,12 @@ DEEP ANALYSIS MODE — additionally examine:
 
     return textwrap.dedent(f"""\
     You are a senior software reliability engineer specializing in Python tooling \
-    and AI agent frameworks. You have deep expertise in debugging skills for the \
-    Manus AI agent platform.
+    and AI agent frameworks. You have deep expertise in debugging portable AI skills.
 
-    Your task: Perform a thorough debug analysis of a Manus skill — its SKILL.md \
+    Your task: Perform a thorough debug analysis of an AI skill - its SKILL.md \
     instructions, Python scripts, and reference files. Identify bugs, logic errors, \
     robustness gaps, and integration issues that would cause the skill to fail or \
-    produce incorrect results when used by Manus.
+    produce incorrect results when used by the agent.
     {depth_instruction}
     ANALYSIS FRAMEWORK — examine each dimension:
 
@@ -105,11 +104,11 @@ DEEP ANALYSIS MODE — additionally examine:
        - API key exposure in logs or error messages
        - Unsafe deserialization (pickle, eval, exec)
 
-    5. INTEGRATION WITH MANUS
-       - Will Manus understand when and how to use this skill?
+    5. AGENT INTEGRATION
+       - Will the agent understand when and how to use this skill?
        - Are the instructions clear enough for an AI agent to follow?
-       - Do scripts produce output that Manus can parse and act on?
-       - Are there ambiguities that could cause Manus to misuse the skill?
+       - Do scripts produce output that the agent can parse and act on?
+       - Are there ambiguities that could cause the agent to misuse the skill?
 
     WHAT NOT TO REPORT (reduces noise):
     - Style preferences (naming conventions, line length)
@@ -120,7 +119,7 @@ DEEP ANALYSIS MODE — additionally examine:
 
     SEVERITY CALIBRATION:
     - CRITICAL: Script crashes, data loss, security vulnerability with practical exploit
-    - HIGH: Incorrect output, silent failures, broken integration with Manus
+    - HIGH: Incorrect output, silent failures, broken integration with the agent
     - MEDIUM: Edge case failures, missing error handling for likely scenarios
     - LOW: Minor robustness gaps, unclear instructions, cosmetic issues
 
@@ -156,13 +155,13 @@ DEEP ANALYSIS MODE — additionally examine:
     IMPORTANT: Return ONLY the JSON object, no markdown fences, no preamble.""")
 
 
-def build_manus_system_prompt(deep: bool = False) -> str:
-    """Build the Manus model system prompt — focused on structural and integration analysis.
+def build_fast_model_system_prompt(deep: bool = False) -> str:
+    """Build the the agent model system prompt — focused on structural and integration analysis.
 
     Techniques used:
-    - Complementary expertise: Focuses on areas where Manus has unique insight
+    - Complementary expertise: Focuses on areas where the agent has unique insight
     - Structured reasoning: Step-by-step analysis framework
-    - Concrete output schema: Matches Claude's schema for easy merging
+    - Concrete output schema: Matches reasoning model's schema for easy merging
     """
     depth_instruction = ""
     if deep:
@@ -170,12 +169,12 @@ def build_manus_system_prompt(deep: bool = False) -> str:
 DEEP MODE — additionally check:
 - Cross-references between SKILL.md and all bundled files
 - Whether the skill's description would correctly trigger in edge cases
-- Whether instructions handle Manus's tool limitations (e.g., no parallel function calls)
+- Whether instructions handle the agent's tool limitations (e.g., no parallel function calls)
 - Whether the skill conflicts with or duplicates other common skills
 """
 
     return textwrap.dedent(f"""\
-    You are an expert Manus skill analyst. You deeply understand how Manus skills \
+    You are an expert AI skill analyst. You deeply understand how AI skills \
     work: YAML frontmatter triggers skill loading, the body provides instructions, \
     and bundled scripts/references/templates extend capabilities.
 
@@ -194,13 +193,13 @@ DEEP MODE — additionally check:
        - Do scripts run correctly? Check imports, syntax, argument parsing
        - Are file paths hardcoded or properly parameterized?
        - Do scripts handle errors gracefully with informative messages?
-       - Is output formatted so Manus can parse and use it?
+       - Is output formatted so the agent can parse and use it?
 
     3. INTEGRATION ISSUES
-       - Would Manus know WHEN to use this skill based on the description?
-       - Would Manus know HOW to use it based on the instructions?
-       - Are there missing steps that Manus would need to figure out?
-       - Does the skill assume capabilities Manus doesn't have?
+       - Would the agent know WHEN to use this skill based on the description?
+       - Would the agent know HOW to use it based on the instructions?
+       - Are there missing steps that the agent would need to figure out?
+       - Does the skill assume capabilities the agent doesn't have?
 
     4. CORRECTNESS
        - Logic errors in scripts (wrong conditions, missing cases)
@@ -279,14 +278,14 @@ def collect_skill_files(skill_dir: Path) -> str:
 # ─── API Calls ───────────────────────────────────────────────────────────────
 
 def query_claude(payload: str, deep: bool = False) -> dict:
-    """Query Claude Opus 4.6 via OpenRouter with retry logic."""
+    """Query reasoning model via OpenRouter with retry logic."""
     import requests
 
     if not OPENROUTER_API_KEY:
         return {"error": "OPENROUTER_API_KEY not set", "findings": []}
 
     system_prompt = build_claude_system_prompt(deep)
-    user_message = f"Analyze this Manus skill for bugs and issues:\n\n{payload}"
+    user_message = f"Analyze this AI skill for bugs and issues:\n\n{payload}"
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
@@ -305,7 +304,7 @@ def query_claude(payload: str, deep: bool = False) -> dict:
 
     for attempt in range(MAX_RETRIES):
         try:
-            print(f"  [Claude Opus 4.6] Attempt {attempt + 1}/{MAX_RETRIES}...", end="", flush=True)
+            print(f"  [reasoning model] Attempt {attempt + 1}/{MAX_RETRIES}...", end="", flush=True)
             start = time.time()
             r = requests.post(
                 "https://openrouter.ai/api/v1/chat/completions",
@@ -323,10 +322,10 @@ def query_claude(payload: str, deep: bool = False) -> dict:
             error_msg = r.text[:200]
             # Non-retryable errors
             if r.status_code in (401, 402, 403):
-                print(f"  [Claude] Auth/billing error: {error_msg}")
+                print(f"  [reasoning model] Auth/billing error: {error_msg}")
                 return {"error": error_msg, "findings": []}
 
-            print(f"  [Claude] HTTP {r.status_code}: {error_msg}")
+            print(f"  [reasoning model] HTTP {r.status_code}: {error_msg}")
 
         except requests.exceptions.Timeout:
             print(f" TIMEOUT", flush=True)
@@ -335,14 +334,14 @@ def query_claude(payload: str, deep: bool = False) -> dict:
 
         if attempt < MAX_RETRIES - 1:
             delay = RETRY_DELAYS[attempt]
-            print(f"  [Claude] Retrying in {delay}s...")
+            print(f"  [reasoning model] Retrying in {delay}s...")
             time.sleep(delay)
 
     return {"error": "All retries exhausted", "findings": []}
 
 
-def query_manus(payload: str, deep: bool = False) -> dict:
-    """Query Manus's built-in model (gpt-4.1-mini) via OpenAI-compatible API."""
+def query_fast_model(payload: str, deep: bool = False) -> dict:
+    """Query the fast synthesis model (gpt-4.1-mini) via OpenAI-compatible API."""
     try:
         from openai import OpenAI
     except ImportError:
@@ -352,17 +351,17 @@ def query_manus(payload: str, deep: bool = False) -> dict:
     if not OPENAI_API_KEY:
         return {"error": "OPENAI_API_KEY not set", "findings": []}
 
-    system_prompt = build_manus_system_prompt(deep)
-    user_message = f"Analyze this Manus skill for bugs and issues:\n\n{payload}"
+    system_prompt = build_fast_model_system_prompt(deep)
+    user_message = f"Analyze this AI skill for bugs and issues:\n\n{payload}"
 
     client = OpenAI()
 
     for attempt in range(MAX_RETRIES):
         try:
-            print(f"  [Manus gpt-4.1-mini] Attempt {attempt + 1}/{MAX_RETRIES}...", end="", flush=True)
+            print(f"  [fast synthesis model] Attempt {attempt + 1}/{MAX_RETRIES}...", end="", flush=True)
             start = time.time()
             response = client.chat.completions.create(
-                model=MANUS_MODEL,
+                model=FAST_MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message},
@@ -375,13 +374,13 @@ def query_manus(payload: str, deep: bool = False) -> dict:
             print(f" {elapsed:.1f}s", flush=True)
 
             content = response.choices[0].message.content
-            return parse_model_response(content, "manus")
+            return parse_model_response(content, "fast")
 
         except Exception as e:
             print(f" ERROR: {e}", flush=True)
             if attempt < MAX_RETRIES - 1:
                 delay = RETRY_DELAYS[attempt]
-                print(f"  [Manus] Retrying in {delay}s...")
+                print(f"  [the agent] Retrying in {delay}s...")
                 time.sleep(delay)
 
     return {"error": "All retries exhausted", "findings": []}
@@ -433,7 +432,7 @@ def parse_model_response(content: str, source: str) -> dict:
 
 # ─── Consensus Merging ───────────────────────────────────────────────────────
 
-def merge_findings(claude_result: dict, manus_result: dict) -> list[dict]:
+def merge_findings(claude_result: dict, fast_result: dict) -> list[dict]:
     """Merge findings from both models using consensus-based deduplication.
 
     Findings confirmed by both models get elevated confidence.
@@ -442,23 +441,23 @@ def merge_findings(claude_result: dict, manus_result: dict) -> list[dict]:
     all_findings = []
 
     claude_findings = claude_result.get("findings", [])
-    manus_findings = manus_result.get("findings", [])
+    fast_findings = fast_result.get("findings", [])
 
     # Mark sources
     for f in claude_findings:
         f.setdefault("source", "claude")
-    for f in manus_findings:
-        f.setdefault("source", "manus")
+    for f in fast_findings:
+        f.setdefault("source", "fast")
 
     # Try to match findings across models
-    matched_manus = set()
+    matched_fast = set()
 
     for cf in claude_findings:
         best_match = None
         best_score = 0.0
 
-        for i, mf in enumerate(manus_findings):
-            if i in matched_manus:
+        for i, mf in enumerate(fast_findings):
+            if i in matched_fast:
                 continue
             score = _similarity(cf, mf)
             if score > best_score:
@@ -467,8 +466,8 @@ def merge_findings(claude_result: dict, manus_result: dict) -> list[dict]:
 
         if best_match is not None and best_score >= 0.4:
             # Consensus finding — merge and elevate
-            mf = manus_findings[best_match]
-            matched_manus.add(best_match)
+            mf = fast_findings[best_match]
+            matched_fast.add(best_match)
 
             merged = {
                 "id": cf.get("id", "DBG-???"),
@@ -482,20 +481,20 @@ def merge_findings(claude_result: dict, manus_result: dict) -> list[dict]:
                 "fix": cf.get("fix", mf.get("fix", "")),
                 "confidence": min(1.0, max(cf.get("confidence", 0.7), mf.get("confidence", 0.7)) + 0.15),
                 "consensus": True,
-                "sources": ["claude", "manus"],
+                "sources": ["claude", "fast"],
             }
             all_findings.append(merged)
         else:
-            # Claude-only finding
+            # reasoning model-only finding
             cf["consensus"] = False
             cf["sources"] = ["claude"]
             all_findings.append(cf)
 
-    # Add unmatched Manus findings
-    for i, mf in enumerate(manus_findings):
-        if i not in matched_manus:
+    # Add unmatched the agent findings
+    for i, mf in enumerate(fast_findings):
+        if i not in matched_fast:
             mf["consensus"] = False
-            mf["sources"] = ["manus"]
+            mf["sources"] = ["fast"]
             all_findings.append(mf)
 
     # Sort by severity then confidence
@@ -557,26 +556,26 @@ def _higher_severity(a: str, b: str) -> str:
 # ─── Report Generation ──────────────────────────────────────────────────────
 
 def generate_report(skill_name: str, findings: list[dict],
-                    claude_result: dict, manus_result: dict,
+                    claude_result: dict, fast_result: dict,
                     output_path: Path) -> str:
     """Generate a detailed Markdown debug report."""
     lines = [
         f"# Skill Debug Report: `{skill_name}`",
         f"",
         f"**Generated:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
-        f"**Models:** Claude Opus 4.6 + Manus gpt-4.1-mini",
+        f"**Models:** reasoning model + fast synthesis model",
         f"",
     ]
 
     # Model status
     claude_ok = "error" not in claude_result
-    manus_ok = "error" not in manus_result
+    fast_ok = "error" not in fast_result
     lines.append("## Model Status")
     lines.append("")
     lines.append(f"| Model | Status | Findings |")
     lines.append(f"|---|---|---|")
-    lines.append(f"| Claude Opus 4.6 | {'OK' if claude_ok else 'FAILED: ' + claude_result.get('error', '?')[:50]} | {len(claude_result.get('findings', []))} |")
-    lines.append(f"| Manus gpt-4.1-mini | {'OK' if manus_ok else 'FAILED: ' + manus_result.get('error', '?')[:50]} | {len(manus_result.get('findings', []))} |")
+    lines.append(f"| reasoning model | {'OK' if claude_ok else 'FAILED: ' + claude_result.get('error', '?')[:50]} | {len(claude_result.get('findings', []))} |")
+    lines.append(f"| fast synthesis model | {'OK' if fast_ok else 'FAILED: ' + fast_result.get('error', '?')[:50]} | {len(fast_result.get('findings', []))} |")
     lines.append("")
 
     # Overall health
@@ -649,11 +648,11 @@ def generate_report(skill_name: str, findings: list[dict],
 # ─── Main ────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Debug a Manus skill using dual AI models")
+    parser = argparse.ArgumentParser(description="Debug an AI skill using dual AI models")
     parser.add_argument("skill", help="Skill name or path to skill directory")
     parser.add_argument("--fix", action="store_true", help="Auto-apply fixes after analysis")
     parser.add_argument("--deep", action="store_true", help="Extended deep analysis mode")
-    parser.add_argument("--model", choices=["both", "claude", "manus"], default="both",
+    parser.add_argument("--model", choices=["both", "claude", "fast", "manus"], default="both",
                         help="Which model(s) to use (default: both)")
     parser.add_argument("--output", default=None, help="Output report path")
     args = parser.parse_args()
@@ -689,16 +688,16 @@ def main():
     # Query models in parallel
     print("Querying models...")
     claude_result = {"findings": [], "error": "skipped"}
-    manus_result = {"findings": [], "error": "skipped"}
+    fast_result = {"findings": [], "error": "skipped"}
 
-    if args.model in ("both", "claude") and args.model in ("both", "manus"):
+    if args.model == "both":
         # Parallel execution
         with ThreadPoolExecutor(max_workers=2) as pool:
             futures = {}
             if args.model in ("both", "claude"):
                 futures["claude"] = pool.submit(query_claude, payload, args.deep)
-            if args.model in ("both", "manus"):
-                futures["manus"] = pool.submit(query_manus, payload, args.deep)
+            if args.model in ("both", "fast", "manus"):
+                futures["fast"] = pool.submit(query_fast_model, payload, args.deep)
 
             for name, future in futures.items():
                 try:
@@ -706,27 +705,27 @@ def main():
                     if name == "claude":
                         claude_result = result
                     else:
-                        manus_result = result
+                        fast_result = result
                 except Exception as e:
                     print(f"  [{name}] Failed: {e}")
     else:
         if args.model == "claude":
             claude_result = query_claude(payload, args.deep)
-        elif args.model == "manus":
-            manus_result = query_manus(payload, args.deep)
+        elif args.model in ("fast", "manus"):
+            fast_result = query_fast_model(payload, args.deep)
 
     print()
 
     # Report errors
     if "error" in claude_result and claude_result["error"] != "skipped":
-        print(f"  Claude error: {claude_result['error']}")
-    if "error" in manus_result and manus_result["error"] != "skipped":
-        print(f"  Manus error: {manus_result['error']}")
+        print(f"  reasoning model error: {claude_result['error']}")
+    if "error" in fast_result and fast_result["error"] != "skipped":
+        print(f"  fast model error: {fast_result['error']}")
 
     # Merge findings
     print("Merging findings...")
     if args.model == "both":
-        findings = merge_findings(claude_result, manus_result)
+        findings = merge_findings(claude_result, fast_result)
     elif args.model == "claude":
         findings = claude_result.get("findings", [])
         for i, f in enumerate(findings, 1):
@@ -734,11 +733,11 @@ def main():
             f["consensus"] = False
             f["sources"] = ["claude"]
     else:
-        findings = manus_result.get("findings", [])
+        findings = fast_result.get("findings", [])
         for i, f in enumerate(findings, 1):
             f["id"] = f"DBG-{i:03d}"
             f["consensus"] = False
-            f["sources"] = ["manus"]
+            f["sources"] = ["fast"]
 
     print(f"  Total findings: {len(findings)}")
     consensus_count = sum(1 for f in findings if f.get("consensus"))
@@ -758,7 +757,7 @@ def main():
 
     # Generate report
     output_path = Path(args.output) if args.output else (skill_path / "DEBUG_REPORT.md")
-    report_path = generate_report(skill_name, findings, claude_result, manus_result, output_path)
+    report_path = generate_report(skill_name, findings, claude_result, fast_result, output_path)
     print(f"\nReport: {report_path}")
 
     # Save raw results
@@ -767,7 +766,7 @@ def main():
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "skill": skill_name,
         "claude": claude_result,
-        "manus": manus_result,
+        "fast": fast_result,
         "merged": findings,
     }
     raw_path.write_text(json.dumps(raw_data, indent=2, default=str))
@@ -778,7 +777,7 @@ def main():
         print(f"\n{'=' * 60}")
         print("AUTO-FIX MODE")
         print(f"{'=' * 60}")
-        print("Fixes should be applied by Manus using the detailed report above.")
+        print("Fixes should be applied by the agent using the detailed report above.")
         print("Read the DEBUG_REPORT.md and apply each fix in order of severity.")
 
     print(f"\n{'=' * 60}")

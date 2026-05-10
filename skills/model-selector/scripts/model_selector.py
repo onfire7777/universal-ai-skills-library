@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Model Selector — Set, auto-select, or toggle the default AI model for Manus.
+"""Model Selector - Set, auto-select, or toggle the preferred AI model.
 
 Commands:
     set <model_id>       Set a specific model as the default backbone LLM
     auto                 Auto-select the best model for the current task
     auto <task_desc>     Auto-select the best model for a described task
-    on                   Enable model-selector (Manus reads config at task start)
-    off                  Disable model-selector (Manus uses its default model)
+    on                   Enable model-selector for compatible clients
+    off                  Disable model-selector and use the client default model
     status               Show current configuration and selected model
     refresh              Refresh the cached model leaderboard from OpenRouter
     list [category]      List top models, optionally filtered by category
@@ -495,7 +495,7 @@ def cmd_set(args):
     print(f"\n  Model set: {model_id}")
     print(f"  Mode: manual")
     print(f"  Status: enabled")
-    print(f"\n  Manus will use this model as its backbone LLM for all tasks.")
+    print(f"\n  Compatible clients should use this model as the preferred backbone LLM.")
 
 
 def cmd_auto(args):
@@ -552,7 +552,7 @@ def cmd_off(args):
     cfg["enabled"] = False
     save_config(cfg)
     print(f"\n  Model selector: DISABLED")
-    print(f"  Manus will use its default backbone model.")
+    print(f"  Compatible clients should use their default backbone model.")
 
 
 def cmd_status(args):
@@ -663,7 +663,7 @@ def cmd_recommend(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Model Selector — Set or auto-select the best AI model for Manus",
+        description="Model Selector - Set or auto-select the best AI model for compatible clients",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

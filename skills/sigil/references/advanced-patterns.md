@@ -92,7 +92,7 @@ Rules:
 - Root skills cover cross-cutting concerns only.
 - Package skills cover framework-specific workflows.
 - Never duplicate a root skill inside a package.
-- Keep `.claude/skills/` and `.agents/skills/` synchronized at every level.
+- Keep configured cross-AI skill roots synchronized at every level.
 
 ## Skill Composition
 

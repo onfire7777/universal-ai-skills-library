@@ -1,15 +1,15 @@
 {
-  "name": "manus",
+  "name": "universal-ai-skills",
   "owner": {
     "name": "onfire7777",
     "url": "https://github.com/onfire7777"
   },
   "plugins": [
     {
-      "name": "manus",
+      "name": "universal-ai-skills",
       "source": "./plugin",
-      "description": "Universal CLI-first skill router: 785 skills on demand, audits, oracle, CLI generation, and optional MCP bridge management.",
-      "version": "2.0.0",
+      "description": "Universal CLI-first skill router: 1,804 skills on demand, audits, oracle, CLI generation, and optional MCP bridge management.",
+      "version": "2.1.0",
       "author": {
         "name": "onfire7777"
       }

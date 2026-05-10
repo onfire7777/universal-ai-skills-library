@@ -1,11 +1,11 @@
 ---
 name: chat-summarizer
-description: Generate a comprehensive, AI-optimized summary of the current Manus chat session. Use when the user asks to summarize this chat, create a session summary, generate a handoff document, capture what was done, or save progress for continuation in a new chat. Also use when the user says "summarize", "recap", "save context", or "handoff".
+description: Generate a comprehensive, AI-optimized summary of the current AI session. Use when the user asks to summarize this chat, create a session summary, generate a handoff document, capture what was done, or save progress for continuation in a new chat or another AI client.
 ---
 
 # Chat Summarizer
 
-Generate a structured, comprehensive summary of the current Manus chat session, specifically designed for AI consumption. The output enables seamless continuation in a new chat — another AI instance can read it and pick up exactly where this session left off.
+Generate a structured, comprehensive summary of the current AI chat session, specifically designed for AI consumption. The output enables seamless continuation in a new chat - another AI instance can read it and pick up exactly where this session left off.
 
 ## When to Use
 
@@ -46,10 +46,10 @@ Generated: [ISO 8601 timestamp]
 Root goal: [One sentence describing the overarching objective]
 
 [For each sub-goal, use this format:]
-- [COMPLETED] Sub-goal description — outcome achieved
-- [IN-PROGRESS] Sub-goal description — current state
-- [BLOCKED] Sub-goal description — what is blocking it
-- [ABANDONED] Sub-goal description — why it was abandoned
+- [COMPLETED] Sub-goal description - outcome achieved
+- [IN-PROGRESS] Sub-goal description - current state
+- [BLOCKED] Sub-goal description - what is blocking it
+- [ABANDONED] Sub-goal description - why it was abandoned
 
 ## DECISIONS_LOG
 
@@ -81,17 +81,17 @@ Root goal: [One sentence describing the overarching objective]
 ## UNRESOLVED_ITEMS
 
 [For each open item:]
-- **[OPEN QUESTION]** Description — context for why it matters
-- **[KNOWN ISSUE]** Description — impact and workaround if any
-- **[PENDING FEATURE]** Description — what was requested, current state
-- **[BLOCKED]** Description — what is blocking and what would unblock
+- **[OPEN QUESTION]** Description - context for why it matters
+- **[KNOWN ISSUE]** Description - impact and workaround if any
+- **[PENDING FEATURE]** Description - what was requested, current state
+- **[BLOCKED]** Description - what is blocking and what would unblock
 
 ## CONTINUATION_CONTEXT
 
 **Current system state:** [Exact state of the project/system right now]
 
 **What the next AI must know:**
-[Critical context that is NOT obvious from the artifacts alone — implicit
+[Critical context that is NOT obvious from the artifacts alone - implicit
 knowledge, user preferences, gotchas, environment quirks]
 
 **Recommended next steps (ordered by priority):**
@@ -100,7 +100,7 @@ knowledge, user preferences, gotchas, environment quirks]
 3. [Third priority]
 
 **Warnings:**
-[Anything the next AI should be careful about — fragile code, user
+[Anything the next AI should be careful about - fragile code, user
 sensitivities, environment constraints]
 ```
 
@@ -137,10 +137,10 @@ If validation fails, fix the missing sections and re-run.
 ### Step 4: Deliver
 
 Send the user these files (in order of importance):
-1. `/home/ubuntu/chat_summary.md` — the full structured summary
-2. `/home/ubuntu/handoff_prompt.txt` — dense single-block for pasting into new chats
-3. `/home/ubuntu/chat_summary.json` — machine-parseable version
-4. `/home/ubuntu/ai_recommendations.md` — AI-generated next steps (only if `--enrich` was used and succeeded)
+1. `/home/ubuntu/chat_summary.md` - the full structured summary
+2. `/home/ubuntu/handoff_prompt.txt` - dense single-block for pasting into new chats
+3. `/home/ubuntu/chat_summary.json` - machine-parseable version
+4. `/home/ubuntu/ai_recommendations.md` - AI-generated next steps (only if `--enrich` was used and succeeded)
 
 ## Quality Criteria
 
@@ -149,7 +149,7 @@ A good summary scores well on these dimensions:
 | Dimension | Indicator |
 |---|---|
 | Completeness | All 7 sections populated with substantive content |
-| Precision | Exact paths, exact error messages, exact decisions — no vague language |
+| Precision | Exact paths, exact error messages, exact decisions - no vague language |
 | Continuability | Another AI can continue without asking user to repeat anything |
 | Rationale density | Every decision has a "because" or "rationale" |
 | Failure coverage | Dead ends and bugs documented with root causes |

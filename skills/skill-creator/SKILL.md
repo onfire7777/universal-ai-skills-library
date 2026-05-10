@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating or updating skills that extend Manus via specialized knowledge, workflows, or tool integrations. For any modification or improvement request, MUST first read this skill and follow its update workflow instead of editing files directly.
+description: Guide for creating or updating portable AI skills via specialized knowledge, workflows, scripts, references, or tool integrations. For any skill modification or improvement request, read this skill first and follow its update workflow.
 license: Complete terms in LICENSE.txt
 ---
 
@@ -10,7 +10,7 @@ This skill provides guidance for creating effective skills.
 
 ## About Skills
 
-Skills are modular, self-contained packages that extend Manus's capabilities by providing specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific domains or tasks—they transform Manus from a general-purpose agent into a specialized agent equipped with procedural knowledge that no model can fully possess.
+Skills are modular, self-contained packages that extend an AI agent's capabilities by providing specialized knowledge, workflows, and tools. Think of them as onboarding guides for specific domains or tasks: they transform a general-purpose agent into a specialized agent equipped with procedural knowledge that no model can fully possess.
 
 ### What Skills Provide
 
@@ -23,9 +23,9 @@ Skills are modular, self-contained packages that extend Manus's capabilities by 
 
 ### Concise is Key
 
-The context window is a public good. Skills share the context window with everything else Manus needs: system prompt, conversation history, other Skills' metadata, and the actual user request.
+The context window is a public good. Skills share the context window with system prompts, conversation history, other skill metadata, and the actual user request.
 
-**Default assumption: Manus is already very smart.** Only add context Manus doesn't already have. Challenge each piece of information: "Does Manus really need this explanation?" and "Does this paragraph justify its token cost?"
+**Default assumption: the assistant is already capable.** Only add context the agent does not already have. Challenge each piece of information: "Does the agent really need this explanation?" and "Does this paragraph justify its token cost?"
 
 Prefer concise examples over verbose explanations.
 
@@ -39,7 +39,7 @@ Match the level of specificity to the task's fragility and variability:
 
 **Low freedom (specific scripts, few parameters)**: Use when operations are fragile and error-prone, consistency is critical, or a specific sequence must be followed.
 
-Think of Manus as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
+Think of the agent as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
 
 ### Anatomy of a Skill
 
@@ -62,7 +62,7 @@ skill-name/
 
 Every SKILL.md consists of:
 
-- **Frontmatter** (YAML): Contains `name` and `description` fields. These are the only fields that Manus reads to determine when the skill gets used, thus it is very important to be clear and comprehensive in describing what the skill is, and when it should be used.
+- **Frontmatter** (YAML): Contains `name` and `description` fields. These are the routing fields agents use to determine when the skill gets used, so they must clearly describe what the skill does and when to use it.
 - **Body** (Markdown): Instructions and guidance for using the skill. Only loaded AFTER the skill triggers (if at all).
 
 #### Bundled Resources (optional)
@@ -97,7 +97,7 @@ bigquery-skill/
     └── product.md
 ```
 
-Manus only loads the relevant reference file when needed.
+The agent only loads the relevant reference file when needed.
 
 ## Skill Creation Process
 
@@ -157,7 +157,7 @@ After initialization, customize or remove the generated SKILL.md and example fil
 
 ### Step 4: Edit the Skill
 
-When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Manus to use. Include information that would be beneficial and non-obvious to Manus. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Manus instance execute these tasks more effectively.
+When editing the newly generated or existing skill, remember that the skill is being created for another AI session to use. Include information that would be beneficial and non-obvious to a capable assistant. Consider what procedural knowledge, domain-specific details, or reusable assets would help another AI instance execute these tasks more effectively.
 
 #### Learn Proven Design Patterns
 
