@@ -20,7 +20,7 @@
     "universal",
     "context-efficient"
   ],
-  "skills": "../skills/",
+  "skills": "./skills/",
   "interface": {
     "displayName": "Universal AI Skills",
     "shortDescription": "CLI-first universal skill router",
