@@ -1,0 +1,17 @@
+---
+title: 'Update Task'
+openapi: 'PUT /v1/tasks/{task_id}'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+Update a task's metadata such as title, sharing settings, and visibility in the task list.
+
+## Updatable Fields
+
+- **title**: Change the task's title
+- **enableShared**: Enable or disable public sharing of the task
+- **enableVisibleInTaskList**: Control whether the task appears in the Manus webapp task list

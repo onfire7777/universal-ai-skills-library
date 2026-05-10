@@ -1,0 +1,13 @@
+---
+title: 'Create File'
+openapi: 'POST /v1/files'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+Creates a file record and returns a presigned URL for uploading the file content to S3. After receiving the upload URL, use a PUT request to upload your file content.
+
+The file can then be referenced in task attachments using the returned `file_id`.

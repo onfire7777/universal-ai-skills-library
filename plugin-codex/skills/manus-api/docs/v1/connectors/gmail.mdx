@@ -1,0 +1,51 @@
+---
+title: 'Gmail'
+description: 'Connect Manus to your Gmail account to manage emails with AI'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+# Gmail
+
+The Gmail connector grants Manus access to your Gmail account, allowing it to help you manage your inbox. With this integration, you can ask Manus to scan, summarize, and identify urgent emails.
+
+## Use Cases
+
+- **Email Summarization**: Get quick summaries of important emails
+- **Urgency Detection**: Automatically identify emails that require immediate response
+- **Inbox Management**: Organize and prioritize your messages
+- **Email Search**: Find specific emails using natural language queries
+
+## Example Usage
+
+If your inbox is cluttered, Manus can quickly find urgent messages. Instead of manually searching through emails, you can use a simple prompt to have Manus scan your inbox and summarize key emails that require immediate attention.
+
+```bash
+curl --request POST \
+  --url https://api.manus.ai/v1/tasks \
+  --header 'API_KEY: <YOUR API KEY HERE>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "prompt": "Can you get my emails and help me see if there is anything urgent to respond to?",
+  "mode": "fast",
+  "connectors": [
+    "9444d960-ab7e-450f-9cb9-b9467fb0adda"
+  ]
+}'
+```
+
+## Setup
+
+To set up the Gmail connector, follow these steps:
+
+1. Go to your integrations page on [manus.im](https://manus.im).
+2. Click **Add Gmail Connector**.
+3. Complete the secure OAuth authentication.
+4. Your Gmail connector will be available with UUID: `9444d960-ab7e-450f-9cb9-b9467fb0adda`.
+
+## Privacy & Security
+
+Manus connects to your Gmail account using secure OAuth authentication and you can revoke access anytime from the integrations page on [manus.im](https://manus.im). 

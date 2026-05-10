@@ -1,0 +1,53 @@
+---
+title: 'Slack'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+## Overview
+
+The Manus Slack integration lets you create sessions directly from Slack channels or with the Manus bot.
+
+---
+
+## Requirements
+
+- A Slack workspace where you have permission to install apps
+- A Manus Account
+
+---
+
+## Installation
+
+1. Go to **Manus Settings → Integrations → Slack**
+2. Click **Connect**
+3. Install the app and complete setup
+
+
+![Slack Integration](/images/screenshot/integration_slack.png)
+
+---
+
+## Usage
+- Tag @manus in threads in channel or send a direct message to the Manus bot
+- Use `mute` or `unmute` to control thread activity  
+
+---
+
+
+## Changelog
+
+### November 27, 2025
+
+We’ve updated Manus Slack App behavior based on user feedback.
+
+| Scenario                                           | Previous Behavior                                                                 | Updated Behavior                                                            |
+| -------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **Direct @Manus in a channel**                  | Manus replies directly under the message and automatically starts a Manus thread. | *No change, behavior remains the same.*                                    |
+| **@Manus in a reply within a non-Manus thread** | A new Manus thread would be created.                                              | Manus now replies directly under the message without creating a new thread. |
+| **User reply behavior inside Manus threads**    | Manus proactively listens and replies within the thread.                          | Manus will only reply when explicitly mentioned.                            |
+
+

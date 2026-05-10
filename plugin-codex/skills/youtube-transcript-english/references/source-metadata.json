@@ -1,0 +1,11 @@
+{
+  "sourceRepository": "https://github.com/jdepoix/youtube-transcript-api",
+  "sourceCommit": "85c859450c014d860297ab9fd4f88145c47ff2e2",
+  "sourceBranch": "master",
+  "canonicalCheckout": "C:\\Users\\burni\\.youtube-transcript-api\\youtube-transcript-api",
+  "venv": "C:\\Users\\burni\\.youtube-transcript-api\\venv",
+  "cli": "C:\\Users\\burni\\.youtube-transcript-api\\venv\\Scripts\\youtube_transcript_api.exe",
+  "englishShim": "C:\\Users\\burni\\.youtube-transcript-api\\bin\\youtube-transcript-english.cmd",
+  "readmeInstallModel": "pip install youtube-transcript-api; CLI name youtube_transcript_api",
+  "englishPolicy": "Default to direct English transcript with languages=['en']; if unavailable and YouTube can translate it, translate transcript to English; otherwise use OpenAI-compatible AI translation with OPENAI_API_KEY; fail clearly only when no transcript exists or required AI credentials are unavailable."
+}

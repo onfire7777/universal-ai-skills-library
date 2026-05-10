@@ -1,0 +1,11 @@
+{
+  "sourceRepository": "https://github.com/jimmc414/onefilellm",
+  "sourceCommit": "99c51a2cbe8cc01c0db037a9f800ca31fae9c2cd",
+  "sourceBranch": "main",
+  "canonicalCheckout": "C:\\Users\\burni\\.onefilellm\\onefilellm",
+  "venv": "C:\\Users\\burni\\.onefilellm\\venv",
+  "cli": "C:\\Users\\burni\\.onefilellm\\venv\\Scripts\\onefilellm.exe",
+  "shim": "C:\\Users\\burni\\.onefilellm\\bin\\onefilellm.cmd",
+  "readmeInstallModel": "pip install -r requirements.txt or pip install -e . for CLI/Python API",
+  "auditNote": "Raw repository audit flags expected network ingestion behavior, GitHub token reads, tests, and example shell snippets; the distributed skill wrapper excludes raw code and exposes an isolated venv CLI."
+}

@@ -1,0 +1,11 @@
+{
+  "owner": "wpank",
+  "slug": "design-hook",
+  "displayName": "Design Uniswap Hook",
+  "latest": {
+    "version": "0.1.0",
+    "publishedAt": 1770745432608,
+    "commit": "https://github.com/openclaw/skills/commit/662cdf82eef0ef3b3effc6b2b3c4c8fa999545bc"
+  },
+  "history": []
+}

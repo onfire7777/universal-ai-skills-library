@@ -1,0 +1,14 @@
+---
+title: 'website.status'
+openapi: 'GET /v2/website.status'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Poll after publish:** Call this after [website.publish](https://open.manus.ai/docs/v2/website.publish) until `publish_status` settles to `published` or `failed`.
+
+**Live version:** Match the response's `version_id` against entries from [website.listCheckpoints](https://open.manus.ai/docs/v2/website.listCheckpoints) to see which checkpoint is serving traffic. See the [Website](https://open.manus.ai/docs/v2/website) guide.
+</Tip>

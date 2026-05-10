@@ -1,0 +1,51 @@
+---
+title: 'Notion'
+description: 'Connect Manus to your Notion workspace for AI-powered knowledge management'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+# Notion
+
+The Notion connector links Manus to your Notion workspace, turning it into a knowledge assistant. Instead of manually searching through pages and databases, you can ask Manus directly for project updates, document summaries, or specific information.
+
+## Use Cases
+
+- **Project Management**: Get real-time updates on project status and progress
+- **Knowledge Retrieval**: Find specific information across all your Notion pages
+- **Document Summarization**: Get quick summaries of long documents or meeting notes
+- **Database Queries**: Ask natural language questions about your Notion databases
+
+## Example Usage
+
+With the Notion connector, Manus becomes your project assistant. This example shows how to request the latest project updates, helping you stay informed without switching context.
+
+```bash
+curl --request POST \
+  --url https://api.manus.ai/v1/tasks \
+  --header 'API_KEY: <YOUR API KEY HERE>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "prompt": "Any new updates on the project status with Manus?",
+  "mode": "fast",
+  "connectors": [
+    "9c27c684-2f4f-4d33-8fcf-51664ea15c00"
+  ]
+}'
+```
+
+## Setup
+
+To set up the Notion connector, follow these steps:
+
+1. Go to your integrations page on [manus.im](https://manus.im).
+2. Click **Add Notion Connector**.
+3. Complete the secure OAuth authentication.
+4. Your Notion connector will be available with UUID: `9c27c684-2f4f-4d33-8fcf-51664ea15c00`.
+
+## Privacy & Security
+
+Manus connects to your Notion workspace using secure OAuth authentication. Your data remains private, and access is limited to the permissions you grant during setup.

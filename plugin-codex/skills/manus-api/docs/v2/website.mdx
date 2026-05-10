@@ -1,0 +1,150 @@
+---
+title: 'Website'
+description: 'Manage websites built by Manus agents — inspect, version, publish, and configure'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+Manus agents can build web apps — see the [Webapp feature](https://manus.im/features/webapp) for what the product can do. When an agent builds a site inside a task, it produces a **website** with its own version history and a hosted URL once published. The `website.*` endpoints manage those websites:
+
+- [website.status](https://open.manus.ai/docs/v2/website.status) — inspect publish state, live URL, visibility
+- [website.listCheckpoints](https://open.manus.ai/docs/v2/website.listCheckpoints) — browse version history
+- [website.publish](https://open.manus.ai/docs/v2/website.publish) — deploy the latest checkpoint
+- [website.update](https://open.manus.ai/docs/v2/website.update) — change metadata (title, visibility) without redeploying
+
+<Note>
+To have an agent **build** a website, create a task with [task.create](https://open.manus.ai/docs/v2/task.create). Once the session has a website attached, the endpoints on this page take over.
+</Note>
+
+## Quickstart: publish a site
+
+After the agent has built something (the task's session now has a website), deploy it with one call and poll for the live URL:
+
+```bash
+# 1. Deploy the latest checkpoint — defaults to public
+curl -X POST 'https://api.manus.ai/v2/website.publish' \
+  -H 'x-manus-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"task_id": "session-xxx"}'
+# → { "ok": true, "website_id": "site-abc", "version_id": "v003" }
+
+# 2. Poll status until published / failed
+while true; do
+  RESP=$(curl -sS "https://api.manus.ai/v2/website.status?website_id=site-abc" \
+    -H 'x-manus-api-key: YOUR_API_KEY')
+  STATUS=$(echo "$RESP" | jq -r .publish_status)
+  echo "status: $STATUS"
+  [[ "$STATUS" == "published" || "$STATUS" == "failed" ]] && break
+  sleep 2
+done
+
+# 3. Read the primary site URL and open it
+echo "$RESP" | jq -r '.site_urls[0]'
+```
+
+Deployment is asynchronous — `website.publish` returns immediately while the deploy runs in the background.
+
+## Other common flows
+
+**Ship an updated build.** After the agent makes more changes (new checkpoints), call `website.publish` again — it always deploys the **latest** checkpoint. There is no way to pin an older checkpoint via this API.
+
+**Browse version history.**
+
+```bash
+curl 'https://api.manus.ai/v2/website.listCheckpoints?task_id=session-xxx' \
+  -H 'x-manus-api-key: YOUR_API_KEY'
+```
+
+Match each `data[].version_id` against `published_version_id` in the same response to find which checkpoint is currently live.
+
+**Change metadata without redeploying.**
+
+```bash
+curl -X POST 'https://api.manus.ai/v2/website.update' \
+  -H 'x-manus-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"website_id": "site-abc", "title": "My landing page", "visibility": "team"}'
+```
+
+Pass any combination of `title` and `visibility` — omitted fields are left unchanged. This does **not** trigger a new deployment, only a metadata update and a CDN refresh; it works even before the site has ever been published.
+
+**Take a site offline.** There is no public unpublish endpoint at this time. If you need to take a site down, contact [api-support@manus.ai](mailto:api-support@manus.ai).
+
+## Reference
+
+### Anatomy of a website
+
+| Concept | What it is |
+|---|---|
+| **Website** | The site itself, identified by a `website_id`. One session (`task_id`) typically owns one website. |
+| **Checkpoint** | A point-in-time snapshot of the site, backed by a git commit. Has its own `version_id`, `message`, `status`, `created_at`. |
+| **Publish state** | Whether the site is deployed, and which checkpoint is live. Tracked on the site, not on individual checkpoints. |
+| **Visibility** | Who can access the live site (`public` / `team` / `private`). |
+
+### Locating a website
+
+All four endpoints accept either `task_id` or `website_id` — exactly one must be provided:
+
+| Field | What it is | Where to get it |
+|---|---|---|
+| `task_id` | Session UID | Returned by task APIs (e.g. [task.create](https://open.manus.ai/docs/v2/task.create)) |
+| `website_id` | Unique website ID | Returned by `website.status` and `website.publish` |
+
+<Warning>
+Passing both `task_id` and `website_id` — or neither — returns `400 invalid_argument`. A session is expected to contain exactly one website; if more exist, the first is used.
+</Warning>
+
+### Site URLs
+
+When a site is published, `website.status` returns `site_urls` — an array of every hostname the site can be reached on, ordered from default to most specific:
+
+1. **Space URL** — `https://{space_id}.manus.space`. Always present for a published site.
+2. **Sub-domain URL** — `https://{sub_domain}.manus.space`. Only when the owner has configured a sub-domain.
+3. **Custom domains** — `https://{custom_domain}` for each active custom domain bound by the owner.
+
+For a simple "open the site" flow, `site_urls[0]` is enough — it's always the space URL. The array is empty whenever `publish_status` is not `published`.
+
+### Publish states
+
+| `publish_status` | Meaning | What to do |
+|---|---|---|
+| `unpublished` | Never published, or previously taken down | Call `website.publish` |
+| `publishing` | Deployment in progress | Poll again |
+| `published` | Live — `site_urls` is reachable | Read `site_urls` / `version_id` |
+| `failed` | Last deployment failed | Retry `website.publish` |
+
+### Checkpoint status vs. publish state
+
+A checkpoint's own `status` (`pending` / `success` / `failed` / `unspecified`) only says whether the snapshot was generated successfully — a `success` checkpoint is **not** automatically live. To find the live version, compare `website.status.version_id` (or `website.listCheckpoints.published_version_id`) against `data[].version_id`.
+
+### Visibility
+
+| Value | Who can access | Notes |
+|---|---|---|
+| `public` | Anyone on the internet | Default for `website.publish` |
+| `team` | Team members of the site owner | Team accounts only |
+| `private` | Owner and invited collaborators | Appears in `website.status` responses only — cannot be set via `website.publish` / `website.update` |
+
+Sites may additionally cap the maximum visibility they accept — for example, a team-only site cannot be set to `public`. Requests that exceed the allowed visibility return `403 permission_denied`.
+
+### `website.publish` vs. `website.update`
+
+|  | `website.publish` | `website.update` |
+|---|---|---|
+| Triggers deploy | ✅ Deploys the latest checkpoint | ❌ Metadata only (`title`, `visibility`) |
+| Default `visibility` | `public` when omitted | Omitted = unchanged; empty string is invalid |
+| Precondition | At least one checkpoint (`412` otherwise) | None |
+| Side effects | Runs the deployment pipeline | Refreshes CDN in the background |
+
+### Errors
+
+| Status / code | When |
+|---|---|
+| `401 unauthenticated` | Missing or invalid API key |
+| `400 invalid_argument` | Both `task_id` and `website_id` passed, neither passed, invalid `visibility`, or `website.update` with nothing to update |
+| `403 permission_denied` | Caller lacks access to the site, or the requested `visibility` exceeds what the site allows |
+| `404 not_found` | No website for the given session, or `website_id` does not exist / is not a website / is not initialized yet |
+| `412 failed_precondition` | `website.publish` called on a site with no checkpoint |
+| `500 internal` | Server-side error — include `request_id` when reporting |

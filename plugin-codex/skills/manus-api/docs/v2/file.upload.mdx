@@ -1,0 +1,16 @@
+---
+title: 'file.upload'
+openapi: 'POST /v2/file.upload'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Upload:** Send file content to the returned `upload_url` via PUT request.
+
+**Use in tasks:** Pass the `file.id` as `file_id` in [task.create](https://open.manus.ai/docs/v2/task.create) or [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) message content.
+
+**Expiration:** The `upload_url` expires in 3 minutes. Files are automatically deleted 48 hours after upload.
+</Tip>

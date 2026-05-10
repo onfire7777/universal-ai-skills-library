@@ -1,0 +1,87 @@
+---
+title: 'Agents'
+description: 'Interact with agents and their tasks via the API'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+
+Agents are custom AI entities in Manus with their own identity (nickname and description) that can be customized for specific use cases. Each agent has a **main task** that serves as its persistent conversation thread. You can manage agents and interact with their tasks through the API.
+
+Every account comes with a default **IM (Instant Messaging) agent** for general-purpose conversations. You can access it directly using [shortcuts](#shortcuts) without looking up its UUID.
+
+## Quick start: talk to an agent
+
+Use the shortcut `agent-default-main_task` as `task_id` to directly interact with the IM agent's main task — no need to look up UUIDs first:
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    # Send a message to the IM agent
+    curl -X POST https://api.manus.ai/v2/task.sendMessage \
+      -H "Content-Type: application/json" \
+      -H "x-manus-api-key: $MANUS_API_KEY" \
+      -d '{
+        "task_id": "agent-default-main_task",
+        "message": { "content": "Summarize today's tech news" }
+      }'
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import requests
+
+    response = requests.post(
+        "https://api.manus.ai/v2/task.sendMessage",
+        headers={
+            "Content-Type": "application/json",
+            "x-manus-api-key": MANUS_API_KEY,
+        },
+        json={
+            "task_id": "agent-default-main_task",
+            "message": {"content": "Summarize today's tech news"},
+        },
+    )
+    print(response.json())
+    ```
+  </Tab>
+</Tabs>
+
+Then poll for the agent's response:
+
+```bash
+curl 'https://api.manus.ai/v2/task.listMessages?task_id=agent-default-main_task&order=desc&limit=5' \
+  -H 'x-manus-api-key: $MANUS_API_KEY'
+```
+
+## Shortcuts
+
+The following shortcuts are available so you don't need to look up UUIDs first:
+
+| Shortcut | Used as | Description |
+|---|---|---|
+| `agent-default-main_task` | `task_id` | The IM agent's main task. Accepted anywhere a `task_id` is expected. |
+| `agent-default` | `agent_id` | The IM agent. Use in [task.list](https://open.manus.ai/docs/v2/task.list) with `scope=agent_subtask`. |
+
+## Managing agents
+
+Use the `agent.*` endpoints to list, view, and update your agents:
+
+| Action | Endpoint |
+|---|---|
+| List all agents | [agent.list](https://open.manus.ai/docs/v2/agent.list) |
+| View agent details | [agent.detail](https://open.manus.ai/docs/v2/agent.detail) |
+| Update nickname / description | [agent.update](https://open.manus.ai/docs/v2/agent.update) |
+
+## Agent subtasks
+
+Agents can create subtasks during execution. To view an agent's subtasks, use [task.list](https://open.manus.ai/docs/v2/task.list) with `scope=agent_subtask`:
+
+```bash
+curl 'https://api.manus.ai/v2/task.list?scope=agent_subtask&agent_id=agent-default' \
+  -H 'x-manus-api-key: $MANUS_API_KEY'
+```
+
+Subtasks have `task_type: "agent_subtask"` in the response and can be interacted with like any other task — [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage), [task.listMessages](https://open.manus.ai/docs/v2/task.listMessages), [task.stop](https://open.manus.ai/docs/v2/task.stop), etc.

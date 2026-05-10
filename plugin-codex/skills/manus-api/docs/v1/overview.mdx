@@ -1,0 +1,114 @@
+---
+title: 'Overview'
+description: 'Complete guide to Manus API - integrate AI agents into your workflows'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+import Features from '/snippets/features.mdx'
+
+# Manus API Documentation
+
+The Manus API allows developers to seamlessly integrate Manus as a complete AI agent into their workflows. Build powerful automations, create tasks, manage files, and leverage data integrations—all through a simple REST API.
+
+<Card title="Quickstart Guide" horizontal icon="rocket" href="/v1/quickstart">
+  Getting started is simple and fast—make your first API call within minutes.
+</Card>
+
+## Documentation Structure
+
+### Core API Reference
+<CardGroup cols={2}>
+  <Card title="Projects" icon="folder" href="/v1/create-project">
+    Create and manage projects to organize your tasks
+  </Card>
+  <Card title="Tasks" icon="list-check" href="/v1/create-task">
+    Create, retrieve, update, and delete AI tasks
+  </Card>
+  <Card title="Files" icon="file" href="/v1/create-file">
+    Upload and manage files for task attachments
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/v1/create-webhook">
+    Register webhooks for real-time task notifications
+  </Card>
+</CardGroup>
+
+### Integrations & Extensions
+
+<CardGroup cols={2}>
+  <Card title="Connectors" icon="plug" href="/v1/connectors/overview">
+    Connect Manus to Gmail, Notion, Google Calendar, and more
+  </Card>
+  <Card title="Data Integrations" icon="database" href="/v1/data-integrations/overview">
+    Access premium data sources like Similarweb built into Manus
+  </Card>
+  <Card title="Slack Integration" icon="slack" href="/v1/integrations/slack">
+    Receive notifications and updates directly in Slack
+  </Card>
+  <Card title="OpenAI SDK" icon="code" href="/v1/openai-compatibility/overview">
+    Use Manus with OpenAI-compatible SDK
+  </Card>
+</CardGroup>
+
+### Guides & Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Webhooks Security" icon="shield" href="/v1/webhooks/security">
+    Learn how to verify webhook signatures and secure your endpoints
+  </Card>
+  <Card title="API Reference" icon="book" href="/v1/api-overview">
+    Complete API endpoint documentation with examples
+  </Card>
+</CardGroup>
+
+## Popular API Endpoints
+
+<CardGroup cols={1}>
+  <Card title="POST /v1/tasks" href="/v1/create-task">
+    Create a new AI task with custom parameters, attachments, and connectors
+  </Card>
+  <Card title="GET /v1/tasks" href="/v1/get-tasks">
+    List all tasks with filtering and pagination options
+  </Card>
+  <Card title="POST /v1/files" href="/v1/create-file">
+    Upload files to use as task attachments or context
+  </Card>
+  <Card title="POST /v1/webhooks" href="/v1/create-webhook">
+    Register a webhook to receive real-time task completion notifications
+  </Card>
+</CardGroup>
+
+## Quick Navigation
+
+<AccordionGroup>
+  <Accordion title="Getting Started">
+    - [Overview](https://open.manus.ai/docs/v1/overview) - This page
+    - [Quickstart](https://open.manus.ai/docs/v1/quickstart) - Make your first API call
+  </Accordion>
+
+  <Accordion title="Core APIs">
+    - [Projects](https://open.manus.ai/docs/v1/create-project) - Create and list projects
+    - [Tasks](https://open.manus.ai/docs/v1/create-task) - Full task lifecycle management
+    - [Files](https://open.manus.ai/docs/v1/create-file) - File upload and management
+    - [Webhooks](https://open.manus.ai/docs/v1/create-webhook) - Event notifications
+  </Accordion>
+
+  <Accordion title="Connectors">
+    - [Connectors Overview](https://open.manus.ai/docs/v1/connectors/overview) - Available connectors
+    - [Gmail](https://open.manus.ai/docs/v1/connectors/gmail) - Email integration
+    - [Notion](https://open.manus.ai/docs/v1/connectors/notion) - Workspace integration
+    - [Google Calendar](https://open.manus.ai/docs/v1/connectors/google-calendar) - Calendar integration
+  </Accordion>
+
+  <Accordion title="Data & Integrations">
+    - [Data Integrations](https://open.manus.ai/docs/v1/data-integrations/overview) - Premium data sources
+    - [Similarweb](https://open.manus.ai/docs/v1/data-integrations/similarweb) - Website analytics data
+    - [Slack](https://open.manus.ai/docs/v1/integrations/slack) - Slack notifications
+  </Accordion>
+</AccordionGroup>
+
+## Start Building
+<Features />

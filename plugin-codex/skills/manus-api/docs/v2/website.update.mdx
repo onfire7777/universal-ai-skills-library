@@ -1,0 +1,14 @@
+---
+title: 'website.update'
+openapi: 'POST /v2/website.update'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**No redeploy:** Only metadata changes — no deployment runs. Use [website.publish](https://open.manus.ai/docs/v2/website.publish) to deploy a new version.
+
+**Partial update:** Pass any combination of `title` and `visibility`; omit fields you don't want to change. Requests with only `task_id`/`website_id` and no updatable field return `400 invalid_argument`. See the [Website](https://open.manus.ai/docs/v2/website) guide.
+</Tip>

@@ -1,0 +1,2692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Realm — HQ Simulation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <style>
+    /* ============================================
+       CSS Custom Properties — Kairosoft Warm Theme
+       ============================================ */
+    :root {
+      --bg-body: #c8b888;
+      --bg-card: #f8f0d8;
+      --bg-panel: #f0e8d0;
+      --bg-header: #3a6a4a;
+      --bg-ticker: #2d5a3d;
+      --border-main: #a08850;
+      --border-hover: #d89020;
+      --accent: #d89020;
+      --text-primary: #2a1a0a;
+      --text-secondary: #5c4a2a;
+      --text-muted: #8b7d5c;
+      --health-green: #4a9a30;
+      --health-yellow: #c89020;
+      --health-orange: #c06020;
+      --health-red: #c03020;
+      --shadow-sm: 0 1px 3px rgba(80,60,20,0.2);
+      --shadow-md: 0 4px 12px rgba(80,60,20,0.25);
+      --shadow-lg: 0 8px 24px rgba(80,60,20,0.3);
+      --glow-blue: 0 0 12px rgba(216,144,32,0.3);
+      --radius: 4px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pixel-font {
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    /* ============================================
+       Top HUD Bar
+       ============================================ */
+    #hud-top {
+      background: var(--bg-header);
+      border-bottom: 3px solid #2d5a3d;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(40,30,10,0.3);
+      flex-shrink: 0;
+      height: 52px;
+    }
+
+    .hud-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hud-logo {
+      font-size: 22px;
+      filter: drop-shadow(0 0 4px rgba(255,255,200,0.4));
+    }
+
+    .hud-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #ffe880;
+      letter-spacing: 0.08em;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+    }
+
+    .hud-stats {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hud-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 4px 10px;
+    }
+
+    .hud-chip__label {
+      color: rgba(255,255,255,0.6);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hud-chip__value {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: #ffe880;
+    }
+
+    .efs-bar-wrap {
+      width: 60px;
+      height: 8px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .efs-bar-fill {
+      height: 100%;
+      border-radius: 1px;
+      transition: width 0.5s ease;
+    }
+
+    .efs-bar-fill.high { background: linear-gradient(90deg, #4a9a30, #7cc860); }
+    .efs-bar-fill.mid  { background: linear-gradient(90deg, #c89020, #e8b830); }
+    .efs-bar-fill.low  { background: linear-gradient(90deg, #c03020, #e05040); }
+
+    .hud-timestamp {
+      color: rgba(255,255,255,0.5);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    /* ============================================
+       Game Canvas Container
+       ============================================ */
+    #game-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #game-container canvas {
+      display: block;
+    }
+
+    /* ============================================
+       Bottom Event Ticker
+       ============================================ */
+    #hud-bottom {
+      background: var(--bg-ticker);
+      border-top: 3px solid #2d5a3d;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      z-index: 1000;
+      flex-shrink: 0;
+      padding: 0 16px;
+      gap: 12px;
+    }
+
+    .ticker-label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      color: #ffe880;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ticker-scroll {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 40px;
+      animation: ticker-slide 30s linear infinite;
+      white-space: nowrap;
+    }
+
+    @keyframes ticker-slide {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #e8e0c8;
+      white-space: nowrap;
+    }
+
+    .ticker-item__icon {
+      font-size: 16px;
+    }
+
+    .ticker-item__date {
+      font-size: 12px;
+      color: #b8b098;
+    }
+
+    /* ============================================
+       Right Detail Panel (overlay)
+       ============================================ */
+    #detail-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 320px;
+      height: 100%;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-main);
+      z-index: 900;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    #detail-panel.open {
+      transform: translateX(0);
+    }
+
+    .panel-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header__title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #8b6520;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-close {
+      background: none;
+      border: 1px solid var(--border-main);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 4px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s;
+    }
+
+    .panel-close:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .panel-section {
+      margin-bottom: 16px;
+    }
+
+    .panel-section__label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .panel-health-bar {
+      width: 100%;
+      height: 10px;
+      background: rgba(160,136,80,0.1);
+      border: 1px solid rgba(160,136,80,0.2);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .panel-health-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .panel-health-text {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: var(--text-secondary);
+    }
+
+    .panel-member {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .panel-member:hover {
+      background: rgba(160,136,80,0.12);
+    }
+
+    .panel-member__icon {
+      font-size: 14px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .panel-member__name {
+      font-size: 12px;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .panel-member__chief {
+      font-size: 10px;
+    }
+
+    .panel-member__rank {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      background: rgba(160,136,80,0.1);
+    }
+
+    .panel-member__class {
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .panel-ability {
+      background: rgba(160,136,80,0.08);
+      border: 1px solid rgba(160,136,80,0.2);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+
+    .panel-ability__name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #8b6520;
+      margin-bottom: 4px;
+    }
+
+    .panel-ability__desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       Agent Sheet Overlay
+       ============================================ */
+    #agent-sheet {
+      position: fixed;
+      inset: 0;
+      background: rgba(80,60,20,0.5);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #agent-sheet.open {
+      display: flex;
+    }
+
+    .sheet-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-main);
+      border-radius: 12px;
+      width: 380px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .sheet-header {
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-main);
+      position: relative;
+    }
+
+    .sheet-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: 1px solid var(--border-main);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 4px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .sheet-close:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .sheet-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    .sheet-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      color: #8b6520;
+      margin-bottom: 4px;
+    }
+
+    .sheet-class {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+
+    .sheet-rank {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(160,136,80,0.15);
+      border: 1px solid rgba(160,136,80,0.25);
+    }
+
+    .sheet-body {
+      padding: 16px 20px;
+    }
+
+    .sheet-section-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .sheet-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .sheet-stat {
+      text-align: center;
+      padding: 8px;
+      background: rgba(160,136,80,0.06);
+      border-radius: 6px;
+      border: 1px solid rgba(160,136,80,0.1);
+    }
+
+    .sheet-stat__label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .sheet-stat__value {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      color: #8b6520;
+    }
+
+    .sheet-xp-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(160,136,80,0.1);
+      border: 1px solid rgba(160,136,80,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .sheet-xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #d89020, #e8b830);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .sheet-xp-text {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* ============================================
+       Tooltip
+       ============================================ */
+    #agent-tooltip {
+      position: fixed;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hover);
+      border-radius: 6px;
+      padding: 8px 12px;
+      pointer-events: none;
+      z-index: 3000;
+      display: none;
+      box-shadow: var(--shadow-md);
+      max-width: 200px;
+    }
+
+    .tooltip-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #8b6520;
+      margin-bottom: 4px;
+    }
+
+    .tooltip-info {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ============================================
+       Scrollbar
+       ============================================ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #b8a070; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a08850; }
+
+    /* ============================================
+       Achievement Popup
+       ============================================ */
+    #achievement-popup {
+      position: fixed;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #6b21a8, #9333ea);
+      border: 2px solid #c084fc;
+      border-radius: 10px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 5000;
+      box-shadow: 0 4px 20px rgba(107,33,168,0.5), 0 0 30px rgba(147,51,234,0.3);
+      transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      min-width: 280px;
+      max-width: 480px;
+    }
+
+    #achievement-popup.show {
+      top: 64px;
+    }
+
+    .achievement-icon {
+      font-size: 28px;
+      filter: drop-shadow(0 0 6px rgba(255,215,0,0.6));
+    }
+
+    .achievement-body {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .achievement-label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: #e9d5ff;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .achievement-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #ffd700;
+      text-shadow: 0 0 8px rgba(255,215,0,0.4);
+    }
+
+    .achievement-desc {
+      font-size: 11px;
+      color: #e9d5ff;
+    }
+
+    /* ============================================
+       Mini Dashboard
+       ============================================ */
+    #mini-dashboard {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(42,26,10,0.92);
+      border-top: 1px solid rgba(216,144,32,0.4);
+      z-index: 800;
+      font-size: 11px;
+      color: #e8e0c8;
+      backdrop-filter: blur(4px);
+      transition: transform 0.3s ease;
+    }
+
+    #mini-dashboard.collapsed #mini-dashboard-body {
+      display: none;
+    }
+
+    #mini-dashboard-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      cursor: pointer;
+      user-select: none;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: #ffe880;
+      letter-spacing: 0.05em;
+    }
+
+    #mini-dashboard-toggle:hover {
+      background: rgba(216,144,32,0.1);
+    }
+
+    #mini-dashboard-toggle .toggle-arrow {
+      transition: transform 0.3s ease;
+      font-size: 10px;
+    }
+
+    #mini-dashboard.collapsed #mini-dashboard-toggle .toggle-arrow {
+      transform: rotate(180deg);
+    }
+
+    #mini-dashboard-body {
+      display: flex;
+      gap: 20px;
+      padding: 0 14px 10px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    #mini-dashboard-body > div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mini-section-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 6px;
+      color: #ffe880;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      margin-top: 0;
+    }
+
+    .mini-agent-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 0;
+    }
+
+    .mini-agent-rank {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      width: 18px;
+      text-align: center;
+    }
+
+    .mini-agent-name {
+      flex: 1;
+      font-size: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-agent-xp {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: #ffe880;
+    }
+
+    .mini-health-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 1px 0;
+    }
+
+    .mini-health-name {
+      font-size: 9px;
+      width: 70px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-health-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .mini-health-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- ============================================
+       Top HUD
+       ============================================ -->
+  <div id="hud-top">
+    <div class="hud-brand">
+      <span class="hud-logo">{{COMPANY_ICON}}</span>
+      <div>
+        <div class="hud-title">THE REALM</div>
+      </div>
+    </div>
+    <div class="hud-stats" id="hud-stats">
+      <!-- Populated by JS -->
+    </div>
+    <div class="hud-timestamp" id="hud-timestamp"></div>
+  </div>
+
+  <!-- ============================================
+       Game Canvas
+       ============================================ -->
+  <div id="game-container">
+    <!-- Phaser renders here -->
+
+    <!-- Detail Panel (overlay inside game container) -->
+    <div id="detail-panel">
+      <div class="panel-header">
+        <div class="panel-header__title" id="panel-title"></div>
+        <button class="panel-close" onclick="closePanel()">&times;</button>
+      </div>
+      <div class="panel-body" id="panel-body"></div>
+    </div>
+
+    <!-- Mini Dashboard (bottom bar, toggleable) -->
+    <div id="mini-dashboard" class="collapsed">
+      <div id="mini-dashboard-toggle" onclick="document.getElementById('mini-dashboard').classList.toggle('collapsed')">
+        <span>TOP AGENTS / DEPT HEALTH</span>
+        <span class="toggle-arrow">&#9650;</span>
+      </div>
+      <div id="mini-dashboard-body">
+        <div>
+          <div class="mini-section-title">TOP AGENTS</div>
+          <div id="mini-top-agents"></div>
+        </div>
+        <div>
+          <div class="mini-section-title">DEPT HEALTH</div>
+          <div id="mini-dept-health"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       Bottom Ticker
+       ============================================ -->
+  <div id="hud-bottom">
+    <span class="ticker-label">EVENTS</span>
+    <div class="ticker-scroll">
+      <div class="ticker-track" id="ticker-track">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       Agent Sheet Overlay
+       ============================================ -->
+  <div id="agent-sheet" onclick="if(event.target===this)closeSheet()">
+    <div class="sheet-card" id="sheet-card"></div>
+  </div>
+
+  <!-- ============================================
+       Tooltip
+       ============================================ -->
+  <div id="agent-tooltip">
+    <div class="tooltip-name" id="tooltip-name"></div>
+    <div class="tooltip-info" id="tooltip-info"></div>
+  </div>
+
+  <!-- ============================================
+       Achievement Popup
+       ============================================ -->
+  <div id="achievement-popup">
+    <span class="achievement-icon" id="achievement-icon"></span>
+    <div class="achievement-body">
+      <span class="achievement-label">Achievement Unlocked!</span>
+      <span class="achievement-name" id="achievement-name"></span>
+      <span class="achievement-desc" id="achievement-desc"></span>
+    </div>
+  </div>
+
+  <!-- ============================================
+       Embedded Realm Data
+       ============================================ -->
+  <script>
+    const REALM_DATA = {{REALM_DATA_JSON}};
+  </script>
+
+  <!-- ============================================
+       Game Logic
+       ============================================ -->
+  <script>
+  (function() {
+    'use strict';
+
+    // ==========================================
+    // Constants
+    // ==========================================
+    const WORLD_W = 3200;
+    const WORLD_H = 1800;
+
+    const DEPT_COLORS = {
+      command: 0xef4444, frontline: 0xf97316, intel: 0x22c55e,
+      defense: 0x06b6d4, academy: 0xa855f7, council: 0x6366f1,
+      enchant: 0xec4899, workshop: 0x84cc16, observatory: 0x3b82f6,
+      herald: 0xf59e0b, pantheon: 0xc026d3, outlands: 0x10b981
+    };
+
+    const CLASS_COLORS = {
+      commander: 0xef4444, ranger: 0x22c55e, artisan: 0xf97316,
+      guardian: 0x06b6d4, paladin: 0xeab308, sage: 0xa855f7,
+      alchemist: 0x14b8a6, scribe: 0x8b5cf6, architect: 0x6366f1,
+      enchanter: 0xec4899, engineer: 0x84cc16, merchant: 0xf59e0b,
+      oracle: 0x06b6d4, herald: 0xf97316, demiurge: 0xc026d3,
+      strategist: 0x4f46e5, diplomat: 0x10b981, pioneer: 0xf43f5e,
+      navigator: 0x34d399, transmuter: 0xfacc15, watcher: 0x6b7280
+    };
+
+    const DEPT_FLOOR_COLORS = {
+      command: 0xf5e0c0, frontline: 0xf0ddb8, intel: 0xd8f0d0,
+      defense: 0xd0e8f0, academy: 0xe8d8f0, council: 0xd8d8f5,
+      enchant: 0xf0d0e0, workshop: 0xe8f0c8, observatory: 0xd0d8f0,
+      herald: 0xf0e8c0, pantheon: 0xf0d0e8, outlands: 0xd0f0e0
+    };
+
+    const RANK_SIZES = {
+      F: 26, E: 30, D: 34, C: 38, B: 42, A: 46, S: 50, SS: 54
+    };
+
+    const RANK_COLORS = {
+      SS: 0xff6eb4, S: 0xbc8cff, A: 0x58a6ff, B: 0x3fb950,
+      C: 0xd29922, D: 0x8b949e, E: 0x6e7681, F: 0x484f58
+    };
+
+    // Department room positions in world coordinates
+    // Layout: 4 columns × 3 rows grid
+    const DEPT_LAYOUT = {
+      command:      { col: 0, row: 0 },
+      council:      { col: 1, row: 0 },
+      herald:       { col: 2, row: 0 },
+      observatory:  { col: 3, row: 0 },
+      frontline:    { col: 0, row: 1 },
+      academy:      { col: 1, row: 1 },
+      defense:      { col: 2, row: 1 },
+      workshop:     { col: 3, row: 1 },
+      enchant:      { col: 0, row: 2 },
+      outlands:     { col: 1, row: 2 },
+      pantheon:     { col: 2, row: 2 },
+      intel:        { col: 3, row: 2 },
+    };
+
+    const ROOM_W = 640;
+    const ROOM_H = 470;
+    const GAP_X = 80;
+    const GAP_Y = 70;
+    const OFFSET_X = 120;
+    const OFFSET_Y = 100;
+
+    function deptRect(key) {
+      const layout = DEPT_LAYOUT[key];
+      if (!layout) return { x: 100, y: 100, w: ROOM_W, h: ROOM_H };
+      return {
+        x: OFFSET_X + layout.col * (ROOM_W + GAP_X),
+        y: OFFSET_Y + layout.row * (ROOM_H + GAP_Y),
+        w: ROOM_W,
+        h: ROOM_H
+      };
+    }
+
+    function deptCenter(key) {
+      const r = deptRect(key);
+      return { x: r.x + r.w / 2, y: r.y + r.h / 2 };
+    }
+
+    const ROADS = [
+      { from: 'command', to: 'frontline', type: 'allied' },
+      { from: 'command', to: 'intel', type: 'allied' },
+      { from: 'intel', to: 'defense', type: 'allied' },
+      { from: 'academy', to: 'frontline', type: 'cooperative' },
+      { from: 'council', to: 'command', type: 'advisory' },
+      { from: 'enchant', to: 'frontline', type: 'cooperative' },
+      { from: 'workshop', to: 'frontline', type: 'support' },
+      { from: 'pantheon', to: 'command', type: 'oversight' },
+      { from: 'workshop', to: 'defense', type: 'support' },
+      { from: 'observatory', to: 'intel', type: 'cooperative' },
+      { from: 'herald', to: 'command', type: 'cooperative' },
+      { from: 'outlands', to: 'intel', type: 'cooperative' },
+    ];
+
+    const CLASS_ICONS = {
+      Commander: '\u2694\uFE0F', Ranger: '\uD83C\uDFF9', Artisan: '\uD83D\uDD28',
+      Guardian: '\uD83D\uDEE1\uFE0F', Paladin: '\u26A1', Sage: '\uD83D\uDCD6',
+      Alchemist: '\u2697\uFE0F', Scribe: '\u270F\uFE0F', Architect: '\uD83D\uDCD0',
+      Pioneer: '\uD83D\uDE80', Enchanter: '\u2728', Engineer: '\u2699\uFE0F',
+      Merchant: '\uD83D\uDCB0', Oracle: '\uD83D\uDD2E', Herald: '\uD83D\uDCEF',
+      Demiurge: '\uD83C\uDF00', Strategist: '\u265F\uFE0F', Diplomat: '\uD83E\uDD1D',
+      Navigator: '\uD83E\uDDED', Transmuter: '\uD83D\uDC8E', Watcher: '\uD83D\uDC41\uFE0F'
+    };
+
+    // ==========================================
+    // Data Manager
+    // ==========================================
+    const DataManager = {
+      data: REALM_DATA,
+      lastHash: null,
+      listeners: [],
+      sessionXP: {},       // agent_name -> session XP delta
+      xpListeners: [],     // XP gain event callbacks
+
+      init() {
+        this.lastHash = this._computeHash();
+        this._startPolling();
+      },
+
+      _computeHash() {
+        // Simple hash from data for local change detection
+        return JSON.stringify(this.data).length.toString();
+      },
+
+      _startPolling() {
+        // Poll /api/hash every 3s
+        setInterval(() => this._checkHash(), 3000);
+        // Poll /api/activity every 5s
+        setInterval(() => this._fetchActivity(), 5000);
+      },
+
+      async _checkHash() {
+        try {
+          const res = await fetch('/api/hash');
+          if (!res.ok) return;
+          const json = await res.json();
+          if (this.lastHash !== null && json.hash !== this.lastHash) {
+            await this._fetchFullData();
+          }
+          this.lastHash = json.hash;
+        } catch (e) {
+          // Server not available; continue with embedded data
+        }
+      },
+
+      async _fetchFullData() {
+        try {
+          const res = await fetch('/api/data');
+          if (!res.ok) return;
+          const newData = await res.json();
+          this.data = newData;
+          this.listeners.forEach(fn => fn(newData));
+        } catch (e) {
+          // Ignore
+        }
+      },
+
+      async _fetchActivity() {
+        try {
+          const res = await fetch('/api/activity');
+          if (!res.ok) return;
+          const activity = await res.json();
+          if (activity.items && activity.items.length > 0) {
+            updateTicker(activity.items);
+          }
+          // Process XP gains from live activity
+          if (activity.xp_gains && activity.xp_gains.length > 0) {
+            for (const gain of activity.xp_gains) {
+              this.xpListeners.forEach(fn => fn(gain));
+            }
+          }
+          // Sync session XP state
+          if (activity.session_xp) {
+            this.sessionXP = activity.session_xp;
+          }
+        } catch (e) {
+          // Ignore
+        }
+      },
+
+      onChange(fn) {
+        this.listeners.push(fn);
+      },
+
+      onXPGain(fn) {
+        this.xpListeners.push(fn);
+      },
+
+      getEffectiveXP(agentName, baseXP) {
+        return baseXP + (this.sessionXP[agentName] || 0);
+      }
+    };
+
+    // ==========================================
+    // HUD Updates
+    // ==========================================
+    function updateHUD(data) {
+      const c = data.company || {};
+      const efsLevel = c.efs >= 70 ? 'high' : (c.efs >= 40 ? 'mid' : 'low');
+
+      document.getElementById('hud-stats').innerHTML = `
+        <div class="hud-chip">
+          <span class="hud-chip__label">EFS</span>
+          <span class="hud-chip__value">${c.efs || 0}</span>
+          <div class="efs-bar-wrap">
+            <div class="efs-bar-fill ${efsLevel}" style="width:${c.efs || 0}%"></div>
+          </div>
+          <span class="hud-chip__value" style="font-size:7px">${c.efsGrade || '?'}</span>
+        </div>
+        <div class="hud-chip">
+          <span class="hud-chip__label">Phase</span>
+          <span class="hud-chip__value">${c.phase || '???'}</span>
+        </div>
+        <div class="hud-chip">
+          <span class="hud-chip__label">Agents</span>
+          <span class="hud-chip__value">${c.totalAgents || 0}</span>
+        </div>
+        <div class="hud-chip">
+          <span class="hud-chip__label">Quests</span>
+          <span class="hud-chip__value">${c.activeQuests || 0}</span>
+        </div>
+      `;
+      document.getElementById('hud-timestamp').textContent = c.lastUpdated || '';
+    }
+
+    function updateTicker(items) {
+      const track = document.getElementById('ticker-track');
+      if (!items || items.length === 0) return;
+
+      const html = items.map(it =>
+        `<span class="ticker-item">
+          <span class="ticker-item__icon">${it.icon || '\uD83D\uDCCC'}</span>
+          <span>${escapeHtml(it.text || '')}</span>
+          <span class="ticker-item__date">${it.date || it.time || ''}</span>
+        </span>`
+      ).join('');
+      // Duplicate for seamless scroll
+      track.innerHTML = html + html;
+    }
+
+    function initTicker(data) {
+      const events = data.events || [];
+      if (events.length > 0) {
+        updateTicker(events);
+      } else {
+        updateTicker([{ icon: '\uD83C\uDFF0', text: 'The Realm simulation active', date: '' }]);
+      }
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // ==========================================
+    // Detail Panel
+    // ==========================================
+    function openPanel(deptKey) {
+      const dept = DataManager.data.departments[deptKey];
+      if (!dept) return;
+
+      const panel = document.getElementById('detail-panel');
+      const title = document.getElementById('panel-title');
+      const body = document.getElementById('panel-body');
+
+      title.innerHTML = `<span>${dept.icon || ''}</span> ${escapeHtml(dept.name || deptKey)}`;
+
+      const healthColor = dept.health >= 80 ? 'var(--health-green)' :
+                          dept.health >= 60 ? 'var(--health-yellow)' :
+                          dept.health >= 40 ? 'var(--health-orange)' : 'var(--health-red)';
+
+      let membersHtml = (dept.members || []).map(m => `
+        <div class="panel-member" onclick="openSheet('${escapeHtml(m.name)}', '${deptKey}')">
+          <span class="panel-member__icon">${m.classIcon || '\uD83D\uDC64'}</span>
+          <span class="panel-member__name">${escapeHtml(m.name)}</span>
+          ${m.isChief ? '<span class="panel-member__chief">\uD83D\uDC51</span>' : ''}
+          <span class="panel-member__rank" style="color:${rankCssColor(m.rank)}">${m.rank}</span>
+          <span class="panel-member__class">${escapeHtml(m.class || '')}</span>
+        </div>
+      `).join('');
+
+      const ability = dept.ability || {};
+
+      body.innerHTML = `
+        <div class="panel-section">
+          <div class="panel-section__label">Department Health</div>
+          <div class="panel-health-bar">
+            <div class="panel-health-fill" style="width:${dept.health}%;background:${healthColor}"></div>
+          </div>
+          <div class="panel-health-text">${dept.healthIcon || ''} ${dept.healthLabel || ''} (${dept.health}%)</div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section__label">Type</div>
+          <div style="font-size:12px;color:var(--text-secondary)">${escapeHtml(dept.type || '')}</div>
+        </div>
+        ${ability.name ? `
+        <div class="panel-section">
+          <div class="panel-section__label">Special Ability</div>
+          <div class="panel-ability">
+            <div class="panel-ability__name">${escapeHtml(ability.name)}</div>
+            <div class="panel-ability__desc">${escapeHtml(ability.description || '')}</div>
+          </div>
+        </div>
+        ` : ''}
+        <div class="panel-section">
+          <div class="panel-section__label">Members (${(dept.members || []).length})</div>
+          ${membersHtml}
+        </div>
+      `;
+
+      panel.classList.add('open');
+    }
+
+    function closePanel() {
+      document.getElementById('detail-panel').classList.remove('open');
+    }
+
+    // ==========================================
+    // Agent Sheet
+    // ==========================================
+    function openSheet(agentName, deptKey) {
+      const dept = DataManager.data.departments[deptKey];
+      if (!dept) return;
+      const agent = (dept.members || []).find(m => m.name === agentName);
+      if (!agent) return;
+
+      const card = document.getElementById('sheet-card');
+      const stats = agent.stats || {};
+      const sessionDelta = DataManager.sessionXP[agent.name] || 0;
+      const effectiveXP = agent.xp + sessionDelta;
+      const maxXP = 1000;
+      const xpPct = Math.min(100, (effectiveXP / maxXP) * 100);
+      const sessionText = sessionDelta > 0
+        ? `<span style="color:#3fb950;font-size:10px"> (+${sessionDelta} this session)</span>` : '';
+
+      card.innerHTML = `
+        <div class="sheet-header">
+          <button class="sheet-close" onclick="closeSheet()">&times;</button>
+          <div class="sheet-icon">${agent.classIcon || '\uD83D\uDC64'}</div>
+          <div class="sheet-name">${escapeHtml(agent.name)}${agent.isChief ? ' \uD83D\uDC51' : ''}</div>
+          <div class="sheet-class">${escapeHtml(agent.class || '')} &mdash; ${escapeHtml(dept.name || '')}</div>
+          <div class="sheet-rank" style="color:${rankCssColor(agent.rank)}">Rank ${agent.rank}</div>
+        </div>
+        <div class="sheet-body">
+          <div class="sheet-section-title">Stats</div>
+          <div class="sheet-stat-grid">
+            ${['str','dex','int','wis','cha','con'].map(k => `
+              <div class="sheet-stat">
+                <div class="sheet-stat__label">${k}</div>
+                <div class="sheet-stat__value">${stats[k] || '?'}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="sheet-section-title">Experience</div>
+          <div class="sheet-xp-bar">
+            <div class="sheet-xp-fill" style="width:${xpPct}%"></div>
+          </div>
+          <div class="sheet-xp-text">${effectiveXP} / ${maxXP} XP${sessionText}</div>
+        </div>
+      `;
+
+      document.getElementById('agent-sheet').classList.add('open');
+    }
+    // Expose globally for onclick handlers
+    window.openSheet = openSheet;
+
+    function closeSheet() {
+      document.getElementById('agent-sheet').classList.remove('open');
+    }
+    window.closeSheet = closeSheet;
+    window.closePanel = closePanel;
+
+    function rankCssColor(rank) {
+      const map = {
+        SS: '#ff6eb4', S: '#bc8cff', A: '#58a6ff', B: '#3fb950',
+        C: '#d29922', D: '#8b949e', E: '#6e7681', F: '#484f58'
+      };
+      return map[rank] || '#8b949e';
+    }
+
+    // ==========================================
+    // Tooltip
+    // ==========================================
+    function showTooltip(x, y, name, cls, rank, xp) {
+      const tip = document.getElementById('agent-tooltip');
+      document.getElementById('tooltip-name').textContent = name;
+      const sessionDelta = DataManager.sessionXP[name] || 0;
+      const effectiveXP = xp + sessionDelta;
+      const deltaText = sessionDelta > 0 ? ` <span style="color:#3fb950">(+${sessionDelta})</span>` : '';
+      document.getElementById('tooltip-info').innerHTML =
+        `${CLASS_ICONS[cls] || ''} ${cls}<br>Rank: ${rank} &bull; XP: ${effectiveXP}${deltaText}`;
+      tip.style.left = (x + 16) + 'px';
+      tip.style.top = (y - 10) + 'px';
+      tip.style.display = 'block';
+    }
+
+    function hideTooltip() {
+      document.getElementById('agent-tooltip').style.display = 'none';
+    }
+
+    // ==========================================
+    // Phaser Scenes
+    // ==========================================
+
+    // ---- BootScene: Generate all textures ----
+    class BootScene extends Phaser.Scene {
+      constructor() {
+        super({ key: 'BootScene' });
+      }
+
+      create() {
+        // Floor tile — warm checkered office tile
+        const floorG = this.make.graphics({ x: 0, y: 0, add: false });
+        floorG.fillStyle(0xd8c8a0, 1);
+        floorG.fillRect(0, 0, 36, 36);
+        floorG.fillStyle(0xd0c098, 1);
+        floorG.fillRect(0, 0, 18, 18);
+        floorG.fillRect(18, 18, 18, 18);
+        floorG.lineStyle(1, 0xc8b890, 0.3);
+        floorG.strokeRect(0, 0, 36, 36);
+        floorG.generateTexture('floor_tile', 36, 36);
+        floorG.destroy();
+
+        // Desk texture (horizontal, 48x24)
+        const deskG = this.make.graphics({ x: 0, y: 0, add: false });
+        deskG.fillStyle(0x8b6b4a, 1);
+        deskG.fillRect(0, 0, 48, 24);
+        deskG.fillStyle(0xa08060, 1);
+        deskG.fillRect(0, 0, 48, 4);
+        deskG.fillStyle(0x7a5a3a, 1);
+        deskG.fillRect(2, 21, 8, 3);
+        deskG.fillRect(38, 21, 8, 3);
+        deskG.generateTexture('desk', 48, 24);
+        deskG.destroy();
+
+        // Monitor texture (18x18)
+        const monG = this.make.graphics({ x: 0, y: 0, add: false });
+        monG.fillStyle(0x505050, 1);
+        monG.fillRect(0, 0, 18, 15);
+        monG.fillStyle(0x88ccff, 1);
+        monG.fillRect(2, 2, 14, 10);
+        monG.fillStyle(0x505050, 1);
+        monG.fillRect(6, 15, 6, 3);
+        monG.generateTexture('monitor', 18, 18);
+        monG.destroy();
+
+        // Chair texture (16x16)
+        const chairG = this.make.graphics({ x: 0, y: 0, add: false });
+        chairG.fillStyle(0x4080a0, 1);
+        chairG.fillRect(0, 5, 16, 11);
+        chairG.fillStyle(0x306880, 1);
+        chairG.fillRect(0, 0, 16, 5);
+        chairG.generateTexture('chair', 16, 16);
+        chairG.destroy();
+
+        // Plant texture (18x28)
+        const plantG = this.make.graphics({ x: 0, y: 0, add: false });
+        plantG.fillStyle(0x7a5a3a, 1);
+        plantG.fillRect(5, 18, 8, 10);
+        plantG.fillStyle(0x40a040, 1);
+        plantG.fillRect(2, 5, 14, 13);
+        plantG.fillStyle(0x30882f, 1);
+        plantG.fillRect(4, 7, 10, 10);
+        plantG.fillStyle(0x50b850, 1);
+        plantG.fillRect(6, 0, 6, 7);
+        plantG.generateTexture('plant', 18, 28);
+        plantG.destroy();
+
+        // Generate pixel art agent textures per class color
+        const allColors = new Set();
+        const data = DataManager.data;
+        const depts = data.departments || {};
+        for (const dk of Object.keys(depts)) {
+          const members = depts[dk].members || [];
+          for (const m of members) {
+            const cls = (m.class || 'artisan').toLowerCase();
+            const color = CLASS_COLORS[cls] || 0x8b949e;
+            allColors.add(color);
+          }
+        }
+
+        // Pixel art humanoid character for each color/rank
+        for (const color of allColors) {
+          for (const [rank, size] of Object.entries(RANK_SIZES)) {
+            const key = `agent_${color}_${rank}`;
+            if (this.textures.exists(key)) continue;
+            const s = size;
+            const g = this.make.graphics({ x: 0, y: 0, add: false });
+            const cx = s; // center x in texture (texture is 2s x 2s)
+            // Head (skin color)
+            const headW = Math.max(3, Math.round(s * 0.4));
+            const headH = Math.max(3, Math.round(s * 0.35));
+            const headX = cx - Math.floor(headW / 2);
+            const headY = Math.round(s * 0.15);
+            g.fillStyle(0xf5c8a0, 1);
+            g.fillRect(headX, headY, headW, headH);
+            // Hair (darker)
+            g.fillStyle(0x6a4a2a, 1);
+            g.fillRect(headX, headY, headW, Math.max(1, Math.floor(headH * 0.3)));
+            // Body (class color)
+            const bodyW = Math.max(4, Math.round(s * 0.55));
+            const bodyH = Math.max(4, Math.round(s * 0.4));
+            const bodyX = cx - Math.floor(bodyW / 2);
+            const bodyY = headY + headH;
+            g.fillStyle(color, 1);
+            g.fillRect(bodyX, bodyY, bodyW, bodyH);
+            // Legs (darker tone)
+            const legW = Math.max(1, Math.round(s * 0.18));
+            const legH = Math.max(2, Math.round(s * 0.25));
+            const legY = bodyY + bodyH;
+            const legGap = Math.max(1, Math.round(s * 0.08));
+            g.fillStyle(0x404050, 1);
+            g.fillRect(cx - legGap - legW, legY, legW, legH);
+            g.fillRect(cx + legGap, legY, legW, legH);
+            g.generateTexture(key, s * 2, s * 2);
+            g.destroy();
+          }
+        }
+
+        // Crown texture for chiefs
+        const crownG = this.make.graphics({ x: 0, y: 0, add: false });
+        crownG.fillStyle(0xffd700, 1);
+        crownG.fillTriangle(0, 18, 9, 0, 18, 18);
+        crownG.fillTriangle(9, 18, 18, 0, 28, 18);
+        crownG.fillRect(0, 15, 28, 7);
+        crownG.generateTexture('crown', 28, 22);
+        crownG.destroy();
+
+        // Working glow ring (warm yellow)
+        const glowG = this.make.graphics({ x: 0, y: 0, add: false });
+        glowG.lineStyle(3, 0xd89020, 0.6);
+        glowG.strokeCircle(36, 36, 28);
+        glowG.generateTexture('glow_ring', 72, 72);
+        glowG.destroy();
+
+        // --- Phase 1: Particle textures ---
+        const dotG = this.make.graphics({ x: 0, y: 0, add: false });
+        dotG.fillStyle(0xffffff, 1);
+        dotG.fillCircle(2, 2, 2);
+        dotG.generateTexture('particle_dot', 5, 5);
+        dotG.destroy();
+
+        const starG = this.make.graphics({ x: 0, y: 0, add: false });
+        starG.fillStyle(0xffffff, 1);
+        starG.fillRect(2, 0, 2, 6);
+        starG.fillRect(0, 2, 6, 2);
+        starG.generateTexture('particle_star', 6, 6);
+        starG.destroy();
+
+        const sqG = this.make.graphics({ x: 0, y: 0, add: false });
+        sqG.fillStyle(0xffffff, 1);
+        sqG.fillRect(0, 0, 4, 4);
+        sqG.generateTexture('particle_white', 4, 4);
+        sqG.destroy();
+
+        // --- Phase 2: Face textures (12x8 per emotion) ---
+        this._generateFaceTextures();
+
+        this.scene.start('HQScene');
+      }
+
+      _generateFaceTextures() {
+        const faces = {
+          face_idle:        { eyes: 'dots',  mouth: 'line',  eyeColor: 0x2a1a0a },
+          face_happy:       { eyes: 'arcs',  mouth: 'smile', eyeColor: 0x2a1a0a },
+          face_working:     { eyes: 'lines', mouth: 'line',  eyeColor: 0x2a1a0a },
+          face_celebrating: { eyes: 'stars', mouth: 'open',  eyeColor: 0xffd700 },
+          face_sleeping:    { eyes: 'lines', mouth: 'small', eyeColor: 0x2a1a0a },
+        };
+        for (const [key, cfg] of Object.entries(faces)) {
+          const g = this.make.graphics({ x: 0, y: 0, add: false });
+          // Eyes
+          if (cfg.eyes === 'dots') {
+            g.fillStyle(cfg.eyeColor, 1);
+            g.fillCircle(3, 3, 1); g.fillCircle(9, 3, 1);
+          } else if (cfg.eyes === 'arcs') {
+            g.lineStyle(1, cfg.eyeColor, 1);
+            g.beginPath(); g.arc(3, 4, 2, Math.PI, 0, false); g.strokePath();
+            g.beginPath(); g.arc(9, 4, 2, Math.PI, 0, false); g.strokePath();
+          } else if (cfg.eyes === 'lines') {
+            g.lineStyle(1, cfg.eyeColor, 1);
+            g.beginPath(); g.moveTo(1, 3); g.lineTo(5, 3); g.strokePath();
+            g.beginPath(); g.moveTo(7, 3); g.lineTo(11, 3); g.strokePath();
+          } else if (cfg.eyes === 'stars') {
+            g.fillStyle(cfg.eyeColor, 1);
+            g.fillRect(2, 2, 2, 2); g.fillRect(1, 3, 1, 1); g.fillRect(4, 3, 1, 1);
+            g.fillRect(8, 2, 2, 2); g.fillRect(7, 3, 1, 1); g.fillRect(10, 3, 1, 1);
+          }
+          // Mouth
+          if (cfg.mouth === 'line') {
+            g.lineStyle(1, 0x2a1a0a, 1);
+            g.beginPath(); g.moveTo(4, 6); g.lineTo(8, 6); g.strokePath();
+          } else if (cfg.mouth === 'smile') {
+            g.lineStyle(1, 0x2a1a0a, 1);
+            g.beginPath(); g.arc(6, 5, 2, 0, Math.PI, false); g.strokePath();
+          } else if (cfg.mouth === 'open') {
+            g.fillStyle(0x2a1a0a, 1);
+            g.fillCircle(6, 6, 1);
+          } else if (cfg.mouth === 'small') {
+            g.fillStyle(0x2a1a0a, 1);
+            g.fillRect(5, 6, 2, 1);
+          }
+          g.generateTexture(key, 12, 8);
+          g.destroy();
+        }
+      }
+
+      _lighten(color, amount) {
+        let r = (color >> 16) & 0xff;
+        let g = (color >> 8) & 0xff;
+        let b = color & 0xff;
+        r = Math.min(255, r + Math.floor((255 - r) * amount));
+        g = Math.min(255, g + Math.floor((255 - g) * amount));
+        b = Math.min(255, b + Math.floor((255 - b) * amount));
+        return (r << 16) | (g << 8) | b;
+      }
+    }
+
+    // ---- RoadNetwork: BFS pathfinding between departments ----
+    const RoadNetwork = {
+      adj: {},
+
+      init() {
+        this.adj = {};
+        for (const dk of Object.keys(DEPT_LAYOUT)) {
+          this.adj[dk] = [];
+        }
+        for (const road of ROADS) {
+          if (!this.adj[road.from]) this.adj[road.from] = [];
+          if (!this.adj[road.to]) this.adj[road.to] = [];
+          this.adj[road.from].push(road.to);
+          this.adj[road.to].push(road.from);
+        }
+      },
+
+      findPath(from, to) {
+        if (from === to) return [from];
+        const visited = new Set([from]);
+        const queue = [[from]];
+        while (queue.length > 0) {
+          const path = queue.shift();
+          const node = path[path.length - 1];
+          for (const neighbor of (this.adj[node] || [])) {
+            if (neighbor === to) return [...path, neighbor];
+            if (!visited.has(neighbor)) {
+              visited.add(neighbor);
+              queue.push([...path, neighbor]);
+            }
+          }
+        }
+        return null;
+      },
+
+      toWaypoints(path) {
+        return path.map(dk => deptCenter(dk));
+      },
+
+      getConnected(deptKey) {
+        return this.adj[deptKey] || [];
+      }
+    };
+
+    // ---- HQScene: Main game scene ----
+    class HQScene extends Phaser.Scene {
+      constructor() {
+        super({ key: 'HQScene' });
+        this.agents = [];          // { sprite, data, deptKey, rect, crown?, glow?, faceSprite? }
+        this.speechBubbles = [];   // active speech bubble objects
+        this.rooms = {};           // dept key → room container
+        this.selectedDept = null;
+        this.envOverlayEl = null;  // Phase 3: day/night DOM overlay
+        this.earnedBadges = new Set(); // Phase 5: track shown badges
+      }
+
+      create() {
+        // Camera bounds
+        this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
+        this.cameras.main.setZoom(this._calcInitialZoom());
+        this.cameras.main.centerOn(WORLD_W / 2, WORLD_H / 2);
+
+        // Floor
+        this._drawFloor();
+
+        // Roads (behind rooms)
+        this._drawRoads();
+
+        // Rooms + agents
+        this._buildRooms();
+
+        // Speech bubble timer
+        this.time.addEvent({
+          delay: Phaser.Math.Between(3000, 5000),
+          callback: () => this._spawnSpeechBubble(),
+          loop: true
+        });
+
+        // Camera controls
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.wasd = this.input.keyboard.addKeys({
+          up: Phaser.Input.Keyboard.KeyCodes.W,
+          down: Phaser.Input.Keyboard.KeyCodes.S,
+          left: Phaser.Input.Keyboard.KeyCodes.A,
+          right: Phaser.Input.Keyboard.KeyCodes.D
+        });
+
+        // Mouse wheel zoom
+        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY) => {
+          const cam = this.cameras.main;
+          const newZoom = Phaser.Math.Clamp(cam.zoom - deltaY * 0.001, 0.5, 2.0);
+          cam.setZoom(newZoom);
+        });
+
+        // Click on empty area to close panel
+        this.input.on('pointerdown', (pointer) => {
+          // Check if clicked on any interactive object
+          const hit = this.input.hitTestPointer(pointer);
+          if (hit.length === 0) {
+            closePanel();
+            this.selectedDept = null;
+          }
+        });
+
+        // Data update listener
+        DataManager.onChange((newData) => {
+          this._rebuildAgents();
+          updateHUD(newData);
+          initTicker(newData);
+        });
+
+        // XP gain listener — visual feedback
+        DataManager.onXPGain((gain) => {
+          this._showXPPopup(gain);
+        });
+
+        // Handle window resize
+        this.scale.on('resize', (gameSize) => {
+          this.cameras.main.setZoom(this._calcInitialZoom());
+          this.cameras.main.centerOn(WORLD_W / 2, WORLD_H / 2);
+        });
+
+        // --- Phase 3: Environment overlay (DOM-based for reliable full-screen coverage) ---
+        this._updateEnvironment();
+        this.time.addEvent({ delay: 30000, callback: () => this._updateEnvironment(), loop: true });
+
+        // --- Phase 4: Road network + visit scheduler ---
+        RoadNetwork.init();
+        this.time.addEvent({
+          delay: Phaser.Math.Between(30000, 60000),
+          callback: () => this._scheduleVisit(),
+          loop: true
+        });
+
+        // --- Phase 5: Mini dashboard ---
+        this._updateMiniDashboard();
+        DataManager.onChange(() => this._updateMiniDashboard());
+
+        // --- Phase 5: Badge listener ---
+        DataManager.onXPGain((gain) => this._checkBadges(gain));
+      }
+
+      _calcInitialZoom() {
+        const container = document.getElementById('game-container');
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        const zx = w / WORLD_W;
+        const zy = h / WORLD_H;
+        return Math.min(zx, zy) * 0.95;
+      }
+
+      update(time, delta) {
+        const cam = this.cameras.main;
+        const speed = 4;
+
+        if (this.cursors.left.isDown || this.wasd.left.isDown) cam.scrollX -= speed;
+        if (this.cursors.right.isDown || this.wasd.right.isDown) cam.scrollX += speed;
+        if (this.cursors.up.isDown || this.wasd.up.isDown) cam.scrollY -= speed;
+        if (this.cursors.down.isDown || this.wasd.down.isDown) cam.scrollY += speed;
+      }
+
+      _drawFloor() {
+        for (let x = 0; x < WORLD_W; x += 36) {
+          for (let y = 0; y < WORLD_H; y += 36) {
+            this.add.image(x, y, 'floor_tile').setOrigin(0, 0).setDepth(0);
+          }
+        }
+      }
+
+      _drawRoads() {
+        const roadGraphics = this.add.graphics().setDepth(1);
+
+        for (const road of ROADS) {
+          const from = deptCenter(road.from);
+          const to = deptCenter(road.to);
+          if (!from || !to) continue;
+
+          if (road.type === 'allied') {
+            // Solid blue line
+            roadGraphics.lineStyle(2, 0xa08850, 0.4);
+            roadGraphics.beginPath();
+            roadGraphics.moveTo(from.x, from.y);
+            roadGraphics.lineTo(to.x, to.y);
+            roadGraphics.strokePath();
+          } else {
+            // Dashed gray line
+            this._drawDashedLine(roadGraphics, from.x, from.y, to.x, to.y,
+                                 1.5, 0xa08850, 0.25, 6, 4);
+          }
+        }
+      }
+
+      _drawDashedLine(g, x1, y1, x2, y2, width, color, alpha, dashLen, gapLen) {
+        g.lineStyle(width, color, alpha);
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const ux = dx / dist;
+        const uy = dy / dist;
+        let drawn = 0;
+        let drawing = true;
+
+        while (drawn < dist) {
+          const segLen = drawing ? dashLen : gapLen;
+          const end = Math.min(drawn + segLen, dist);
+          if (drawing) {
+            g.beginPath();
+            g.moveTo(x1 + ux * drawn, y1 + uy * drawn);
+            g.lineTo(x1 + ux * end, y1 + uy * end);
+            g.strokePath();
+          }
+          drawn = end;
+          drawing = !drawing;
+        }
+      }
+
+      _buildRooms() {
+        const data = DataManager.data;
+        const depts = data.departments || {};
+
+        for (const deptKey of Object.keys(DEPT_LAYOUT)) {
+          const dept = depts[deptKey];
+          const rect = deptRect(deptKey);
+          const color = DEPT_COLORS[deptKey] || 0x8b949e;
+
+          // Room background — Kairosoft style (bright pastel floor, pixel walls)
+          const roomBg = this.add.graphics().setDepth(2);
+          const floorColor = DEPT_FLOOR_COLORS[deptKey] || 0xf0e8d0;
+
+          // Pastel floor fill
+          roomBg.fillStyle(floorColor, 1);
+          roomBg.fillRect(rect.x, rect.y, rect.w, rect.h);
+
+          // Pixel wall border (dark brown)
+          roomBg.lineStyle(2, 0x6b5a3a, 1);
+          roomBg.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+          // Header bar (department accent color)
+          roomBg.fillStyle(color, 0.85);
+          roomBg.fillRect(rect.x + 1, rect.y + 1, rect.w - 2, 46);
+
+          // Department label (on header bar, white text)
+          const deptName = dept ? dept.name : deptKey;
+          const deptIcon = dept ? (dept.icon || '') : '';
+          const label = this.add.text(
+            rect.x + 16, rect.y + 12,
+            `${deptIcon} ${deptName}`,
+            {
+              fontFamily: '"Press Start 2P", monospace',
+              fontSize: '20px',
+              color: '#ffffff',
+              resolution: 2
+            }
+          ).setDepth(10);
+
+          // Health indicator
+          if (dept) {
+            const healthW = 100;
+            const healthH = 12;
+            const hx = rect.x + rect.w - healthW - 16;
+            const hy = rect.y + 28;
+
+            const healthBg = this.add.graphics().setDepth(10);
+            healthBg.fillStyle(0x000000, 0.3);
+            healthBg.fillRoundedRect(hx, hy, healthW, healthH, 3);
+
+            const healthColor = dept.health >= 80 ? 0x3fb950 :
+                                dept.health >= 60 ? 0xd29922 :
+                                dept.health >= 40 ? 0xdb6d28 : 0xf85149;
+            const fillW = (dept.health / 100) * healthW;
+            healthBg.fillStyle(healthColor, 0.8);
+            healthBg.fillRoundedRect(hx, hy, fillW, healthH, 3);
+          }
+
+          // Room click zone
+          const clickZone = this.add.zone(
+            rect.x + rect.w / 2, rect.y + rect.h / 2,
+            rect.w, rect.h
+          ).setInteractive({ useHandCursor: true }).setDepth(5);
+
+          clickZone.on('pointerdown', () => {
+            this.selectedDept = deptKey;
+            openPanel(deptKey);
+            // Subtle camera ease toward the room
+            const cam = this.cameras.main;
+            const cx = rect.x + rect.w / 2;
+            const cy = rect.y + rect.h / 2;
+            cam.pan(cx, cy, 400, 'Sine.easeInOut');
+          });
+
+          clickZone.on('pointerover', () => {
+            roomBg.clear();
+            const floorColor = DEPT_FLOOR_COLORS[deptKey] || 0xf0e8d0;
+            roomBg.fillStyle(this._lightenColor(floorColor, 0.08), 1);
+            roomBg.fillRect(rect.x, rect.y, rect.w, rect.h);
+            roomBg.lineStyle(3, 0xd89020, 1);
+            roomBg.strokeRect(rect.x, rect.y, rect.w, rect.h);
+            roomBg.fillStyle(color, 0.9);
+            roomBg.fillRect(rect.x + 1, rect.y + 1, rect.w - 2, 46);
+          });
+
+          clickZone.on('pointerout', () => {
+            roomBg.clear();
+            const floorColor = DEPT_FLOOR_COLORS[deptKey] || 0xf0e8d0;
+            roomBg.fillStyle(floorColor, 1);
+            roomBg.fillRect(rect.x, rect.y, rect.w, rect.h);
+            roomBg.lineStyle(2, 0x6b5a3a, 1);
+            roomBg.strokeRect(rect.x, rect.y, rect.w, rect.h);
+            roomBg.fillStyle(color, 0.85);
+            roomBg.fillRect(rect.x + 1, rect.y + 1, rect.w - 2, 46);
+          });
+
+          this.rooms[deptKey] = { bg: roomBg, rect, label, clickZone };
+
+          // Place furniture (desks, monitors, chairs, plants)
+          this._furnishRoom(deptKey, rect, dept ? (dept.members || []).length : 0);
+
+          // Place agents
+          if (dept && dept.members) {
+            this._placeAgents(deptKey, dept.members, rect);
+          }
+        }
+      }
+
+      _furnishRoom(deptKey, rect, memberCount) {
+        const startX = rect.x + 40;
+        const startY = rect.y + 68;
+        const deskSpacingX = 120;
+        const deskSpacingY = 84;
+        const cols = Math.min(3, Math.max(1, Math.ceil(memberCount / 3)));
+        const rows = Math.min(3, Math.max(1, Math.ceil(memberCount / cols)));
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const dx = startX + c * deskSpacingX;
+            const dy = startY + r * deskSpacingY;
+            if (dx + 50 > rect.x + rect.w - 25 || dy + 25 > rect.y + rect.h - 25) continue;
+            this.add.image(dx, dy, 'desk').setOrigin(0, 0).setDepth(3);
+            this.add.image(dx + 15, dy - 16, 'monitor').setOrigin(0, 0).setDepth(4);
+            this.add.image(dx + 55, dy + 5, 'chair').setOrigin(0, 0).setDepth(3);
+          }
+        }
+        // Decorative plant in bottom-right
+        if (rect.w > 80 && rect.h > 60) {
+          this.add.image(rect.x + rect.w - 30, rect.y + rect.h - 36, 'plant').setOrigin(0, 0).setDepth(3);
+        }
+      }
+
+      _lightenColor(color, amount) {
+        let r = (color >> 16) & 0xff;
+        let g = (color >> 8) & 0xff;
+        let b = color & 0xff;
+        r = Math.min(255, r + Math.floor((255 - r) * amount));
+        g = Math.min(255, g + Math.floor((255 - g) * amount));
+        b = Math.min(255, b + Math.floor((255 - b) * amount));
+        return (r << 16) | (g << 8) | b;
+      }
+
+      _placeAgents(deptKey, members, rect) {
+        const padding = 40;
+        const agentArea = {
+          x: rect.x + padding,
+          y: rect.y + 68,
+          w: rect.w - padding * 2,
+          h: rect.h - 68 - padding
+        };
+
+        members.forEach((m, idx) => {
+          const cls = (m.class || 'artisan').toLowerCase();
+          const color = CLASS_COLORS[cls] || 0x8b949e;
+          const rank = m.rank || 'F';
+          const size = RANK_SIZES[rank] || 8;
+          const texKey = `agent_${color}_${rank}`;
+
+          // Random initial position within room
+          const px = agentArea.x + Math.random() * agentArea.w;
+          const py = agentArea.y + Math.random() * agentArea.h;
+
+          const sprite = this.add.image(px, py, texKey).setDepth(20);
+          sprite.setInteractive({ useHandCursor: true });
+
+          // Hover tooltip
+          sprite.on('pointerover', (pointer) => {
+            const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+            // Convert to screen coords
+            showTooltip(pointer.x, pointer.y, m.name, m.class || '', rank, m.xp || 0);
+            sprite.setScale(1.3);
+          });
+
+          sprite.on('pointerout', () => {
+            hideTooltip();
+            sprite.setScale(1.0);
+          });
+
+          sprite.on('pointerdown', (pointer) => {
+            pointer.event.stopPropagation();
+            openSheet(m.name, deptKey);
+          });
+
+          // Phase 2: Face overlay
+          const faceSprite = this.add.image(px, py - size * 0.15, 'face_idle').setDepth(22);
+          faceSprite.setScale(Math.max(1, size / 20));
+
+          const agentObj = {
+            sprite,
+            data: m,
+            deptKey,
+            area: agentArea,
+            isChief: m.isChief || false,
+            faceSprite,
+            emotion: 'idle',
+            visiting: false,
+            homeDeptKey: deptKey,
+          };
+
+          // Crown for chiefs
+          if (m.isChief) {
+            const crown = this.add.image(px, py - size - 6, 'crown').setDepth(21);
+            crown.setScale(1.0);
+            agentObj.crown = crown;
+          }
+
+          // Working glow for ~20% of agents
+          if (Math.random() < 0.2) {
+            const glow = this.add.image(px, py, 'glow_ring').setDepth(19);
+            glow.setAlpha(0);
+            this.tweens.add({
+              targets: glow,
+              alpha: { from: 0, to: 0.6 },
+              duration: 1200,
+              yoyo: true,
+              repeat: -1,
+              ease: 'Sine.easeInOut'
+            });
+            agentObj.glow = glow;
+          }
+
+          this.agents.push(agentObj);
+
+          // Start wandering
+          this._wanderAgent(agentObj);
+        });
+      }
+
+      _wanderAgent(agentObj) {
+        // Phase 4: Skip wandering while visiting another department
+        if (agentObj.visiting) return;
+
+        const area = agentObj.area;
+        const pad = 6;
+        const nx = area.x + pad + Math.random() * (area.w - pad * 2);
+        const ny = area.y + pad + Math.random() * (area.h - pad * 2);
+        const duration = agentObj.isChief
+          ? Phaser.Math.Between(1500, 2500)
+          : Phaser.Math.Between(2000, 4000);
+
+        const size = RANK_SIZES[agentObj.data.rank || 'F'] || 26;
+
+        // Move sprite
+        this.tweens.add({
+          targets: agentObj.sprite,
+          x: nx,
+          y: ny,
+          duration,
+          ease: 'Sine.easeInOut',
+          onComplete: () => {
+            this.time.delayedCall(Phaser.Math.Between(500, 1500), () => {
+              this._wanderAgent(agentObj);
+            });
+          }
+        });
+
+        // Move crown if present
+        if (agentObj.crown) {
+          this.tweens.add({
+            targets: agentObj.crown,
+            x: nx, y: ny - size - 6,
+            duration, ease: 'Sine.easeInOut'
+          });
+        }
+
+        // Move glow if present
+        if (agentObj.glow) {
+          this.tweens.add({
+            targets: agentObj.glow,
+            x: nx, y: ny,
+            duration, ease: 'Sine.easeInOut'
+          });
+        }
+
+        // Phase 2: Move faceSprite
+        if (agentObj.faceSprite) {
+          this.tweens.add({
+            targets: agentObj.faceSprite,
+            x: nx, y: ny - size * 0.15,
+            duration, ease: 'Sine.easeInOut'
+          });
+        }
+      }
+
+      _spawnSpeechBubble() {
+        // Limit simultaneous bubbles
+        this.speechBubbles = this.speechBubbles.filter(b => b.active);
+        if (this.speechBubbles.length >= 3) return;
+
+        const conversations = DataManager.data.conversations || [];
+        if (conversations.length === 0) return;
+
+        const convo = Phaser.Utils.Array.GetRandom(conversations);
+
+        // Find the agent sprite for this conversation
+        const agentObj = this.agents.find(a =>
+          a.data.name === convo.agent && a.deptKey === convo.dept
+        );
+        if (!agentObj) return;
+
+        // Check if this agent already has a bubble
+        if (this.speechBubbles.some(b => b.agentName === convo.agent)) return;
+
+        const sprite = agentObj.sprite;
+        const msg = convo.message || '...';
+
+        // Create speech bubble as text with background
+        const bubblePad = 10;
+        const text = this.add.text(sprite.x, sprite.y - 44, msg, {
+          fontFamily: '"Inter", sans-serif',
+          fontSize: '18px',
+          color: '#2a1a0a',
+          resolution: 2,
+          padding: { x: bubblePad, y: bubblePad },
+          backgroundColor: '#f8f0d8ee',
+          maxLines: 2,
+          wordWrap: { width: 280 }
+        }).setOrigin(0.5, 1).setDepth(30);
+
+        // Outline effect via stroke
+        text.setStroke('#a08850', 1);
+
+        // Small triangle pointer (using graphics)
+        const tri = this.add.graphics().setDepth(29);
+        tri.fillStyle(0xf8f0d8, 0.93);
+        tri.fillTriangle(
+          sprite.x - 8, sprite.y - 44,
+          sprite.x + 8, sprite.y - 44,
+          sprite.x, sprite.y - 34
+        );
+
+        // Fade in
+        text.setAlpha(0);
+        tri.setAlpha(0);
+        this.tweens.add({
+          targets: [text, tri],
+          alpha: 1,
+          duration: 300,
+          ease: 'Sine.easeOut'
+        });
+
+        const bubble = {
+          text,
+          tri,
+          agentName: convo.agent,
+          active: true
+        };
+        this.speechBubbles.push(bubble);
+
+        // Follow agent position
+        const followTimer = this.time.addEvent({
+          delay: 50,
+          callback: () => {
+            if (bubble.active) {
+              text.setPosition(sprite.x, sprite.y - 44);
+              tri.clear();
+              tri.fillStyle(0xf8f0d8, 0.93);
+              tri.fillTriangle(
+                sprite.x - 8, sprite.y - 44,
+                sprite.x + 8, sprite.y - 44,
+                sprite.x, sprite.y - 34
+              );
+            }
+          },
+          loop: true
+        });
+
+        // Auto-dismiss after 3 seconds
+        this.time.delayedCall(3000, () => {
+          this.tweens.add({
+            targets: [text, tri],
+            alpha: 0,
+            duration: 400,
+            ease: 'Sine.easeIn',
+            onComplete: () => {
+              text.destroy();
+              tri.destroy();
+              followTimer.remove();
+              bubble.active = false;
+            }
+          });
+        });
+      }
+
+      _showXPPopup(gain) {
+        // Find the agent sprite matching this gain
+        const agentObj = this.agents.find(a => a.data.name === gain.agent);
+        if (!agentObj) return;
+
+        const sprite = agentObj.sprite;
+
+        // "+N XP" floating text above agent
+        const xpText = this.add.text(sprite.x, sprite.y - 30, `+${gain.xp} XP`, {
+          fontFamily: '"Press Start 2P", monospace',
+          fontSize: '14px',
+          color: '#ffd700',
+          resolution: 2,
+          stroke: '#000000',
+          strokeThickness: 3,
+        }).setOrigin(0.5, 1).setDepth(50);
+
+        // Float upward + fade out
+        this.tweens.add({
+          targets: xpText,
+          y: sprite.y - 80,
+          alpha: 0,
+          duration: 1500,
+          ease: 'Sine.easeOut',
+          onComplete: () => xpText.destroy()
+        });
+
+        // Sprite pop (momentary scale bounce)
+        this.tweens.add({
+          targets: sprite,
+          scaleX: 1.3,
+          scaleY: 1.3,
+          duration: 200,
+          ease: 'Back.easeOut',
+          yoyo: true,
+        });
+
+        // Phase 1: Sparkle effect
+        this._emitSparkle(sprite.x, sprite.y);
+
+        // Phase 2: Happy face
+        this._setAgentEmotion(agentObj, 'happy', 10000);
+
+        // Trigger rank-up effect if applicable
+        if (gain.rank_up) {
+          this.time.delayedCall(300, () => {
+            this._showRankUpEffect(agentObj, gain.rank_up);
+          });
+        }
+      }
+
+      _showRankUpEffect(agentObj, newRank) {
+        const sprite = agentObj.sprite;
+
+        // Glow ring expanding outward
+        const glow = this.add.image(sprite.x, sprite.y, 'glow_ring').setDepth(49);
+        glow.setScale(0.5);
+        glow.setAlpha(0.9);
+        this.tweens.add({
+          targets: glow,
+          scaleX: 2.5,
+          scaleY: 2.5,
+          alpha: 0,
+          duration: 800,
+          ease: 'Sine.easeOut',
+          onComplete: () => glow.destroy()
+        });
+
+        // "RANK UP! → S" banner text
+        const banner = this.add.text(sprite.x, sprite.y - 50,
+          `RANK UP! \u2192 ${newRank}`, {
+          fontFamily: '"Press Start 2P", monospace',
+          fontSize: '16px',
+          color: '#ff6eb4',
+          resolution: 2,
+          stroke: '#000000',
+          strokeThickness: 4,
+        }).setOrigin(0.5, 1).setDepth(51);
+
+        this.tweens.add({
+          targets: banner,
+          y: sprite.y - 110,
+          alpha: 0,
+          duration: 2000,
+          ease: 'Sine.easeOut',
+          onComplete: () => banner.destroy()
+        });
+
+        // Double bounce (1.6x scale, 300ms x 2)
+        this.tweens.add({
+          targets: sprite,
+          scaleX: 1.6,
+          scaleY: 1.6,
+          duration: 300,
+          ease: 'Back.easeOut',
+          yoyo: true,
+          repeat: 1,
+        });
+
+        // Phase 1: Confetti burst
+        this._emitConfetti(sprite.x, sprite.y);
+
+        // Phase 2: Celebrating face
+        this._setAgentEmotion(agentObj, 'celebrating', 15000);
+      }
+
+      _rebuildAgents() {
+        // Remove existing agents
+        for (const ag of this.agents) {
+          ag.sprite.destroy();
+          if (ag.crown) ag.crown.destroy();
+          if (ag.glow) ag.glow.destroy();
+          if (ag.faceSprite) ag.faceSprite.destroy();
+        }
+        this.agents = [];
+
+        // Remove speech bubbles
+        for (const b of this.speechBubbles) {
+          if (b.text) b.text.destroy();
+          if (b.tri) b.tri.destroy();
+          b.active = false;
+        }
+        this.speechBubbles = [];
+
+        // Recreate agents from new data
+        const depts = DataManager.data.departments || {};
+        for (const deptKey of Object.keys(DEPT_LAYOUT)) {
+          const dept = depts[deptKey];
+          if (dept && dept.members) {
+            const rect = deptRect(deptKey);
+            this._placeAgents(deptKey, dept.members, rect);
+          }
+        }
+      }
+
+      // ==========================================
+      // Phase 1: Particle Effects
+      // ==========================================
+
+      _emitConfetti(x, y) {
+        const colors = [0xff6eb4, 0xffd700, 0x58a6ff, 0x3fb950, 0xbc8cff, 0xff8844];
+        for (let i = 0; i < 18; i++) {
+          const color = Phaser.Utils.Array.GetRandom(colors);
+          const p = this.add.image(x, y, 'particle_dot').setDepth(55).setTint(color);
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 60 + Math.random() * 120;
+          this.tweens.add({
+            targets: p,
+            x: x + Math.cos(angle) * speed,
+            y: y + Math.sin(angle) * speed + 40,
+            alpha: 0,
+            scaleX: { from: 1.5, to: 0.3 },
+            scaleY: { from: 1.5, to: 0.3 },
+            duration: 600 + Math.random() * 400,
+            ease: 'Sine.easeOut',
+            onComplete: () => p.destroy()
+          });
+        }
+      }
+
+      _emitSparkle(x, y) {
+        for (let i = 0; i < 6; i++) {
+          const p = this.add.image(x, y, 'particle_star').setDepth(55).setTint(0xffd700);
+          const angle = (Math.PI * 2 / 6) * i + Math.random() * 0.5;
+          const dist = 20 + Math.random() * 30;
+          this.tweens.add({
+            targets: p,
+            x: x + Math.cos(angle) * dist,
+            y: y + Math.sin(angle) * dist - 10,
+            alpha: 0,
+            scaleX: { from: 1.2, to: 0.2 },
+            scaleY: { from: 1.2, to: 0.2 },
+            duration: 800,
+            ease: 'Sine.easeOut',
+            onComplete: () => p.destroy()
+          });
+        }
+      }
+
+      _emitFirework(x, y) {
+        const stages = [
+          { delay: 0,   color: 0xff6eb4, count: 15 },
+          { delay: 300, color: 0xffd700, count: 15 },
+          { delay: 600, color: 0x58a6ff, count: 15 },
+        ];
+        for (const stage of stages) {
+          this.time.delayedCall(stage.delay, () => {
+            for (let i = 0; i < stage.count; i++) {
+              const p = this.add.image(x, y, 'particle_white').setDepth(55).setTint(stage.color);
+              const angle = (Math.PI * 2 / stage.count) * i;
+              const dist = 50 + Math.random() * 40;
+              this.tweens.add({
+                targets: p,
+                x: x + Math.cos(angle) * dist,
+                y: y + Math.sin(angle) * dist,
+                alpha: 0,
+                scaleX: { from: 2, to: 0.3 },
+                scaleY: { from: 2, to: 0.3 },
+                duration: 700 + Math.random() * 300,
+                ease: 'Cubic.easeOut',
+                onComplete: () => p.destroy()
+              });
+            }
+          });
+        }
+      }
+
+      // ==========================================
+      // Phase 2: Agent Emotion System
+      // ==========================================
+
+      _setAgentEmotion(agentObj, emotion, durationMs) {
+        if (!agentObj.faceSprite) return;
+        const texKey = `face_${emotion}`;
+        if (!this.textures.exists(texKey)) return;
+
+        agentObj.emotion = emotion;
+        agentObj.faceSprite.setTexture(texKey);
+
+        // Clear any existing emotion timer
+        if (agentObj._emotionTimer) {
+          agentObj._emotionTimer.remove();
+          agentObj._emotionTimer = null;
+        }
+
+        // Auto-revert to idle after duration (unless idle itself)
+        if (emotion !== 'idle' && durationMs > 0) {
+          agentObj._emotionTimer = this.time.delayedCall(durationMs, () => {
+            agentObj.emotion = 'idle';
+            if (agentObj.faceSprite) {
+              agentObj.faceSprite.setTexture('face_idle');
+            }
+            agentObj._emotionTimer = null;
+          });
+        }
+      }
+
+      // ==========================================
+      // Phase 3: Day/Night Cycle + Weather
+      // ==========================================
+
+      _updateEnvironment() {
+        const hour = new Date().getHours();
+
+        // -- Day/night DOM overlay (very subtle tint) --
+        let el = this.envOverlayEl;
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'env-overlay';
+          el.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:50;background:transparent;transition:background 2s ease';
+          const container = document.getElementById('game-container');
+          if (container) container.appendChild(el);
+          this.envOverlayEl = el;
+        }
+
+        let envBg = 'transparent';
+        let timeLabel = '\u2600 DAY';
+
+        if (hour >= 7 && hour < 17) {
+          envBg = 'transparent'; timeLabel = '\u2600 DAY';
+        } else if (hour >= 6 && hour < 7) {
+          envBg = 'rgba(255,136,68,0.03)'; timeLabel = '\uD83C\uDF05 DAWN';
+        } else if (hour >= 17 && hour < 19) {
+          envBg = 'rgba(255,102,34,0.04)'; timeLabel = '\uD83C\uDF07 DUSK';
+        } else if (hour >= 19 && hour < 22) {
+          envBg = 'rgba(0,16,64,0.08)'; timeLabel = '\uD83C\uDF19 NIGHT';
+        } else {
+          envBg = 'rgba(0,8,48,0.12)'; timeLabel = '\uD83C\uDF11 LATE NIGHT';
+        }
+        el.style.background = envBg;
+
+        // Night mode: slightly dim inactive agents
+        const isNight = hour >= 19 || hour < 6;
+        for (const ag of this.agents) {
+          if (isNight) {
+            ag.sprite.setAlpha(ag.glow ? 0.95 : 0.75);
+            if (ag.faceSprite) ag.faceSprite.setAlpha(ag.glow ? 0.95 : 0.75);
+            if (!ag.glow && ag.emotion === 'idle') {
+              this._setAgentEmotion(ag, 'sleeping', 0);
+            }
+          } else {
+            ag.sprite.setAlpha(1);
+            if (ag.faceSprite) ag.faceSprite.setAlpha(1);
+            if (ag.emotion === 'sleeping') {
+              this._setAgentEmotion(ag, 'idle', 0);
+            }
+          }
+          if (ag.glow && ag.emotion === 'idle') {
+            this._setAgentEmotion(ag, 'working', 0);
+          }
+        }
+
+        // -- EFS weather: very subtle grey tint --
+        const company = DataManager.data.company || {};
+        const efsScore = typeof company.efs === 'number' ? company.efs : 80;
+        let weatherAlpha = 0;
+        if (efsScore < 40) weatherAlpha = 0.04;
+        else if (efsScore < 60) weatherAlpha = 0.02;
+        el.style.boxShadow = weatherAlpha > 0
+          ? `inset 0 0 0 9999px rgba(128,128,128,${weatherAlpha})`
+          : 'none';
+
+        // Update HUD timestamp with time-of-day label
+        const tsEl = document.getElementById('hud-timestamp');
+        if (tsEl) {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+          tsEl.textContent = `${timeLabel}  ${timeStr}`;
+        }
+      }
+
+      // ==========================================
+      // Phase 4: Inter-department Visits
+      // ==========================================
+
+      _scheduleVisit() {
+        // Pick a random high-rank or chief agent not currently visiting
+        const candidates = this.agents.filter(ag =>
+          !ag.visiting &&
+          (ag.isChief || ['S', 'SS', 'A', 'B'].includes(ag.data.rank))
+        );
+        if (candidates.length === 0) return;
+
+        const agent = Phaser.Utils.Array.GetRandom(candidates);
+        const connected = RoadNetwork.getConnected(agent.homeDeptKey);
+        if (connected.length === 0) return;
+
+        const targetDept = Phaser.Utils.Array.GetRandom(connected);
+        this._startVisit(agent, targetDept);
+      }
+
+      _startVisit(agentObj, targetDeptKey) {
+        agentObj.visiting = true;
+
+        // Kill existing movement tweens
+        this.tweens.killTweensOf(agentObj.sprite);
+        if (agentObj.crown) this.tweens.killTweensOf(agentObj.crown);
+        if (agentObj.glow) this.tweens.killTweensOf(agentObj.glow);
+        if (agentObj.faceSprite) this.tweens.killTweensOf(agentObj.faceSprite);
+
+        // Calculate waypoints via BFS path
+        const path = RoadNetwork.findPath(agentObj.homeDeptKey, targetDeptKey);
+        if (!path || path.length < 2) {
+          agentObj.visiting = false;
+          this._wanderAgent(agentObj);
+          return;
+        }
+
+        const waypoints = RoadNetwork.toWaypoints(path);
+        const size = RANK_SIZES[agentObj.data.rank || 'F'] || 26;
+
+        // Build tween chain for path traversal
+        const tweenConfigs = [];
+        for (let i = 1; i < waypoints.length; i++) {
+          const wp = waypoints[i];
+          tweenConfigs.push({
+            targets: agentObj.sprite,
+            x: wp.x,
+            y: wp.y,
+            duration: 1200,
+            ease: 'Sine.easeInOut',
+          });
+        }
+
+        // Chain movement through waypoints
+        let step = 0;
+        const moveNext = () => {
+          if (step >= tweenConfigs.length) {
+            // Arrived at destination — show collab state
+            this._setAgentEmotion(agentObj, 'happy', 8000);
+            this._showCollabBubble(agentObj, targetDeptKey);
+
+            // Stay at destination 5-10 seconds, then return
+            const stayDuration = Phaser.Math.Between(5000, 10000);
+            this.time.delayedCall(stayDuration, () => {
+              this._returnAgent(agentObj);
+            });
+            return;
+          }
+          const cfg = tweenConfigs[step];
+          step++;
+          this.tweens.add({
+            ...cfg,
+            onUpdate: () => {
+              const sx = agentObj.sprite.x;
+              const sy = agentObj.sprite.y;
+              if (agentObj.crown) { agentObj.crown.x = sx; agentObj.crown.y = sy - size - 6; }
+              if (agentObj.glow) { agentObj.glow.x = sx; agentObj.glow.y = sy; }
+              if (agentObj.faceSprite) { agentObj.faceSprite.x = sx; agentObj.faceSprite.y = sy - size * 0.15; }
+            },
+            onComplete: moveNext,
+          });
+        };
+        moveNext();
+      }
+
+      _showCollabBubble(agentObj, targetDeptKey) {
+        const collabPhrases = [
+          '\uD83E\uDD1D Collaborating!',
+          '\uD83D\uDCAC Let\'s sync up',
+          '\u2728 Knowledge share',
+          '\uD83D\uDE80 Cross-team work',
+        ];
+        const msg = Phaser.Utils.Array.GetRandom(collabPhrases);
+        const sprite = agentObj.sprite;
+
+        const text = this.add.text(sprite.x, sprite.y - 44, msg, {
+          fontFamily: '"Inter", sans-serif',
+          fontSize: '16px',
+          color: '#2a1a0a',
+          resolution: 2,
+          padding: { x: 8, y: 6 },
+          backgroundColor: '#e8d8f0ee',
+          wordWrap: { width: 220 }
+        }).setOrigin(0.5, 1).setDepth(30);
+        text.setStroke('#9060c0', 1);
+        text.setAlpha(0);
+        this.tweens.add({ targets: text, alpha: 1, duration: 300, ease: 'Sine.easeOut' });
+
+        // Auto-dismiss after 4 seconds
+        this.time.delayedCall(4000, () => {
+          this.tweens.add({
+            targets: text,
+            alpha: 0,
+            duration: 400,
+            onComplete: () => text.destroy()
+          });
+        });
+      }
+
+      _returnAgent(agentObj) {
+        // Path back to home department
+        const currentCenter = { x: agentObj.sprite.x, y: agentObj.sprite.y };
+        const homeCenter = deptCenter(agentObj.homeDeptKey);
+        const size = RANK_SIZES[agentObj.data.rank || 'F'] || 26;
+
+        this.tweens.add({
+          targets: agentObj.sprite,
+          x: homeCenter.x + Phaser.Math.Between(-60, 60),
+          y: homeCenter.y + Phaser.Math.Between(-30, 30),
+          duration: 1500,
+          ease: 'Sine.easeInOut',
+          onUpdate: () => {
+            const sx = agentObj.sprite.x;
+            const sy = agentObj.sprite.y;
+            if (agentObj.crown) { agentObj.crown.x = sx; agentObj.crown.y = sy - size - 6; }
+            if (agentObj.glow) { agentObj.glow.x = sx; agentObj.glow.y = sy; }
+            if (agentObj.faceSprite) { agentObj.faceSprite.x = sx; agentObj.faceSprite.y = sy - size * 0.15; }
+          },
+          onComplete: () => {
+            agentObj.visiting = false;
+            // Restore wandering area to home department
+            const homeRect = deptRect(agentObj.homeDeptKey);
+            const padding = 40;
+            agentObj.area = {
+              x: homeRect.x + padding,
+              y: homeRect.y + 68,
+              w: homeRect.w - padding * 2,
+              h: homeRect.h - 68 - padding
+            };
+            this._wanderAgent(agentObj);
+          }
+        });
+      }
+
+      // ==========================================
+      // Phase 5: Mini Dashboard + Achievements
+      // ==========================================
+
+      _updateMiniDashboard() {
+        const data = DataManager.data;
+        const depts = data.departments || {};
+
+        // Top 5 agents by XP
+        const allAgents = [];
+        for (const dk of Object.keys(depts)) {
+          for (const m of (depts[dk].members || [])) {
+            allAgents.push({ ...m, dept: dk });
+          }
+        }
+        allAgents.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+        const top5 = allAgents.slice(0, 5);
+
+        const topEl = document.getElementById('mini-top-agents');
+        if (topEl) {
+          topEl.innerHTML = top5.map((a, i) => {
+            const rankColor = {
+              SS: '#ff6eb4', S: '#bc8cff', A: '#58a6ff', B: '#3fb950',
+              C: '#d29922', D: '#8b949e', E: '#6e7681', F: '#484f58'
+            }[a.rank || 'F'] || '#484f58';
+            return `<div class="mini-agent-row">
+              <span class="mini-agent-rank" style="color:${rankColor}">#${i+1}</span>
+              <span class="mini-agent-name">${a.name}</span>
+              <span class="mini-agent-xp">${a.xp || 0}</span>
+            </div>`;
+          }).join('');
+        }
+
+        // Department health bars
+        const healthEl = document.getElementById('mini-dept-health');
+        if (healthEl) {
+          const deptEntries = Object.keys(DEPT_LAYOUT).map(dk => {
+            const dept = depts[dk] || {};
+            const health = dept.health || 50;
+            let barColor = '#4a9a30';
+            if (health < 40) barColor = '#c03020';
+            else if (health < 60) barColor = '#c06020';
+            else if (health < 80) barColor = '#c89020';
+            const label = dk.charAt(0).toUpperCase() + dk.slice(1, 4);
+            return `<div class="mini-health-row" title="${dk}: ${health}%">
+              <span class="mini-health-name">${label}</span>
+              <div class="mini-health-bar"><div class="mini-health-fill" style="width:${health}%;background:${barColor}"></div></div>
+            </div>`;
+          });
+          healthEl.innerHTML = deptEntries.join('');
+        }
+      }
+
+      _checkBadges(gain) {
+        // Track session XP accumulation
+        if (!this._sessionXPTotal) this._sessionXPTotal = 0;
+        this._sessionXPTotal += (gain.xp || 0);
+
+        // Milestone badges based on session XP
+        const milestones = [
+          { threshold: 100, id: 'seasoned_worker', icon: '\uD83C\uDFC5', name: 'Seasoned Worker', desc: 'Earned 100+ XP in a single session' },
+          { threshold: 500, id: 'powerhouse', icon: '\uD83D\uDD25', name: 'Powerhouse', desc: 'Earned 500+ XP in a single session' },
+          { threshold: 1000, id: 'legendary', icon: '\uD83C\uDF1F', name: 'Legendary', desc: 'Earned 1000+ XP in a single session' },
+        ];
+
+        for (const m of milestones) {
+          if (this._sessionXPTotal >= m.threshold && !this.earnedBadges.has(m.id)) {
+            this.earnedBadges.add(m.id);
+            showAchievement(m.icon, m.name, m.desc);
+            // Firework celebration for badges
+            const center = deptCenter('command');
+            this._emitFirework(center.x, center.y);
+          }
+        }
+      }
+    }
+
+    // ==========================================
+    // Achievement Popup (global function)
+    // ==========================================
+    function showAchievement(icon, name, description) {
+      const popup = document.getElementById('achievement-popup');
+      if (!popup) return;
+
+      const iconEl = document.getElementById('achievement-icon');
+      const nameEl = document.getElementById('achievement-name');
+      const descEl = document.getElementById('achievement-desc');
+      if (iconEl) iconEl.textContent = icon;
+      if (nameEl) nameEl.textContent = name;
+      if (descEl) descEl.textContent = description;
+
+      popup.classList.add('show');
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 4000);
+    }
+
+    // ==========================================
+    // Phaser Config & Init
+    // ==========================================
+    function initGame() {
+      const container = document.getElementById('game-container');
+
+      const config = {
+        type: Phaser.CANVAS,
+        parent: 'game-container',
+        width: container.clientWidth,
+        height: container.clientHeight,
+        backgroundColor: '#c8b888',
+        scene: [BootScene, HQScene],
+        scale: {
+          mode: Phaser.Scale.RESIZE,
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+        },
+        render: {
+          pixelArt: true,
+          antialias: false,
+          antialiasGL: false,
+        },
+        input: {
+          keyboard: true,
+          mouse: true,
+        },
+        audio: {
+          noAudio: true
+        },
+      };
+
+      const game = new Phaser.Game(config);
+      return game;
+    }
+
+    // ==========================================
+    // Bootstrap
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      DataManager.init();
+      updateHUD(DataManager.data);
+      initTicker(DataManager.data);
+      initGame();
+    });
+
+  })();
+  </script>
+</body>
+</html>

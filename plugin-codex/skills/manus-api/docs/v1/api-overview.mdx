@@ -1,0 +1,36 @@
+---
+title: 'Overview'
+---
+
+import V1Deprecated from "/snippets/v1-deprecated.mdx"
+
+<V1Deprecated />
+
+
+The Manus API provides RESTful endpoints to programmatically manage projects, tasks, files, and webhooks.
+
+**Base URL**: `https://api.manus.ai`
+
+**Authentication**: Include your API key in the `API_KEY` header with each request.
+
+```bash
+curl -H "API_KEY: your-api-key" https://api.manus.ai/v1/tasks
+```
+
+## Resources
+
+| Entity | Endpoint | Description |
+|----------|----------|-------------|
+| **Projects** | Create Project | Create a new project with default instructions |
+| | List Projects | Retrieve projects |
+| **Tasks** | Create Task | Submit a new task with prompt and attachments |
+| | Get Tasks | List tasks with filtering and pagination |
+| | Get Task | Retrieve a specific task by ID |
+| | Update Task | Modify an existing task |
+| | Delete Task | Remove a task |
+| **Files** | Create File | Get a presigned URL for file upload |
+| | List Files | Retrieve uploaded files |
+| | Get File | Get details of a specific file |
+| | Delete File | Remove a file |
+| **Webhooks** | Create Webhook | Register a new webhook URL |
+| | Delete Webhook | Remove a webhook subscription |

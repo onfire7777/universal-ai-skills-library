@@ -1,0 +1,14 @@
+---
+title: 'agent.detail'
+openapi: 'GET /v2/agent.detail'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Talk to this agent:** Use [task.sendMessage](https://open.manus.ai/docs/v2/task.sendMessage) with the agent's `task_id` to send messages to its main task.
+
+**View subtasks:** Use [task.list](https://open.manus.ai/docs/v2/task.list) with `scope=agent_subtask` and this agent's ID to list all subtasks.
+</Tip>

@@ -1,0 +1,14 @@
+---
+title: 'browser.onlineList'
+openapi: 'GET /v2/browser.onlineList'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+<Tip>
+**Use in tasks:** When the agent triggers a `needConnectMyBrowser` waiting event, pass the returned `client_id` via [task.confirmAction](https://open.manus.ai/docs/v2/task.confirmAction) to select a browser.
+
+**Guide:** See the [Task Lifecycle](https://open.manus.ai/docs/v2/task-lifecycle#using-my-browser) for the full browser integration flow.
+</Tip>

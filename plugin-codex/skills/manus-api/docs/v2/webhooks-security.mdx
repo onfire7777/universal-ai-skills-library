@@ -1,0 +1,249 @@
+---
+title: 'Webhook Security'
+description: 'Verify webhook signatures to ensure requests are from Manus'
+---
+
+import Support from "/snippets/support.mdx"
+
+<Support />
+
+
+Every webhook request from Manus includes a cryptographic signature. Verifying it ensures the request is authentic and hasn't been tampered with.
+
+## How it works
+
+Manus signs each request using **RSA-SHA256** (2048-bit key). Your server verifies the signature with our public key.
+
+<Steps>
+  <Step title="Extract headers">
+    Read `X-Webhook-Signature` and `X-Webhook-Timestamp` from the incoming request.
+  </Step>
+  <Step title="Check timestamp">
+    Reject requests older than 5 minutes to prevent replay attacks.
+  </Step>
+  <Step title="Reconstruct the signed content">
+    Concatenate: `{timestamp}.{url}.{sha256_hex(body)}`
+  </Step>
+  <Step title="Verify signature">
+    Hash the content with SHA-256, then verify the signature using the public key.
+  </Step>
+</Steps>
+
+## Request headers
+
+| Header | Description |
+|---|---|
+| `X-Webhook-Signature` | Base64-encoded RSA-SHA256 signature |
+| `X-Webhook-Timestamp` | Unix timestamp (seconds) when the request was signed |
+
+## Signature format
+
+The signature is computed over this string:
+
+```
+{timestamp}.{url}.{body_sha256_hex}
+```
+
+| Component | Description |
+|---|---|
+| `timestamp` | Value of `X-Webhook-Timestamp` |
+| `url` | Full webhook URL including query parameters |
+| `body_sha256_hex` | SHA-256 hash of the raw request body, hex-encoded |
+
+**Example:**
+```
+1704067200.https://api.yourapp.com/webhooks.a1b2c3d4e5f6...
+```
+
+## Get the public key
+
+Fetch the public key from the [webhook.publicKey](https://open.manus.ai/docs/v2/webhook.publicKey) endpoint:
+
+```bash
+curl 'https://api.manus.ai/v2/webhook.publicKey' \
+  -H 'x-manus-api-key: YOUR_API_KEY'
+```
+
+```json
+{
+  "ok": true,
+  "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQE...\n-----END PUBLIC KEY-----",
+  "algorithm": "RSA-SHA256"
+}
+```
+
+<Warning>
+Cache this key on your server with a reasonable TTL (e.g. 1 hour). Do not fetch it on every webhook request.
+</Warning>
+
+## Verification examples
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    import base64, hashlib, time
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import padding
+    from cryptography.exceptions import InvalidSignature
+
+    def verify_webhook(public_key_pem, url, body, signature_b64, timestamp):
+        # 1. Check timestamp freshness (5-minute window)
+        if abs(int(time.time()) - int(timestamp)) > 300:
+            return False
+
+        # 2. Reconstruct signed content
+        body_hash = hashlib.sha256(body).hexdigest()
+        signed_content = f"{timestamp}.{url}.{body_hash}".encode()
+
+        # 3. Hash the content
+        content_hash = hashlib.sha256(signed_content).digest()
+
+        # 4. Verify signature
+        try:
+            key = serialization.load_pem_public_key(public_key_pem.encode())
+            key.verify(
+                base64.b64decode(signature_b64),
+                content_hash,
+                padding.PKCS1v15(),
+                hashes.SHA256()
+            )
+            return True
+        except (InvalidSignature, Exception):
+            return False
+    ```
+
+    **Flask handler:**
+    ```python
+    @app.route("/webhooks", methods=["POST"])
+    def handle_webhook():
+        sig = request.headers.get("X-Webhook-Signature")
+        ts = request.headers.get("X-Webhook-Timestamp")
+
+        if not sig or not ts:
+            return "Missing headers", 400
+
+        if not verify_webhook(get_cached_public_key(), request.url, request.data, sig, ts):
+            return "Unauthorized", 401
+
+        # Process webhook
+        data = request.json
+        process_event(data)
+        return "OK", 200
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    const crypto = require("crypto");
+
+    function verifyWebhook({ publicKeyPem, url, body, signatureB64, timestamp }) {
+      // 1. Check timestamp freshness
+      if (Math.abs(Math.floor(Date.now() / 1000) - parseInt(timestamp)) > 300) {
+        return false;
+      }
+
+      // 2. Reconstruct signed content
+      const bodyHash = crypto.createHash("sha256").update(body).digest("hex");
+      const signedContent = `${timestamp}.${url}.${bodyHash}`;
+
+      // 3. Hash the content
+      const contentHash = crypto.createHash("sha256").update(signedContent).digest();
+
+      // 4. Verify signature
+      try {
+        const verifier = crypto.createVerify("RSA-SHA256");
+        verifier.update(contentHash);
+        return verifier.verify(publicKeyPem, signatureB64, "base64");
+      } catch {
+        return false;
+      }
+    }
+    ```
+
+    **Express middleware:**
+    ```javascript
+    app.use("/webhooks", express.raw({ type: "application/json" }), (req, res, next) => {
+      const sig = req.headers["x-webhook-signature"];
+      const ts = req.headers["x-webhook-timestamp"];
+
+      if (!sig || !ts) return res.status(400).json({ error: "Missing headers" });
+
+      const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+      const valid = verifyWebhook({
+        publicKeyPem: getCachedPublicKey(),
+        url: fullUrl,
+        body: req.body,
+        signatureB64: sig,
+        timestamp: ts,
+      });
+
+      if (!valid) return res.status(401).json({ error: "Invalid signature" });
+
+      req.body = JSON.parse(req.body.toString());
+      next();
+    });
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```go
+    func VerifyWebhook(publicKeyPEM []byte, url string, body []byte, signatureB64 string, timestamp int64) error {
+        // 1. Check timestamp freshness
+        if math.Abs(float64(time.Now().Unix()-timestamp)) > 300 {
+            return fmt.Errorf("timestamp too old")
+        }
+
+        // 2. Reconstruct signed content
+        bodyHash := sha256.Sum256(body)
+        signedContent := fmt.Sprintf("%d.%s.%x", timestamp, url, bodyHash)
+
+        // 3. Hash the content
+        contentHash := sha256.Sum256([]byte(signedContent))
+
+        // 4. Parse public key and verify
+        block, _ := pem.Decode(publicKeyPEM)
+        pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+        if err != nil {
+            return err
+        }
+
+        sig, err := base64.StdEncoding.DecodeString(signatureB64)
+        if err != nil {
+            return err
+        }
+
+        return rsa.VerifyPKCS1v15(pubKey.(*rsa.PublicKey), crypto.SHA256, contentHash[:], sig)
+    }
+    ```
+
+    **HTTP handler:**
+    ```go
+    func webhookHandler(w http.ResponseWriter, r *http.Request) {
+        sig := r.Header.Get("X-Webhook-Signature")
+        tsStr := r.Header.Get("X-Webhook-Timestamp")
+        if sig == "" || tsStr == "" {
+            http.Error(w, "Missing headers", http.StatusBadRequest)
+            return
+        }
+
+        ts, _ := strconv.ParseInt(tsStr, 10, 64)
+        body, _ := io.ReadAll(r.Body)
+        fullURL := fmt.Sprintf("https://%s%s", r.Host, r.RequestURI)
+
+        if err := VerifyWebhook(getCachedPublicKey(), fullURL, body, sig, ts); err != nil {
+            http.Error(w, "Unauthorized", http.StatusUnauthorized)
+            return
+        }
+
+        w.WriteHeader(http.StatusOK)
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Best practices
+
+| Practice | Why |
+|---|---|
+| Cache the public key | Avoid fetching on every request — it rarely changes |
+| Verify timestamps | Reject requests older than 5 minutes to prevent replay attacks |
+| Use HTTPS | Ensure your webhook endpoint uses TLS |
+| Return generic errors | Don't expose internal details in 401 responses |
