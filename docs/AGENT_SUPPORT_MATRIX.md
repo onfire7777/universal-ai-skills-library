@@ -1,0 +1,48 @@
+# Agent Support Matrix
+
+The Universal AI Skills Router is designed around a context-light default:
+
+```bash
+skill-router skill search <query>
+skill-router skill <name>
+```
+
+Agent roots should usually contain a small `universal-ai-skills` wrapper instead of a physical copy of all 1,804 skills.
+
+## Read-only matrix
+
+Use this before changing any agent root:
+
+```bash
+skill-router sync matrix
+skill-router sync matrix --json
+```
+
+The matrix reports:
+
+- whether each known agent root exists
+- whether it appears to use wrapper, full-copy, custom, missing, or special mode
+- whether it is a legacy default sync target
+- recommended action
+
+## Current support policy
+
+| Agent | Root | Sync policy | Notes |
+|---|---|---|---|
+| OpenSkills / `.agent` | `~/.agent/skills` | default | Standard wrapper root. |
+| Claude Code | `~/.claude/skills` | default | Wrapper root. |
+| OpenAI Codex | `~/.codex/skills` | default | Wrapper root plus Codex-specific `.system` content may exist. |
+| Manus-compatible | `~/.manus/skills` | default | Legacy compatibility root. |
+| Gemini CLI | `~/.gemini/skills` | default | Wrapper root. |
+| Cursor | `~/.cursor/skills` | default | Wrapper root. |
+| OpenCode | `~/.opencode/skills` | default | Wrapper root. |
+| Kiro | `~/.kiro/skills` | default | Wrapper root. |
+| Windsurf | `~/.windsurf/skills` | report-only | Detected locally; do not mutate until adapter semantics are confirmed. |
+| Roo | `~/.roo/skills` | report-only | Detected locally; wrapper observed. |
+| Continue | `~/.continue/skills` | report-only | Detected locally; wrapper observed. |
+| Qwen | `~/.qwen/skills` | report-only | Detected locally; custom/caveman skills observed. |
+| Kimi / OpenClaw | `~/.kimi_openclaw/workspace/skills` | report-only special | Do not mutate with generic full-copy sync. |
+
+## Safety rule
+
+Adding an agent to the matrix is safe. Adding an agent to default sync is a behavior change and should only happen after adapter-specific install semantics and tests exist.

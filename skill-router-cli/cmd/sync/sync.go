@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,7 +21,9 @@ var Cmd = &cobra.Command{
 	Long: `Sync and install all skills from the GitHub skills repository into
 all agent platforms. Pulls latest from repo, runs install, and
 propagates to .agent, .claude, .codex, .manus, .gemini, .cursor,
-.opencode, and .kiro roots.`,
+.opencode, and .kiro roots.
+
+Use sync matrix for a read-only compatibility view before changing roots.`,
 }
 
 var allCmd = &cobra.Command{
@@ -51,12 +54,12 @@ var allCmd = &cobra.Command{
 		}
 		green.Println("  Done.")
 
-		bold.Println("[3/3] Propagating to all agent roots...")
+		bold.Println("[3/3] Propagating to default agent roots...")
 		propagateToRoots()
 		green.Println("  Done.")
 
 		fmt.Println()
-		green.Println("Sync complete. All platforms updated.")
+		green.Println("Sync complete. Default platforms updated.")
 		return nil
 	},
 }
@@ -75,7 +78,7 @@ var repoCmd = &cobra.Command{
 
 var propagateAllCmd = &cobra.Command{
 	Use:   "propagate",
-	Short: "Propagate skills from source to all agent roots",
+	Short: "Propagate skills from source to default agent roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		propagateToRoots()
 		fmt.Println("Propagation complete.")
@@ -85,7 +88,7 @@ var propagateAllCmd = &cobra.Command{
 
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "Show sync status across all agent roots",
+	Short: "Show sync status across default agent roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		bold := color.New(color.Bold)
 		bold.Println("Sync Status:")
@@ -102,11 +105,57 @@ var statusCmd = &cobra.Command{
 	},
 }
 
+type matrixRow struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	Path           string `json:"path"`
+	Exists         bool   `json:"exists"`
+	DefaultSync    bool   `json:"defaultSync"`
+	TopLevelDirs   int    `json:"topLevelDirs"`
+	SkillFiles     int    `json:"skillFiles"`
+	Wrapper        bool   `json:"wrapper"`
+	LikelyMode     string `json:"likelyMode"`
+	Recommendation string `json:"recommendation"`
+	Notes          string `json:"notes"`
+}
+
+var matrixCmd = &cobra.Command{
+	Use:   "matrix",
+	Short: "Show read-only support matrix for known agent skill roots",
+	Long: `Show a read-only compatibility matrix across known AI agent skill roots.
+This command does not install, copy, link, delete, or modify any files.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		jsonOut, _ := cmd.Flags().GetBool("json")
+		rows := buildMatrix()
+		if jsonOut {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			return enc.Encode(rows)
+		}
+		fmt.Printf("%-15s %-11s %-7s %-7s %-12s %s\n", "AGENT", "MODE", "ROOT", "SKILLS", "SYNC", "RECOMMENDATION")
+		for _, row := range rows {
+			exists := "missing"
+			if row.Exists {
+				exists = "exists"
+			}
+			sync := "report-only"
+			if row.DefaultSync {
+				sync = "default"
+			}
+			fmt.Printf("%-15s %-11s %-7s %-7d %-12s %s\n", row.ID, row.LikelyMode, exists, row.SkillFiles, sync, row.Recommendation)
+		}
+		return nil
+	},
+}
+
 func init() {
+	matrixCmd.Flags().Bool("json", false, "Output JSON")
+
 	Cmd.AddCommand(allCmd)
 	Cmd.AddCommand(repoCmd)
 	Cmd.AddCommand(propagateAllCmd)
 	Cmd.AddCommand(statusCmd)
+	Cmd.AddCommand(matrixCmd)
 }
 
 func propagateToRoots() {
@@ -130,6 +179,94 @@ func propagateToRoots() {
 			}
 		}
 	}
+}
+
+func buildMatrix() []matrixRow {
+	rows := []matrixRow{}
+	for _, spec := range platform.AgentRootSpecs() {
+		row := matrixRow{
+			ID:          spec.ID,
+			Name:        spec.Name,
+			Path:        spec.Path,
+			DefaultSync: spec.DefaultSync,
+			Notes:       spec.Notes,
+		}
+		entries, err := os.ReadDir(spec.Path)
+		if err != nil {
+			row.LikelyMode = "missing"
+			row.Recommendation = "create wrapper only after confirming this agent is installed"
+			rows = append(rows, row)
+			continue
+		}
+		row.Exists = true
+		row.TopLevelDirs = countDirs(entries)
+		row.SkillFiles = countSkillMarkdown(spec.Path)
+		row.Wrapper = fileExists(filepath.Join(spec.Path, "universal-ai-skills", "SKILL.md"))
+		// WalkDir does not follow junction/symlinked directories on every platform,
+		// but a wrapper SKILL.md reachable through the known path is still installed.
+		if row.Wrapper && row.SkillFiles == 0 {
+			row.SkillFiles = 1
+		}
+		row.LikelyMode = classifyMode(row)
+		row.Recommendation = recommendation(row)
+		rows = append(rows, row)
+	}
+	return rows
+}
+
+func classifyMode(row matrixRow) string {
+	switch {
+	case !row.Exists:
+		return "missing"
+	case row.ID == "kimi-openclaw":
+		return "special"
+	case row.SkillFiles > 100:
+		return "full-copy"
+	case row.Wrapper && row.SkillFiles <= 10:
+		return "wrapper"
+	case row.SkillFiles == 0:
+		return "empty"
+	default:
+		return "custom"
+	}
+}
+
+func recommendation(row matrixRow) string {
+	if !row.Exists {
+		return "report only"
+	}
+	if row.ID == "kimi-openclaw" {
+		return "do not mutate with generic sync"
+	}
+	if !row.DefaultSync {
+		return "report-only until adapter semantics are confirmed"
+	}
+	if row.Wrapper {
+		return "healthy wrapper install"
+	}
+	if row.SkillFiles > 100 {
+		return "full copy detected; verify intentional"
+	}
+	return "consider wrapper install"
+}
+
+func countSkillMarkdown(root string) int {
+	count := 0
+	filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !d.IsDir() && d.Name() == "SKILL.md" {
+			count++
+		}
+		return nil
+	})
+	return count
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 func countDirs(entries []os.DirEntry) int {
