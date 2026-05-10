@@ -49,6 +49,8 @@ skill-router skill <name>          # Print one SKILL.md
 skill-router skill search <query>  # Search manifest names and descriptions
 skill-router skill list            # List all skills from manifest.json
 skill-router doctor                # Check local AI stack health
+skill-router sync matrix           # Read-only agent support matrix
+skill-router skills validate-manifest # Validate manifest.json against skills/
 skill-router mcp status            # Check optional MCP bridge endpoints
 skill-router audit <path>          # Run audit workflows
 skill-router oracle <question>     # Query multi-model oracle flow
@@ -108,7 +110,16 @@ Keep always-loaded instructions compact. Do not paste the full skills corpus int
 skill-router --version
 skill-router skill universal-ai-config
 skill-router skill search debugging
+skill-router skills validate-manifest
+skill-router sync matrix
 skill-router doctor
 ```
 
 Expected current corpus size: 1,804 canonical skills.
+
+## Install mode safety
+
+Default to wrapper/router installs. Avoid full physical copies of all skills unless explicitly requested.
+
+- Agent support matrix: `docs/AGENT_SUPPORT_MATRIX.md`
+- Install modes: `docs/INSTALL_MODES.md`

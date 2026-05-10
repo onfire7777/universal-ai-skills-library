@@ -100,19 +100,49 @@ func PrintingPressDir() string {
 	return filepath.Join(HomeDir(), "printing-press")
 }
 
-// AgentRoots returns all agent platform root directories.
-func AgentRoots() []string {
+// AgentRootSpec describes one known AI client skill root.
+// DefaultSync controls the legacy physical propagation target set. Keep it
+// conservative: newly detected agent roots should appear in read-only matrix
+// reports before they become write targets.
+type AgentRootSpec struct {
+	ID          string
+	Name        string
+	Path        string
+	DefaultSync bool
+	Notes       string
+}
+
+// AgentRootSpecs returns the full known local-agent compatibility matrix.
+func AgentRootSpecs() []AgentRootSpec {
 	home := HomeDir()
-	return []string{
-		filepath.Join(home, ".agent", "skills"),
-		filepath.Join(home, ".claude", "skills"),
-		filepath.Join(home, ".codex", "skills"),
-		filepath.Join(home, ".manus", "skills"),
-		filepath.Join(home, ".gemini", "skills"),
-		filepath.Join(home, ".cursor", "skills"),
-		filepath.Join(home, ".opencode", "skills"),
-		filepath.Join(home, ".kiro", "skills"),
+	return []AgentRootSpec{
+		{ID: "agent", Name: "OpenSkills / .agent", Path: filepath.Join(home, ".agent", "skills"), DefaultSync: true, Notes: "OpenSkills standard root"},
+		{ID: "claude", Name: "Claude Code", Path: filepath.Join(home, ".claude", "skills"), DefaultSync: true, Notes: "Claude Code skill root"},
+		{ID: "codex", Name: "OpenAI Codex", Path: filepath.Join(home, ".codex", "skills"), DefaultSync: true, Notes: "Codex skill root"},
+		{ID: "manus", Name: "Manus-compatible", Path: filepath.Join(home, ".manus", "skills"), DefaultSync: true, Notes: "Legacy Manus compatibility root"},
+		{ID: "gemini", Name: "Gemini CLI", Path: filepath.Join(home, ".gemini", "skills"), DefaultSync: true, Notes: "Gemini CLI skill root"},
+		{ID: "cursor", Name: "Cursor", Path: filepath.Join(home, ".cursor", "skills"), DefaultSync: true, Notes: "Cursor skill root"},
+		{ID: "opencode", Name: "OpenCode", Path: filepath.Join(home, ".opencode", "skills"), DefaultSync: true, Notes: "OpenCode skill root"},
+		{ID: "kiro", Name: "Kiro", Path: filepath.Join(home, ".kiro", "skills"), DefaultSync: true, Notes: "Kiro skill root"},
+		{ID: "windsurf", Name: "Windsurf", Path: filepath.Join(home, ".windsurf", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
+		{ID: "roo", Name: "Roo", Path: filepath.Join(home, ".roo", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
+		{ID: "continue", Name: "Continue", Path: filepath.Join(home, ".continue", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
+		{ID: "qwen", Name: "Qwen", Path: filepath.Join(home, ".qwen", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
+		{ID: "kimi-openclaw", Name: "Kimi / OpenClaw workspace", Path: filepath.Join(home, ".kimi_openclaw", "workspace", "skills"), DefaultSync: false, Notes: "Special adapter; never mutate with generic full-copy sync"},
 	}
+}
+
+// AgentRoots returns the legacy default physical propagation roots.
+// It intentionally excludes report-only roots so existing sync behavior does
+// not suddenly write into additional AI clients.
+func AgentRoots() []string {
+	roots := []string{}
+	for _, spec := range AgentRootSpecs() {
+		if spec.DefaultSync {
+			roots = append(roots, spec.Path)
+		}
+	}
+	return roots
 }
 
 // LogDir returns the log directory for MCP bridges.
