@@ -44,7 +44,7 @@ multi-model auditing, oracle queries, file organization, model selection,
 platform API integrations, CLI generation, database management, email,
 Hugging Face, Google Workspace, automation, and local AI setup.
 
-Consolidates 1,804 repo skills, 4 optional MCP bridges,
+Consolidates 1,805 repo skills, indexed local external skills, 4 optional MCP bridges,
 6 MCP connectors (Supabase, HuggingFace, Make, Gmail, SkillSeekers, MemPalace),
 multi-model code auditor, multi-model oracle, file organizer,
 model selector, music prompter, chat summarizer, skill debugger,
@@ -59,6 +59,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		bold.Println("skill-router - Universal AI Skills Router v" + Version)
 		fmt.Println()
 		fmt.Println("Core Commands:")
+		fmt.Println("  route       Pick and load the best skill for a prompt")
 		fmt.Println("  skill       Load one skill on demand: skill-router skill <name>")
 		fmt.Println("  skills      Manage canonical and local external AI skills on demand")
 		fmt.Println("  mcp         Control MCP bridge infrastructure (start, stop, status, logs)")
@@ -107,6 +108,7 @@ func Execute() error {
 func init() {
 	// Core
 	rootCmd.AddCommand(skills.Cmd)
+	rootCmd.AddCommand(skills.RouteCmd)
 	rootCmd.AddCommand(mcp.Cmd)
 	rootCmd.AddCommand(audit.Cmd)
 	rootCmd.AddCommand(oracle.Cmd)

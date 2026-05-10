@@ -22,6 +22,7 @@ universal-ai-skills-library/
 ```bash
 skill-router skill <name>
 skill-router skill search <query>
+skill-router route "<prompt>"
 skill-router skill list
 skill-router skills sources
 ```
@@ -49,6 +50,7 @@ On Windows the installed binaries are:
 skill-router skill <name>          # Print one SKILL.md
 skill-router skill search <query>  # Search canonical skills plus read-only local external roots
 skill-router skill search --refresh <query> # Rebuild external index before searching
+skill-router route "<prompt>"      # Pick and load the best skill for a task prompt
 skill-router skill list            # List all skills from manifest.json
 skill-router skills list --external # Include unique local external skills without copying them
 skill-router skills sources         # Show read-only external skill roots
@@ -92,6 +94,8 @@ Detailed policy: `docs/UNIVERSAL_COMPATIBILITY.md`.
 The canonical library keeps one physical copy per canonical skill ID under `skills/`.
 Legacy names resolve through aliases, not duplicate directories. For example,
 `card-creator` resolves to the existing full `printable-cards` skill.
+`skill-router route "use the card creator skill to make a Mother's Day card"`
+selects that same exact Manus-origin `printable-cards` skill.
 
 Installed Claude, Codex, Manus-compatible, and other AI skill roots are integrated
 as read-only external sources. The router can search and load unique local skills

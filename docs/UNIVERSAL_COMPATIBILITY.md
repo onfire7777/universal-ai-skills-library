@@ -48,6 +48,7 @@ Full skill bodies are loaded only when needed:
 
 ```bash
 skill-router skill search <query>
+skill-router route "<prompt>"
 skill-router skill <name>
 skill-router skills sources
 skill-router skills sources --refresh
@@ -67,6 +68,9 @@ Canonical skill directories must be unique by ID and content. Do not create a ne
 top-level skill directory for an old name when an alias can preserve compatibility.
 Example: `card-creator` is an alias for `printable-cards`, because the full card
 creator skill already exists there.
+For natural-language routing, `skill-router route "<prompt>"` must choose and
+load the best skill. Example: card creator and Mother's Day card prompts route
+to the exact Manus-origin `printable-cards` skill.
 
 Third-party caches and marketplaces under Claude, Codex, Manus-compatible, and
 other AI roots remain read-only external sources. This keeps the universal setup

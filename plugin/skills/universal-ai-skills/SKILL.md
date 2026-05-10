@@ -1,6 +1,6 @@
 ---
 name: universal-ai-skills
-description: Operating rule for the Universal AI Skills Router. Use this to keep skill loading context-light and cross-compatible across Codex, Claude Code, Cursor, Gemini, OpenCode, and Manus compatibility surfaces.
+description: Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically. This skill routes through the `skill-router` CLI instead of relying on the native client skill list.
 ---
 
 # Universal AI Skills Router
@@ -10,6 +10,9 @@ description: Operating rule for the Universal AI Skills Router. Use this to keep
 - Legacy alias: `%USERPROFILE%\go\bin\manus.exe`.
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
+- Use `skill-router route "<user prompt>"` when the user gives a natural-language task and expects the router to choose the best skill.
+- If a user says "universal AI skills <thing>", do not decide from the native client skill list. Run `skill-router skill search <thing>` or `skill-router skill <thing>` first.
+- If the user asks for `card creator`, `card-creator`, a printable greeting card, Mother's Day card, birthday card, or foldable card, load `skill-router skill card-creator`. It resolves to the canonical `printable-cards` skill.
 - Use `skill-router skills sources` to inspect read-only local external skill roots.
 - Use `skill-router skills sources --refresh` after adding or removing external skill roots.
 - Keep always-loaded instructions compact. Do not paste the full skill corpus into global rules.
