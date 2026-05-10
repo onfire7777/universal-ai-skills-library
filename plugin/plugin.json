@@ -20,25 +20,7 @@
     "universal",
     "context-efficient"
   ],
-  "commands": [
-    {
-      "name": "skill",
-      "description": "Search for or load one skill through skill-router."
-    },
-    {
-      "name": "doctor",
-      "description": "Run the local universal AI setup health check."
-    },
-    {
-      "name": "audit",
-      "description": "Run the configured code audit workflow."
-    },
-    {
-      "name": "oracle",
-      "description": "Query the configured multi-model oracle workflow."
-    }
-  ],
-  "mcpServers": {},
+  "skills": "./skills",
   "interface": {
     "displayName": "Universal AI Skills",
     "shortDescription": "CLI-first universal skill router",
