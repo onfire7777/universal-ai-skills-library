@@ -19,6 +19,9 @@ func TestRouteScoringPrefersPrintableCardsForCardCreatorPrompt(t *testing.T) {
 	if scoreManifestSkill(prompt, printable) == 0 {
 		t.Fatal("expected printable-cards to score for card creator prompt")
 	}
+	if !isConfidentRoute(scoreManifestSkill(prompt, printable)) {
+		t.Fatal("expected printable-cards to pass automatic route confidence")
+	}
 }
 
 func TestSearchScoringFindsPrintableCardsForMothersDayPrompt(t *testing.T) {
@@ -43,5 +46,18 @@ func TestRouterMaintenancePromptAllowsMetaSkill(t *testing.T) {
 	}
 	if isRouterMaintenancePrompt("use the universal ai skills card creator skill") {
 		t.Fatal("card creator prompt should route to the task skill, not router maintenance")
+	}
+}
+
+func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
+	genericPrompt := "thanks, that makes sense"
+	printable := manifestSkill{
+		Name:        "printable-cards",
+		Description: "Create beautiful printable foldable greeting cards as PDFs.",
+		Aliases:     []string{"card-creator", "card creator", "greeting-card-creator"},
+	}
+	score := scoreManifestSkill(genericPrompt, printable)
+	if isConfidentRoute(score) {
+		t.Fatalf("expected generic prompt to stay below confidence threshold, got %d", score)
 	}
 }

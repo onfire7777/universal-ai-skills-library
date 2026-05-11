@@ -5,12 +5,15 @@ This plugin is an index and rule surface for the Universal AI Skills Router. It 
 Use:
 
 ```bash
+skill-router auto "<latest user prompt>"
 skill-router skill <name>
 skill-router skill search <query>
 skill-router skill list
 skill-router doctor
 skill-router mcp status
 ```
+
+Agents should run `skill-router auto "<latest user prompt>"` before substantive replies. It loads a skill only when the prompt has a confident match and no-ops on generic prompts.
 
 Compatibility:
 

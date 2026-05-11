@@ -8,8 +8,8 @@
     {
       "name": "universal-ai-skills",
       "source": "./plugin",
-    "description": "Universal CLI-first skill router: 1,805 canonical skills plus indexed local external skills on demand, audits, oracle, CLI generation, and optional MCP bridge management.",
-      "version": "2.1.0",
+      "description": "Universal CLI-first skill router: auto-route every substantive prompt, load 1,805 canonical skills plus indexed local external skills on demand, audits, oracle, CLI generation, and optional MCP bridge management.",
+      "version": "2.1.1",
       "author": {
         "name": "onfire7777"
       }

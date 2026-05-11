@@ -8,9 +8,10 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Canonical source: `C:\Users\burni\universal-ai-skills-library`.
 - Primary binary: `C:\Users\burni\go\bin\skill-router.exe`.
 - Legacy alias: `C:\Users\burni\go\bin\manus.exe`.
+- For every new substantive user prompt, first run `skill-router auto "<latest user prompt>"`. If it prints a skill, follow that skill. If it says no route, continue normally.
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
-- Use `skill-router route "<user prompt>"` when the user gives a natural-language task and expects the router to choose the best skill.
+- Use `skill-router route "<user prompt>"` for explicit routing checks that should fail when no confident skill applies.
 - If a user says "universal AI skills <thing>", do not decide from the native client skill list. Run `skill-router skill search <thing>` or `skill-router skill <thing>` first.
 - If the user asks for `card creator`, `card-creator`, a printable greeting card, Mother's Day card, birthday card, or foldable card, load `skill-router skill card-creator`. It resolves to the canonical `printable-cards` skill.
 - Use `skill-router skills sources` to inspect read-only local external skill roots.
