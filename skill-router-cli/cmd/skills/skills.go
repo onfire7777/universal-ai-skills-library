@@ -50,6 +50,8 @@ type externalSkillsCache struct {
 	Skills        []externalSkill `json:"skills"`
 }
 
+const automaticRouteMinScore = 25
+
 // Cmd is the top-level skills command group. It also backs the singular
 // "skill" alias so agents can use `skill-router skill <name>` as the context-light path.
 var Cmd = &cobra.Command{
@@ -234,11 +236,27 @@ var RouteCmd = &cobra.Command{
 
 This is the automatic CLI routing path for agents. It scores canonical skills
 first, including aliases such as card-creator -> printable-cards, then searches
-read-only local external roots only when needed.`,
+read-only local external roots only when needed. It requires a confident match
+and returns an error for generic prompts.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		return routePrompt(prompt)
+		return routePromptWithOptions(prompt, routeOptions{})
+	},
+}
+
+var AutoCmd = &cobra.Command{
+	Use:   "auto <prompt>",
+	Short: "Automatically load an applicable skill for a prompt",
+	Long: `Automatically check a natural-language prompt before an agent responds.
+
+If a confident skill applies, this prints that full SKILL.md. If the prompt is
+generic or below the confidence threshold, it exits successfully with a short
+no-route message so agents can continue normally.`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		prompt := strings.Join(args, " ")
+		return routePromptWithOptions(prompt, routeOptions{optional: true})
 	},
 }
 
@@ -364,6 +382,7 @@ func init() {
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(searchCmd)
 	Cmd.AddCommand(RouteCmd)
+	Cmd.AddCommand(AutoCmd)
 	Cmd.AddCommand(sourcesCmd)
 	Cmd.AddCommand(propagateCmd)
 	Cmd.AddCommand(ultimateCmd)
@@ -599,7 +618,15 @@ func matchesExternalSkill(s externalSkill, query string) bool {
 	return len(strings.Fields(normalizedQuery)) > 0
 }
 
+type routeOptions struct {
+	optional bool
+}
+
 func routePrompt(prompt string) error {
+	return routePromptWithOptions(prompt, routeOptions{})
+}
+
+func routePromptWithOptions(prompt string, opts routeOptions) error {
 	manifest, err := loadManifest()
 	if err != nil {
 		return err
@@ -624,7 +651,7 @@ func routePrompt(prompt string) error {
 			best = next
 		}
 	}
-	if best.score < 25 {
+	if best.score < automaticRouteMinScore {
 		external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
 		if err != nil {
 			return err
@@ -642,8 +669,15 @@ func routePrompt(prompt string) error {
 	if best.score == 0 && bestMeta.score > 0 {
 		best = bestMeta
 	}
-	if best.score == 0 {
-		return fmt.Errorf("no skill matched prompt; try `skill-router skill search %s`", prompt)
+	if best.score < automaticRouteMinScore {
+		if opts.optional {
+			fmt.Println("No skill route: generic prompt.")
+			return nil
+		}
+		if best.score == 0 {
+			return fmt.Errorf("no skill matched prompt; try `skill-router skill search %s`", prompt)
+		}
+		return fmt.Errorf("no confident skill matched prompt (best: %s, score %d, threshold %d); try `skill-router skill search %s`", best.name, best.score, automaticRouteMinScore, prompt)
 	}
 	source := "canonical"
 	if best.external {
@@ -651,6 +685,10 @@ func routePrompt(prompt string) error {
 	}
 	fmt.Printf("Route: %s (%s, score %d)\n\n", best.name, source, best.score)
 	return printSkill(best.name)
+}
+
+func isConfidentRoute(score int) bool {
+	return score >= automaticRouteMinScore
 }
 
 func scoreManifestSkill(prompt string, s manifestSkill) int {

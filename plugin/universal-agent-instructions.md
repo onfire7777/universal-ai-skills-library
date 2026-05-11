@@ -1,9 +1,10 @@
 # Universal AI Skills Router Rule
 
 - Canonical source: `%USERPROFILE%\universal-ai-skills-library`.
+- For every new substantive user prompt, run `skill-router auto "<latest user prompt>"` before responding. If it prints a skill, follow that skill. If it says no route, continue normally.
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
-- Use `skill-router route "<user prompt>"` when the user expects the router to choose the best skill.
+- Use `skill-router route "<user prompt>"` when an explicit routing check should fail if no confident skill applies.
 - For card creator, printable greeting card, Mother's Day card, birthday card, or foldable card requests, route to the exact Manus-origin `printable-cards` skill.
 - Do not preload the full skills corpus into context.
 - Treat `skills/` as source data and `skill-router-cli/` as the router source.

@@ -22,6 +22,7 @@ universal-ai-skills-library/
 ```bash
 skill-router skill <name>
 skill-router skill search <query>
+skill-router auto "<latest user prompt>"
 skill-router route "<prompt>"
 skill-router skill list
 skill-router skills sources
@@ -50,7 +51,8 @@ On Windows the installed binaries are:
 skill-router skill <name>          # Print one SKILL.md
 skill-router skill search <query>  # Search canonical skills plus read-only local external roots
 skill-router skill search --refresh <query> # Rebuild external index before searching
-skill-router route "<prompt>"      # Pick and load the best skill for a task prompt
+skill-router auto "<prompt>"       # Default per-prompt preflight; no-op on generic prompts
+skill-router route "<prompt>"      # Explicit route; errors when no confident skill applies
 skill-router skill list            # List all skills from manifest.json
 skill-router skills list --external # Include unique local external skills without copying them
 skill-router skills sources         # Show read-only external skill roots
