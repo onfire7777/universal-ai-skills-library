@@ -125,6 +125,8 @@ func AgentRootSpecs() []AgentRootSpec {
 		{ID: "opencode", Name: "OpenCode", Path: filepath.Join(home, ".config", "opencode", "skills"), DefaultSync: true, Notes: "OpenCode canonical skill root"},
 		{ID: "kiro", Name: "Kiro", Path: filepath.Join(home, ".kiro", "skills"), DefaultSync: true, Notes: "Kiro skill root"},
 		{ID: "opencode-legacy", Name: "OpenCode legacy", Path: filepath.Join(home, ".opencode", "skills"), DefaultSync: false, Notes: "Legacy/report-only OpenCode skill root"},
+		{ID: "hermes", Name: "Hermes Agent/Desktop local profile", Path: filepath.Join(home, ".hermes", "skills"), DefaultSync: false, Notes: "CLI-first wrapper root; do not full-copy the corpus into Hermes"},
+		{ID: "hermes-agent-source", Name: "Hermes Agent source checkout", Path: filepath.Join(home, ".hermes", "hermes-agent", "skills"), DefaultSync: false, Notes: "Bundled/source skill tree; adapter-specific updates only"},
 		{ID: "windsurf", Name: "Windsurf", Path: filepath.Join(home, ".windsurf", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
 		{ID: "roo", Name: "Roo", Path: filepath.Join(home, ".roo", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
 		{ID: "continue", Name: "Continue", Path: filepath.Join(home, ".continue", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},

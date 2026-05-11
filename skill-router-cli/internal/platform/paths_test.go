@@ -20,7 +20,7 @@ func TestAgentRootSpecsIncludeReportOnlyAgents(t *testing.T) {
 			t.Fatalf("expected %q to remain a default sync root", id)
 		}
 	}
-	for _, id := range []string{"opencode-legacy", "windsurf", "roo", "continue", "qwen", "kimi-openclaw"} {
+	for _, id := range []string{"opencode-legacy", "hermes", "hermes-agent-source", "windsurf", "roo", "continue", "qwen", "kimi-openclaw"} {
 		spec, ok := byID[id]
 		if !ok {
 			t.Fatalf("missing report-only agent %q", id)
@@ -42,7 +42,7 @@ func TestAgentRootsStayConservative(t *testing.T) {
 			t.Fatalf("expected conservative default root for %s in %#v", id, roots)
 		}
 	}
-	for _, id := range []string{".opencode", ".windsurf", ".roo", ".continue", ".qwen", ".kimi_openclaw"} {
+	for _, id := range []string{".opencode", ".hermes", ".windsurf", ".roo", ".continue", ".qwen", ".kimi_openclaw"} {
 		if got[id] {
 			t.Fatalf("did not expect report-only root %s in default AgentRoots %#v", id, roots)
 		}

@@ -793,6 +793,8 @@ func externalSkillRoots() []externalSkillRoot {
 		{ID: "cursor", Path: filepath.Join(home, ".cursor", "skills")},
 		{ID: "opencode", Path: filepath.Join(home, ".config", "opencode", "skills")},
 		{ID: "kiro", Path: filepath.Join(home, ".kiro", "skills")},
+		{ID: "hermes", Path: filepath.Join(home, ".hermes", "skills")},
+		{ID: "hermes-agent-source", Path: filepath.Join(home, ".hermes", "hermes-agent", "skills")},
 	}
 	if extra := os.Getenv("SKILL_ROUTER_EXTERNAL_SKILL_ROOTS"); extra != "" {
 		for i, path := range filepath.SplitList(extra) {
