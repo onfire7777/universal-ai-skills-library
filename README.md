@@ -1,8 +1,14 @@
 # Universal AI Skills Library
 
-CLI-first skill routing for Codex, Claude Code, Cursor, Gemini, OpenCode, Manus compatibility workflows, and local desktop AI setups.
+CLI-first skill routing for Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini CLI, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, and local desktop AI setups.
 
 The repository keeps a large skill corpus available without loading it all into every agent context. The source of truth is `skills/`; the router is `skill-router-cli/`; plugin metadata lives in `plugin/`.
+
+Compatibility is adapter-based:
+
+- `skill-root`: clients that can discover `SKILL.md` packages get a tiny wrapper skill and on-demand CLI loading.
+- `repo-instruction`: clients that read `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md` get compact router pointers.
+- `hosted`: ChatGPT, Claude Cowork, Devin, Amazon Q Developer, and similar hosted tools use Actions, Apps SDK, MCP, API, or uploaded instructions instead of local full-copy sync.
 
 ## Layout
 

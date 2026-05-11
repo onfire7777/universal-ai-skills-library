@@ -22,6 +22,11 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Local Claude, Codex, Manus-compatible, and other AI skill roots are searched read-only by the router; promote external skills into `skills/` only after audit and dedupe.
 - Prefer CLI calls for skill access and deterministic local workflows.
 - Run MCP bridges only for persistent endpoint services that cannot be replaced by direct CLI calls.
+- Treat AI platform compatibility as adapter-based:
+  - `skill-root` for clients that discover `SKILL.md` packages, such as OpenSkills, Claude Code, Codex, OpenCode, Cline, OpenHands, Hermes Agent, and OpenClaw.
+  - `repo-instruction` for clients that read files such as `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md`.
+  - `hosted` for ChatGPT, Claude Cowork, Devin, Amazon Q Developer, Sourcegraph Cody, Augment, and similar tools that need Actions, Apps SDK, MCP, API, or uploaded-instruction adapters rather than local skill-root sync.
+- Use `skill-router sync matrix` before changing any agent root or compatibility adapter.
 
 Optional local MCP endpoints:
 
