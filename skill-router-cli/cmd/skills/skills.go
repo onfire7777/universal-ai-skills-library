@@ -23,6 +23,8 @@ type manifestSkill struct {
 	Directory   string   `json:"directory"`
 	Description string   `json:"description"`
 	Aliases     []string `json:"aliases,omitempty"`
+	HasScripts  bool     `json:"has_scripts,omitempty"`
+	Scripts     []string `json:"scripts,omitempty"`
 }
 
 type skillManifest struct {
@@ -184,18 +186,22 @@ var searchCmd = &cobra.Command{
 		}
 
 		bold := color.New(color.Bold)
-		var matches int
+		type searchMatch struct {
+			kind        string
+			name        string
+			description string
+			score       int
+		}
+		results := []searchMatch{}
 		bold.Println("Search results:")
 		for _, s := range manifest.CoreSkills {
-			if matchesSkill(s, query) {
-				fmt.Printf("  [CORE] %-30s %s\n", s.Name, truncate(s.Description, 50))
-				matches++
+			if score := scoreManifestSkill(query, s); score > 0 || matchesSkill(s, query) {
+				results = append(results, searchMatch{kind: "CORE", name: s.Name, description: s.Description, score: score})
 			}
 		}
 		for _, s := range manifest.LibrarySkills {
-			if matchesSkill(s, query) {
-				fmt.Printf("  [LIB]  %-30s %s\n", s.Name, truncate(s.Description, 50))
-				matches++
+			if score := scoreManifestSkill(query, s); score > 0 || matchesSkill(s, query) {
+				results = append(results, searchMatch{kind: "LIB", name: s.Name, description: s.Description, score: score})
 			}
 		}
 		external, err := findExternalSkills(canonicalSkillKeys(manifest), refreshExternal)
@@ -203,12 +209,20 @@ var searchCmd = &cobra.Command{
 			return err
 		}
 		for _, s := range external {
-			if matchesExternalSkill(s, query) {
-				fmt.Printf("  [EXT:%-16s] %-30s %s\n", s.SourceID, s.Name, truncate(s.Description, 50))
-				matches++
+			if score := scoreExternalSkill(query, s); score > 0 || matchesExternalSkill(s, query) {
+				results = append(results, searchMatch{kind: "EXT:" + s.SourceID, name: s.Name, description: s.Description, score: score})
 			}
 		}
-		fmt.Printf("\n%d matches found.\n", matches)
+		sort.SliceStable(results, func(i, j int) bool {
+			if results[i].score == results[j].score {
+				return strings.ToLower(results[i].name) < strings.ToLower(results[j].name)
+			}
+			return results[i].score > results[j].score
+		})
+		for _, result := range results {
+			fmt.Printf("  [%-18s] %-30s %s\n", result.kind, result.name, truncate(result.description, 50))
+		}
+		fmt.Printf("\n%d matches found.\n", len(results))
 		return nil
 	},
 }

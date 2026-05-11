@@ -101,6 +101,34 @@ func TestValidateManifestDetectsDuplicateContent(t *testing.T) {
 	}
 }
 
+func TestValidateManifestDetectsScriptMetadataDrift(t *testing.T) {
+	repo := t.TempDir()
+	t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
+	writeSkill(t, repo, "alpha")
+	scriptDir := filepath.Join(repo, "skills", "alpha", "scripts")
+	if err := os.MkdirAll(scriptDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(scriptDir, "run.py"), []byte("print('ok')\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	writeManifest(t, repo, `{
+		"core_skills": [{"name":"alpha","directory":"skills/alpha","description":"Alpha","has_scripts":true,"scripts":["run.py"]}],
+		"library_skills": []
+	}`)
+
+	result, err := validateManifest()
+	if err == nil {
+		t.Fatalf("expected script metadata validation error, got nil: %#v", result)
+	}
+	if len(result.MissingScriptFiles) == 0 {
+		t.Fatalf("expected missing script file finding: %#v", result)
+	}
+	if len(result.ScriptMetadataMismatches) == 0 {
+		t.Fatalf("expected script metadata mismatch finding: %#v", result)
+	}
+}
+
 func TestIsUnsafeManifestDir(t *testing.T) {
 	unsafe := []string{"", "..", "../x", "..\\x"}
 	for _, dir := range unsafe {

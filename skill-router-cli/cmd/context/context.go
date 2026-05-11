@@ -108,7 +108,7 @@ var propagateCmd = &cobra.Command{
 			return fmt.Errorf("no AGENTS.md found in %s - create one first with 'skill-router context create agents'", dir)
 		}
 
-		platforms := []string{".claude", ".manus", ".codex", ".cursor", ".gemini", ".kiro", ".opencode", ".agent"}
+		platforms := []string{".claude", ".manus", ".codex", ".cursor", ".gemini", ".kiro", filepath.Join(".config", "opencode"), ".agent"}
 		for _, p := range platforms {
 			instrDir := filepath.Join(dir, p)
 			os.MkdirAll(instrDir, 0755)

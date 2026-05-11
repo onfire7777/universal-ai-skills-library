@@ -16,16 +16,18 @@ import (
 )
 
 type manifestValidation struct {
-	CoreSkills       int      `json:"coreSkills"`
-	LibrarySkills    int      `json:"librarySkills"`
-	TotalSkills      int      `json:"totalSkills"`
-	DuplicateNames   []string `json:"duplicateNames,omitempty"`
-	DuplicateDirs    []string `json:"duplicateDirs,omitempty"`
-	DuplicateContent []string `json:"duplicateContent,omitempty"`
-	UnsafeDirs       []string `json:"unsafeDirs,omitempty"`
-	MissingSkillMD   []string `json:"missingSkillMd,omitempty"`
-	UnindexedTopDirs []string `json:"unindexedTopDirs,omitempty"`
-	OK               bool     `json:"ok"`
+	CoreSkills               int      `json:"coreSkills"`
+	LibrarySkills            int      `json:"librarySkills"`
+	TotalSkills              int      `json:"totalSkills"`
+	DuplicateNames           []string `json:"duplicateNames,omitempty"`
+	DuplicateDirs            []string `json:"duplicateDirs,omitempty"`
+	DuplicateContent         []string `json:"duplicateContent,omitempty"`
+	UnsafeDirs               []string `json:"unsafeDirs,omitempty"`
+	MissingSkillMD           []string `json:"missingSkillMd,omitempty"`
+	MissingScriptFiles       []string `json:"missingScriptFiles,omitempty"`
+	ScriptMetadataMismatches []string `json:"scriptMetadataMismatches,omitempty"`
+	UnindexedTopDirs         []string `json:"unindexedTopDirs,omitempty"`
+	OK                       bool     `json:"ok"`
 }
 
 var validateManifestCmd = &cobra.Command{
@@ -48,9 +50,11 @@ var validateManifestCmd = &cobra.Command{
 		printValidationList("Duplicate SKILL.md content", result.DuplicateContent)
 		printValidationList("Unsafe directories", result.UnsafeDirs)
 		printValidationList("Missing SKILL.md", result.MissingSkillMD)
+		printValidationList("Missing script files", result.MissingScriptFiles)
+		printValidationList("Script metadata mismatches", result.ScriptMetadataMismatches)
 		printValidationList("Unindexed top-level skills", result.UnindexedTopDirs)
 		if result.OK {
-			fmt.Println("OK: manifest matches canonical top-level skills.")
+			fmt.Println("OK: manifest matches canonical top-level skills and script metadata.")
 		}
 		return err
 	},
@@ -104,6 +108,21 @@ func validateManifest() (manifestValidation, error) {
 			sum := sha256.Sum256(data)
 			contentHashes[hex.EncodeToString(sum[:])] = append(contentHashes[hex.EncodeToString(sum[:])], skill.Name)
 		}
+		skillDir := filepath.Dir(skillPath)
+		actualScripts, err := listSkillScripts(skillDir)
+		if err != nil {
+			result.ScriptMetadataMismatches = append(result.ScriptMetadataMismatches, fmt.Sprintf("%s: cannot scan scripts: %v", skill.Name, err))
+			continue
+		}
+		listedScripts := normalizeScriptList(skill.Scripts)
+		if skill.HasScripts != (len(actualScripts) > 0) || !equalStringSlices(listedScripts, actualScripts) {
+			result.ScriptMetadataMismatches = append(result.ScriptMetadataMismatches, fmt.Sprintf("%s: manifest=%v actual=%v", skill.Name, listedScripts, actualScripts))
+		}
+		for _, script := range listedScripts {
+			if _, err := os.Stat(filepath.Join(skillDir, filepath.FromSlash(script))); err != nil {
+				result.MissingScriptFiles = append(result.MissingScriptFiles, fmt.Sprintf("%s:%s", skill.Name, script))
+			}
+		}
 	}
 
 	for _, names := range contentHashes {
@@ -132,8 +151,10 @@ func validateManifest() (manifestValidation, error) {
 	sort.Strings(result.DuplicateContent)
 	sort.Strings(result.UnsafeDirs)
 	sort.Strings(result.MissingSkillMD)
+	sort.Strings(result.MissingScriptFiles)
+	sort.Strings(result.ScriptMetadataMismatches)
 	sort.Strings(result.UnindexedTopDirs)
-	result.OK = len(result.DuplicateNames) == 0 && len(result.DuplicateDirs) == 0 && len(result.DuplicateContent) == 0 && len(result.UnsafeDirs) == 0 && len(result.MissingSkillMD) == 0 && len(result.UnindexedTopDirs) == 0
+	result.OK = len(result.DuplicateNames) == 0 && len(result.DuplicateDirs) == 0 && len(result.DuplicateContent) == 0 && len(result.UnsafeDirs) == 0 && len(result.MissingSkillMD) == 0 && len(result.MissingScriptFiles) == 0 && len(result.ScriptMetadataMismatches) == 0 && len(result.UnindexedTopDirs) == 0
 	if !result.OK {
 		return result, fmt.Errorf("manifest validation failed")
 	}
@@ -161,4 +182,59 @@ func printValidationList(label string, items []string) {
 	for _, item := range items {
 		fmt.Printf("  - %s\n", item)
 	}
+}
+
+func listSkillScripts(skillDir string) ([]string, error) {
+	scriptsDir := filepath.Join(skillDir, "scripts")
+	if _, err := os.Stat(scriptsDir); err != nil {
+		if os.IsNotExist(err) {
+			return []string{}, nil
+		}
+		return nil, err
+	}
+	scripts := []string{}
+	err := filepath.WalkDir(scriptsDir, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(skillDir, path)
+		if err != nil {
+			return err
+		}
+		scripts = append(scripts, filepath.ToSlash(rel))
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(scripts)
+	return scripts, nil
+}
+
+func normalizeScriptList(scripts []string) []string {
+	normalized := []string{}
+	for _, script := range scripts {
+		script = strings.TrimSpace(filepath.ToSlash(script))
+		if script == "" {
+			continue
+		}
+		normalized = append(normalized, script)
+	}
+	sort.Strings(normalized)
+	return normalized
+}
+
+func equalStringSlices(left, right []string) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for i := range left {
+		if left[i] != right[i] {
+			return false
+		}
+	}
+	return true
 }

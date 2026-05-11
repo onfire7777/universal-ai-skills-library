@@ -21,6 +21,22 @@ func TestRouteScoringPrefersPrintableCardsForCardCreatorPrompt(t *testing.T) {
 	}
 }
 
+func TestSearchScoringFindsPrintableCardsForMothersDayPrompt(t *testing.T) {
+	query := "mother card creator"
+	printable := manifestSkill{
+		Name:        "printable-cards",
+		Description: "Create beautiful printable foldable greeting cards as PDFs.",
+		Aliases:     []string{"card-creator", "card creator", "greeting-card-creator", "mothers day card"},
+	}
+	wrapper := manifestSkill{
+		Name:        "universal-ai-skills",
+		Description: "Use this whenever the user mentions Universal AI Skills, skill-router, router, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically.",
+	}
+	if scoreManifestSkill(query, printable) <= scoreManifestSkill(query, wrapper) {
+		t.Fatalf("expected printable-cards to outrank wrapper for %q", query)
+	}
+}
+
 func TestRouterMaintenancePromptAllowsMetaSkill(t *testing.T) {
 	if !isRouterMaintenancePrompt("fix the universal ai skills router setup") {
 		t.Fatal("expected router maintenance prompt to be detected")
