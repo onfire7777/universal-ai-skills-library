@@ -27,6 +27,15 @@ func TestBuildMatrixIncludesReportOnlyRoots(t *testing.T) {
 	if byID["kimi-openclaw"].DefaultSync {
 		t.Fatalf("expected Kimi/OpenClaw to be report-only")
 	}
+	if byID["chatgpt"].Adapter != "hosted" {
+		t.Fatalf("expected ChatGPT to be modeled as a hosted adapter")
+	}
+	if byID["github-copilot"].LikelyMode != "repo-instruction" {
+		t.Fatalf("expected GitHub Copilot to use repo-instruction mode")
+	}
+	if byID["openclaw-global"].DefaultSync {
+		t.Fatalf("expected OpenClaw global skills to be report-only")
+	}
 }
 
 func TestClassifyMode(t *testing.T) {
@@ -35,7 +44,10 @@ func TestClassifyMode(t *testing.T) {
 		want string
 	}{
 		{matrixRow{Exists: false}, "missing"},
+		{matrixRow{Adapter: "hosted"}, "hosted"},
+		{matrixRow{Adapter: "repo-instruction"}, "repo-instruction"},
 		{matrixRow{Exists: true, ID: "kimi-openclaw"}, "special"},
+		{matrixRow{Exists: true, ID: "openclaw-workspace"}, "special"},
 		{matrixRow{Exists: true, SkillFiles: 200}, "full-copy"},
 		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 1}, "wrapper"},
 		{matrixRow{Exists: true, SkillFiles: 0}, "empty"},

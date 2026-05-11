@@ -9,6 +9,16 @@ skill-router skill <name>
 
 Agent roots should usually contain a small `universal-ai-skills` wrapper instead of a physical copy of all 1,805 canonical skills.
 
+## Compatibility layers
+
+Universal support is modeled in three layers:
+
+| Layer | Purpose | Examples | Router policy |
+|---|---|---|---|
+| `skill-root` | Native or compatible `SKILL.md` loading | OpenSkills, Claude Code, Codex, OpenCode, Cline, OpenHands, OpenClaw | Prefer a small wrapper skill; never full-copy by default. |
+| `repo-instruction` | Repository instruction files consumed by tools | `AGENTS.md`, `.github/copilot-instructions.md`, `.cursor/rules`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, `CONVENTIONS.md` | Write compact router pointers and project rules only. |
+| `hosted` | Hosted apps, APIs, connectors, MCP clients, or IDE agents without a stable local skill root | ChatGPT, Claude Cowork, Amazon Q Developer, Devin, hosted OpenHands, Sourcegraph Cody, Augment | Use MCP, Actions/Apps, API, or client-specific instructions; no root mutation. |
+
 ## Read-only matrix
 
 Use this before changing any agent root:
@@ -27,24 +37,57 @@ The matrix reports:
 
 ## Current support policy
 
-| Agent | Root | Sync policy | Notes |
-|---|---|---|---|
-| OpenSkills / `.agent` | `~/.agent/skills` | default | Standard wrapper root. |
-| Claude Code | `~/.claude/skills` | default | Wrapper root. |
-| OpenAI Codex | `~/.codex/skills` | default | Wrapper root plus Codex-specific `.system` content may exist. |
-| Manus-compatible | `~/.manus/skills` | default | Legacy compatibility root. |
-| Gemini CLI | `~/.gemini/skills` | default | Wrapper root. |
-| Cursor | `~/.cursor/skills` | default | Wrapper root. |
-| OpenCode | `~/.config/opencode/skills` | default | Wrapper root. |
-| OpenCode legacy | `~/.opencode/skills` | report-only | Compatibility root; do not use as the canonical install target. |
-| Kiro | `~/.kiro/skills` | default | Wrapper root. |
-| Hermes Agent/Desktop | `~/.hermes/skills` | report-only | Hermes local profile root. Install only the wrapper skill and use `skill-router auto`; do not full-copy the corpus. |
-| Hermes Agent source | `~/.hermes/hermes-agent/skills` | report-only special | Source/bundled skill tree for Hermes Agent. Adapter-specific wrapper updates only. |
-| Windsurf | `~/.windsurf/skills` | report-only | Detected locally; do not mutate until adapter semantics are confirmed. |
-| Roo | `~/.roo/skills` | report-only | Detected locally; wrapper observed. |
-| Continue | `~/.continue/skills` | report-only | Detected locally; wrapper observed. |
-| Qwen | `~/.qwen/skills` | report-only | Detected locally; custom/caveman skills observed. |
-| Kimi / OpenClaw | `~/.kimi_openclaw/workspace/skills` | report-only special | Do not mutate with generic full-copy sync. |
+| Agent/tool | Adapter | Root or instruction surface | Sync policy | Notes |
+|---|---|---|---|---|
+| OpenSkills / `.agent` | `skill-root` | `~/.agent/skills` | default | Standard wrapper root. |
+| Agent Skills open-standard root | `skill-root` | `~/.agents/skills` | report-only | Shared location used by OpenCode and OpenHands-style clients when configured. |
+| Claude Code / Claude Skills | `skill-root` | `~/.claude/skills` | default | Wrapper root plus Claude plugin support. |
+| OpenAI Codex | `skill-root` | `~/.codex/skills` and `AGENTS.md` | default | Local wrapper root plus project instructions. |
+| Manus-compatible | `skill-root` | `~/.manus/skills` | default | Legacy compatibility root. |
+| Gemini CLI | `skill-root` / `repo-instruction` | `~/.gemini/skills`, `GEMINI.md`, `AGENTS.md` | default | Wrapper root and context-file compatibility. |
+| Cursor | `skill-root` / `repo-instruction` | `~/.cursor/skills`, `.cursor/rules`, `AGENTS.md` | default | Project rules remain the preferred Cursor-native surface. |
+| OpenCode | `skill-root` | `~/.config/opencode/skills` | default | Canonical OpenCode skill root. |
+| OpenCode legacy | `skill-root` | `~/.opencode/skills` | report-only | Compatibility root; do not use as canonical install target. |
+| Kiro | `skill-root` / `repo-instruction` | `~/.kiro/skills`, `~/.kiro/steering`, `.kiro/steering`, `AGENTS.md` | default | Steering files are separate from skill-root sync. |
+| Hermes Agent/Desktop | `skill-root` | `~/.hermes/skills` | report-only | Install only the wrapper skill and use `skill-router auto`; do not full-copy the corpus. |
+| Hermes Agent source | `skill-root` | `~/.hermes/hermes-agent/skills` | report-only special | Source/bundled skill tree; adapter-specific wrapper updates only. |
+| OpenClaw global | `skill-root` | `~/.openclaw/skills` | report-only | AgentSkills-compatible root observed locally; wrapper-only until semantics are confirmed. |
+| OpenClaw workspace | `skill-root` | `~/.openclaw/workspace/skills` | report-only special | Workspace-scoped root; do not mutate with generic full-copy sync. |
+| Kimi / OpenClaw | `skill-root` | `~/.kimi_openclaw/workspace/skills` | report-only special | Do not mutate with generic full-copy sync. |
+| Cline | `skill-root` / `repo-instruction` | `~/.cline/skills`, `.cline/skills`, `.clinerules` | report-only | Cline supports on-demand skills; report-only until local install semantics are confirmed. |
+| Continue | `repo-instruction` | `.continue/rules` and hub rules | report-only | Rules are the primary compatibility surface. |
+| Windsurf | `repo-instruction` | `.windsurf/rules` and memories | report-only | Use compact rules or MCP; no generic skill-copy target yet. |
+| Roo Code | `repo-instruction` | `.roo` rules and related config | report-only | Keep report-only until current project-rule and skill semantics are confirmed. |
+| Qwen Code | `repo-instruction` | `QWEN.md` / AGENTS-style project guidance | report-only | Open-source terminal agent; adapter semantics remain report-only. |
+| GitHub Copilot | `repo-instruction` | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Compact repository instructions and path-scoped instructions only. |
+| VS Code Copilot | `repo-instruction` | `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Same repo instruction model, IDE-scoped behavior. |
+| Aider | `repo-instruction` | `CONVENTIONS.md` | report-only | Add router pointer only when intentionally included in chat. |
+| JetBrains Junie | `repo-instruction` | `.junie/guidelines.md`, `AGENTS.md` | report-only | IDE guidelines, not a skill-copy root. |
+| ChatGPT / Custom GPTs | `hosted` | Custom GPT instructions, Actions, Apps SDK, MCP connectors | report-only | Hosted adapter; expose CLI through an API/MCP/action, not filesystem sync. |
+| Claude Cowork | `hosted` | Claude-hosted instructions, Skills/API/MCP where available | report-only | Hosted/desktop adapter; avoid assuming a local root. |
+| OpenHands | `skill-root` / `hosted` | `~/.agents/skills`, `.agents/skills`, SDK skills, cloud skills | report-only | Supports AgentSkills-style loading; explicit adapter only. |
+| Amazon Q Developer | `hosted` | MCP config under `~/.aws/amazonq/*` | report-only | Use MCP integration, not skill-copy sync. |
+| Devin | `hosted` | Hosted agent instructions/API surfaces | report-only | No stable local skill root modeled. |
+| Sourcegraph Cody | `hosted` | Organization/repository instruction surfaces | report-only | Prefer repo guidance and MCP/API integrations. |
+| Augment | `hosted` | IDE instruction surfaces | report-only | Prefer compact repo guidance only. |
+
+## Research basis
+
+Primary compatibility sources checked in May 2026:
+
+- Anthropic Agent Skills / Claude Code: <https://docs.claude.com/en/docs/claude-code/skills>
+- OpenCode Agent Skills: <https://opencode.ai/docs/skills>
+- Cline Skills and customization: <https://docs.cline.bot/customization/skills>
+- OpenHands skills: <https://docs.openhands.dev/overview/skills>
+- GitHub Copilot custom instructions: <https://docs.github.com/en/copilot/concepts/prompting/response-customization>
+- Cursor rules: <https://docs.cursor.com/en/context>
+- Continue rules: <https://docs.continue.dev/customize/rules>
+- Gemini CLI context files: <https://google-gemini.github.io/gemini-cli/docs/cli/gemini-md.html>
+- Qwen Code MCP/features: <https://qwenlm.github.io/qwen-code-docs/en/users/features/mcp/>
+- ChatGPT Apps SDK and GPT Actions: <https://help.openai.com/en/articles/12515353-build-with-the-apps-sdk> and <https://help.openai.com/en/articles/9442513-configuring-actions-in-gpts>
+- Amazon Q Developer MCP: <https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-mcp.html>
+- JetBrains Junie guidelines: <https://www.jetbrains.com/help/junie/customize-guidelines.html>
+- Aider conventions: <https://aider.chat/docs/usage/conventions.html>
 
 ## Safety rule
 

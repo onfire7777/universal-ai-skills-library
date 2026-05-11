@@ -783,6 +783,7 @@ func externalSkillRoots() []externalSkillRoot {
 	home := platform.HomeDir()
 	roots := []externalSkillRoot{
 		{ID: "agent", Path: filepath.Join(home, ".agent", "skills")},
+		{ID: "agent-skills-standard", Path: filepath.Join(home, ".agents", "skills")},
 		{ID: "claude-skills", Path: filepath.Join(home, ".claude", "skills")},
 		{ID: "claude-market", Path: filepath.Join(home, ".claude", "plugins", "marketplaces")},
 		{ID: "claude-cache", Path: filepath.Join(home, ".claude", "plugins", "cache")},
@@ -796,6 +797,9 @@ func externalSkillRoots() []externalSkillRoot {
 		{ID: "kiro", Path: filepath.Join(home, ".kiro", "skills")},
 		{ID: "hermes", Path: filepath.Join(home, ".hermes", "skills")},
 		{ID: "hermes-agent-source", Path: filepath.Join(home, ".hermes", "hermes-agent", "skills")},
+		{ID: "openclaw-global", Path: filepath.Join(home, ".openclaw", "skills")},
+		{ID: "openclaw-workspace", Path: filepath.Join(home, ".openclaw", "workspace", "skills")},
+		{ID: "cline", Path: filepath.Join(home, ".cline", "skills")},
 	}
 	if extra := os.Getenv("SKILL_ROUTER_EXTERNAL_SKILL_ROOTS"); extra != "" {
 		for i, path := range filepath.SplitList(extra) {

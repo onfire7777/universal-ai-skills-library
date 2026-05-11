@@ -108,6 +108,7 @@ type AgentRootSpec struct {
 	ID          string
 	Name        string
 	Path        string
+	Adapter     string
 	DefaultSync bool
 	Notes       string
 }
@@ -116,22 +117,37 @@ type AgentRootSpec struct {
 func AgentRootSpecs() []AgentRootSpec {
 	home := HomeDir()
 	return []AgentRootSpec{
-		{ID: "agent", Name: "OpenSkills / .agent", Path: filepath.Join(home, ".agent", "skills"), DefaultSync: true, Notes: "OpenSkills standard root"},
-		{ID: "claude", Name: "Claude Code", Path: filepath.Join(home, ".claude", "skills"), DefaultSync: true, Notes: "Claude Code skill root"},
-		{ID: "codex", Name: "OpenAI Codex", Path: filepath.Join(home, ".codex", "skills"), DefaultSync: true, Notes: "Codex skill root"},
-		{ID: "manus", Name: "Manus-compatible", Path: filepath.Join(home, ".manus", "skills"), DefaultSync: true, Notes: "Legacy Manus compatibility root"},
-		{ID: "gemini", Name: "Gemini CLI", Path: filepath.Join(home, ".gemini", "skills"), DefaultSync: true, Notes: "Gemini CLI skill root"},
-		{ID: "cursor", Name: "Cursor", Path: filepath.Join(home, ".cursor", "skills"), DefaultSync: true, Notes: "Cursor skill root"},
-		{ID: "opencode", Name: "OpenCode", Path: filepath.Join(home, ".config", "opencode", "skills"), DefaultSync: true, Notes: "OpenCode canonical skill root"},
-		{ID: "kiro", Name: "Kiro", Path: filepath.Join(home, ".kiro", "skills"), DefaultSync: true, Notes: "Kiro skill root"},
-		{ID: "opencode-legacy", Name: "OpenCode legacy", Path: filepath.Join(home, ".opencode", "skills"), DefaultSync: false, Notes: "Legacy/report-only OpenCode skill root"},
-		{ID: "hermes", Name: "Hermes Agent/Desktop local profile", Path: filepath.Join(home, ".hermes", "skills"), DefaultSync: false, Notes: "CLI-first wrapper root; do not full-copy the corpus into Hermes"},
-		{ID: "hermes-agent-source", Name: "Hermes Agent source checkout", Path: filepath.Join(home, ".hermes", "hermes-agent", "skills"), DefaultSync: false, Notes: "Bundled/source skill tree; adapter-specific updates only"},
-		{ID: "windsurf", Name: "Windsurf", Path: filepath.Join(home, ".windsurf", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
-		{ID: "roo", Name: "Roo", Path: filepath.Join(home, ".roo", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
-		{ID: "continue", Name: "Continue", Path: filepath.Join(home, ".continue", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
-		{ID: "qwen", Name: "Qwen", Path: filepath.Join(home, ".qwen", "skills"), DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed"},
-		{ID: "kimi-openclaw", Name: "Kimi / OpenClaw workspace", Path: filepath.Join(home, ".kimi_openclaw", "workspace", "skills"), DefaultSync: false, Notes: "Special adapter; never mutate with generic full-copy sync"},
+		{ID: "agent", Name: "OpenSkills / .agent", Path: filepath.Join(home, ".agent", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "OpenSkills standard root"},
+		{ID: "agent-skills-standard", Name: "Agent Skills open-standard root", Path: filepath.Join(home, ".agents", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Shared AgentSkills-compatible root used by clients such as OpenCode/OpenClaw when configured"},
+		{ID: "claude", Name: "Claude Code / Claude Skills", Path: filepath.Join(home, ".claude", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Claude Code filesystem skill root"},
+		{ID: "codex", Name: "OpenAI Codex", Path: filepath.Join(home, ".codex", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Codex local skill root plus AGENTS.md project instructions"},
+		{ID: "manus", Name: "Manus-compatible", Path: filepath.Join(home, ".manus", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Legacy Manus compatibility root"},
+		{ID: "gemini", Name: "Gemini CLI", Path: filepath.Join(home, ".gemini", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Gemini CLI skill root plus AGENTS.md project instructions"},
+		{ID: "cursor", Name: "Cursor", Path: filepath.Join(home, ".cursor", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Cursor skill root plus .cursor/rules project rules"},
+		{ID: "opencode", Name: "OpenCode", Path: filepath.Join(home, ".config", "opencode", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "OpenCode canonical skill root"},
+		{ID: "kiro", Name: "Kiro", Path: filepath.Join(home, ".kiro", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Kiro skill root; steering files remain a separate repo instruction surface"},
+		{ID: "opencode-legacy", Name: "OpenCode legacy", Path: filepath.Join(home, ".opencode", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Legacy/report-only OpenCode skill root"},
+		{ID: "hermes", Name: "Hermes Agent/Desktop local profile", Path: filepath.Join(home, ".hermes", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "CLI-first wrapper root; do not full-copy the corpus into Hermes"},
+		{ID: "hermes-agent-source", Name: "Hermes Agent source checkout", Path: filepath.Join(home, ".hermes", "hermes-agent", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Bundled/source skill tree; adapter-specific updates only"},
+		{ID: "openclaw-global", Name: "OpenClaw global skills", Path: filepath.Join(home, ".openclaw", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "OpenClaw global AgentSkills-compatible root; report-only until wrapper install semantics are confirmed"},
+		{ID: "openclaw-workspace", Name: "OpenClaw workspace skills", Path: filepath.Join(home, ".openclaw", "workspace", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "OpenClaw workspace-scoped skills; never mutate with generic full-copy sync"},
+		{ID: "windsurf", Name: "Windsurf", Path: filepath.Join(home, ".windsurf", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed; project rules live in .windsurf/rules"},
+		{ID: "roo", Name: "Roo Code", Path: filepath.Join(home, ".roo", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Detected/report-only until adapter semantics are confirmed; project rules live under .roo"},
+		{ID: "cline", Name: "Cline", Path: filepath.Join(home, ".cline", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Cline supports skills/rules/workflows; report-only until local adapter semantics are confirmed"},
+		{ID: "continue", Name: "Continue", Path: filepath.Join(home, ".continue", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Detected/report-only until adapter semantics are confirmed; local rules live under .continue/rules"},
+		{ID: "qwen", Name: "Qwen Code", Path: filepath.Join(home, ".qwen", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Detected/report-only until adapter semantics are confirmed"},
+		{ID: "kimi-openclaw", Name: "Kimi / OpenClaw workspace", Path: filepath.Join(home, ".kimi_openclaw", "workspace", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Special adapter; never mutate with generic full-copy sync"},
+		{ID: "chatgpt", Name: "ChatGPT / Custom GPTs", Adapter: "hosted", DefaultSync: false, Notes: "Hosted adapter: use custom GPT instructions, Actions, Apps SDK, or MCP connector; no local skill root to mutate"},
+		{ID: "claude-cowork", Name: "Claude Cowork", Adapter: "hosted", DefaultSync: false, Notes: "Hosted/desktop agent adapter: route through compact instructions, MCP/connectors, or Claude Skills where available"},
+		{ID: "github-copilot", Name: "GitHub Copilot", Path: ".github/copilot-instructions.md", Adapter: "repo-instruction", DefaultSync: false, Notes: "Repository custom instructions plus Copilot agent skills; write compact router pointer only"},
+		{ID: "vscode-copilot", Name: "VS Code Copilot", Path: ".github/instructions/*.instructions.md", Adapter: "repo-instruction", DefaultSync: false, Notes: "Path-scoped instruction files and custom agents; not a global skill-copy target"},
+		{ID: "aider", Name: "Aider", Path: "CONVENTIONS.md", Adapter: "repo-instruction", DefaultSync: false, Notes: "Aider convention files are task/repo context; use a compact pointer to skill-router when needed"},
+		{ID: "openhands", Name: "OpenHands", Adapter: "hosted", DefaultSync: false, Notes: "SDK/cloud skill adapter supports AgentSkills-style SKILL.md; use explicit integration, not generic sync"},
+		{ID: "devin", Name: "Devin", Adapter: "hosted", DefaultSync: false, Notes: "Hosted/terminal agent; use repo instructions and MCP/API integration surfaces when available"},
+		{ID: "jetbrains-junie", Name: "JetBrains Junie", Adapter: "hosted", DefaultSync: false, Notes: "IDE/CLI agent with custom guidelines; use compact repo guidance, not skill-root sync"},
+		{ID: "amazon-q", Name: "Amazon Q Developer", Adapter: "hosted", DefaultSync: false, Notes: "IDE/CLI agent with MCP support; use explicit MCP or repo guidance adapters"},
+		{ID: "sourcegraph-cody", Name: "Sourcegraph Cody", Adapter: "hosted", DefaultSync: false, Notes: "IDE/web/CLI coding assistant; use organization or repo instructions where supported"},
+		{ID: "augment", Name: "Augment", Adapter: "hosted", DefaultSync: false, Notes: "IDE coding assistant with instruction surfaces; use compact repo guidance only"},
 	}
 }
 

@@ -109,6 +109,7 @@ type matrixRow struct {
 	ID             string `json:"id"`
 	Name           string `json:"name"`
 	Path           string `json:"path"`
+	Adapter        string `json:"adapter"`
 	Exists         bool   `json:"exists"`
 	DefaultSync    bool   `json:"defaultSync"`
 	TopLevelDirs   int    `json:"topLevelDirs"`
@@ -132,17 +133,19 @@ This command does not install, copy, link, delete, or modify any files.`,
 			enc.SetIndent("", "  ")
 			return enc.Encode(rows)
 		}
-		fmt.Printf("%-15s %-11s %-7s %-7s %-12s %s\n", "AGENT", "MODE", "ROOT", "SKILLS", "SYNC", "RECOMMENDATION")
+		fmt.Printf("%-22s %-16s %-15s %-7s %-7s %-12s %s\n", "AGENT", "ADAPTER", "MODE", "ROOT", "SKILLS", "SYNC", "RECOMMENDATION")
 		for _, row := range rows {
 			exists := "missing"
 			if row.Exists {
 				exists = "exists"
+			} else if row.Path == "" || row.Adapter == "hosted" || row.Adapter == "repo-instruction" {
+				exists = "n/a"
 			}
 			sync := "report-only"
 			if row.DefaultSync {
 				sync = "default"
 			}
-			fmt.Printf("%-15s %-11s %-7s %-7d %-12s %s\n", row.ID, row.LikelyMode, exists, row.SkillFiles, sync, row.Recommendation)
+			fmt.Printf("%-22s %-16s %-15s %-7s %-7d %-12s %s\n", row.ID, row.Adapter, row.LikelyMode, exists, row.SkillFiles, sync, row.Recommendation)
 		}
 		return nil
 	},
@@ -188,8 +191,15 @@ func buildMatrix() []matrixRow {
 			ID:          spec.ID,
 			Name:        spec.Name,
 			Path:        spec.Path,
+			Adapter:     spec.Adapter,
 			DefaultSync: spec.DefaultSync,
 			Notes:       spec.Notes,
+		}
+		if spec.Adapter == "hosted" || spec.Adapter == "repo-instruction" || spec.Path == "" {
+			row.LikelyMode = spec.Adapter
+			row.Recommendation = recommendation(row)
+			rows = append(rows, row)
+			continue
 		}
 		entries, err := os.ReadDir(spec.Path)
 		if err != nil {
@@ -216,9 +226,11 @@ func buildMatrix() []matrixRow {
 
 func classifyMode(row matrixRow) string {
 	switch {
+	case row.Adapter == "hosted" || row.Adapter == "repo-instruction":
+		return row.Adapter
 	case !row.Exists:
 		return "missing"
-	case row.ID == "kimi-openclaw":
+	case row.ID == "kimi-openclaw" || row.ID == "openclaw-workspace":
 		return "special"
 	case row.SkillFiles > 100:
 		return "full-copy"
@@ -232,10 +244,16 @@ func classifyMode(row matrixRow) string {
 }
 
 func recommendation(row matrixRow) string {
+	if row.Adapter == "hosted" {
+		return "adapter only; no local skill-root mutation"
+	}
+	if row.Adapter == "repo-instruction" {
+		return "write compact router pointer only"
+	}
 	if !row.Exists {
 		return "report only"
 	}
-	if row.ID == "kimi-openclaw" {
+	if row.ID == "kimi-openclaw" || row.ID == "openclaw-workspace" {
 		return "do not mutate with generic sync"
 	}
 	if !row.DefaultSync {

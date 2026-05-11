@@ -10,3 +10,7 @@
 - Treat `skills/` as source data and `skill-router-cli/` as the router source.
 - MCP bridges are optional adapters for persistent endpoint workflows only.
 - Legacy compatibility: `manus skill <name>` may be used only when a client has not moved to `skill-router` yet.
+- Universal compatibility is adapter-based:
+  - `skill-root` clients load `SKILL.md` wrappers and call the CLI on demand.
+  - `repo-instruction` clients get compact pointers in `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md`.
+  - `hosted` clients such as ChatGPT or Claude Cowork use Actions, Apps SDK, MCP, API, or uploaded instructions instead of local full-copy sync.
