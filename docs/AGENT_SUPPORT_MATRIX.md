@@ -38,6 +38,8 @@ The matrix reports:
 | OpenCode | `~/.config/opencode/skills` | default | Wrapper root. |
 | OpenCode legacy | `~/.opencode/skills` | report-only | Compatibility root; do not use as the canonical install target. |
 | Kiro | `~/.kiro/skills` | default | Wrapper root. |
+| Hermes Agent/Desktop | `~/.hermes/skills` | report-only | Hermes local profile root. Install only the wrapper skill and use `skill-router auto`; do not full-copy the corpus. |
+| Hermes Agent source | `~/.hermes/hermes-agent/skills` | report-only special | Source/bundled skill tree for Hermes Agent. Adapter-specific wrapper updates only. |
 | Windsurf | `~/.windsurf/skills` | report-only | Detected locally; do not mutate until adapter semantics are confirmed. |
 | Roo | `~/.roo/skills` | report-only | Detected locally; wrapper observed. |
 | Continue | `~/.continue/skills` | report-only | Detected locally; wrapper observed. |
