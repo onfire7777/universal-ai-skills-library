@@ -21,7 +21,7 @@ var Cmd = &cobra.Command{
 	Long: `Sync and install all skills from the GitHub skills repository into
 all agent platforms. Pulls latest from repo, runs install, and
 propagates to .agent, .claude, .codex, .manus, .gemini, .cursor,
-.opencode, and .kiro roots.
+.config/opencode, and .kiro roots.
 
 Use sync matrix for a read-only compatibility view before changing roots.`,
 }

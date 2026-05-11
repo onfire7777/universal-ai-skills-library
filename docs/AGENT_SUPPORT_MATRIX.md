@@ -35,7 +35,8 @@ The matrix reports:
 | Manus-compatible | `~/.manus/skills` | default | Legacy compatibility root. |
 | Gemini CLI | `~/.gemini/skills` | default | Wrapper root. |
 | Cursor | `~/.cursor/skills` | default | Wrapper root. |
-| OpenCode | `~/.opencode/skills` | default | Wrapper root. |
+| OpenCode | `~/.config/opencode/skills` | default | Wrapper root. |
+| OpenCode legacy | `~/.opencode/skills` | report-only | Compatibility root; do not use as the canonical install target. |
 | Kiro | `~/.kiro/skills` | default | Wrapper root. |
 | Windsurf | `~/.windsurf/skills` | report-only | Detected locally; do not mutate until adapter semantics are confirmed. |
 | Roo | `~/.roo/skills` | report-only | Detected locally; wrapper observed. |

@@ -1,14 +1,14 @@
 {
   "schema": "universal-ai-skills-build-manifest/v2",
-  "generated_at": "2026-05-10T01:06:18.690668+00:00",
+  "generated_at": "2026-05-11T16:34:24.486Z",
   "source_of_truth": "C:\\Users\\burni\\universal-ai-skills-library\\skills",
   "router_source": "C:\\Users\\burni\\universal-ai-skills-library\\skill-router-cli",
   "primary_binary": "skill-router",
   "legacy_binary_alias": "manus",
-  "skill_count": 1804,
-  "directories_total": 1804,
+  "skill_count": 1805,
+  "directories_total": 1805,
   "missing_skill_md": [],
-  "alias_count": 125,
+  "alias_count": 137,
   "merged_legacy_directories": [
     {
       "legacy_directory": "anthropic_administrator-automation",
@@ -337,7 +337,7 @@
       "description": "Guides assessment of third-country adequacy decisions under GDPR Article 45 for international data transfers. Covers the current EC adequacy decisions list, adequacy assessment criteria, partial adequacy handling, and monitoring of adequacy decision reviews. Keywords: adequacy decision, Article 45, third country, adequate protection, EC adequacy list.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -416,7 +416,7 @@
       "description": "Evaluates and implements age estimation and verification technologies for online services. Covers facial age estimation, digital ID verification, self-declaration with risk assessment, AI-based age estimation, and the accuracy versus privacy tradeoff. Includes ICO guidance and euCONSENT framework. Keywords: age verification, age estimation, facial analysis, digital ID, children, online safety.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -498,7 +498,7 @@
       "description": "Conducts Data Protection Impact Assessments for AI and ML systems per EDPB Guidelines 04/2025 on AI processing. Covers training data lawfulness evaluation, model risk assessment, automated decision triggers, and AI-specific DPIA methodology. Keywords: AI DPIA, machine learning impact assessment, EDPB AI guidelines, model risk, training data.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -514,7 +514,7 @@
       "description": "Implements federated learning architecture patterns for GDPR compliance. Covers secure aggregation protocols, differential privacy integration, communication protocols, and privacy-by-design distributed ML training. Keywords: federated learning, distributed training, secure aggregation, differential privacy, privacy-preserving ML.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -530,7 +530,7 @@
       "description": "Conducts privacy auditing of AI models including training data extraction testing, membership inference attacks, model inversion testing, and attribute inference assessment. Uses ML Privacy Meter and related tools to quantify privacy leakage. Keywords: model audit, membership inference, privacy meter, model inversion, training data extraction.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -539,7 +539,7 @@
       "description": "Guides the combined DPIA and AI Act conformity assessment for AI systems processing personal data. Covers EDPB-EDPS Joint Opinion 5/2021, training data lawfulness under Art. 6 and Art. 9, Art. 22 automated decision-making, algorithmic bias detection, and NIST AI RMF MAP function. Keywords: AI privacy, DPIA, AI Act, algorithmic bias, automated decision-making, Art. 22, training data, NIST AI RMF.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -555,7 +555,7 @@
       "description": "Classifies sensitive data in AI/ML training datasets including bias detection for Art. 9 categories, data card documentation, provenance tracking, and consent verification for model training. Keywords: AI training data, ML dataset, bias detection, data card, model training, Art 9, consent, GDPR AI.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -564,7 +564,7 @@
       "description": "Assesses lawful basis for AI training data processing per EDPB April 2025 report on LLMs and general-purpose AI. Covers legitimate interest balancing tests, consent challenges for ML training, public dataset assessment, and web scraping lawfulness. Keywords: AI training data, lawful basis, EDPB LLM, legitimate interest, consent, web scraping.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -573,7 +573,7 @@
       "description": "Implements AI transparency requirements under EU AI Act Arts. 13-14 and GDPR Arts. 13-14. Covers user notification of AI interaction, system capability disclosure, limitation documentation, and meaningful information about automated logic. Keywords: AI transparency, EU AI Act, GDPR notification, explainability, automated decision.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -582,7 +582,7 @@
       "description": "Determines controller-processor relationships for AI services and conducts privacy due diligence. Covers SaaS AI (processor), embedded AI (joint controller), API-based AI (assessment framework), and vendor risk assessment. Keywords: AI vendor, controller-processor, due diligence, SaaS AI, joint controller, Art. 28.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -710,7 +710,7 @@
       "description": "Analyzes intrusion activity against the Lockheed Martin Cyber Kill Chain framework to identify which phases an adversary has completed, where defenses succeeded or failed, and what controls would have interrupted the attack at earlier phases. Use when conducting post-incident analysis, building prevention-focused security controls, or mapping detection gaps to kill chain phases. Activates for requests involving kill chain analysis, intrusion kill chain, attack phase mapping, or Lockheed Martin kill chain framework.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -719,7 +719,7 @@
       "description": "Analyzes indicators of compromise (IOCs) including IP addresses, domains, file hashes, URLs, and email artifacts to determine maliciousness confidence, campaign attribution, and blocking priority. Use when triaging IOCs from phishing emails, security alerts, or external threat feeds; enriching raw IOCs with multi-source intelligence; or making block/monitor/whitelist decisions. Activates for requests involving VirusTotal, AbuseIPDB, MalwareBazaar, MISP, or IOC enrichment pipelines.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -728,7 +728,7 @@
       "description": "Craft, send, sniff, and dissect network packets using Scapy for protocol analysis, network reconnaissance, and traffic anomaly detection in authorized security testing",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -737,7 +737,7 @@
       "description": "Captures and analyzes network packet data using Wireshark and tshark to identify malicious traffic patterns, diagnose protocol issues, extract artifacts, and support incident response investigations on authorized network segments.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -746,7 +746,7 @@
       "description": "Analyzes encryption algorithms, key management, and file encryption routines used by ransomware families to assess decryption feasibility, identify implementation weaknesses, and support recovery efforts. Covers AES, RSA, ChaCha20, and hybrid encryption schemes. Activates for requests involving ransomware cryptanalysis, encryption analysis, key recovery assessment, or ransomware decryption feasibility.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -769,7 +769,7 @@
       "description": "Evaluates anonymization as a retention alternative under GDPR Recital 26, applying the WP29 Opinion 05/2014 techniques including randomization and generalization. Validates anonymization effectiveness using k-anonymity, l-diversity, and t-closeness metrics. Activate for anonymization, de-identification, k-anonymity, retention alternative queries.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -934,7 +934,7 @@
       "description": "Systematic application of the eight privacy design patterns per Hoepman: minimize, hide, separate, abstract, inform, control, enforce, and demonstrate. Covers pattern selection methodology per processing activity, mapping to GDPR principles, and practical implementation guidance for privacy-by-design system architecture.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1013,8 +1013,9 @@
       "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
       "has_scripts": true,
       "scripts": [
-        "bundle-artifact.sh",
-        "init-artifact.sh"
+        "scripts/bundle-artifact.sh",
+        "scripts/init-artifact.sh",
+        "scripts/shadcn-components.tar.gz"
       ]
     },
     {
@@ -1155,7 +1156,7 @@
       "description": "Implements automated data deletion workflows for GDPR Article 17 right to erasure and retention period expiry. Covers cascading deletion across dependent systems, dependency handling for referential integrity, confirmation logging, and audit trail generation. Activate for automated deletion, erasure automation, data purge, retention expiry queries.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1273,7 +1274,7 @@
       "description": "Guides development and approval of Binding Corporate Rules under GDPR Article 47 for intra-group international data transfers. Covers Art. 47(2)(a)-(n) content requirements, BCR approval process with lead supervisory authority, and WP256/WP257 referentials. Keywords: BCR, binding corporate rules, intra-group transfers, Art. 47.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1569,10 +1570,11 @@
       "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
       "has_scripts": true,
       "scripts": [
-        "helper.js",
-        "server.cjs",
-        "start-server.sh",
-        "stop-server.sh"
+        "scripts/frame-template.html",
+        "scripts/helper.js",
+        "scripts/server.cjs",
+        "scripts/start-server.sh",
+        "scripts/stop-server.sh"
       ]
     },
     {
@@ -1595,10 +1597,10 @@
       ],
       "has_scripts": true,
       "scripts": [
-        "extract-colors.cjs",
-        "inject-brand-context.cjs",
-        "sync-brand-to-tokens.cjs",
-        "validate-asset.cjs"
+        "scripts/extract-colors.cjs",
+        "scripts/inject-brand-context.cjs",
+        "scripts/sync-brand-to-tokens.cjs",
+        "scripts/validate-asset.cjs"
       ]
     },
     {
@@ -1649,7 +1651,7 @@
       "description": "Guides compliance with Brazil''s Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018). Covers the 10 lawful bases under Art. 7, DPO appointment, ANPD enforcement, data subject rights under Arts. 17-22, and international transfer mechanisms. Keywords: LGPD, Brazil data protection, ANPD, lawful bases, data subject rights, international transfers.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1665,7 +1667,7 @@
       "description": "Executes the GDPR Article 33 mandatory breach notification to the supervisory authority within 72 hours of becoming aware of a personal data breach. Covers required notification content, deadline calculation, risk assessment for notification threshold, and DPO involvement. Keywords: GDPR, Article 33, breach notification, 72 hours, supervisory authority, DPO, EDPB.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1674,7 +1676,7 @@
       "description": "Implements technical breach detection capabilities including SIEM integration, DLP alert configuration, anomaly detection rules, and insider threat monitoring. Provides a breach classification taxonomy across confidentiality, integrity, and availability dimensions. Covers detection tool selection, alert tuning, and integration with privacy incident response workflows. Keywords: breach detection, SIEM, DLP, anomaly detection, insider threat, classification.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1683,7 +1685,7 @@
       "description": "Conducts digital forensics investigations following a personal data breach, covering evidence preservation, chain of custody documentation, log analysis, scope determination, and root cause analysis. References industry-standard tools including Splunk, ELK Stack, and Wireshark. Provides forensic workflow from initial evidence collection through final investigation report. Keywords: digital forensics, breach investigation, evidence preservation, chain of custody, root cause analysis, Splunk, ELK, Wireshark.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1692,7 +1694,7 @@
       "description": "Builds a comprehensive breach response team playbook defining CSIRT and privacy team structure with named roles (incident commander, legal counsel, communications, IT forensics, DPO), escalation matrices, communication templates, pre-negotiated vendor contacts, and regulatory authority contacts organized by jurisdiction. Keywords: breach response playbook, CSIRT, incident response team, escalation matrix, communication templates, vendor contacts.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1701,7 +1703,7 @@
       "description": "Designs and executes tabletop breach simulation exercises for testing organizational breach response capabilities. Covers scenario creation with realistic inject timelines, participant role assignment, communication testing across internal and external channels, decision-point evaluation, and after-action report generation. Keywords: tabletop exercise, breach simulation, incident response testing, scenario design, after-action report.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -1867,7 +1869,7 @@
       "description": "This skill covers deploying Microsoft Sentinel as a cloud-native SIEM and SOAR platform for centralized security operations. It details configuring data connectors for multi-cloud log ingestion, writing KQL detection queries, building automated response playbooks with Logic Apps, and leveraging the Sentinel data lake for petabyte-scale threat hunting across AWS, Azure, and GCP security telemetry.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -1876,7 +1878,7 @@
       "description": "Designs and documents structured incident response playbooks that define step-by-step procedures for specific incident types aligned with NIST SP 800-61r3 and SANS PICERL frameworks. Covers playbook structure, decision trees, escalation criteria, RACI matrices, and integration with SOAR platforms. Activates for requests involving IR playbook creation, incident response procedure documentation, response runbook development, or SOAR playbook design.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -1885,7 +1887,7 @@
       "description": "Builds a structured ransomware incident response playbook aligned with the CISA StopRansomware Guide and NIST Cybersecurity Framework. Covers preparation, detection, containment, eradication, recovery, and post-incident phases with actionable checklists. Activates for requests involving ransomware response planning, CISA compliance, incident response playbook creation, or ransomware preparedness assessment.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -1922,7 +1924,7 @@
       "description": "Searches and explores Burp Suite project files (.burp) from the command line. Use when searching response headers or bodies with regex patterns, extracting security audit findings, dumping proxy history or site map data, or analyzing HTTP traffic captured in a Burp project.",
       "has_scripts": true,
       "scripts": [
-        "burp-search.sh"
+        "scripts/burp-search.sh"
       ]
     },
     {
@@ -2131,13 +2133,13 @@
       "description": "Compress natural language memory files (CLAUDE.md, todos, preferences) into caveman format to save input tokens. Preserves all technical substance, code, URLs, and structure. Compressed version overwrites the original file. Human-readable backup saved as FILE.original.md. Trigger: /caveman:compress FILEPATH or \"compress memory file\"",
       "has_scripts": true,
       "scripts": [
-        "__init__.py",
-        "__main__.py",
-        "benchmark.py",
-        "cli.py",
-        "compress.py",
-        "detect.py",
-        "validate.py"
+        "scripts/__init__.py",
+        "scripts/__main__.py",
+        "scripts/benchmark.py",
+        "scripts/cli.py",
+        "scripts/compress.py",
+        "scripts/detect.py",
+        "scripts/validate.py"
       ]
     },
     {
@@ -2167,7 +2169,7 @@
       "description": "Complete CCPA/CPRA compliance implementation covering California Civil Code §1798.100-199. Includes consumer rights framework, business obligations, service provider and contractor requirements, enforcement mechanisms, and CPPA rulemaking. Triggers on CCPA, CPRA, California privacy, consumer rights.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -2260,7 +2262,7 @@
       "description": "Generate a comprehensive, AI-optimized summary of the current AI session. Use when the user asks to summarize this chat, create a session summary, generate a handoff document, capture what was done, or save progress for continuation in a new chat or another AI client.",
       "has_scripts": true,
       "scripts": [
-        "format_summary.py"
+        "scripts/format_summary.py"
       ]
     },
     {
@@ -2290,7 +2292,7 @@
       "description": "Implements strict data minimization and retention limits for children''s personal data under GDPR Art. 5(1)(c), Recital 38, UK AADC Standard 8, and COPPA Section 312.7. Covers strict necessity testing, shorter retention periods, limited profiling, parental dashboard design, and automated deletion. Keywords: data minimization, children, retention, necessity test, parental dashboard.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -2299,7 +2301,7 @@
       "description": "Guides compliance with China''s Personal Information Protection Law (PIPL, effective 1 November 2021). Covers consent requirements, cross-border transfer mechanisms (CAC security assessment, standard contracts, certification), separate consent triggers, and critical information infrastructure obligations. Keywords: PIPL, China data protection, CAC security assessment, cross-border transfer, separate consent, CIIO.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -2329,16 +2331,25 @@
       "description": "Security leadership for growth-stage companies. Risk quantification in dollars, compliance roadmap (SOC 2/ISO 27001/HIPAA/GDPR), security architecture strategy, incident response leadership, and board-level security reporting. Use when building security programs, justifying security budget, selecting compliance frameworks, managing incidents, assessing vendor risk, or when user mentions CISO, security strategy, compliance roadmap, zero trust, or board security reporting.",
       "has_scripts": true,
       "scripts": [
-        "compliance_tracker.py",
-        "risk_quantifier.py"
+        "scripts/compliance_tracker.py",
+        "scripts/risk_quantifier.py"
       ]
     },
     {
       "name": "ckmdesign",
       "directory": "skills/ckmdesign",
       "description": "Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.",
-      "has_scripts": false,
-      "scripts": []
+      "has_scripts": true,
+      "scripts": [
+        "scripts/cip/core.py",
+        "scripts/cip/generate.py",
+        "scripts/cip/render-html.py",
+        "scripts/cip/search.py",
+        "scripts/icon/generate.py",
+        "scripts/logo/core.py",
+        "scripts/logo/generate.py",
+        "scripts/logo/search.py"
+      ]
     },
     {
       "name": "ckmdesign-system",
@@ -2346,15 +2357,15 @@
       "description": "Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.",
       "has_scripts": true,
       "scripts": [
-        "embed-tokens.cjs",
-        "fetch-background.py",
-        "generate-slide.py",
-        "generate-tokens.cjs",
-        "html-token-validator.py",
-        "search-slides.py",
-        "slide-token-validator.py",
-        "slide_search_core.py",
-        "validate-tokens.cjs"
+        "scripts/embed-tokens.cjs",
+        "scripts/fetch-background.py",
+        "scripts/generate-slide.py",
+        "scripts/generate-tokens.cjs",
+        "scripts/html-token-validator.py",
+        "scripts/search-slides.py",
+        "scripts/slide_search_core.py",
+        "scripts/slide-token-validator.py",
+        "scripts/validate-tokens.cjs"
       ]
     },
     {
@@ -2363,8 +2374,14 @@
       "description": "Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.",
       "has_scripts": true,
       "scripts": [
-        "shadcn_add.py",
-        "tailwind_config_gen.py"
+        "scripts/.coverage",
+        "scripts/requirements.txt",
+        "scripts/shadcn_add.py",
+        "scripts/tailwind_config_gen.py",
+        "scripts/tests/coverage-ui.json",
+        "scripts/tests/requirements.txt",
+        "scripts/tests/test_shadcn_add.py",
+        "scripts/tests/test_tailwind_config_gen.py"
       ]
     },
     {
@@ -2380,7 +2397,7 @@
       "description": "Develops data classification policies with tiered handling (public, internal, confidential, restricted), labeling requirements, enforcement mechanisms, and procedures per tier. Covers policy governance, exception handling, and compliance monitoring. Keywords: classification policy, data tiers, handling procedures, labeling, enforcement, data governance, information security.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -2438,9 +2455,65 @@
       "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
       "has_scripts": true,
       "scripts": [
-        "__init__.py",
-        "accept_changes.py",
-        "comment.py"
+        "scripts/__init__.py",
+        "scripts/accept_changes.py",
+        "scripts/comment.py",
+        "scripts/office/helpers/__init__.py",
+        "scripts/office/helpers/merge_runs.py",
+        "scripts/office/helpers/simplify_redlines.py",
+        "scripts/office/pack.py",
+        "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+        "scripts/office/schemas/mce/mc.xsd",
+        "scripts/office/schemas/microsoft/wml-2010.xsd",
+        "scripts/office/schemas/microsoft/wml-2012.xsd",
+        "scripts/office/schemas/microsoft/wml-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+        "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+        "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+        "scripts/office/soffice.py",
+        "scripts/office/unpack.py",
+        "scripts/office/validate.py",
+        "scripts/office/validators/__init__.py",
+        "scripts/office/validators/base.py",
+        "scripts/office/validators/docx.py",
+        "scripts/office/validators/pptx.py",
+        "scripts/office/validators/redlining.py",
+        "scripts/templates/comments.xml",
+        "scripts/templates/commentsExtended.xml",
+        "scripts/templates/commentsExtensible.xml",
+        "scripts/templates/commentsIds.xml",
+        "scripts/templates/people.xml"
       ]
     },
     {
@@ -2449,8 +2522,10 @@
       "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
       "has_scripts": true,
       "scripts": [
-        "connections.py",
-        "evaluation.py"
+        "scripts/connections.py",
+        "scripts/evaluation.py",
+        "scripts/example_evaluation.xml",
+        "scripts/requirements.txt"
       ]
     },
     {
@@ -2466,8 +2541,9 @@
       "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
       "has_scripts": true,
       "scripts": [
-        "bundle-artifact.sh",
-        "init-artifact.sh"
+        "scripts/bundle-artifact.sh",
+        "scripts/init-artifact.sh",
+        "scripts/shadcn-components.tar.gz"
       ]
     },
     {
@@ -2476,7 +2552,7 @@
       "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
       "has_scripts": true,
       "scripts": [
-        "with_server.py"
+        "scripts/with_server.py"
       ]
     },
     {
@@ -2485,7 +2561,58 @@
       "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \\\"the xlsx in my downloads\\\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
       "has_scripts": true,
       "scripts": [
-        "recalc.py"
+        "scripts/office/helpers/__init__.py",
+        "scripts/office/helpers/merge_runs.py",
+        "scripts/office/helpers/simplify_redlines.py",
+        "scripts/office/pack.py",
+        "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+        "scripts/office/schemas/mce/mc.xsd",
+        "scripts/office/schemas/microsoft/wml-2010.xsd",
+        "scripts/office/schemas/microsoft/wml-2012.xsd",
+        "scripts/office/schemas/microsoft/wml-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+        "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+        "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+        "scripts/office/soffice.py",
+        "scripts/office/unpack.py",
+        "scripts/office/validate.py",
+        "scripts/office/validators/__init__.py",
+        "scripts/office/validators/base.py",
+        "scripts/office/validators/docx.py",
+        "scripts/office/validators/pptx.py",
+        "scripts/office/validators/redlining.py",
+        "scripts/recalc.py"
       ]
     },
     {
@@ -2762,12 +2889,12 @@
       "description": "Generate color palettes and get color suggestions via the Colormind.io API (list models, generate palettes with optional locked colors).",
       "has_scripts": true,
       "scripts": [
-        "combine_results.py",
-        "generate_palette.mjs",
-        "get_base_rgb.py",
-        "image_to_palette.sh",
-        "list_models.mjs",
-        "parse_histogram.py"
+        "scripts/combine_results.py",
+        "scripts/generate_palette.mjs",
+        "scripts/get_base_rgb.py",
+        "scripts/image_to_palette.sh",
+        "scripts/list_models.mjs",
+        "scripts/parse_histogram.py"
       ]
     },
     {
@@ -2839,13 +2966,13 @@
       "description": "Compress natural language memory files (CLAUDE.md, todos, preferences) into caveman format to save input tokens. Preserves all technical substance, code, URLs, and structure. Compressed version overwrites the original file. Human-readable backup saved as FILE.original.md. Trigger: /caveman:compress FILEPATH or \"compress memory file\"",
       "has_scripts": true,
       "scripts": [
-        "__init__.py",
-        "__main__.py",
-        "benchmark.py",
-        "cli.py",
-        "compress.py",
-        "detect.py",
-        "validate.py"
+        "scripts/__init__.py",
+        "scripts/__main__.py",
+        "scripts/benchmark.py",
+        "scripts/cli.py",
+        "scripts/compress.py",
+        "scripts/detect.py",
+        "scripts/validate.py"
       ]
     },
     {
@@ -2857,7 +2984,8 @@
       ],
       "has_scripts": true,
       "scripts": [
-        "main.ts"
+        "scripts/main.ts",
+        "scripts/package.json"
       ]
     },
     {
@@ -2866,7 +2994,7 @@
       "description": "Conducts security testing of REST, GraphQL, and gRPC APIs to identify vulnerabilities in authentication, authorization, rate limiting, input validation, and business logic. The tester uses the OWASP API Security Top 10 as the testing framework, combining Burp Suite interception with Postman collections and custom scripts to test endpoint security at every privilege level. Activates for requests involving API security testing, REST API pentest, GraphQL security assessment, or API vulnerability testing.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2875,7 +3003,7 @@
       "description": "Responds to security incidents in cloud environments (AWS, Azure, GCP) by performing identity-based containment, cloud-native log analysis, resource isolation, and forensic evidence acquisition adapted for ephemeral cloud infrastructure. Activates for requests involving cloud incident response, AWS security incident, Azure compromise, GCP breach, cloud forensics, or cloud identity compromise.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2884,7 +3012,7 @@
       "description": "Guides the end-to-end GDPR Data Protection Impact Assessment process under Article 35, including mandatory trigger identification per Art. 35(3), DPIA content requirements per Art. 35(7), and EDPB WP248rev.01 methodology. Activate for systematic profiling, large-scale special category processing, or large-scale public monitoring. Keywords: DPIA, Article 35, impact assessment, WP248, data protection, risk assessment.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -2897,8 +3025,8 @@
       ],
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -2907,7 +3035,7 @@
       "description": "Responds to malware infections across enterprise endpoints by identifying the malware family, determining infection vectors, assessing spread, and executing eradication procedures. Covers the full lifecycle from detection through containment, analysis, removal, and recovery. Activates for requests involving malware response, malware eradication, trojan removal, worm containment, malware triage, or infected endpoint remediation.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2916,7 +3044,7 @@
       "description": "Performs memory forensics analysis using Volatility 3 to extract evidence of malware execution, process injection, network connections, and credential theft from RAM dumps captured during incident response. Covers memory acquisition, process analysis, DLL inspection, and malware detection. Activates for requests involving memory forensics, RAM analysis, Volatility framework, memory dump investigation, volatile evidence analysis, or live memory acquisition.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2925,7 +3053,7 @@
       "description": "Conducts comprehensive network penetration tests against authorized target environments by performing host discovery, port scanning, service enumeration, vulnerability identification, and controlled exploitation to assess the security posture of network infrastructure. The tester follows PTES methodology from reconnaissance through post-exploitation and reporting. Activates for requests involving network pentest, infrastructure security assessment, internal network testing, or external perimeter testing.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2934,7 +3062,7 @@
       "description": "Responds to phishing incidents by analyzing reported emails, extracting indicators, assessing credential compromise, quarantining malicious messages across the organization, and remediating affected accounts. Covers email header analysis, URL/attachment sandboxing, and mailbox-wide purge operations. Activates for requests involving phishing response, email incident, credential phishing, spear phishing investigation, or phishing remediation.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2943,8 +3071,8 @@
       "description": "Design and execute a social engineering penetration test including phishing, vishing, smishing, and physical pretexting campaigns to measure human security resilience and identify training gaps.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -2953,7 +3081,7 @@
       "description": "Harden LDAP directory services against common attacks including credential harvesting, LDAP injection, anonymous binding, and channel binding bypass. Covers LDAPS enforcement, channel binding, LDAP si",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2962,8 +3090,8 @@
       "description": "Configure microsegmentation policies to enforce least-privilege workload-to-workload access using tools like VMware NSX, Illumio, and Calico, preventing lateral movement in zero trust architectures.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -2972,8 +3100,8 @@
       "description": "Configure secure OAuth 2.0 authorization flows including Authorization Code with PKCE, Client Credentials, and Device Authorization Grant. This skill covers flow selection, PKCE implementation, token",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -2982,7 +3110,7 @@
       "description": "Configures pfSense firewall rules, NAT policies, VPN tunnels, and traffic shaping to enforce network segmentation, control traffic flow, and protect internal network zones in enterprise and small-to-medium business environments.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -2991,7 +3119,7 @@
       "description": "Installs, configures, and tunes Snort 3 intrusion detection system to monitor network traffic for malicious activity using custom and community rulesets, preprocessors, and alert output plugins on authorized network segments.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -3021,7 +3149,7 @@
       "description": "Technical architecture guide for building a multi-purpose consent preference center. Covers per-purpose granularity, easy withdrawal under Article 7(3), version history, audit trails, and IAB Transparency and Consent Framework v2.2 integration. Includes database schema, API design, and UI component specifications.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -3089,7 +3217,7 @@
       "description": "Set and maintain a persistent core topic or purpose for the entire AI session. Use when the user sets a core topic, anchors context, says \"let's focus on X\", \"today we're building Y\", \"we're working on Z\", or asks the assistant to stay on track across a long task.",
       "has_scripts": true,
       "scripts": [
-        "anchor.py"
+        "scripts/anchor.py"
       ]
     },
     {
@@ -3105,7 +3233,7 @@
       "description": "Guides continuous privacy compliance monitoring implementation including automated control testing, evidence collection automation, real-time compliance dashboards, alert-based remediation workflows, regulatory change integration, and deviation management. Covers GRC platform configuration, control framework mapping, and compliance-as-code approaches. Keywords: continuous compliance, automated monitoring, evidence collection, dashboard, regulatory change, compliance-as-code.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -3405,8 +3533,8 @@
       "description": "Extract structured data from 40+ websites including Amazon, LinkedIn, Instagram, TikTok, Facebook, YouTube, and more. Uses Bright Data's Web Data APIs with automatic polling. Returns clean JSON with product details, profiles, reviews, posts, and comments.",
       "has_scripts": true,
       "scripts": [
-        "datasets.sh",
-        "fetch.sh"
+        "scripts/datasets.sh",
+        "scripts/fetch.sh"
       ]
     },
     {
@@ -3415,7 +3543,7 @@
       "description": "Guides systematic mapping of international personal data flows across an organisation. Covers system-by-system inventory methodology, third-party identification, transfer mechanism assignment, gap analysis, and data flow visualisation. Keywords: data flow mapping, international transfers, data inventory, transfer register, cross-border data flows.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -3424,7 +3552,7 @@
       "description": "Executes GDPR Article 20 data portability requests, covering machine-readable format requirements (JSON, CSV, XML), direct controller-to-controller transfer mechanisms, and scope limitations to data provided by the subject on consent or contract basis. Activate for portability, data export, Art. 20, data transfer queries.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -3482,7 +3610,7 @@
       "description": "Interactively debug source code — set breakpoints, step through execution line by line, inspect live variable state, evaluate expressions against the running program, and navigate the call stack to trace root causes. Use when a program crashes, raises unexpected exceptions, produces wrong output, when you need to understand how execution reached a certain state, or when print-statement debugging isn't revealing enough.",
       "has_scripts": true,
       "scripts": [
-        "install-dap.sh"
+        "scripts/install-dap.sh"
       ]
     },
     {
@@ -3582,9 +3710,9 @@
       "description": "Dependency Auditor",
       "has_scripts": true,
       "scripts": [
-        "dep_scanner.py",
-        "license_checker.py",
-        "upgrade_planner.py"
+        "scripts/dep_scanner.py",
+        "scripts/license_checker.py",
+        "scripts/upgrade_planner.py"
       ]
     },
     {
@@ -3600,8 +3728,8 @@
       "description": "Deploys and configures CrowdStrike Falcon EDR agents across enterprise endpoints to enable real-time threat detection, behavioral analysis, and automated response. Use when onboarding endpoints to EDR coverage, configuring detection policies, or integrating Falcon telemetry with SIEM platforms. Activates for requests involving CrowdStrike deployment, Falcon sensor installation, EDR policy configuration, or endpoint detection and response.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -3619,8 +3747,17 @@
         "ckm-design",
         "ckm:design"
       ],
-      "has_scripts": false,
-      "scripts": []
+      "has_scripts": true,
+      "scripts": [
+        "scripts/cip/core.py",
+        "scripts/cip/generate.py",
+        "scripts/cip/render-html.py",
+        "scripts/cip/search.py",
+        "scripts/icon/generate.py",
+        "scripts/logo/core.py",
+        "scripts/logo/generate.py",
+        "scripts/logo/search.py"
+      ]
     },
     {
       "name": "design-an-interface",
@@ -3684,8 +3821,8 @@
       "description": "Replicate the visual style of any website and apply it to your existing codebase. Use this skill whenever the user wants to match a site's design, mirror a UI aesthetic, make their app look like another site, or replicate a specific visual style from a URL. Trigger on phrases like 'make it look like', 'match the design of', 'copy the style from', 'I want my app to look like X', 'mirror this design', 'inspired by [url]', or any time the user points at a website and says they want their frontend to match it.",
       "has_scripts": true,
       "scripts": [
-        "scrape_html.sh",
-        "screenshot.sh"
+        "scripts/scrape_html.sh",
+        "scripts/screenshot.sh"
       ]
     },
     {
@@ -3708,7 +3845,7 @@
       "description": "Use when selecting design and UI resources for frontend work, including UI graphics, fonts, color tools, icons, logos, favicons, stock photos, videos, sound effects, vectors, mockups, HTML/CSS templates, CSS frameworks, animation/chart libraries, UI kits, React/Vue/Angular/Svelte/React Native UI libraries, design systems, design tools, inspiration, compression tools, browser extensions, and AI graphic design tools. This is a locally integrated mirror of bradtraversy/design-resources-for-developers.",
       "has_scripts": true,
       "scripts": [
-        "search_design_resources.py"
+        "scripts/search_design_resources.py"
       ]
     },
     {
@@ -3735,15 +3872,15 @@
       ],
       "has_scripts": true,
       "scripts": [
-        "embed-tokens.cjs",
-        "fetch-background.py",
-        "generate-slide.py",
-        "generate-tokens.cjs",
-        "html-token-validator.py",
-        "search-slides.py",
-        "slide-token-validator.py",
-        "slide_search_core.py",
-        "validate-tokens.cjs"
+        "scripts/embed-tokens.cjs",
+        "scripts/fetch-background.py",
+        "scripts/generate-slide.py",
+        "scripts/generate-tokens.cjs",
+        "scripts/html-token-validator.py",
+        "scripts/search-slides.py",
+        "scripts/slide_search_core.py",
+        "scripts/slide-token-validator.py",
+        "scripts/validate-tokens.cjs"
       ]
     },
     {
@@ -3787,7 +3924,7 @@
       "description": "Design privacy-preserving analytics systems using differential privacy, k-anonymity, l-diversity, and t-closeness. Covers privacy budget allocation with epsilon tracking, references Google DP library, OpenDP, and Apple PPML. Includes Python differential privacy implementation for GDPR-compliant statistical analysis.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -3803,7 +3940,7 @@
       "description": "Detects insider data exfiltration by analyzing DLP policy violations, file access patterns, upload volume anomalies, and off-hours activity in endpoint and cloud logs. Uses pandas for behavioral analytics and statistical baselines. Use when investigating insider threats or building user behavior analytics for data loss prevention.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -3812,7 +3949,7 @@
       "description": "Detects and responds to OAuth token theft and replay attacks in cloud environments, focusing on Microsoft Entra ID (Azure AD) token protection, conditional access policies, and sign-in anomaly detection. Covers access token theft, refresh token replay, Primary Refresh Token (PRT) abuse, and pass-the-cookie attacks. Activates for requests involving OAuth token theft detection, token replay prevention, Azure AD conditional access token protection, or cloud identity attack investigation.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -3821,7 +3958,7 @@
       "description": "Analyze WAF (ModSecurity/AWS WAF/Cloudflare) logs to detect SQL injection attack campaigns. Parses ModSecurity audit logs and JSON WAF event logs to identify SQLi patterns (UNION SELECT, OR 1=1, SLEEP(), BENCHMARK()), tracks attack sources, correlates multi-stage injection attempts, and generates incident reports with OWASP classification.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -3837,7 +3974,7 @@
       "description": "Use when an AI coding agent is building or iterating on a web game (HTML/JS) and needs a reliable development + testing loop: implement small changes, run a Playwright-based test script with short input bursts and intentional pauses, inspect screenshots/text, and review console errors with render_game_to_text. Includes Codex install-path defaults as a compatibility adapter.",
       "has_scripts": true,
       "scripts": [
-        "web_game_playwright_client.js"
+        "scripts/web_game_playwright_client.js"
       ]
     },
     {
@@ -3853,7 +3990,7 @@
       "description": "Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce → minimise → hypothesise → instrument → fix → regression-test. Use when user says \"diagnose this\" / \"debug this\", reports a bug, says something is broken/throwing/failing, or describes a performance regression.",
       "has_scripts": true,
       "scripts": [
-        "hitl-loop.template.sh"
+        "scripts/hitl-loop.template.sh"
       ]
     },
     {
@@ -3897,7 +4034,7 @@
       "description": "Deploy differential privacy in production systems including epsilon selection strategies, noise calibration with Laplace and Gaussian mechanisms, privacy budget tracking, composition theorems, and Python implementation patterns. Covers both central and local differential privacy models.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -4113,9 +4250,65 @@
       "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files). Triggers include: any mention of ''Word doc'', ''word document'', ''.docx'', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a ''report'', ''memo'', ''letter'', ''template'', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
       "has_scripts": true,
       "scripts": [
-        "__init__.py",
-        "accept_changes.py",
-        "comment.py"
+        "scripts/__init__.py",
+        "scripts/accept_changes.py",
+        "scripts/comment.py",
+        "scripts/office/helpers/__init__.py",
+        "scripts/office/helpers/merge_runs.py",
+        "scripts/office/helpers/simplify_redlines.py",
+        "scripts/office/pack.py",
+        "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+        "scripts/office/schemas/mce/mc.xsd",
+        "scripts/office/schemas/microsoft/wml-2010.xsd",
+        "scripts/office/schemas/microsoft/wml-2012.xsd",
+        "scripts/office/schemas/microsoft/wml-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+        "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+        "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+        "scripts/office/soffice.py",
+        "scripts/office/unpack.py",
+        "scripts/office/validate.py",
+        "scripts/office/validators/__init__.py",
+        "scripts/office/validators/base.py",
+        "scripts/office/validators/docx.py",
+        "scripts/office/validators/pptx.py",
+        "scripts/office/validators/redlining.py",
+        "scripts/templates/comments.xml",
+        "scripts/templates/commentsExtended.xml",
+        "scripts/templates/commentsExtensible.xml",
+        "scripts/templates/commentsIds.xml",
+        "scripts/templates/people.xml"
       ]
     },
     {
@@ -4194,8 +4387,8 @@
       "description": "draw.io diagram creation, editing, and review. Use for .drawio XML editing, PNG conversion, layout adjustment, and AWS icon usage.",
       "has_scripts": true,
       "scripts": [
-        "convert-drawio-to-png.sh",
-        "find_aws_icon.py"
+        "scripts/convert-drawio-to-png.sh",
+        "scripts/find_aws_icon.py"
       ]
     },
     {
@@ -4253,7 +4446,7 @@
       "description": "Guides AI agents through the complete GDPR Data Subject Access Request (DSAR) workflow under Article 15, including identity verification, 30-day deadline calculation with extensions, response formatting, exemptions, and fee provisions. Activate when handling DSAR, access request, subject access, Art. 15, or SAR queries.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -4789,15 +4982,15 @@
       "description": "Comprehensive file organization suite. Use for cleaning up messy folders, arranging the desktop, finding duplicates, renaming files intelligently, and categorizing files by type or date. Includes safety features like dry-run mode and undo capabilities.",
       "has_scripts": true,
       "scripts": [
-        "arrange_desktop.py",
-        "cleanup_files.py",
-        "find_duplicates.py",
-        "generate_plan.py",
-        "generate_report.py",
-        "organize_files.py",
-        "rename_files.py",
-        "scan_files.py",
-        "undo_operations.py"
+        "scripts/arrange_desktop.py",
+        "scripts/cleanup_files.py",
+        "scripts/find_duplicates.py",
+        "scripts/generate_plan.py",
+        "scripts/generate_report.py",
+        "scripts/organize_files.py",
+        "scripts/rename_files.py",
+        "scripts/scan_files.py",
+        "scripts/undo_operations.py"
       ]
     },
     {
@@ -5270,7 +5463,7 @@
       "description": "Guides a comprehensive organisational data protection audit against key GDPR requirements including Articles 5, 24, 25, 28, 30, 32, 35, and 37. Includes 50+ control points covering principles, accountability, security, and governance. Activate when performing compliance audits, preparing for supervisory authority inspections, or assessing organisational GDPR maturity. Keywords: data protection audit, compliance audit, GDPR audit, control points, accountability.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -5279,9 +5472,9 @@
       "description": "GDPR and German DSGVO compliance automation. Scans codebases for privacy risks, generates DPIA documentation, tracks data subject rights requests. Use for GDPR compliance assessments, privacy audits, data protection planning, DPIA generation, and data subject rights management.",
       "has_scripts": true,
       "scripts": [
-        "data_subject_rights_tracker.py",
-        "dpia_generator.py",
-        "gdpr_compliance_checker.py"
+        "scripts/data_subject_rights_tracker.py",
+        "scripts/dpia_generator.py",
+        "scripts/gdpr_compliance_checker.py"
       ]
     },
     {
@@ -5290,7 +5483,7 @@
       "description": "Guides systematic assessment of current state versus GDPR requirements across all chapters with prioritised remediation matrix. Activate when starting compliance programmes or conducting periodic reassessment. Keywords: gap analysis, compliance assessment, remediation matrix, GDPR readiness.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -5299,7 +5492,7 @@
       "description": "Guides creation of organisational privacy policy hierarchy aligned to GDPR chapters including top-level policy, supporting procedures, operational guidelines, and training materials. Activate when building or updating policy frameworks. Keywords: policy framework, privacy policy, procedures, guidelines, policy hierarchy.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -5308,7 +5501,7 @@
       "description": "Guide for implementing GDPR-valid consent under Article 7 conditions and Article 4(11) definition. Covers five core requirements: freely given, specific, informed, unambiguous, and clear affirmative action. Includes pre-ticked boxes prohibition per Planet49 CJEU C-673/17, consent form audit checklist, and practical implementation patterns.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -5352,7 +5545,7 @@
       "description": "Generative Engine Optimization for AI search engines (ChatGPT, Claude, Perplexity).",
       "has_scripts": true,
       "scripts": [
-        "geo_checker.py"
+        "scripts/geo_checker.py"
       ]
     },
     {
@@ -5389,7 +5582,7 @@
       "description": "Use when a user asks to debug or fix failing GitHub PR checks that run in GitHub Actions. Uses `gh` to inspect checks and logs, summarize failure context, draft a fix plan, and implement only after explicit approval. Treats external providers (for example Buildkite) as out of scope and reports only the details URL. Do NOT use for addressing PR review comments (use gh-address-comments) or general CI outside GitHub Actions.",
       "has_scripts": true,
       "scripts": [
-        "inspect_pr_checks.py"
+        "scripts/inspect_pr_checks.py"
       ]
     },
     {
@@ -5433,7 +5626,7 @@
       "description": "Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code.",
       "has_scripts": true,
       "scripts": [
-        "block-dangerous-git.sh"
+        "scripts/block-dangerous-git.sh"
       ]
     },
     {
@@ -5484,7 +5677,7 @@
       "description": "Implementation guide for Global Privacy Control (GPC) automated opt-out signal per CPRA Section 1798.135(e). Covers Sec-GPC HTTP header detection, JavaScript navigator.globalPrivacyControl API, and state-specific requirements for CA, CO, CT, MT, TX, and OR. Includes server-side detection code and compliance mapping.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -5891,8 +6084,8 @@
       "description": "Harden the Docker daemon by configuring daemon.json with user namespace remapping, TLS authentication, rootless mode, and CIS benchmark controls.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -5908,9 +6101,9 @@
       "description": "Collect GitHub PR information, generate reports, and create work reports. Retrieves PR data using the gh command and automatically generates weekly/monthly reports and release notes. Used when work reporting or PR analysis is needed.",
       "has_scripts": true,
       "scripts": [
-        "generate-report.js",
-        "html-to-pdf.sh",
-        "puppeteer-pdf.js"
+        "scripts/generate-report.js",
+        "scripts/html-to-pdf.sh",
+        "scripts/puppeteer-pdf.js"
       ]
     },
     {
@@ -5936,21 +6129,21 @@
       "description": "Create, repair, validate, preview, and package Codex-compatible animated pet spritesheets from character art, screenshots, generated images, or visual references. Use when a user wants to hatch a Codex pet, create a custom animated pet, or build a built-in pet asset with an 8x9 atlas, transparent unused cells, row-by-row animation prompts, QA contact sheets, preview videos, and pet.json packaging. This skill composes the installed $imagegen system skill for visual generation and uses bundled scripts for deterministic spritesheet assembly.",
       "has_scripts": true,
       "scripts": [
-        "compose_atlas.py",
-        "derive_running_left_from_running_right.py",
-        "extract_strip_frames.py",
-        "finalize_pet_run.py",
-        "generate_pet_images.py",
-        "inspect_frames.py",
-        "make_contact_sheet.py",
-        "package_custom_pet.py",
-        "pet_job_status.py",
-        "prepare_pet_run.py",
-        "queue_pet_repairs.py",
-        "record_imagegen_result.py",
-        "render_animation_videos.py",
-        "render_animation_videos.sh",
-        "validate_atlas.py"
+        "scripts/compose_atlas.py",
+        "scripts/derive_running_left_from_running_right.py",
+        "scripts/extract_strip_frames.py",
+        "scripts/finalize_pet_run.py",
+        "scripts/generate_pet_images.py",
+        "scripts/inspect_frames.py",
+        "scripts/make_contact_sheet.py",
+        "scripts/package_custom_pet.py",
+        "scripts/pet_job_status.py",
+        "scripts/prepare_pet_run.py",
+        "scripts/queue_pet_repairs.py",
+        "scripts/record_imagegen_result.py",
+        "scripts/render_animation_videos.py",
+        "scripts/render_animation_videos.sh",
+        "scripts/validate_atlas.py"
       ]
     },
     {
@@ -5959,7 +6152,7 @@
       "description": "Addresses healthcare AI privacy at the intersection of HIPAA and the EU AI Act for clinical decision support systems. Covers training data PHI handling, model transparency and explainability, patient rights in algorithmic decisions, FDA/OCR regulatory coordination, and bias monitoring. Keywords: healthcare AI, HIPAA, AI Act, clinical decision support, PHI training data, model transparency.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6062,7 +6255,7 @@
       "description": "Implements HIPAA breach notification requirements under 45 CFR §164.400-414. Covers individual notification within 60 days, HHS reporting thresholds (500+ immediate, under 500 annual), state attorney general notification, media notification for 500+ in a state, and breach risk assessment. Keywords: HIPAA breach notification, HHS reporting, OCR breach portal, individual notice, state attorney general.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6071,7 +6264,7 @@
       "description": "Implements HIPAA de-identification methods under 45 CFR §164.514(a)-(b). Covers expert determination method and safe harbor method with 18 identifiers removal, re-identification risk assessment, limited dataset requirements, and data use agreements. Keywords: HIPAA de-identification, safe harbor, expert determination, 18 identifiers, limited dataset, PHI.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6136,8 +6329,64 @@
       "description": "Create professional static HTML presentations with templates, keyboard navigation, responsive layouts, and tasteful slide pacing.",
       "has_scripts": true,
       "scripts": [
-        "new-deck.sh",
-        "render.sh"
+        "scripts/new-deck.sh",
+        "scripts/render.sh",
+        "scripts/verify-output/animation-showcase/animation-showcase_01.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_02.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_03.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_04.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_05.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_06.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_07.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_08.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_09.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_10.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_11.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_12.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_13.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_14.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_15.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_16.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_17.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_18.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_19.png",
+        "scripts/verify-output/animation-showcase/animation-showcase_20.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_01.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_02.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_03.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_04.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_05.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_06.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_07.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_08.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_09.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_10.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_11.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_12.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_13.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_14.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_15.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_16.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_17.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_18.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_19.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_20.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_21.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_22.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_23.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_24.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_25.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_26.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_27.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_28.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_29.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_30.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_31.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_32.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_33.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_34.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_35.png",
+        "scripts/verify-output/theme-showcase/theme-showcase_36.png"
       ]
     },
     {
@@ -6407,7 +6656,7 @@
       "description": "Use when the user asks to generate or edit images via the OpenAI Image API (for example: generate image, edit/inpaint/mask, background removal or replacement, transparent background, product shots, concept art, covers, or batch variants); run the bundled CLI (`scripts/image_gen.py`) and require `OPENAI_API_KEY` for live calls.",
       "has_scripts": true,
       "scripts": [
-        "image_gen.py"
+        "scripts/image_gen.py"
       ]
     },
     {
@@ -6451,27 +6700,28 @@
       "description": "Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Handles UX review, visual hierarchy, information architecture, cognitive load, accessibility, performance, responsive behavior, theming, anti-patterns, typography, fonts, spacing, layout, alignment, color, motion, micro-interactions, UX copy, error states, edge cases, i18n, and reusable design systems or tokens. Also use for bland designs that need to become bolder or more delightful, loud designs that should become quieter, live browser iteration on UI elements, or ambitious visual effects that should feel technically extraordinary. Not for backend-only or non-UI tasks.",
       "has_scripts": true,
       "scripts": [
-        "cleanup-deprecated.mjs",
-        "design-parser.mjs",
-        "detect-csp.mjs",
-        "impeccable-paths.mjs",
-        "is-generated.mjs",
-        "live-accept.mjs",
-        "live-browser-session.js",
-        "live-browser.js",
-        "live-complete.mjs",
-        "live-completion.mjs",
-        "live-inject.mjs",
-        "live-poll.mjs",
-        "live-resume.mjs",
-        "live-server.mjs",
-        "live-session-store.mjs",
-        "live-status.mjs",
-        "live-wrap.mjs",
-        "live.mjs",
-        "load-context.mjs",
-        "modern-screenshot.umd.js",
-        "pin.mjs"
+        "scripts/cleanup-deprecated.mjs",
+        "scripts/command-metadata.json",
+        "scripts/design-parser.mjs",
+        "scripts/detect-csp.mjs",
+        "scripts/impeccable-paths.mjs",
+        "scripts/is-generated.mjs",
+        "scripts/live-accept.mjs",
+        "scripts/live-browser-session.js",
+        "scripts/live-browser.js",
+        "scripts/live-complete.mjs",
+        "scripts/live-completion.mjs",
+        "scripts/live-inject.mjs",
+        "scripts/live-poll.mjs",
+        "scripts/live-resume.mjs",
+        "scripts/live-server.mjs",
+        "scripts/live-session-store.mjs",
+        "scripts/live-status.mjs",
+        "scripts/live-wrap.mjs",
+        "scripts/live.mjs",
+        "scripts/load-context.mjs",
+        "scripts/modern-screenshot.umd.js",
+        "scripts/pin.mjs"
       ]
     },
     {
@@ -6487,8 +6737,8 @@
       "description": "AES (Advanced Encryption Standard) is a symmetric block cipher standardized by NIST (FIPS 197) used to protect classified and sensitive data. This skill covers implementing AES-256 encryption in GCM m",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6497,7 +6747,7 @@
       "description": "Implements security controls at the API gateway layer including authentication enforcement, rate limiting, request validation, IP allowlisting, TLS termination, and threat protection. The engineer configures API gateways (Kong, AWS API Gateway, Azure APIM, Apigee) to act as a centralized security enforcement point that validates, throttles, and monitors all API traffic before it reaches backend services. Activates for requests involving API gateway security, API management security, gateway authentication, or centralized API protection.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6506,7 +6756,7 @@
       "description": "Implements API rate limiting and throttling controls using token bucket, sliding window, and fixed window algorithms to protect against brute force attacks, credential stuffing, resource exhaustion, and API abuse. The engineer configures per-user, per-IP, and per-endpoint rate limits using Redis-backed counters, API gateway plugins, or application middleware, and implements proper HTTP 429 responses with Retry-After headers. Activates for requests involving rate limiting implementation, API throttling setup, request quota management, or API abuse prevention.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6515,7 +6765,7 @@
       "description": "Implement API Security Posture Management to continuously discover, classify, and score APIs based on risk while enforcing security policies across the API lifecycle.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6524,7 +6774,7 @@
       "description": "Implements external attack surface management (EASM) using Shodan, Censys, and ProjectDiscovery tools (subfinder, httpx, nuclei) for asset discovery, subdomain enumeration, service fingerprinting, and exposure scoring. Includes a weighted risk scoring algorithm based on OWASP attack surface analysis methodology and the Relative Attack Surface Quotient (RSQ). Use when building continuous ASM programs or performing external reconnaissance for security assessments.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6533,8 +6783,8 @@
       "description": "Configure IAM permission boundaries in AWS to delegate role creation to developers while enforcing maximum privilege limits set by the security team.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6543,7 +6793,7 @@
       "description": "Implementing AWS Security Hub to aggregate security findings across AWS accounts, enable compliance standards like CIS AWS Foundations and PCI DSS, configure automated remediation with EventBridge and Lambda, and create custom security insights for organizational risk management.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6552,8 +6802,8 @@
       "description": "Configure Microsoft Entra Privileged Identity Management to enforce just-in-time role activation, approval workflows, and access reviews for Azure AD privileged roles.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6562,8 +6812,8 @@
       "description": "Implementing Google's BeyondCorp zero trust access model to eliminate implicit trust from the network perimeter, enforce identity-aware access controls using IAP, Access Context Manager, and Chrome Enterprise Premium for VPN-less secure application access.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6572,7 +6822,7 @@
       "description": "Implementing Cloud Data Loss Prevention (DLP) using Amazon Macie, Azure Information Protection, and Google Cloud DLP API to discover, classify, and protect sensitive data across cloud storage, databases, and data pipelines.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6581,7 +6831,7 @@
       "description": "Implementing Cloud Security Posture Management (CSPM) to continuously monitor multi-cloud environments for misconfigurations, compliance violations, and security risks using Prowler, ScoutSuite, AWS Security Hub, Azure Defender, and GCP Security Command Center.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6590,7 +6840,7 @@
       "description": "This skill covers deploying and tuning Web Application Firewall rules on AWS WAF, Azure WAF, and Cloudflare to protect cloud-hosted applications against OWASP Top 10 attacks. It details configuring managed rule sets, creating custom rules for business logic protection, implementing rate limiting, deploying bot management, and reducing false positives through rule tuning and logging analysis.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6599,7 +6849,7 @@
       "description": "Implements cloud workload protection using boto3 and google-cloud APIs for runtime security monitoring, process anomaly detection, and file integrity checking on EC2/GCE instances. Scans for cryptomining, reverse shells, and unauthorized binaries. Use when building runtime security controls for cloud compute workloads.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6608,8 +6858,8 @@
       "description": "This skill covers implementing code signing for build artifacts to ensure integrity and authenticity throughout the software supply chain. It addresses signing binaries, packages, and containers using GPG, Sigstore, and platform-specific signing tools, establishing trust chains, and verifying signatures in deployment pipelines.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6618,7 +6868,7 @@
       "description": "Enforce Kubernetes network segmentation using Calico CNI network policies and global network policies to control pod-to-pod traffic, restrict egress, and implement zero-trust microsegmentation.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6627,8 +6877,8 @@
       "description": "Deploy Breach and Attack Simulation tools to continuously validate security control effectiveness by safely emulating real-world attack techniques across the kill chain.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6637,7 +6887,7 @@
       "description": "Architecture patterns for GDPR Article 5(1)(c) data minimization and Article 25(1) data protection by design. Covers field-level encryption, data masking, aggregation, pseudonymization per Article 4(5), and anonymization per Recital 26. Includes ENISA pseudonymization techniques and a data minimization assessment matrix.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6646,7 +6896,7 @@
       "description": "Technical implementation of GDPR Article 25(2) data protection by default. Covers strictest privacy settings as default configuration, minimum data collection, limited storage duration, restricted accessibility, and opt-in rather than opt-out patterns. Includes implementation checklist and system design requirements.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6655,7 +6905,7 @@
       "description": "Configure Cloudflare DDoS protection with managed rulesets, rate limiting, WAF rules, Bot Management, and origin protection to mitigate volumetric, protocol, and application-layer attacks.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6664,7 +6914,7 @@
       "description": "Deploy and monitor Canary Tokens via the Thinkst Canary API for deception-based breach detection using web bug tokens, DNS tokens, document tokens, and AWS key tokens.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6673,7 +6923,7 @@
       "description": "Implements Delinea Secret Server for privileged access management (PAM) including secret vault configuration, role-based access policies, automated password rotation, session recording, and integration with Active Directory and cloud platforms. Activates for requests involving PAM deployment, privileged credential vaulting, secret server administration, or password rotation automation.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6682,7 +6932,7 @@
       "description": "Integrates Static Application Security Testing (SAST), Dynamic Application Security Testing (DAST), and Software Composition Analysis (SCA) into CI/CD pipelines using open-source tools. Covers Semgrep for SAST, Trivy for SCA and container scanning, OWASP ZAP for DAST, and Gitleaks for secrets detection. Activates for requests involving DevSecOps pipeline setup, automated security scanning in CI/CD, SAST/DAST/SCA integration, or shift-left security implementation.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6691,8 +6941,8 @@
       "description": "The Diamond Model of Intrusion Analysis provides a structured framework for analyzing cyber intrusions by examining four core features - Adversary, Capability, Infrastructure, and Victim. This skill covers implementing the Diamond Model programmatically to classify and correlate intrusion events, build activity threads, and generate pivot-ready intelligence.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6701,8 +6951,8 @@
       "description": "Ed25519 is a high-performance digital signature algorithm using the Edwards curve Curve25519. It provides 128-bit security with 64-byte signatures and 32-byte keys, offering significant advantages ove",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6711,8 +6961,8 @@
       "description": "Implements full disk encryption using Microsoft BitLocker on Windows endpoints to protect data at rest from unauthorized access in case of device loss or theft. Use when deploying encryption for compliance requirements, securing mobile workstations, or implementing data protection controls across the enterprise. Activates for requests involving BitLocker encryption, disk encryption, TPM configuration, or data-at-rest protection.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6721,8 +6971,8 @@
       "description": "SPF, DKIM, and DMARC form the three pillars of email authentication. Together they prevent domain spoofing, validate message integrity, and define policies for handling unauthenticated mail. Proper im",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6731,7 +6981,7 @@
       "description": "Implements eBPF-based security monitoring using Cilium Tetragon for real-time process execution tracking, network connection observability, file access auditing, and runtime enforcement. Covers TracingPolicy CRD authoring with kprobe/tracepoint hooks, in-kernel filtering via matchArgs/matchBinaries selectors, JSON event export, and integration with SIEM pipelines. Use when building kernel-level runtime security observability for Linux hosts or Kubernetes clusters.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6740,8 +6990,8 @@
       "description": "End-to-end encryption (E2EE) ensures that only the communicating parties can read messages, with no intermediary (including the server) able to decrypt them. This skill implements a simplified version",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6750,7 +7000,7 @@
       "description": "Deploy and configure Wazuh SIEM/XDR for endpoint detection including agent management, custom decoder and rule XML creation, alert querying via the Wazuh REST API, and automated response actions.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6759,8 +7009,8 @@
       "description": "Envelope encryption is a strategy where data is encrypted with a data encryption key (DEK), and the DEK itself is encrypted with a master key (KEK) managed by AWS KMS. This approach allows encrypting",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6769,7 +7019,7 @@
       "description": "Configure AIDE (Advanced Intrusion Detection Environment) for file integrity monitoring including baseline creation, scheduled integrity checks, change detection, and alerting",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6778,7 +7028,7 @@
       "description": "Guide to implementing homomorphic encryption for privacy-preserving computation under GDPR. Covers scheme selection (BFV, BGV, CKKS, TFHE), Microsoft SEAL, IBM HELib, and Google FHE transpiler. Includes performance benchmarks, parameter tuning, and basic HE example code for encrypted arithmetic operations.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6787,8 +7037,8 @@
       "description": "Implement continuous identity verification for zero trust using phishing-resistant MFA (FIDO2/WebAuthn), risk-based conditional access, and identity governance aligned with the CISA Zero Trust Maturity Model.",
       "has_scripts": true,
       "scripts": [
-        "agent.py",
-        "process.py"
+        "scripts/agent.py",
+        "scripts/process.py"
       ]
     },
     {
@@ -6797,7 +7047,7 @@
       "description": "Configures mutual TLS (mTLS) authentication between microservices using Python cryptography library for certificate generation and ssl module for TLS verification. Validates certificate chains, checks expiration, and audits mTLS deployment status. Use when implementing zero-trust service-to-service authentication.",
       "has_scripts": true,
       "scripts": [
-        "agent.py"
+        "scripts/agent.py"
       ]
     },
     {
@@ -6806,7 +7056,7 @@
       "description": "Implementation guide for secure multi-party computation enabling privacy-preserving analytics across organizations. Covers secret sharing, garbled circuits, reference frameworks MP-SPDZ and CrypTen, practical deployment patterns, and GDPR alignment for joint controller analytics without revealing individual party inputs.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6829,7 +7079,7 @@
       "description": "Guides compliance with India''s Digital Personal Data Protection Act 2023. Covers consent manager registration, data fiduciary obligations under Sections 4-7, significant data fiduciary requirements under Section 10, data principal rights, and Board enforcement framework. Keywords: DPDP Act, India data protection, consent manager, data fiduciary, significant data fiduciary, data principal rights.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6852,13 +7102,55 @@
       "description": "Generate high-density infographics with structured layout and style choices and bundled generation tooling. Use when the user asks to create an infographic, a visual summary, or a dense single-page information graphic.",
       "has_scripts": true,
       "scripts": [
-        "bootstrap.mjs",
-        "build-batch.ts",
-        "build-prompt.ts",
-        "ensure-ready.mjs",
-        "scaffold.ts",
-        "setup.mjs",
-        "visual-policy.ts"
+        "scripts/bootstrap.mjs",
+        "scripts/build-batch.ts",
+        "scripts/build-prompt.ts",
+        "scripts/ensure-ready.mjs",
+        "scripts/package.json",
+        "scripts/scaffold.ts",
+        "scripts/setup.mjs",
+        "scripts/vendor/compression-runtime/AGENTS.md",
+        "scripts/vendor/compression-runtime/package.json",
+        "scripts/vendor/compression-runtime/scripts/main.ts",
+        "scripts/vendor/compression-runtime/scripts/package.json",
+        "scripts/vendor/compression-runtime/SKILL.md",
+        "scripts/vendor/shared-image-generation/references/config/first-time-setup.md",
+        "scripts/vendor/shared-image-generation/references/config/model-registry-schema.md",
+        "scripts/vendor/shared-image-generation/references/config/preferences-schema.md",
+        "scripts/vendor/shared-image-generation/references/config/starter-models.json",
+        "scripts/vendor/shared-image-generation/references/style-presets.md",
+        "scripts/vendor/shared-image-generation/references/weryai-platform.md",
+        "scripts/vendor/shared-image-generation/scripts/bootstrap.mjs",
+        "scripts/vendor/shared-image-generation/scripts/build-visual-brief.mjs",
+        "scripts/vendor/shared-image-generation/scripts/discover-models.mjs",
+        "scripts/vendor/shared-image-generation/scripts/doctor.mjs",
+        "scripts/vendor/shared-image-generation/scripts/ensure-ready.mjs",
+        "scripts/vendor/shared-image-generation/scripts/main.ts",
+        "scripts/vendor/shared-image-generation/scripts/package.json",
+        "scripts/vendor/shared-image-generation/scripts/recommend-model.mjs",
+        "scripts/vendor/shared-image-generation/scripts/setup.mjs",
+        "scripts/vendor/shared-image-generation/scripts/smoke-check.mjs",
+        "scripts/vendor/shared-image-generation/scripts/style-menu.mjs",
+        "scripts/vendor/weryai-core/balance.js",
+        "scripts/vendor/weryai-core/client.js",
+        "scripts/vendor/weryai-core/errors.js",
+        "scripts/vendor/weryai-core/normalize.js",
+        "scripts/vendor/weryai-core/status.js",
+        "scripts/vendor/weryai-core/wait.js",
+        "scripts/vendor/weryai-image/discover-models.mjs",
+        "scripts/vendor/weryai-image/doctor.mjs",
+        "scripts/vendor/weryai-image/ensure-ready.mjs",
+        "scripts/vendor/weryai-image/main.ts",
+        "scripts/vendor/weryai-image/model-registry.js",
+        "scripts/vendor/weryai-image/models-command.js",
+        "scripts/vendor/weryai-image/models.js",
+        "scripts/vendor/weryai-image/README.md",
+        "scripts/vendor/weryai-image/recommend-model.mjs",
+        "scripts/vendor/weryai-image/setup.mjs",
+        "scripts/vendor/weryai-image/submit-image.js",
+        "scripts/vendor/weryai-image/submit-text.js",
+        "scripts/vendor/weryai-image/validators.js",
+        "scripts/visual-policy.ts"
       ]
     },
     {
@@ -6874,8 +7166,8 @@
       "description": "ISO 27001 ISMS implementation and cybersecurity governance for HealthTech and MedTech companies. Use for ISMS design, security risk assessment, control implementation, ISO 27001 certification, security audits, incident response, and compliance verification. Covers ISO 27001, ISO 27002, healthcare security, and medical device cybersecurity.",
       "has_scripts": true,
       "scripts": [
-        "compliance_checker.py",
-        "risk_assessment.py"
+        "scripts/compliance_checker.py",
+        "scripts/risk_assessment.py"
       ]
     },
     {
@@ -6964,7 +7256,7 @@
       "description": "Guides internal privacy audit program design and execution including risk-based audit planning, scope definition, fieldwork procedures, finding classification, evidence gathering, remediation tracking, and management reporting. Covers audit universe definition, annual audit plan, working papers, and closure verification. Keywords: internal audit, privacy audit, fieldwork, remediation, findings, audit plan.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -6980,7 +7272,7 @@
       "description": "Search and recommend Agent Skills from verified GitHub repositories. Use when users ask to find, discover, search for, or recommend skills/plugins for specific tasks, domains, or workflows.",
       "has_scripts": true,
       "scripts": [
-        "fetch_skills.py"
+        "scripts/fetch_skills.py"
       ]
     },
     {
@@ -7087,7 +7379,7 @@
       "description": "Information Security Management System (ISMS) audit expert for ISO 27001 compliance verification, security control assessment, and certification support. Use when the user mentions ISO 27001, ISMS audit, Annex A controls, Statement of Applicability (SOA), gap analysis, nonconformity management, internal audit, surveillance audit, or security certification preparation. Helps review control implementation evidence, document audit findings, classify nonconformities, generate risk-based audit plans, map controls to Annex A requirements, prepare Stage 1 and Stage 2 audit documentation, and support corrective action workflows.",
       "has_scripts": true,
       "scripts": [
-        "isms_audit_scheduler.py"
+        "scripts/isms_audit_scheduler.py"
       ]
     },
     {
@@ -7096,7 +7388,7 @@
       "description": "Guides ISO 27701 Privacy Information Management System implementation extending ISO 27001/27002. Covers Clause 5 PIMS-specific requirements, Clause 6 PIMS guidance for ISO 27002, Clause 7 PII controller guidance (Annex A), Clause 8 PII processor guidance (Annex B), gap assessment, and certification path. Keywords: ISO 27701, PIMS, privacy management system, ISO 27001 extension, certification, Annex A, Annex B.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -7389,7 +7681,7 @@
       "description": "Guides determination of the correct lawful basis under GDPR Article 6(1)(a)-(f) for each processing activity. Includes decision tree logic for consent vs legitimate interest vs contract necessity. Activate when evaluating legal grounds for processing or reviewing lawful basis selections. Keywords: lawful basis, Article 6, consent, legitimate interest, legal obligation, contract.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -7461,7 +7753,7 @@
       "description": "Guides the three-part Legitimate Interest Assessment (LIA) required under GDPR Article 6(1)(f): purpose test, necessity test, and balancing test. Activate when evaluating legitimate interest as a lawful basis, conducting LIA reviews, or documenting proportionality analysis. Keywords: LIA, legitimate interest, balancing test, necessity test, purpose test, Article 6(1)(f).",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -7557,10 +7849,10 @@
       "description": "Use when an AI skill, MCP client, or automation needs browser-based web retrieval, JavaScript page loading, scraping, form interaction, markdown extraction, semantic DOM extraction, or Playwright/Puppeteer CDP automation without graphical rendering. Defaults AI browser work to Lightpanda on this machine.",
       "has_scripts": true,
       "scripts": [
-        "lightpanda-fetch.cmd",
-        "lightpanda-mcp.cmd",
-        "lightpanda-serve.ps1",
-        "lightpanda-stop.ps1"
+        "scripts/lightpanda-fetch.cmd",
+        "scripts/lightpanda-mcp.cmd",
+        "scripts/lightpanda-serve.ps1",
+        "scripts/lightpanda-stop.ps1"
       ]
     },
     {
@@ -7569,7 +7861,7 @@
       "description": "Conduct LINDDUN privacy threat modeling across all seven categories: Linking, Identifying, Non-repudiation, Detecting, Data Disclosure, Unawareness, and Non-compliance. Includes DFD-based analysis, threat trees, privacy-specific mitigation strategies, and integration with STRIDE security threat modeling.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -7885,8 +8177,10 @@
       "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
       "has_scripts": true,
       "scripts": [
-        "connections.py",
-        "evaluation.py"
+        "scripts/connections.py",
+        "scripts/evaluation.py",
+        "scripts/example_evaluation.xml",
+        "scripts/requirements.txt"
       ]
     },
     {
@@ -8109,7 +8403,7 @@
       "description": "Mobile-first design thinking and decision-making for iOS and Android apps. Touch interaction, performance patterns, platform conventions. Teaches principles, not fixed values. Use when building React Native, Flutter, or native mobile apps.",
       "has_scripts": true,
       "scripts": [
-        "mobile_audit.py"
+        "scripts/mobile_audit.py"
       ]
     },
     {
@@ -8139,7 +8433,7 @@
       "description": "Set and manage the preferred backbone LLM for compatible AI-agent workflows. Supports manual model selection, automatic best-model selection based on task type, and a cached/refreshable leaderboard of the latest frontier models from OpenRouter. Toggle on/off via chat commands. Use when the user says \"model-selector\", \"set model\", \"change model\", \"best model\", \"auto model\", \"switch model\", \"model-selector on\", \"model-selector off\", \"list models\", \"show models\", \"model status\", \"recommend model\", \"refresh models\", or asks which AI model to use for a task.",
       "has_scripts": true,
       "scripts": [
-        "model_selector.py"
+        "scripts/model_selector.py"
       ]
     },
     {
@@ -8253,7 +8547,7 @@
       "description": "Execute read-only SQL queries against multiple Microsoft SQL Server databases. Use when: (1) querying MSSQL/SQL Server databases, (2) exploring database schemas/tables, (3) running SELECT queries for data analysis, (4) checking database contents. Supports multiple database connections with descriptions for intelligent auto-selection. Blocks all write operations (INSERT, UPDATE, DELETE, DROP, etc.) for safety.",
       "has_scripts": true,
       "scripts": [
-        "query.py"
+        "scripts/query.py"
       ]
     },
     {
@@ -8262,7 +8556,7 @@
       "description": "Engineer professional-grade brand logos using geometric primitives and negative space — generates minimalist, scalable vector-style marks via muapi.ai",
       "has_scripts": true,
       "scripts": [
-        "create-logo.sh"
+        "scripts/create-logo.sh"
       ]
     },
     {
@@ -8271,8 +8565,8 @@
       "description": "Run a comprehensive security, privacy, and bug audit on any codebase using the absolute best frontier AI models via OpenRouter API. Dynamically discovers the latest models, uses model-specific elite prompt engineering, merges findings by consensus, implements fixes, and runs a verification re-audit. Use when the user requests a code audit, security review, vulnerability scan, bug audit, or asks to review code with multiple AI models.",
       "has_scripts": true,
       "scripts": [
-        "cross_compare.py",
-        "run_audit.py"
+        "scripts/cross_compare.py",
+        "scripts/run_audit.py"
       ]
     },
     {
@@ -8281,7 +8575,7 @@
       "description": "Get a merged answer from a configured multi-model pool. Automatically prompt-engineers the query first, queries available models in parallel, and merges results into one best answer. Use when the user wants a best-effort answer, model comparison, multi-model response, oracle answer, or consensus synthesis.",
       "has_scripts": true,
       "scripts": [
-        "oracle.py"
+        "scripts/oracle.py"
       ]
     },
     {
@@ -8332,7 +8626,7 @@
       "description": "Execute read-only SQL queries against multiple MySQL databases. Use when: (1) querying MySQL databases, (2) exploring database schemas/tables, (3) running SELECT queries for data analysis, (4) checking database contents. Supports multiple database connections with descriptions for intelligent auto-selection. Blocks all write operations (INSERT, UPDATE, DELETE, DROP, etc.) for safety.",
       "has_scripts": true,
       "scripts": [
-        "query.py"
+        "scripts/query.py"
       ]
     },
     {
@@ -8582,7 +8876,7 @@
       "description": "Implement the NIST Privacy Framework GOVERN function covering GV.AT awareness and training, GV.MT monitoring and review, GV.PO policy development, and GV.RR roles and responsibilities. Provides governance structure templates, training programs, and accountability frameworks for privacy governance.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -8591,7 +8885,7 @@
       "description": "Implement the NIST Privacy Framework IDENTIFY function including ID.BE business environment, ID.DA data actions, ID.IM improvement, and ID.RA risk assessment subcategories. Provides control mapping, gap analysis templates, and implementation workflows for privacy risk identification.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -8600,7 +8894,7 @@
       "description": "Implement the NIST Privacy Framework PROTECT function covering PR.AC access control, PR.DS data security, and PR.PO protective policies. Provides technical control implementation guidance, encryption standards, access management architectures, and security-privacy integration patterns.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -8696,7 +8990,7 @@
       "description": "Use when aggregating local files, directories, GitHub repositories/issues/PRs, documentation pages, PDFs, arXiv/DOI/PMID sources, YouTube transcripts, stdin, or clipboard text into a single LLM-ready XML context file using the locally installed jimmc414/onefilellm CLI. Use for context packaging, source bundling, repo-to-text conversion, and multi-source research ingestion.",
       "has_scripts": true,
       "scripts": [
-        "run_onefilellm.py"
+        "scripts/run_onefilellm.py"
       ]
     },
     {
@@ -8729,9 +9023,9 @@
       "description": "Produce a world-class single-page editorial landing site in the Atelier Zero visual language (Monocle / Apartamento / Études editorial collage) — the same aesthetic Open Design uses for its own marketing surface. The agent fills a typed `inputs.json` from a brand brief, optionally generates 16 collage assets via gpt-image-2, then runs a pure-function composer that emits a self-contained HTML file; a separate path can mirror the Astro marketing site in `apps/landing-page/`. Drop-in scroll-reveal motion and a Headroom-style sticky nav are wired automatically.",
       "has_scripts": true,
       "scripts": [
-        "compose.ts",
-        "imagegen.ts",
-        "placeholder.ts"
+        "scripts/compose.ts",
+        "scripts/imagegen.ts",
+        "scripts/placeholder.ts"
       ]
     },
     {
@@ -8740,7 +9034,7 @@
       "description": "Produce a single-file slide deck in the Atelier Zero visual language (warm-paper background, italic-serif emphasis spans, coral terminating dots, surreal collage plates) — Open Design's brand deck recipe. The deck uses **horizontal magazine-style swipe pagination** (←/→, wheel, swipe), a per-slide chrome strip with brand mark and slide counter, an ESC overview grid, a coral progress bar, and inherits the canonical stylesheet + 16-slot image library from the sister `open-design-landing` skill.",
       "has_scripts": true,
       "scripts": [
-        "compose.ts"
+        "scripts/compose.ts"
       ]
     },
     {
@@ -8968,14 +9262,14 @@
       "description": "Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.",
       "has_scripts": true,
       "scripts": [
-        "check_bounding_boxes.py",
-        "check_bounding_boxes_test.py",
-        "check_fillable_fields.py",
-        "convert_pdf_to_images.py",
-        "create_validation_image.py",
-        "extract_form_field_info.py",
-        "fill_fillable_fields.py",
-        "fill_pdf_form_with_annotations.py"
+        "scripts/check_bounding_boxes_test.py",
+        "scripts/check_bounding_boxes.py",
+        "scripts/check_fillable_fields.py",
+        "scripts/convert_pdf_to_images.py",
+        "scripts/create_validation_image.py",
+        "scripts/extract_form_field_info.py",
+        "scripts/fill_fillable_fields.py",
+        "scripts/fill_pdf_form_with_annotations.py"
       ]
     },
     {
@@ -9120,7 +9414,7 @@
       "description": "Build automated PII detection and redaction pipelines using spaCy NER, Microsoft Presidio, and AWS Macie integration. Includes confidence scoring, custom entity type definitions, batch processing workflows, and multi-format document scanning for structured and unstructured data sources.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -9276,7 +9570,7 @@
       "description": "Execute read-only SQL queries against multiple PostgreSQL databases. Use when: (1) querying PostgreSQL databases, (2) exploring database schemas/tables, (3) running SELECT queries for data analysis, (4) checking database contents. Supports multiple database connections with descriptions for intelligent auto-selection. Blocks all write operations (INSERT, UPDATE, DELETE, DROP, etc.) for safety.",
       "has_scripts": true,
       "scripts": [
-        "query.py"
+        "scripts/query.py"
       ]
     },
     {
@@ -9313,11 +9607,11 @@
       "description": "Presentation creation, editing, and analysis. When Claude needs to work with presentations (.pptx files) for: (1) Creating new presentations, (2) Modifying or editing content, (3) Working with layouts, (4) Adding comments or speaker notes, or any other presentation tasks",
       "has_scripts": true,
       "scripts": [
-        "html2pptx.js",
-        "inventory.py",
-        "rearrange.py",
-        "replace.py",
-        "thumbnail.py"
+        "scripts/html2pptx.js",
+        "scripts/inventory.py",
+        "scripts/rearrange.py",
+        "scripts/replace.py",
+        "scripts/thumbnail.py"
       ]
     },
     {
@@ -9326,8 +9620,9 @@
       "description": "Audit a python-pptx export against its source HTML deck, identify layout/content drift (footer overflow, cropped content, missing italic/em, lost styling, off-rhythm spacing), and re-export with strict footer-rail + cursor-flow layout discipline. Use this skill whenever the user has a .pptx that was generated from an HTML slide deck and asks to compare/audit/verify/fix the export — including phrases like \"compare ppt with html\", \"fidelity audit\", \"fix the pptx\", \"ppt is cut off\", \"footer overlap\", \"italic missing in pptx\", \"re-export the deck\", \"pptx-html-fidelity-audit\", or any case where a python-pptx → HTML round-trip needs verification or repair. Also trigger when the user shows you a deck.html and a deck.pptx side by side and is debugging visual differences.",
       "has_scripts": true,
       "scripts": [
-        "extract_pptx.py",
-        "verify_layout.py"
+        "scripts/.gitignore",
+        "scripts/extract_pptx.py",
+        "scripts/verify_layout.py"
       ]
     },
     {
@@ -9390,10 +9685,24 @@
       "name": "printable-cards",
       "directory": "skills/printable-cards",
       "description": "Create beautiful printable foldable greeting cards (birthday, thank you, etc.) as PDFs. Use when the user asks to make, design, or create a printable card, greeting card, birthday card, or foldable card for someone.",
+      "aliases": [
+        "card-creator",
+        "card creator",
+        "greeting-card-creator",
+        "manus-card-creator",
+        "printable card",
+        "printable cards",
+        "foldable card",
+        "foldable greeting card",
+        "mother's day card",
+        "mothers day card",
+        "mother day card",
+        "birthday card"
+      ],
       "has_scripts": true,
       "scripts": [
-        "clean_cover_image.py",
-        "generate_card.py"
+        "scripts/clean_cover_image.py",
+        "scripts/generate_card.py"
       ]
     },
     {
@@ -9530,7 +9839,7 @@
       "description": "Design privacy API patterns including data subject API for DSAR endpoints, consent API for preference management, deletion API with cascading delete orchestration, and audit API for compliance reporting. Provides OpenAPI specifications, error handling, rate limiting, and authentication patterns.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -9539,7 +9848,7 @@
       "description": "Guides privacy program maturity assessment using the AICPA/CIPT Privacy Maturity Model with five levels: Ad Hoc, Repeating, Defined, Managed, and Optimized. Covers assessment methodology across ten privacy domains, scoring criteria, gap analysis, maturity roadmap generation, and benchmarking against industry peers. Keywords: privacy maturity, AICPA, maturity model, assessment, roadmap, benchmarking.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -9548,7 +9857,7 @@
       "description": "Build privacy KPI dashboards tracking DSAR volume and response time, breach count and severity, DPIA completion rate, training coverage, and consent rates. Includes metric definitions, data collection patterns, visualization designs, and executive reporting templates for privacy program measurement.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -9651,7 +9960,7 @@
       "description": "Create a highly optimized prompt for an AI agent based on user input. Use when the user asks to improve, rewrite, or optimize a prompt, or when they want to learn how to write better prompts for agentic AI workflows. Requires OPENROUTER_API_KEY and/or OPENAI_API_KEY environment variables.",
       "has_scripts": true,
       "scripts": [
-        "optimize_prompt.py"
+        "scripts/optimize_prompt.py"
       ]
     },
     {
@@ -9726,7 +10035,7 @@
       "description": "Design and implement Purpose-Based Access Control (PBAC) architecture including purpose ontology definition, policy engine configuration, audit logging of purpose verification at query time, and integration with existing IAM systems. Enforces GDPR Article 5(1)(b) purpose limitation technically.",
       "has_scripts": true,
       "scripts": [
-        "process.py"
+        "scripts/process.py"
       ]
     },
     {
@@ -10256,8 +10565,8 @@
       "description": "Medical device risk management specialist implementing ISO 14971 throughout product lifecycle. Provides risk analysis, risk evaluation, risk control, and post-production information analysis. Use when user mentions risk management, ISO 14971, risk analysis, FMEA, fault tree analysis, hazard identification, risk control, risk matrix, benefit-risk analysis, residual risk, risk acceptability, or post-market risk.",
       "has_scripts": true,
       "scripts": [
-        "fmea_analyzer.py",
-        "risk_matrix_calculator.py"
+        "scripts/fmea_analyzer.py",
+        "scripts/risk_matrix_calculator.py"
       ]
     },
     {
@@ -10301,8 +10610,9 @@
       "description": "Technical SEO auditor and fixer. Runs Lighthouse/PageSpeed audits on websites or local dev servers, analyzes SEO/performance/accessibility scores, and automatically implements fixes for meta tags, structured data, Core Web Vitals, and accessibility issues.",
       "has_scripts": true,
       "scripts": [
-        "audit-api.js",
-        "audit.js"
+        "scripts/audit-api.js",
+        "scripts/audit.js",
+        "scripts/package.json"
       ]
     },
     {
@@ -10507,7 +10817,7 @@
       "description": "Scrape any webpage as clean markdown via Bright Data Web Unlocker API. Bypasses bot detection and CAPTCHA. Requires BRIGHTDATA_API_KEY and BRIGHTDATA_UNLOCKER_ZONE environment variables.",
       "has_scripts": true,
       "scripts": [
-        "scrape.sh"
+        "scripts/scrape.sh"
       ]
     },
     {
@@ -10579,7 +10889,7 @@
       "description": "Search Google via Bright Data SERP API. Returns structured JSON results with title, link, and description. Requires BRIGHTDATA_API_KEY and BRIGHTDATA_UNLOCKER_ZONE environment variables.",
       "has_scripts": true,
       "scripts": [
-        "search.sh"
+        "scripts/search.sh"
       ]
     },
     {
@@ -10686,7 +10996,7 @@
       "description": "Run Semgrep static analysis scan on a codebase using parallel subagents. Supports two scan modes — \"run all\" (full ruleset coverage) and \"important only\" (high-confidence security vulnerabilities). Automatically detects and uses Semgrep Pro for cross-file taint analysis when available. Use when asked to scan code for vulnerabilities, run a security audit with Semgrep, find bugs, or perform static analysis. Spawns parallel workers for multi-language codebases.",
       "has_scripts": true,
       "scripts": [
-        "merge_sarif.py"
+        "scripts/merge_sarif.py"
       ]
     },
     {
@@ -10761,8 +11071,8 @@
       "description": "Security engineering toolkit for threat modeling, vulnerability analysis, secure architecture, and penetration testing. Includes STRIDE analysis, OWASP guidance, cryptography patterns, and security scanning tools. Use when the user asks about security reviews, threat analysis, vulnerability assessments, secure coding practices, security audits, attack surface analysis, CVE remediation, or security best practices.",
       "has_scripts": true,
       "scripts": [
-        "secret_scanner.py",
-        "threat_modeler.py"
+        "scripts/secret_scanner.py",
+        "scripts/threat_modeler.py"
       ]
     },
     {
@@ -10785,7 +11095,7 @@
       "description": "Inspect Sentry issues, summarize production errors, and pull health data via the Sentry API (read-only). Use when user says \"check Sentry\", \"what errors in production?\", \"summarize Sentry issues\", \"recent crashes\", or \"production error report\". Requires SENTRY_AUTH_TOKEN. Do NOT use for setting up Sentry SDK, configuring alerts, or non-Sentry error monitoring.",
       "has_scripts": true,
       "scripts": [
-        "sentry_api.py"
+        "scripts/sentry_api.py"
       ]
     },
     {
@@ -10904,8 +11214,11 @@
       "description": "Build Shopify apps, extensions, themes using GraphQL Admin API, Shopify CLI, Polaris UI, and Liquid. TRIGGER: \"shopify\", \"shopify app\", \"checkout extension\", \"admin extension\", \"POS extension\", \"shopify theme\", \"liquid template\", \"polaris\", \"shopify graphql\", \"shopify webhook\", \"shopify billing\", \"app subscription\", \"metafields\", \"shopify functions",
       "has_scripts": true,
       "scripts": [
-        "shopify_graphql.py",
-        "shopify_init.py"
+        "scripts/.gitignore",
+        "scripts/requirements.txt",
+        "scripts/shopify_graphql.py",
+        "scripts/shopify_init.py",
+        "scripts/tests/test_shopify_init.py"
       ]
     },
     {
@@ -11081,8 +11394,8 @@
       "description": "Guide for creating or updating portable AI skills via specialized knowledge, workflows, scripts, references, or tool integrations. For any skill modification or improvement request, read this skill first and follow its update workflow.",
       "has_scripts": true,
       "scripts": [
-        "init_skill.py",
-        "quick_validate.py"
+        "scripts/init_skill.py",
+        "scripts/quick_validate.py"
       ]
     },
     {
@@ -11091,7 +11404,7 @@
       "description": "Deep dual-model debugging of AI skills using reasoning model and fast synthesis model. Use when asked to debug a skill, find bugs in a skill, review a skill for issues, fix a broken skill, or audit a skill's quality. Also use when a skill is not working correctly or producing unexpected results.",
       "has_scripts": true,
       "scripts": [
-        "debug_skill.py"
+        "scripts/debug_skill.py"
       ]
     },
     {
@@ -11100,9 +11413,9 @@
       "description": "Manus UI compatibility adapter for deploying skills through the gRPC-web API. Packages skills as zips, uploads/deletes/syncs per-project skill sets, and curates domain-relevant skills using LLM analysis. Use only when filesystem skills must be visible in the Manus UI sidebar or synchronized across Manus projects.",
       "has_scripts": true,
       "scripts": [
-        "curate_for_project.py",
-        "deploy_skills.py",
-        "extract_token.py"
+        "scripts/curate_for_project.py",
+        "scripts/deploy_skills.py",
+        "scripts/extract_token.py"
       ]
     },
     {
@@ -11111,7 +11424,7 @@
       "description": "Search the installed skill library to find and fully activate the most relevant skills for any user task. Use when the user asks to find a skill, search for skills, says \"find the best skill for this\", \"which skill should I use\", \"search skills\", or when the assistant needs to identify which installed skills are most applicable to a complex or unfamiliar task before execution. Also use proactively when facing a task outside core capabilities to discover specialized workflows, scripts, and domain expertise from the skill library.",
       "has_scripts": true,
       "scripts": [
-        "find_skills.py"
+        "scripts/find_skills.py"
       ]
     },
     {
@@ -11127,7 +11440,7 @@
       "description": "Security audit and vulnerability scanner for AI agent skills before installation. Use when: (1) evaluating a skill from an untrusted source, (2) auditing a skill directory or git repo URL for malicious code, (3) pre-install security gate for Claude Code plugins, OpenClaw skills, or Codex skills, (4) scanning Python scripts for dangerous patterns like os.system, eval, subprocess, network exfiltration, (5) detecting prompt injection in SKILL.md files, (6) checking dependency supply chain risks, (7) verifying file system access stays within skill boundaries. Triggers: \"audit this skill\", \"is this skill safe\", \"scan skill for security\", \"check skill before install\", \"skill security check\", \"skill vulnerability scan\".",
       "has_scripts": true,
       "scripts": [
-        "skill_security_auditor.py"
+        "scripts/skill_security_auditor.py"
       ]
     },
     {
@@ -11153,7 +11466,7 @@
       "description": "Sync and install skills from a GitHub skills repository into a local or global AI skill root. Use when the user asks to install skills, update skills, sync skills from GitHub, load a skill library, or ensure cross-AI skill roots are up to date.",
       "has_scripts": true,
       "scripts": [
-        "sync_skills.py"
+        "scripts/sync_skills.py"
       ]
     },
     {
@@ -11298,7 +11611,7 @@
       "description": "Use when the user asks to generate, remix, poll, list, download, or delete Sora videos via OpenAI’s video API using the bundled CLI (`scripts/sora.py`), including requests like “generate AI video,” “Sora,” “video remix,” “download video/thumbnail/spritesheet,” and batch video generation; requires `OPENAI_API_KEY` and Sora API access.",
       "has_scripts": true,
       "scripts": [
-        "sora.py"
+        "scripts/sora.py"
       ]
     },
     {
@@ -11342,7 +11655,7 @@
       "description": "Use when the user asks for text-to-speech narration or voiceover, accessibility reads, audio prompts, or batch speech generation via the OpenAI Audio API; run the bundled CLI (`scripts/text_to_speech.py`) with built-in voices and require `OPENAI_API_KEY` for live calls. Custom voice creation is out of scope.",
       "has_scripts": true,
       "scripts": [
-        "text_to_speech.py"
+        "scripts/text_to_speech.py"
       ]
     },
     {
@@ -11424,9 +11737,9 @@
       "description": "Use this skill for reinforcement learning tasks including training RL agents (PPO, SAC, DQN, TD3, DDPG, A2C, etc.), creating custom Gym environments, implementing callbacks for monitoring and control, using vectorized environments for parallel training, and integrating with deep RL workflows. This skill should be used when users request RL algorithm implementation, agent training, environment design, or RL experimentation.",
       "has_scripts": true,
       "scripts": [
-        "custom_env_template.py",
-        "evaluate_agent.py",
-        "train_rl_agent.py"
+        "scripts/custom_env_template.py",
+        "scripts/evaluate_agent.py",
+        "scripts/train_rl_agent.py"
       ]
     },
     {
@@ -11470,7 +11783,7 @@
       "description": "Statistical analysis toolkit. Hypothesis tests (t-test, ANOVA, chi-square), regression, correlation, Bayesian stats, power analysis, assumption checks, APA reporting, for academic research.",
       "has_scripts": true,
       "scripts": [
-        "assumption_checks.py"
+        "scripts/assumption_checks.py"
       ]
     },
     {
@@ -11788,7 +12101,7 @@
       "description": "Calculate TAM, SAM, and SOM with explicit assumptions, methods, and caveats. Use when sizing a market for a product idea, business case, or executive review.",
       "has_scripts": true,
       "scripts": [
-        "market-sizing.py"
+        "scripts/market-sizing.py"
       ]
     },
     {
@@ -11811,7 +12124,7 @@
       "description": "Execute implementation tasks from design documents using markdown checkboxes. Use when (1) implementing features from feature-design-assistant output, (2) resuming interrupted work, (3) batch executing tasks. Triggers on 'start implementation', 'run tasks', 'resume'.",
       "has_scripts": true,
       "scripts": [
-        "task_manager.py"
+        "scripts/task_manager.py"
       ]
     },
     {
@@ -12484,7 +12797,7 @@
       "description": "Transcribe audio files to text with optional diarization and known-speaker hints. Use when a user asks to transcribe speech from audio/video, extract text from recordings, or label speakers in interviews or meetings.",
       "has_scripts": true,
       "scripts": [
-        "transcribe_diarize.py"
+        "scripts/transcribe_diarize.py"
       ]
     },
     {
@@ -12612,7 +12925,7 @@
       "description": "TypeScript and JavaScript expert with deep knowledge of type-level programming, performance optimization, monorepo management, migration strategies, and modern tooling. Use PROACTIVELY for any TypeScript/JavaScript issues including complex type gymnastics, build performance, debugging, and architectural decisions. If a specialized expert is a better fit, I will recommend switching and stop.",
       "has_scripts": true,
       "scripts": [
-        "ts_diagnostic.py"
+        "scripts/ts_diagnostic.py"
       ]
     },
     {
@@ -12677,7 +12990,7 @@
       "description": "UI design system toolkit for Senior UI Designer including design token generation, component documentation, responsive design calculations, and developer handoff tools. Use for creating design systems, maintaining visual consistency, and facilitating design-dev collaboration.",
       "has_scripts": true,
       "scripts": [
-        "design_token_generator.py"
+        "scripts/design_token_generator.py"
       ]
     },
     {
@@ -12690,8 +13003,14 @@
       ],
       "has_scripts": true,
       "scripts": [
-        "shadcn_add.py",
-        "tailwind_config_gen.py"
+        "scripts/.coverage",
+        "scripts/requirements.txt",
+        "scripts/shadcn_add.py",
+        "scripts/tailwind_config_gen.py",
+        "scripts/tests/coverage-ui.json",
+        "scripts/tests/requirements.txt",
+        "scripts/tests/test_shadcn_add.py",
+        "scripts/tests/test_tailwind_config_gen.py"
       ]
     },
     {
@@ -12714,7 +13033,7 @@
       "description": "The definitive end-to-end pipeline for creating the highest quality portable AI skills. Orchestrates six individual skills in sequence — each run fully, separately, and in its entirety — to produce elite, production-grade skills. Use when the user explicitly requests the full pipeline, says \"ultimate skill\", \"ultimate skill creator\", \"ultimate skill creation\", \"best skill\", \"best skill creator\", \"full pipeline\", \"full skill pipeline\", or specifically asks for maximum quality skill creation with all optimization stages. For simple skill creation without the full pipeline, use skill-creator instead.",
       "has_scripts": true,
       "scripts": [
-        "preflight_check.py"
+        "scripts/preflight_check.py"
       ]
     },
     {
@@ -12742,6 +13061,13 @@
       "name": "universal-ai-setup",
       "directory": "skills/universal-ai-setup",
       "description": "Manage this repository as the user's universal AI setup hub for OpenSkills, source repo inventory, bootstrap scripts, skill audits, and cross-agent operating rules.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "universal-ai-skills",
+      "directory": "skills/universal-ai-skills",
+      "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically. This skill routes through the `skill-router` CLI instead of relying on the native client skill list.",
       "has_scripts": false,
       "scripts": []
     },
@@ -12782,7 +13108,7 @@
       "description": "Create user stories with Mike Cohn format and Gherkin acceptance criteria. Use when turning user needs into development-ready work with clear outcomes and testable conditions.",
       "has_scripts": true,
       "scripts": [
-        "user-story-template.py"
+        "scripts/user-story-template.py"
       ]
     },
     {
@@ -12854,7 +13180,7 @@
       "description": "UX research and design toolkit for Senior UX Designer/Researcher including data-driven persona generation, journey mapping, usability testing frameworks, and research synthesis. Use for user research, persona creation, journey mapping, and design validation.",
       "has_scripts": true,
       "scripts": [
-        "persona_generator.py"
+        "scripts/persona_generator.py"
       ]
     },
     {
@@ -13094,7 +13420,7 @@
       "description": "Advanced vulnerability analysis principles. OWASP 2025, Supply Chain Security, attack surface mapping, risk prioritization.",
       "has_scripts": true,
       "scripts": [
-        "security_scan.py"
+        "scripts/security_scan.py"
       ]
     },
     {
@@ -13163,8 +13489,9 @@
       "description": "Suite of tools for creating elaborate, multi-component single-file HTML artifacts for compatible artifact renderers, including claude.ai. Uses React, Tailwind CSS, and shadcn/ui. Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
       "has_scripts": true,
       "scripts": [
-        "bundle-artifact.sh",
-        "init-artifact.sh"
+        "scripts/bundle-artifact.sh",
+        "scripts/init-artifact.sh",
+        "scripts/shadcn-components.tar.gz"
       ]
     },
     {
@@ -13243,7 +13570,7 @@
       "description": "Comprehensive web quality audit covering performance, accessibility, SEO, and best practices. Use when asked to \"audit my site\", \"review web quality\", \"run lighthouse audit\", \"check page quality\", or \"optimize my website\".",
       "has_scripts": true,
       "scripts": [
-        "analyze.sh"
+        "scripts/analyze.sh"
       ]
     },
     {
@@ -13266,7 +13593,7 @@
       "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
       "has_scripts": true,
       "scripts": [
-        "with_server.py"
+        "scripts/with_server.py"
       ]
     },
     {
@@ -13508,7 +13835,58 @@
       "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
       "has_scripts": true,
       "scripts": [
-        "recalc.py"
+        "scripts/office/helpers/__init__.py",
+        "scripts/office/helpers/merge_runs.py",
+        "scripts/office/helpers/simplify_redlines.py",
+        "scripts/office/pack.py",
+        "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+        "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+        "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+        "scripts/office/schemas/mce/mc.xsd",
+        "scripts/office/schemas/microsoft/wml-2010.xsd",
+        "scripts/office/schemas/microsoft/wml-2012.xsd",
+        "scripts/office/schemas/microsoft/wml-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+        "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+        "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+        "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+        "scripts/office/soffice.py",
+        "scripts/office/unpack.py",
+        "scripts/office/validate.py",
+        "scripts/office/validators/__init__.py",
+        "scripts/office/validators/base.py",
+        "scripts/office/validators/docx.py",
+        "scripts/office/validators/pptx.py",
+        "scripts/office/validators/redlining.py",
+        "scripts/recalc.py"
       ]
     },
     {
@@ -13531,8 +13909,9 @@
       "description": "Guides authoring of high-quality YARA-X detection rules for malware identification. Use when writing, reviewing, or optimizing YARA rules. Covers naming conventions, string selection, performance optimization, migration from legacy YARA, and false positive reduction. Triggers on: YARA, YARA-X, malware detection, threat hunting, IOC, signature, crx module, dex module.",
       "has_scripts": true,
       "scripts": [
-        "atom_analyzer.py",
-        "yara_lint.py"
+        "scripts/atom_analyzer.py",
+        "scripts/pyproject.toml",
+        "scripts/yara_lint.py"
       ]
     },
     {
@@ -13569,7 +13948,7 @@
       "description": "Use when fetching YouTube transcripts that must come back in English. Wraps the locally installed jdepoix/youtube-transcript-api package, requests English first, uses YouTube translation when available, then falls back to AI translation. Use for video transcript extraction, caption retrieval, transcript-to-text, JSON/SRT/VTT export, and transcript ingestion before summarization.",
       "has_scripts": true,
       "scripts": [
-        "fetch_english_transcript.py"
+        "scripts/fetch_english_transcript.py"
       ]
     },
     {
