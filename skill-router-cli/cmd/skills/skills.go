@@ -45,12 +45,13 @@ type externalSkill struct {
 }
 
 type externalSkillsCache struct {
-	Version       int             `json:"version"`
-	GeneratedUnix int64           `json:"generatedUnix"`
-	Skills        []externalSkill `json:"skills"`
+	Version        int             `json:"version"`
+	GeneratedUnix  int64           `json:"generatedUnix"`
+	RootsSignature string          `json:"rootsSignature"`
+	Skills         []externalSkill `json:"skills"`
 }
 
-const automaticRouteMinScore = 25
+const automaticRouteMinScore = 40
 
 // Cmd is the top-level skills command group. It also backs the singular
 // "skill" alias so agents can use `skill-router skill <name>` as the context-light path.
@@ -933,6 +934,9 @@ func readExternalSkillsCache(canonical map[string]bool) ([]externalSkill, bool) 
 	if err := json.Unmarshal(data, &cache); err != nil || cache.Version != 1 {
 		return nil, false
 	}
+	if cache.RootsSignature != externalSkillRootsSignature() {
+		return nil, false
+	}
 	if time.Since(time.Unix(cache.GeneratedUnix, 0)) > externalSkillsCacheTTL() {
 		return nil, false
 	}
@@ -955,9 +959,10 @@ func writeExternalSkillsCache(skills []externalSkill) error {
 		return err
 	}
 	cache := externalSkillsCache{
-		Version:       1,
-		GeneratedUnix: time.Now().Unix(),
-		Skills:        skills,
+		Version:        1,
+		GeneratedUnix:  time.Now().Unix(),
+		RootsSignature: externalSkillRootsSignature(),
+		Skills:         skills,
 	}
 	data, err := json.MarshalIndent(cache, "", "  ")
 	if err != nil {
@@ -968,6 +973,15 @@ func writeExternalSkillsCache(skills []externalSkill) error {
 
 func externalSkillsCachePath() string {
 	return filepath.Join(platform.ConfigDir(), "external-skills-index.json")
+}
+
+func externalSkillRootsSignature() string {
+	roots := externalSkillRoots()
+	parts := make([]string, 0, len(roots))
+	for _, root := range roots {
+		parts = append(parts, strings.ToLower(root.ID+"="+filepath.Clean(root.Path)))
+	}
+	return strings.Join(parts, "\n")
 }
 
 func externalSkillsCacheTTL() time.Duration {

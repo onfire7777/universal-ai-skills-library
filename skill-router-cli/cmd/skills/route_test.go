@@ -61,3 +61,28 @@ func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
 		t.Fatalf("expected generic prompt to stay below confidence threshold, got %d", score)
 	}
 }
+
+func TestAutomaticRoutingRejectsBroadAgentKeywordMatch(t *testing.T) {
+	prompt := "i just downloaded hermes agent tell me about what to do first"
+	mail := manifestSkill{
+		Name:        "agent-mail-automation",
+		Description: "Automate Agent Mail tasks via Rube MCP (Composio). Always search tools first for current schemas.",
+	}
+	score := scoreManifestSkill(prompt, mail)
+	if isConfidentRoute(score) {
+		t.Fatalf("expected broad agent prompt to stay below confidence threshold for agent-mail-automation, got %d", score)
+	}
+}
+
+func TestExternalHermesAgentBeatsBroadAgentKeywordMatch(t *testing.T) {
+	prompt := "i just downloaded hermes agent tell me about what to do first"
+	hermes := externalSkill{
+		Name:        "hermes-agent",
+		Description: "Configure, extend, or contribute to Hermes Agent.",
+		SourceID:    "hermes",
+	}
+	score := scoreExternalSkill(prompt, hermes)
+	if !isConfidentRoute(score) {
+		t.Fatalf("expected hermes-agent external skill to pass automatic route confidence, got %d", score)
+	}
+}
