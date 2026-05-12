@@ -59,6 +59,7 @@ The matrix reports:
 | Continue | `skill-root` / `repo-instruction` | `~/.continue/skills`, `.continue/rules`, and hub rules | installed-wrapper | Wrapper-only in the local skill root; rules remain the primary compatibility surface. |
 | Windsurf | `skill-root` / `repo-instruction` | `~/.windsurf/skills`, `.windsurf/rules`, and memories | installed-wrapper | Wrapper-only in the local skill root; use compact rules or MCP for project behavior. |
 | Roo Code | `skill-root` / `repo-instruction` | `~/.roo/skills`, `.roo` rules and related config | installed-wrapper | Wrapper-only in the local skill root; project rules stay separate. |
+| Kimi CLI | `skill-root` / `repo-instruction` | `~/.kimi/skills`, `~/.kimi/AGENTS.md`, `~/.kimi/config.toml` | installed-wrapper | Wrapper-only in the local skill root, referenced through `extra_skill_dirs`. |
 | Qwen Code | `skill-root` / `repo-instruction` | `~/.qwen/skills`, `QWEN.md` / AGENTS-style project guidance | installed-wrapper | Wrapper-only in the local skill root; keep prompts compact. |
 | GitHub Copilot | `repo-instruction` | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Compact repository instructions and path-scoped instructions only. |
 | VS Code Copilot | `repo-instruction` | `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Same repo instruction model, IDE-scoped behavior. |

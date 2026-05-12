@@ -34,7 +34,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/web"
 )
 
-const Version = "2.1.7"
+const Version = "2.1.8"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
