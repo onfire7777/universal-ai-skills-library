@@ -51,7 +51,7 @@ type externalSkillsCache struct {
 	Skills         []externalSkill `json:"skills"`
 }
 
-const automaticRouteMinScore = 40
+const automaticRouteMinScore = 75
 
 // Cmd is the top-level skills command group. It also backs the singular
 // "skill" alias so agents can use `skill-router skill <name>` as the context-light path.
@@ -242,7 +242,8 @@ and returns an error for generic prompts.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		return routePromptWithOptions(prompt, routeOptions{})
+		explain, _ := cmd.Flags().GetBool("explain")
+		return routePromptWithOptions(prompt, routeOptions{explain: explain})
 	},
 }
 
@@ -257,7 +258,8 @@ no-route message so agents can continue normally.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		return routePromptWithOptions(prompt, routeOptions{optional: true})
+		explain, _ := cmd.Flags().GetBool("explain")
+		return routePromptWithOptions(prompt, routeOptions{optional: true, explain: explain})
 	},
 }
 
@@ -371,6 +373,8 @@ func init() {
 	listCmd.Flags().Bool("external", false, "Also list unique skills from local external roots")
 	searchCmd.Flags().Bool("refresh", false, "Refresh local external skill index before searching")
 	sourcesCmd.Flags().Bool("refresh", false, "Refresh local external skill index after scanning sources")
+	RouteCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
+	AutoCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
 	propagateCmd.Flags().Bool("dry-run", false, "Show target roots without copying")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
 
@@ -621,6 +625,7 @@ func matchesExternalSkill(s externalSkill, query string) bool {
 
 type routeOptions struct {
 	optional bool
+	explain  bool
 }
 
 func routePrompt(prompt string) error {
@@ -632,53 +637,56 @@ func routePromptWithOptions(prompt string, opts routeOptions) error {
 	if err != nil {
 		return err
 	}
-	type candidate struct {
-		name     string
-		score    int
-		external bool
-	}
-	best := candidate{}
-	bestMeta := candidate{}
+	candidates := []routeCandidate{}
+	bestRaw := routeCandidate{}
+	maintenancePrompt := isRouterMaintenancePrompt(prompt)
 	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
-		score := scoreManifestSkill(prompt, s)
-		next := candidate{name: s.Name, score: score}
-		if isMetaRoutingSkill(s.Name) {
-			if score > bestMeta.score {
-				bestMeta = next
-			}
+		next := manifestRouteCandidate(prompt, s)
+		if next.score > bestRaw.score {
+			bestRaw = next
+		}
+		if next.meta && !maintenancePrompt {
 			continue
 		}
-		if score > best.score {
-			best = next
+		candidates = append(candidates, next)
+	}
+	external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
+	if err != nil {
+		return err
+	}
+	for _, s := range external {
+		next := externalRouteCandidate(prompt, s)
+		if next.score > bestRaw.score {
+			bestRaw = next
+		}
+		candidates = append(candidates, next)
+	}
+	sortRouteCandidates(candidates)
+	if opts.explain {
+		printRouteExplanation(candidates)
+	}
+	best, second, ok := chooseRouteCandidate(candidates)
+	if maintenancePrompt {
+		if metaBest, metaSecond, metaOK := chooseRouteCandidate(filterMetaRouteCandidates(candidates)); metaOK {
+			best, second, ok = metaBest, metaSecond, true
 		}
 	}
-	if best.score < automaticRouteMinScore {
-		external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
-		if err != nil {
-			return err
-		}
-		for _, s := range external {
-			score := scoreExternalSkill(prompt, s)
-			if score > best.score {
-				best = candidate{name: s.Name, score: score, external: true}
-			}
-		}
-	}
-	if isRouterMaintenancePrompt(prompt) && bestMeta.score >= best.score {
-		best = bestMeta
-	}
-	if best.score == 0 && bestMeta.score > 0 {
-		best = bestMeta
-	}
-	if best.score < automaticRouteMinScore {
+	if !ok {
 		if opts.optional {
 			fmt.Println("No skill route: generic prompt.")
 			return nil
 		}
-		if best.score == 0 {
+		if bestRaw.score == 0 {
 			return fmt.Errorf("no skill matched prompt; try `skill-router skill search %s`", prompt)
 		}
-		return fmt.Errorf("no confident skill matched prompt (best: %s, score %d, threshold %d); try `skill-router skill search %s`", best.name, best.score, automaticRouteMinScore, prompt)
+		return fmt.Errorf("no confident skill matched prompt (best: %s, score %d, threshold %d); try `skill-router skill search %s`", bestRaw.name, bestRaw.score, automaticRouteMinScore, prompt)
+	}
+	if isAmbiguousRoute(best, second) {
+		if opts.optional {
+			fmt.Printf("No skill route: ambiguous prompt (best: %s, runner-up: %s).\n", best.name, second.name)
+			return nil
+		}
+		return fmt.Errorf("ambiguous skill route (best: %s score %d, runner-up: %s score %d); try `skill-router skill search %s`", best.name, best.score, second.name, second.score, prompt)
 	}
 	source := "canonical"
 	if best.external {
@@ -686,22 +694,6 @@ func routePromptWithOptions(prompt string, opts routeOptions) error {
 	}
 	fmt.Printf("Route: %s (%s, score %d)\n\n", best.name, source, best.score)
 	return printSkill(best.name)
-}
-
-func isConfidentRoute(score int) bool {
-	return score >= automaticRouteMinScore
-}
-
-func scoreManifestSkill(prompt string, s manifestSkill) int {
-	haystacks := []struct {
-		text   string
-		weight int
-	}{
-		{s.Name, 100},
-		{strings.Join(s.Aliases, " "), 95},
-		{s.Description, 35},
-	}
-	return scoreText(prompt, haystacks)
 }
 
 func isMetaRoutingSkill(name string) bool {
@@ -716,56 +708,18 @@ func isMetaRoutingSkill(name string) bool {
 func isRouterMaintenancePrompt(prompt string) bool {
 	normalized := normalizeForMatch(prompt)
 	return strings.Contains(normalized, "skill router") ||
+		strings.Contains(normalized, "skill routing") ||
+		strings.Contains(normalized, "skills routing") ||
+		strings.Contains(normalized, "router accuracy") ||
 		strings.Contains(normalized, "router setup") ||
+		strings.Contains(normalized, "routing router") ||
+		strings.Contains(normalized, "automatic routing") ||
 		strings.Contains(normalized, "universal ai skills setup") ||
 		strings.Contains(normalized, "universal ai skills router")
 }
 
-func scoreExternalSkill(prompt string, s externalSkill) int {
-	return scoreText(prompt, []struct {
-		text   string
-		weight int
-	}{
-		{s.Name, 90},
-		{s.Description, 30},
-		{s.SourceID, 5},
-	})
-}
-
-func scoreText(prompt string, haystacks []struct {
-	text   string
-	weight int
-}) int {
-	query := normalizeForMatch(prompt)
-	tokens := strings.Fields(query)
-	if len(tokens) == 0 {
-		return 0
-	}
-	score := 0
-	for _, h := range haystacks {
-		text := normalizeForMatch(h.text)
-		if text == "" {
-			continue
-		}
-		if strings.Contains(query, text) || strings.Contains(text, query) {
-			score += h.weight
-		}
-		for _, token := range tokens {
-			if len(token) < 3 {
-				continue
-			}
-			if strings.Contains(text, token) {
-				score += h.weight / 6
-			}
-		}
-	}
-	return score
-}
-
 func normalizeForMatch(value string) string {
-	value = strings.ToLower(value)
-	value = strings.NewReplacer("-", " ", "_", " ", ":", " ", "'", "", "\"", "").Replace(value)
-	return strings.Join(strings.Fields(value), " ")
+	return normalizeRouteText(value)
 }
 
 func canonicalSkillKeys(manifest skillManifest) map[string]bool {

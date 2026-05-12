@@ -5,6 +5,7 @@
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
 - Use `skill-router route "<user prompt>"` when an explicit routing check should fail if no confident skill applies.
+- Use `skill-router route --explain "<user prompt>"` to debug unexpected routes; prefer no route over a weak or ambiguous route.
 - For card creator, printable greeting card, Mother's Day card, birthday card, or foldable card requests, route to the exact Manus-origin `printable-cards` skill.
 - Do not preload the full skills corpus into context.
 - Treat `skills/` as source data and `skill-router-cli/` as the router source.

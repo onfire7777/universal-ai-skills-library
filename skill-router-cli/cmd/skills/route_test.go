@@ -44,8 +44,33 @@ func TestRouterMaintenancePromptAllowsMetaSkill(t *testing.T) {
 	if !isRouterMaintenancePrompt("fix the universal ai skills router setup") {
 		t.Fatal("expected router maintenance prompt to be detected")
 	}
+	if !isRouterMaintenancePrompt("improve the skill router automatic routing accuracy") {
+		t.Fatal("expected automatic router accuracy prompt to be detected")
+	}
 	if isRouterMaintenancePrompt("use the universal ai skills card creator skill") {
 		t.Fatal("card creator prompt should route to the task skill, not router maintenance")
+	}
+}
+
+func TestRouterMaintenancePromptPrefersMetaSkill(t *testing.T) {
+	prompt := "improve the skill router automatic routing accuracy"
+	meta := manifestRouteCandidate(prompt, manifestSkill{
+		Name:        "universal-ai-skills",
+		Description: "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically.",
+	})
+	generic := externalRouteCandidate(prompt, externalSkill{
+		Name:        "improve-skill",
+		Description: "Improve an existing AI skill based on review feedback.",
+		SourceID:    "claude",
+	})
+	candidates := []routeCandidate{generic, meta}
+	sortRouteCandidates(candidates)
+	best, _, ok := chooseRouteCandidate(filterMetaRouteCandidates(candidates))
+	if !ok {
+		t.Fatal("expected a confident meta route")
+	}
+	if best.name != "universal-ai-skills" {
+		t.Fatalf("expected maintenance routing to prefer universal-ai-skills, got %s", best.name)
 	}
 }
 
@@ -59,6 +84,15 @@ func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
 	score := scoreManifestSkill(genericPrompt, printable)
 	if isConfidentRoute(score) {
 		t.Fatalf("expected generic prompt to stay below confidence threshold, got %d", score)
+	}
+
+	issuePrompt := "please solve this issue"
+	toIssues := manifestRouteCandidate(issuePrompt, manifestSkill{
+		Name:        "to-issues",
+		Description: "Convert notes and TODOs into tracked issues.",
+	})
+	if isEligibleRouteCandidate(toIssues) {
+		t.Fatalf("expected broad issue prompt to stay ineligible, got score %d", toIssues.score)
 	}
 }
 
@@ -84,5 +118,52 @@ func TestExternalHermesAgentBeatsBroadAgentKeywordMatch(t *testing.T) {
 	score := scoreExternalSkill(prompt, hermes)
 	if !isConfidentRoute(score) {
 		t.Fatalf("expected hermes-agent external skill to pass automatic route confidence, got %d", score)
+	}
+}
+
+func TestAutomaticRoutingRejectsSourceOnlyExternalMatch(t *testing.T) {
+	prompt := "hermes setup"
+	worker := externalRouteCandidate(prompt, externalSkill{
+		Name:        "kanban-worker",
+		Description: "Run a worker in the Hermes automation environment.",
+		SourceID:    "hermes",
+	})
+	if isEligibleRouteCandidate(worker) {
+		t.Fatalf("expected source-only external match to be ineligible, got score %d", worker.score)
+	}
+}
+
+func TestAutomaticRoutingHandlesInflectedDescriptionPhrase(t *testing.T) {
+	prompt := "rename files in this folder"
+	organizer := manifestRouteCandidate(prompt, manifestSkill{
+		Name:        "file-organizer",
+		Description: "Comprehensive file organization suite. Use for cleaning up messy folders, arranging the desktop, finding duplicates, renaming files intelligently, and categorizing files by type or date.",
+	})
+	if !isEligibleRouteCandidate(organizer) {
+		t.Fatalf("expected file-organizer to be eligible for rename files prompt, got score %d", organizer.score)
+	}
+}
+
+func TestAutomaticRoutingRejectsAmbiguousNearTie(t *testing.T) {
+	prompt := "debug this failing test"
+	candidates := []routeCandidate{
+		externalRouteCandidate(prompt, externalSkill{
+			Name:        "test-failing-test",
+			Description: "Diagnose and fix a failing test.",
+			SourceID:    "external",
+		}),
+		externalRouteCandidate(prompt, externalSkill{
+			Name:        "testing",
+			Description: "General testing workflows for fixing failing tests.",
+			SourceID:    "external",
+		}),
+	}
+	sortRouteCandidates(candidates)
+	best, second, ok := chooseRouteCandidate(candidates)
+	if !ok {
+		t.Fatal("expected eligible test-related candidates")
+	}
+	if !isAmbiguousRoute(best, second) {
+		t.Fatalf("expected near-tie to be ambiguous, best=%s/%d second=%s/%d", best.name, best.score, second.name, second.score)
 	}
 }
