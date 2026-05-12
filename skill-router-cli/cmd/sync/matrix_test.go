@@ -48,6 +48,8 @@ func TestClassifyMode(t *testing.T) {
 		{matrixRow{Adapter: "repo-instruction"}, "repo-instruction"},
 		{matrixRow{Exists: true, ID: "kimi-openclaw"}, "special"},
 		{matrixRow{Exists: true, ID: "openclaw-workspace"}, "special"},
+		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 200, DefaultSync: true}, "full-copy"},
+		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 200, DefaultSync: false}, "custom+wrapper"},
 		{matrixRow{Exists: true, SkillFiles: 200}, "full-copy"},
 		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 1}, "wrapper"},
 		{matrixRow{Exists: true, SkillFiles: 0}, "empty"},

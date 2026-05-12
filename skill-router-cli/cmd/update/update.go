@@ -11,6 +11,7 @@ import (
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillsync"
 )
 
 // Cmd is the update command.
@@ -19,11 +20,12 @@ var Cmd = &cobra.Command{
 	Short: "Self-update router binary, skills repo, and printing-press",
 	Long: `Update the skill-router binaries from the local skills repository,
 pull latest skills from the repository, update printing-press,
-and re-propagate to all agent roots.`,
+and re-propagate compact wrapper skills to default agent roots.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		skillsOnly, _ := cmd.Flags().GetBool("skills")
 		cliOnly, _ := cmd.Flags().GetBool("cli")
 		all, _ := cmd.Flags().GetBool("all")
+		fullCopy, _ := cmd.Flags().GetBool("full-copy")
 
 		if !skillsOnly && !cliOnly {
 			all = true
@@ -48,23 +50,20 @@ and re-propagate to all agent roots.`,
 				fmt.Println("  Done.")
 			}
 
-			bold.Println("[3/4] Re-installing skills...")
-			repoDir := platform.RepoDir()
-			installScript := filepath.Join(repoDir, "install.sh")
-			if runtime.GOOS != "windows" {
-				if _, err := os.Stat(installScript); err == nil {
-					runner.RunCommand("bash", installScript, "--target", platform.SkillsDir())
-				}
-			} else {
-				psScript := filepath.Join(repoDir, "infrastructure", "scripts", "install_skills.ps1")
-				if _, err := os.Stat(psScript); err == nil {
-					runner.RunPowerShell(psScript, "-Target", platform.SkillsDir())
-				}
+			bold.Println("[3/4] Verifying canonical skills source...")
+			if _, err := os.Stat(skillsync.SourceDir()); err != nil {
+				return err
 			}
 			fmt.Println("  Done.")
 
-			bold.Println("[4/4] Propagating to agent roots...")
-			propagateSkills()
+			bold.Println("[4/4] Propagating wrapper skills to agent roots...")
+			counts, err := skillsync.PropagateToDefaultRoots(fullCopy)
+			for _, root := range platform.AgentRoots() {
+				fmt.Printf("  %-40s [%d skills]\n", root, counts[root])
+			}
+			if err != nil {
+				return err
+			}
 			fmt.Println("  Done.")
 		}
 
@@ -82,6 +81,7 @@ func init() {
 	Cmd.Flags().Bool("skills", false, "Update only skills")
 	Cmd.Flags().Bool("cli", false, "Update only the CLI binary")
 	Cmd.Flags().Bool("all", false, "Update everything (default)")
+	Cmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 }
 
 func updateCLI() error {
@@ -114,21 +114,6 @@ func updateSkillsRepo() error {
 	}
 	// Pull latest
 	return runner.RunCommand("git", "-C", repoDir, "pull", "--ff-only")
-}
-
-func propagateSkills() {
-	src := platform.SkillsDir()
-	for _, root := range platform.AgentRoots() {
-		os.MkdirAll(root, 0755)
-		entries, _ := os.ReadDir(src)
-		for _, e := range entries {
-			if e.IsDir() {
-				srcPath := filepath.Join(src, e.Name())
-				dstPath := filepath.Join(root, e.Name())
-				runner.RunCommand("cp", "-r", srcPath, dstPath)
-			}
-		}
-	}
 }
 
 func updatePrintingPress() {

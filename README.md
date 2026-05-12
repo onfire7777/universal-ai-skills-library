@@ -4,6 +4,19 @@ CLI-first skill routing for Codex, ChatGPT, Claude, Claude Code, Claude Cowork, 
 
 The repository keeps a large skill corpus available without loading it all into every agent context. The source of truth is `skills/`; the router is `skill-router-cli/`; plugin metadata lives in `plugin/`.
 
+## GitHub Source Of Truth
+
+The canonical GitHub repo for this setup is:
+
+```text
+https://github.com/onfire7777/universal-ai-skills-library.git
+```
+
+OpenSkills checkouts are upstream dependencies and compatibility surfaces. Do
+not maintain a separate OpenSkills fork for this universal setup; keep OpenSkills
+tracking its upstream and keep universal router code, docs, skills, plugins, and
+install policy in this repository.
+
 Compatibility is adapter-based:
 
 - `skill-root`: clients that can discover `SKILL.md` packages get a tiny wrapper skill and on-demand CLI loading.

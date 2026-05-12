@@ -88,7 +88,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  create      Create new skills, projects, and templates")
 		fmt.Println("  debug       Deep dual-model skill debugging")
 		fmt.Println("  context     Manage context anchors and project instructions")
-		fmt.Println("  sync        Sync skills and propagate to all agent platforms")
+		fmt.Println("  sync        Sync skills and propagate router wrappers")
 		fmt.Println("  music       Music prompt crafting framework")
 		fmt.Println("  chat        Summarize and manage chat sessions")
 		fmt.Println()

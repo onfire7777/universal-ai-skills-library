@@ -93,7 +93,7 @@ if __name__ == "__main__":
 		fmt.Println("Next steps:")
 		fmt.Println("  1. Edit SKILL.md with your skill's instructions")
 		fmt.Println("  2. Implement scripts/main.py")
-		fmt.Println("  3. Run 'skill-router sync propagate' to distribute to all platforms")
+		fmt.Println("  3. Run 'skill-router sync propagate' to refresh router wrappers")
 		return nil
 	},
 }
