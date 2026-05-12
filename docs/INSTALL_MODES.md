@@ -28,17 +28,19 @@ Use only when a client requires physical skills and the user explicitly accepts 
 ## Current CLI behavior
 
 - `skill-router sync matrix` is read-only and safe.
-- Existing `sync propagate` behavior remains conservative: it writes only to legacy default roots returned by `platform.AgentRoots()`.
+- `skill-router sync propagate`, `skill-router sync all`, `skill-router update`, `skill-router skills install`, and `skill-router skills propagate` are wrapper-only by default.
+- Full-copy installation requires the explicit `--full-copy` flag.
+- Default writes are limited to conservative roots returned by `platform.AgentRoots()`.
 - Newly detected roots such as Windsurf, Roo, Continue, Qwen, and Kimi/OpenClaw are report-only until adapter semantics are confirmed.
 
-## Desired future commands
+## Explicit command shape
 
 ```bash
-skill-router sync plan
-skill-router sync install-wrapper --all
-skill-router sync install-wrapper --agent claude
-skill-router sync install-selected <skill> --agent codex
-skill-router sync propagate-full --all --confirm-full-copy
+skill-router sync matrix
+skill-router sync propagate
+skill-router sync propagate --full-copy
+skill-router skills install --target ~/.codex/skills
+skill-router skills install --target ~/.codex/skills --full-copy
 ```
 
-These commands should make install intent explicit before changing any agent root.
+Do not use `--full-copy` unless the user explicitly accepts redundant physical skill copies.

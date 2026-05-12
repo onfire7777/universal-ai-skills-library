@@ -5,31 +5,31 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillsync"
 )
 
 // Cmd is the top-level sync command group.
 var Cmd = &cobra.Command{
 	Use:   "sync",
-	Short: "Sync skills, repos, and propagate to all agent platforms",
-	Long: `Sync and install all skills from the GitHub skills repository into
-all agent platforms. Pulls latest from repo, runs install, and
-propagates to .agent, .claude, .codex, .manus, .gemini, .cursor,
-.config/opencode, and .kiro roots.
+	Short: "Sync skills, repos, and propagate wrapper skills to agent roots",
+	Long: `Sync the canonical GitHub skills repository and propagate compact
+wrapper skills to conservative default agent roots. This keeps local AI clients
+connected to skill-router without copying the full skill corpus into each root.
 
 Use sync matrix for a read-only compatibility view before changing roots.`,
 }
 
 var allCmd = &cobra.Command{
 	Use:   "all",
-	Short: "Full sync: pull repo, install skills, propagate to all roots",
+	Short: "Pull repo and propagate wrapper skills to default roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		fullCopy, _ := cmd.Flags().GetBool("full-copy")
 		bold := color.New(color.Bold)
 		green := color.New(color.FgGreen)
 
@@ -42,20 +42,16 @@ var allCmd = &cobra.Command{
 		}
 		green.Println("  Done.")
 
-		bold.Println("[2/3] Installing skills...")
-		if runtime.GOOS == "windows" {
-			// Use openskills propagation
-			runner.RunCommand("npx", "openskills", "install", "onfire7777/universal-ai-skills-library", "-g", "-u", "-y")
-		} else {
-			installScript := filepath.Join(repoDir, "install.sh")
-			if _, err := os.Stat(installScript); err == nil {
-				runner.RunCommand("bash", installScript)
-			}
+		bold.Println("[2/3] Verifying canonical skills source...")
+		if _, err := os.Stat(skillsync.SourceDir()); err != nil {
+			return err
 		}
 		green.Println("  Done.")
 
 		bold.Println("[3/3] Propagating to default agent roots...")
-		propagateToRoots()
+		if err := propagateToRoots(fullCopy); err != nil {
+			return err
+		}
 		green.Println("  Done.")
 
 		fmt.Println()
@@ -78,9 +74,12 @@ var repoCmd = &cobra.Command{
 
 var propagateAllCmd = &cobra.Command{
 	Use:   "propagate",
-	Short: "Propagate skills from source to default agent roots",
+	Short: "Propagate wrapper skills from source to default agent roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		propagateToRoots()
+		fullCopy, _ := cmd.Flags().GetBool("full-copy")
+		if err := propagateToRoots(fullCopy); err != nil {
+			return err
+		}
 		fmt.Println("Propagation complete.")
 		return nil
 	},
@@ -152,6 +151,8 @@ This command does not install, copy, link, delete, or modify any files.`,
 }
 
 func init() {
+	allCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
+	propagateAllCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	matrixCmd.Flags().Bool("json", false, "Output JSON")
 
 	Cmd.AddCommand(allCmd)
@@ -161,27 +162,12 @@ func init() {
 	Cmd.AddCommand(matrixCmd)
 }
 
-func propagateToRoots() {
-	src := platform.SkillsDir()
-	entries, err := os.ReadDir(src)
-	if err != nil {
-		return
-	}
+func propagateToRoots(fullCopy bool) error {
+	counts, err := skillsync.PropagateToDefaultRoots(fullCopy)
 	for _, root := range platform.AgentRoots() {
-		os.MkdirAll(root, 0755)
-		for _, e := range entries {
-			if e.IsDir() {
-				srcPath := filepath.Join(src, e.Name())
-				dstPath := filepath.Join(root, e.Name())
-				if runtime.GOOS == "windows" {
-					runner.RunCommand("powershell", "-NoProfile", "-Command",
-						fmt.Sprintf(`Copy-Item -Path "%s" -Destination "%s" -Recurse -Force`, srcPath, dstPath))
-				} else {
-					runner.RunCommand("cp", "-r", srcPath, dstPath)
-				}
-			}
-		}
+		fmt.Printf("  %-40s [%d skills]\n", root, counts[root])
 	}
+	return err
 }
 
 func buildMatrix() []matrixRow {
@@ -232,6 +218,8 @@ func classifyMode(row matrixRow) string {
 		return "missing"
 	case row.ID == "kimi-openclaw" || row.ID == "openclaw-workspace":
 		return "special"
+	case row.Wrapper && !row.DefaultSync && row.SkillFiles > 10:
+		return "custom+wrapper"
 	case row.SkillFiles > 100:
 		return "full-copy"
 	case row.Wrapper && row.SkillFiles <= 10:
@@ -255,6 +243,9 @@ func recommendation(row matrixRow) string {
 	}
 	if row.ID == "kimi-openclaw" || row.ID == "openclaw-workspace" {
 		return "do not mutate with generic sync"
+	}
+	if row.LikelyMode == "custom+wrapper" {
+		return "wrapper installed; preserve adapter-specific skills"
 	}
 	if !row.DefaultSync {
 		return "report-only until adapter semantics are confirmed"

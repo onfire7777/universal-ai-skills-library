@@ -1,161 +1,159 @@
 # Universal AI Skills Installer
-# Installs ALL skills (core + library) from this repository to all detected AI platform roots
-# Run from the repository root directory
+# Default mode installs only compact router wrapper skills. This keeps agent
+# roots connected to skill-router without copying the full corpus everywhere.
 #
 # Usage:
-#   .\infrastructure\scripts\install_skills.ps1           # Install with junctions
-#   .\infrastructure\scripts\install_skills.ps1 -DryRun   # Preview without changes
-#   .\infrastructure\scripts\install_skills.ps1 -Force    # Overwrite existing installations
-#   .\infrastructure\scripts\install_skills.ps1 -Copy     # Copy files instead of junction
+#   .\infrastructure\scripts\install_skills.ps1
+#   .\infrastructure\scripts\install_skills.ps1 -DryRun
+#   .\infrastructure\scripts\install_skills.ps1 -Force
+#   .\infrastructure\scripts\install_skills.ps1 -Copy
+#   .\infrastructure\scripts\install_skills.ps1 -SkillNames universal-ai-skills,printable-cards
+#   .\infrastructure\scripts\install_skills.ps1 -FullCopy   # explicit, intentionally redundant
+#   .\infrastructure\scripts\install_skills.ps1 -Target "$env:USERPROFILE\.codex\skills"
 
 param(
     [switch]$DryRun,
     [switch]$Force,
-    [switch]$Copy
+    [switch]$Copy,
+    [switch]$FullCopy,
+    [string[]]$SkillNames = @(),
+    [string]$Target
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$LibrarySkillsDir = Join-Path $RepoRoot "skills"
+$DefaultWrapperSkillNames = @("universal-ai-skills", "printable-cards")
 
 Write-Host "=== Universal AI Skills Installer ===" -ForegroundColor Cyan
 Write-Host "Repository: $RepoRoot"
+Write-Host "Mode: $(if ($FullCopy) { 'full-copy' } elseif ($SkillNames.Count -gt 0) { 'selected' } else { 'wrapper-only' })"
 Write-Host ""
 
-# ─── Identify all skills ──────────────────────────────────────────────────────
-# Core skills: top-level directories with SKILL.md (not skills/, infrastructure/, .git)
-$coreSkillDirs = Get-ChildItem $RepoRoot -Directory | Where-Object {
-    (Test-Path (Join-Path $_.FullName "SKILL.md")) -and
-    $_.Name -notin @("skills", "infrastructure", ".git", "node_modules")
+if (-not (Test-Path $LibrarySkillsDir)) {
+    throw "Missing skills directory: $LibrarySkillsDir"
 }
 
-# Library skills: in the skills/ subdirectory
-$librarySkillsDir = Join-Path $RepoRoot "skills"
-$librarySkillDirs = @()
-if (Test-Path $librarySkillsDir) {
-    $librarySkillDirs = Get-ChildItem $librarySkillsDir -Directory | Where-Object {
-        Test-Path (Join-Path $_.FullName "SKILL.md")
+$allSkillDirs = Get-ChildItem $LibrarySkillsDir -Directory | Where-Object {
+    Test-Path (Join-Path $_.FullName "SKILL.md")
+}
+
+if ($FullCopy) {
+    $selectedSkillDirs = $allSkillDirs
+} else {
+    $wanted = if ($SkillNames.Count -gt 0) { $SkillNames } else { $DefaultWrapperSkillNames }
+    $wantedSet = @{}
+    foreach ($name in $wanted) {
+        $wantedSet[$name] = $true
+    }
+    $selectedSkillDirs = $allSkillDirs | Where-Object { $wantedSet.ContainsKey($_.Name) }
+    $selectedNames = @($selectedSkillDirs | ForEach-Object { $_.Name })
+    $missing = @($wanted | Where-Object { $_ -notin $selectedNames })
+    if ($missing.Count -gt 0) {
+        throw "Missing selected skill(s): $($missing -join ', ')"
     }
 }
 
-$totalSkills = $coreSkillDirs.Count + $librarySkillDirs.Count
-Write-Host "Skills found:" -ForegroundColor Green
-Write-Host "  Core skills:    $($coreSkillDirs.Count) (top-level, with scripts)"
-Write-Host "  Library skills: $($librarySkillDirs.Count) (in skills/ directory)"
-Write-Host "  Total:          $totalSkills"
+Write-Host "Skills selected: $($selectedSkillDirs.Count)" -ForegroundColor Green
+foreach ($skill in $selectedSkillDirs) {
+    Write-Host "  - $($skill.Name)"
+}
 Write-Host ""
 
-# ─── Define AI platform roots ─────────────────────────────────────────────────
-$platforms = @(
-    @{ Name = "Claude Desktop"; Path = "$env:APPDATA\Claude\skills" },
-    @{ Name = "Claude Code";    Path = "$env:USERPROFILE\.claude\skills" },
-    @{ Name = "Cursor";         Path = "$env:USERPROFILE\.cursor\skills" },
-    @{ Name = "Codex";          Path = "$env:USERPROFILE\.codex\skills" },
-    @{ Name = "OpenCode";       Path = "$env:USERPROFILE\.opencode\skills" },
-    @{ Name = "Gemini CLI";     Path = "$env:USERPROFILE\.gemini\skills" },
-    @{ Name = "Manus-compatible"; Path = "$env:USERPROFILE\.manus\skills" }
-)
+if ($Target) {
+    $platforms = @(@{ Name = "Explicit target"; Path = $Target })
+} else {
+    $platforms = @(
+        @{ Name = "OpenSkills / .agent"; Path = "$env:USERPROFILE\.agent\skills" },
+        @{ Name = "Claude Code"; Path = "$env:USERPROFILE\.claude\skills" },
+        @{ Name = "Codex"; Path = "$env:USERPROFILE\.codex\skills" },
+        @{ Name = "Manus-compatible"; Path = "$env:USERPROFILE\.manus\skills" },
+        @{ Name = "Gemini CLI"; Path = "$env:USERPROFILE\.gemini\skills" },
+        @{ Name = "Cursor"; Path = "$env:USERPROFILE\.cursor\skills" },
+        @{ Name = "OpenCode"; Path = "$env:USERPROFILE\.config\opencode\skills" },
+        @{ Name = "Kiro"; Path = "$env:USERPROFILE\.kiro\skills" }
+    )
+}
 
-# ─── Install function ─────────────────────────────────────────────────────────
 function Install-SkillToTarget {
     param(
         [string]$SourceDir,
         [string]$TargetDir,
         [string]$SkillName
     )
-    
+
     $targetSkillPath = Join-Path $TargetDir $SkillName
-    
+
     if (Test-Path $targetSkillPath) {
         if (-not $Force) {
-            $item = Get-Item $targetSkillPath -Force -ErrorAction SilentlyContinue
-            if ($item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
-                return "linked"
-            }
             return "exists"
         }
-        Remove-Item $targetSkillPath -Recurse -Force
+        Remove-Item -LiteralPath $targetSkillPath -Recurse -Force
     }
-    
+
     if ($Copy) {
-        Copy-Item $SourceDir -Destination $targetSkillPath -Recurse -Force
+        Copy-Item -LiteralPath $SourceDir -Destination $targetSkillPath -Recurse -Force
     } else {
         New-Item -ItemType Junction -Path $targetSkillPath -Target $SourceDir | Out-Null
     }
     return "installed"
 }
 
-# ─── Install to each platform ─────────────────────────────────────────────────
-$installedCount = 0
+$configuredCount = 0
 $skippedCount = 0
 
 foreach ($platform in $platforms) {
     $targetPath = $platform.Path
     $parentDir = Split-Path $targetPath -Parent
-    
-    # Check if the platform is installed (parent directory exists)
+
     if (-not (Test-Path $parentDir)) {
-        Write-Host "  SKIP: $($platform.Name) (not installed)" -ForegroundColor DarkGray
+        Write-Host "  SKIP: $($platform.Name) (parent missing: $parentDir)" -ForegroundColor DarkGray
         $skippedCount++
         continue
     }
-    
+
     Write-Host "  Installing to $($platform.Name)..." -ForegroundColor Yellow
-    
-    # Create skills directory if it doesn't exist
-    if (-not (Test-Path $targetPath)) {
-        if (-not $DryRun) {
-            New-Item -ItemType Directory -Path $targetPath -Force | Out-Null
-        }
-    }
-    
+
     if ($DryRun) {
-        Write-Host "    [DRY RUN] Would install $totalSkills skills to: $targetPath"
+        Write-Host "    [DRY RUN] Would ensure $targetPath"
+        Write-Host "    [DRY RUN] Would install $($selectedSkillDirs.Count) selected skill(s)"
+        $configuredCount++
         continue
     }
-    
-    $platformInstalled = 0
-    $platformLinked = 0
-    $platformSkipped = 0
-    
-    # Install core skills (these have scripts and are the most important)
-    foreach ($skill in $coreSkillDirs) {
+
+    if (-not (Test-Path $targetPath)) {
+        New-Item -ItemType Directory -Path $targetPath -Force | Out-Null
+    }
+
+    $installed = 0
+    $existing = 0
+    foreach ($skill in $selectedSkillDirs) {
         $result = Install-SkillToTarget -SourceDir $skill.FullName -TargetDir $targetPath -SkillName $skill.Name
         switch ($result) {
-            "installed" { $platformInstalled++ }
-            "linked"    { $platformLinked++ }
-            "exists"    { $platformSkipped++ }
+            "installed" { $installed++ }
+            "exists" { $existing++ }
         }
     }
-    
-    # Install library skills
-    foreach ($skill in $librarySkillDirs) {
-        $result = Install-SkillToTarget -SourceDir $skill.FullName -TargetDir $targetPath -SkillName $skill.Name
-        switch ($result) {
-            "installed" { $platformInstalled++ }
-            "linked"    { $platformLinked++ }
-            "exists"    { $platformSkipped++ }
-        }
-    }
-    
-    Write-Host "    New: $platformInstalled | Already linked: $platformLinked | Skipped: $platformSkipped" -ForegroundColor Green
-    $installedCount++
+
+    Write-Host "    Installed: $installed | Existing: $existing" -ForegroundColor Green
+    $configuredCount++
 }
 
 Write-Host ""
 Write-Host "=== Installation Complete ===" -ForegroundColor Green
-Write-Host "  Platforms configured: $installedCount"
-Write-Host "  Platforms skipped:    $skippedCount (not installed)"
+Write-Host "  Platforms configured: $configuredCount"
+Write-Host "  Platforms skipped:    $skippedCount"
 Write-Host ""
 
-if (-not $Copy) {
-    Write-Host "Skills are linked via directory junctions." -ForegroundColor Cyan
-    Write-Host "Updates to the repo will automatically propagate to all platforms."
+if ($FullCopy) {
+    Write-Host "Full-copy mode was explicitly requested. This is not the recommended default." -ForegroundColor Yellow
+} elseif (-not $Copy) {
+    Write-Host "Wrapper skills are linked via directory junctions." -ForegroundColor Cyan
 } else {
-    Write-Host "Skills were copied. Run again after updates to re-sync." -ForegroundColor Yellow
+    Write-Host "Wrapper skills were copied. Run again after updates to re-sync." -ForegroundColor Yellow
 }
 
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor White
-Write-Host "  1. Set up MCP bridges:  .\infrastructure\scripts\setup_mcp_bridges.ps1"
-Write-Host "  2. Verify installation: Open any AI client and check that skills are available"
-Write-Host ""
+Write-Host "  1. Verify: skill-router doctor"
+Write-Host "  2. Inspect matrix: skill-router sync matrix"

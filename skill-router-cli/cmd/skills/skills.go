@@ -3,7 +3,6 @@ package skills
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillsync"
 )
 
 type manifestSkill struct {
@@ -89,21 +89,26 @@ var readCmd = &cobra.Command{
 
 var installCmd = &cobra.Command{
 	Use:   "install [--target DIR]",
-	Short: "Install all repo skills to a target skills directory",
+	Short: "Install wrapper skills to a target skills directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		target, _ := cmd.Flags().GetString("target")
+		fullCopy, _ := cmd.Flags().GetBool("full-copy")
 		if target == "" {
 			target = platform.SkillsDir()
 		}
-		return installAllSkills(target)
+		return installSkills(target, fullCopy)
 	},
 }
 
 var syncCmd = &cobra.Command{
 	Use:   "sync",
-	Short: "Sync skills from GitHub repo and propagate to all agent roots",
+	Short: "Compatibility alias for wrapper-only default root propagation",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runner.RunPython(skillScriptPath("skill-sync", "scripts", "sync_skills.py"))
+		counts, err := skillsync.PropagateToDefaultRoots(false)
+		for _, root := range platform.AgentRoots() {
+			fmt.Printf("  %s - copied %d skills\n", root, counts[root])
+		}
+		return err
 	},
 }
 
@@ -329,22 +334,26 @@ var sourcesCmd = &cobra.Command{
 
 var propagateCmd = &cobra.Command{
 	Use:   "propagate",
-	Short: "Copy repo skills to all configured agent skill roots",
+	Short: "Copy wrapper skills to default agent skill roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		src := repoSkillsDir()
+		fullCopy, _ := cmd.Flags().GetBool("full-copy")
 		roots := platform.AgentRoots()
 		bold := color.New(color.Bold)
-		bold.Println("Propagating repo skills to agent roots...")
+		bold.Println("Propagating selected skills to agent roots...")
 		for _, root := range roots {
-			count, err := copySkills(src, root, dryRun)
-			if err != nil {
-				return err
-			}
 			if dryRun {
+				count, err := countInstallableSkills(repoSkillsDir(), fullCopy)
+				if err != nil {
+					return err
+				}
 				fmt.Printf("  %s - would copy %d skills\n", root, count)
 			} else {
-				fmt.Printf("  %s - copied %d skills\n", root, count)
+				counts, err := skillsync.Propagate(repoSkillsDir(), []string{root}, fullCopy)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("  %s - copied %d skills\n", root, counts[root])
 			}
 		}
 		return nil
@@ -403,6 +412,7 @@ var summarizeCmd = &cobra.Command{
 
 func init() {
 	installCmd.Flags().String("target", "", "Target directory for skill installation")
+	installCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to the target")
 	listCmd.Flags().Bool("core", false, "Show only core skills")
 	listCmd.Flags().Bool("library", false, "Show only library skills")
 	listCmd.Flags().Bool("all", true, "Show all skills (default)")
@@ -414,6 +424,7 @@ func init() {
 	PreflightCmd.Flags().Bool("explain", false, "Print route scoring diagnostics")
 	PreflightCmd.Flags().Bool("json", false, "Print structured JSON preflight output")
 	propagateCmd.Flags().Bool("dry-run", false, "Show target roots without copying")
+	propagateCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
 
 	Cmd.AddCommand(readCmd)
@@ -508,24 +519,22 @@ func skillMarkdownFromDirectory(directory string) (string, error) {
 	return "", fmt.Errorf("skill markdown not found for manifest directory %s", directory)
 }
 
-func installAllSkills(target string) error {
-	count, err := copySkills(repoSkillsDir(), target, false)
+func installSkills(target string, fullCopy bool) error {
+	counts, err := skillsync.Propagate(repoSkillsDir(), []string{target}, fullCopy)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Installed %d skills to %s\n", count, target)
+	fmt.Printf("Installed %d skills to %s\n", counts[target], target)
 	return nil
 }
 
-func copySkills(srcRoot, dstRoot string, dryRun bool) (int, error) {
+func countInstallableSkills(srcRoot string, fullCopy bool) (int, error) {
+	if !fullCopy {
+		return len(skillsync.DefaultWrapperSkills), nil
+	}
 	entries, err := os.ReadDir(srcRoot)
 	if err != nil {
 		return 0, fmt.Errorf("cannot read skills directory %s: %w", srcRoot, err)
-	}
-	if !dryRun {
-		if err := os.MkdirAll(dstRoot, 0755); err != nil {
-			return 0, err
-		}
 	}
 	count := 0
 	for _, entry := range entries {
@@ -537,68 +546,8 @@ func copySkills(srcRoot, dstRoot string, dryRun bool) (int, error) {
 			continue
 		}
 		count++
-		if dryRun {
-			continue
-		}
-		if err := copyDir(src, filepath.Join(dstRoot, entry.Name())); err != nil {
-			return count, err
-		}
 	}
 	return count, nil
-}
-
-func copyDir(src, dst string) error {
-	info, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-	if !info.IsDir() {
-		return fmt.Errorf("source is not a directory: %s", src)
-	}
-	if err := os.MkdirAll(dst, info.Mode()); err != nil {
-		return err
-	}
-	entries, err := os.ReadDir(src)
-	if err != nil {
-		return err
-	}
-	for _, entry := range entries {
-		srcPath := filepath.Join(src, entry.Name())
-		dstPath := filepath.Join(dst, entry.Name())
-		if entry.IsDir() {
-			if err := copyDir(srcPath, dstPath); err != nil {
-				return err
-			}
-			continue
-		}
-		if err := copyFile(srcPath, dstPath); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	info, err := in.Stat()
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
-		return err
-	}
-	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, info.Mode())
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	_, err = io.Copy(out, in)
-	return err
 }
 
 func loadManifest() (skillManifest, error) {
