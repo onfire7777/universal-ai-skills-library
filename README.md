@@ -30,6 +30,7 @@ skill-router skill <name>
 skill-router skill search <query>
 skill-router auto "<latest user prompt>"
 skill-router route "<prompt>"
+skill-router route --explain "<prompt>"
 skill-router skill list
 skill-router skills sources
 ```
@@ -59,6 +60,7 @@ skill-router skill search <query>  # Search canonical skills plus read-only loca
 skill-router skill search --refresh <query> # Rebuild external index before searching
 skill-router auto "<prompt>"       # Default per-prompt preflight; no-op on generic prompts
 skill-router route "<prompt>"      # Explicit route; errors when no confident skill applies
+skill-router route --explain "<prompt>" # Show top candidates and evidence gates
 skill-router skill list            # List all skills from manifest.json
 skill-router skills list --external # Include unique local external skills without copying them
 skill-router skills sources         # Show read-only external skill roots
@@ -104,6 +106,11 @@ Legacy names resolve through aliases, not duplicate directories. For example,
 `card-creator` resolves to the existing full `printable-cards` skill.
 `skill-router route "use the card creator skill to make a Mother's Day card"`
 selects that same exact Manus-origin `printable-cards` skill.
+
+Automatic routing is intentionally conservative. It ranks canonical and read-only
+external skills together, requires strong evidence such as exact aliases, matched
+domain phrases, or multi-token task descriptions, and refuses ambiguous near-ties
+instead of loading a questionable skill. Use `--explain` when debugging a route.
 
 Installed Claude, Codex, Manus-compatible, and other AI skill roots are integrated
 as read-only external sources. The router can search and load unique local skills

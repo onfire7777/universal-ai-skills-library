@@ -12,6 +12,8 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
 - Use `skill-router route "<user prompt>"` for explicit routing checks that should fail when no confident skill applies.
+- Use `skill-router route --explain "<user prompt>"` when a route looks wrong; it prints the top candidates, score, source, evidence gates, and ambiguity behavior.
+- Automatic routing should prefer no route over a weak route. It ranks canonical and read-only external skills together, requires exact aliases or strong multi-token evidence, and refuses ambiguous near-ties.
 - If a user says "universal AI skills <thing>", do not decide from the native client skill list. Run `skill-router skill search <thing>` or `skill-router skill <thing>` first.
 - If the user asks for `card creator`, `card-creator`, a printable greeting card, Mother's Day card, birthday card, or foldable card, load `skill-router skill card-creator`. It resolves to the canonical `printable-cards` skill.
 - Use `skill-router skills sources` to inspect read-only local external skill roots.

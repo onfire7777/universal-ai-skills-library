@@ -8,12 +8,15 @@ Use:
 skill-router auto "<latest user prompt>"
 skill-router skill <name>
 skill-router skill search <query>
+skill-router route "<user prompt>"
+skill-router route --explain "<user prompt>"
 skill-router skill list
 skill-router doctor
 skill-router mcp status
 ```
 
 Agents should run `skill-router auto "<latest user prompt>"` before substantive replies. It loads a skill only when the prompt has a confident match and no-ops on generic prompts.
+Use `skill-router route --explain "<user prompt>"` to inspect top candidates, evidence gates, and ambiguity behavior.
 
 Compatibility:
 
