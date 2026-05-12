@@ -95,6 +95,20 @@ func TestUniversalAISetupPromptPrefersSetupOverGithub(t *testing.T) {
 	}
 }
 
+func TestNamedAISoftwareStatusPromptPrefersSetupOverAppUpgrade(t *testing.T) {
+	prompt := "did you update hermes open ai claude aion open code kimi and all the different ai softwares with a clean install of the latest version"
+	preflight, err := buildRoutePreflight(prompt, routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionRoute {
+		t.Fatalf("expected route, got %s: %s", preflight.Decision, preflight.Reason)
+	}
+	if preflight.Best.name != "universal-ai-setup" {
+		t.Fatalf("expected universal-ai-setup, got %s", preflight.Best.name)
+	}
+}
+
 func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
 	genericPrompt := "thanks, that makes sense"
 	printable := manifestSkill{

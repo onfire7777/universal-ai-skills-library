@@ -704,11 +704,25 @@ func isUniversalAIControlPlanePrompt(normalized string) bool {
 		"cross ai",
 		"cross agent",
 		"different ai services",
+		"different ai software",
 		"all ai services",
+		"all ai software",
 		"ai platforms",
 		"ai services",
+		"ai software",
 	}) {
-		return false
+		if !containsAnyNormalized(normalized, []string{
+			"claude",
+			"codex",
+			"hermes",
+			"kimi",
+			"opencode",
+			"open code",
+			"openai",
+			"open ai",
+		}) {
+			return false
+		}
 	}
 	return containsAnyNormalized(normalized, []string{
 		"audit",
@@ -726,6 +740,7 @@ func isUniversalAIControlPlanePrompt(normalized string) bool {
 		"synced",
 		"update",
 		"updated",
+		"version",
 	})
 }
 
