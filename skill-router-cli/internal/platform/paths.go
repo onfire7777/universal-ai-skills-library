@@ -100,6 +100,30 @@ func PrintingPressDir() string {
 	return filepath.Join(HomeDir(), "printing-press")
 }
 
+// PaperclipSkillsDir returns the local Paperclip wrapper-skill directory.
+// Paperclip keeps its own company skills in the instance database; this root is
+// only for the compact Universal AI Skills wrapper and local source locator.
+func PaperclipSkillsDir() string {
+	if d := os.Getenv("SKILL_ROUTER_PAPERCLIP_SKILLS_DIR"); d != "" {
+		return d
+	}
+	return filepath.Join(HomeDir(), ".paperclip", "skills")
+}
+
+// PaperclipInstructionsDir returns the local Paperclip adapter instruction
+// directory. Agents point at AGENTS.md here instead of receiving a full corpus.
+func PaperclipInstructionsDir() string {
+	if d := os.Getenv("SKILL_ROUTER_PAPERCLIP_INSTRUCTIONS_DIR"); d != "" {
+		return d
+	}
+	return filepath.Join(HomeDir(), ".paperclip", "universal-ai-skills")
+}
+
+// PaperclipInstructionsFile returns the Paperclip adapter AGENTS.md path.
+func PaperclipInstructionsFile() string {
+	return filepath.Join(PaperclipInstructionsDir(), "AGENTS.md")
+}
+
 // AgentRootSpec describes one known AI client skill root.
 // DefaultSync controls the legacy physical propagation target set. Keep it
 // conservative: newly detected agent roots should appear in read-only matrix
@@ -129,6 +153,7 @@ func AgentRootSpecs() []AgentRootSpec {
 		{ID: "opencode-legacy", Name: "OpenCode legacy", Path: filepath.Join(home, ".opencode", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Legacy/report-only OpenCode skill root"},
 		{ID: "hermes", Name: "Hermes Agent/Desktop local profile", Path: filepath.Join(home, ".hermes", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "CLI-first wrapper root; do not full-copy the corpus into Hermes"},
 		{ID: "hermes-agent-source", Name: "Hermes Agent source checkout", Path: filepath.Join(home, ".hermes", "hermes-agent", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Bundled/source skill tree; adapter-specific updates only"},
+		{ID: "paperclip", Name: "Paperclip local agents", Path: PaperclipSkillsDir(), Adapter: "skill-root", DefaultSync: false, Notes: "Paperclip company agents use a compact instructions file plus one wrapper skill; do not full-copy the corpus"},
 		{ID: "openclaw-global", Name: "OpenClaw global skills", Path: filepath.Join(home, ".openclaw", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "OpenClaw global AgentSkills-compatible root; report-only until wrapper install semantics are confirmed"},
 		{ID: "openclaw-workspace", Name: "OpenClaw workspace skills", Path: filepath.Join(home, ".openclaw", "workspace", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "OpenClaw workspace-scoped skills; never mutate with generic full-copy sync"},
 		{ID: "windsurf", Name: "Windsurf", Path: filepath.Join(home, ".windsurf", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Detected/report-only until install semantics are confirmed; project rules live in .windsurf/rules"},

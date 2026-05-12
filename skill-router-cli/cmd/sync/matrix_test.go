@@ -36,6 +36,12 @@ func TestBuildMatrixIncludesReportOnlyRoots(t *testing.T) {
 	if byID["openclaw-global"].DefaultSync {
 		t.Fatalf("expected OpenClaw global skills to be report-only")
 	}
+	if byID["paperclip"].DefaultSync {
+		t.Fatalf("expected Paperclip to be report-only")
+	}
+	if byID["paperclip"].Adapter != "skill-root" {
+		t.Fatalf("expected Paperclip wrapper to use skill-root mode")
+	}
 }
 
 func TestClassifyMode(t *testing.T) {

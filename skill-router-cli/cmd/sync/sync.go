@@ -102,6 +102,37 @@ skips workspace/source trees that should not be mutated generically.`,
 	},
 }
 
+var paperclipCmd = &cobra.Command{
+	Use:   "paperclip",
+	Short: "Install the compact Paperclip compatibility adapter",
+	Long: `Install the Paperclip compatibility adapter without copying the skill
+corpus. This writes one wrapper skill under ~/.paperclip/skills and one compact
+AGENTS.md instruction file under ~/.paperclip/universal-ai-skills. Paperclip
+company agents should point their instructionsFilePath at that AGENTS.md and
+load full skills through skill-router on demand.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		skillsDir := platform.PaperclipSkillsDir()
+		instructionsDir := platform.PaperclipInstructionsDir()
+		instructionsFile := platform.PaperclipInstructionsFile()
+
+		counts, err := skillsync.Propagate(skillsync.SourceDir(), []string{skillsDir}, false)
+		fmt.Printf("  %-40s [%d skills]\n", skillsDir, counts[skillsDir])
+		if err != nil {
+			return err
+		}
+
+		if err := os.MkdirAll(instructionsDir, 0755); err != nil {
+			return err
+		}
+		content := paperclipInstructionsContent()
+		if err := os.WriteFile(instructionsFile, []byte(content), 0644); err != nil {
+			return err
+		}
+		fmt.Printf("  %-40s [instructions]\n", instructionsFile)
+		return nil
+	},
+}
+
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show sync status across default agent roots",
@@ -176,6 +207,7 @@ func init() {
 	Cmd.AddCommand(repoCmd)
 	Cmd.AddCommand(propagateAllCmd)
 	Cmd.AddCommand(installedCmd)
+	Cmd.AddCommand(paperclipCmd)
 	Cmd.AddCommand(statusCmd)
 	Cmd.AddCommand(matrixCmd)
 }
@@ -205,6 +237,34 @@ func installedWrapperRoots() []string {
 		roots = append(roots, spec.Path)
 	}
 	return roots
+}
+
+func paperclipInstructionsContent() string {
+	repoDir := platform.RepoDir()
+	routerPath := filepath.Join(platform.HomeDir(), "go", "bin", "skill-router.exe")
+	if os.PathSeparator != '\\' {
+		routerPath = "skill-router"
+	}
+	return fmt.Sprintf(`# Universal AI Skills Router For Paperclip Agents
+
+Canonical source: %s
+Wrapper skill root: %s
+Router command: skill-router
+Absolute fallback: %s
+
+Paperclip-specific operating rule:
+
+- Keep Paperclip's native company skills for Paperclip board, issue, API, and heartbeat workflows. The universal router adds cross-platform skill selection; it does not replace Paperclip's own execution contract.
+- For each real user-submitted Paperclip prompt, issue wake, or human comment that creates substantive work, run the router preflight internally before choosing optional extra skills:
+  - skill-router preflight --hook-event UserPromptSubmit --json "<latest user/task prompt>"
+  - If PATH is stale, use the absolute fallback above.
+- Do not run automatic skill loading from Paperclip status checks, liveness loops, session-start/stop events, assistant messages, tool output, run logs, background jobs, or database maintenance.
+- If preflight returns decision=route, sanity-check that the selected skill clearly matches the core task object and action. If it only matched generic words such as issue, problem, fix, install, setup, local, AI, agent, or skill, continue with no universal skill.
+- If decision=ambiguous or host_ai_review.required is true, choose only from the listed candidates when one is clearly right; otherwise continue with no universal skill.
+- Load exactly one needed skill with skill-router skill <name>. Search first with skill-router skill search <query> when the name is unknown.
+- Do not copy or paste the 1,807-skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
+- MCP bridges are optional. Use the CLI for skill loading and use MCP only for persistent endpoint workflows such as durable memory, context routing, skill generation services, or browser/CDP automation.
+`, repoDir, platform.PaperclipSkillsDir(), routerPath)
 }
 
 func skipGenericInstalledSync(id string) bool {

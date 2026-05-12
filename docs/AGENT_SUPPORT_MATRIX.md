@@ -52,6 +52,7 @@ The matrix reports:
 | Kiro | `skill-root` / `repo-instruction` | `~/.kiro/skills`, `~/.kiro/steering`, `.kiro/steering`, `AGENTS.md` | default | Steering files are separate from skill-root sync. |
 | Hermes Agent/Desktop | `skill-root` | `~/.hermes/skills` | installed-wrapper | Install only the wrapper skill and run `skill-router preflight --json` only for user-submitted prompts as an internal adapter; do not full-copy the corpus. |
 | Hermes Agent source | `skill-root` | `~/.hermes/hermes-agent/skills` | report-only special | Source/bundled skill tree; adapter-specific wrapper updates only. |
+| Paperclip local agents | `skill-root` + instruction file | `~/.paperclip/skills`, `~/.paperclip/universal-ai-skills/AGENTS.md`, agent `instructionsFilePath` | installed-wrapper special | `skill-router sync paperclip` installs one wrapper and compact agent instructions. Paperclip company skills stay native; full universal skills load through the CLI only when routed. |
 | OpenClaw global | `skill-root` | `~/.openclaw/skills` | installed-wrapper | AgentSkills-compatible root observed locally; wrapper-only. |
 | OpenClaw workspace | `skill-root` | `~/.openclaw/workspace/skills` | report-only special | Workspace-scoped root; do not mutate with generic full-copy sync. |
 | Kimi / OpenClaw | `skill-root` | `~/.kimi_openclaw/workspace/skills` | report-only special | Do not mutate with generic full-copy sync. |

@@ -23,3 +23,4 @@
   - `skill-root` clients load `SKILL.md` wrappers and call the CLI on demand.
   - `repo-instruction` clients get compact pointers in `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md`.
   - `hosted` clients such as ChatGPT or Claude Cowork use Actions, Apps SDK, MCP, API, or uploaded instructions instead of local full-copy sync.
+- Paperclip local agents use a combined adapter: one wrapper skill at `%USERPROFILE%\.paperclip\skills\universal-ai-skills` plus compact instructions at `%USERPROFILE%\.paperclip\universal-ai-skills\AGENTS.md`. Keep Paperclip-native company skills for board/API work and call `skill-router` only for prompt-scoped universal skill selection.

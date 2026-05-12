@@ -34,9 +34,10 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Prefer CLI calls for skill access and deterministic local workflows.
 - Run MCP bridges only for persistent endpoint services that cannot be replaced by direct CLI calls.
 - Treat AI platform compatibility as adapter-based:
-  - `skill-root` for clients that discover `SKILL.md` packages, such as OpenSkills, Claude Code, Codex, OpenCode, Cline, OpenHands, Hermes Agent, and OpenClaw.
+  - `skill-root` for clients that discover `SKILL.md` packages, such as OpenSkills, Claude Code, Codex, OpenCode, Cline, OpenHands, Hermes Agent, Paperclip local agents, and OpenClaw.
   - `repo-instruction` for clients that read files such as `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md`.
   - `hosted` for ChatGPT, Claude Cowork, Devin, Amazon Q Developer, Sourcegraph Cody, Augment, and similar tools that need Actions, Apps SDK, MCP, API, or uploaded-instruction adapters rather than local skill-root sync.
+- Paperclip uses a combined adapter: `skill-router sync paperclip` installs one wrapper skill under `%USERPROFILE%\.paperclip\skills` and compact Paperclip agent instructions under `%USERPROFILE%\.paperclip\universal-ai-skills\AGENTS.md`. Keep Paperclip company skills native and route universal skills through the CLI only when the preflight route is relevant.
 - Use `skill-router sync matrix` before changing any agent root or compatibility adapter.
 
 Optional local MCP endpoints:
