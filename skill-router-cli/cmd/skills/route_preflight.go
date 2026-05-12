@@ -61,6 +61,7 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 	maintenancePrompt := isRouterMaintenancePrompt(prompt)
 	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
 		next := manifestRouteCandidate(prompt, s)
+		next = applyMetaMaintenanceBoost(prompt, next)
 		rawCandidates = append(rawCandidates, next)
 		if next.score > bestRaw.score {
 			bestRaw = next

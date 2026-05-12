@@ -17,8 +17,8 @@ func TestPropagateDefaultsToWrapperSkillsOnly(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Propagate returned error: %v", err)
 	}
-	if counts[dst] != 2 {
-		t.Fatalf("copied %d skills, want 2", counts[dst])
+	if counts[dst] != 1 {
+		t.Fatalf("copied %d skills, want 1", counts[dst])
 	}
 	for _, name := range DefaultWrapperSkills {
 		if _, err := os.Stat(filepath.Join(dst, name, "SKILL.md")); err != nil {
@@ -27,6 +27,9 @@ func TestPropagateDefaultsToWrapperSkillsOnly(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(dst, "extra-skill", "SKILL.md")); !os.IsNotExist(err) {
 		t.Fatalf("extra-skill should not be copied by default")
+	}
+	if _, err := os.Stat(filepath.Join(dst, "printable-cards", "SKILL.md")); !os.IsNotExist(err) {
+		t.Fatalf("printable-cards should stay in the canonical corpus and load through the router")
 	}
 }
 

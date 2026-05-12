@@ -26,6 +26,7 @@ Use this before changing any agent root:
 ```bash
 skill-router sync matrix
 skill-router sync matrix --json
+skill-router sync installed
 ```
 
 The matrix reports:
@@ -40,25 +41,25 @@ The matrix reports:
 | Agent/tool | Adapter | Root or instruction surface | Sync policy | Notes |
 |---|---|---|---|---|
 | OpenSkills / `.agent` | `skill-root` | `~/.agent/skills` | default | Standard wrapper root. |
-| Agent Skills open-standard root | `skill-root` | `~/.agents/skills` | report-only | Shared location used by OpenCode and OpenHands-style clients when configured. |
+| Agent Skills open-standard root | `skill-root` | `~/.agents/skills` | installed-wrapper | Shared location used by OpenCode and OpenHands-style clients when configured; wrapper-only when the root exists. |
 | Claude Code / Claude Skills | `skill-root` | `~/.claude/skills` | default | Wrapper root plus Claude plugin support. |
 | OpenAI Codex | `skill-root` | `~/.codex/skills` and `AGENTS.md` | default | Local wrapper root plus project instructions. |
 | Manus-compatible | `skill-root` | `~/.manus/skills` | default | Legacy compatibility root. |
 | Gemini CLI | `skill-root` / `repo-instruction` | `~/.gemini/skills`, `GEMINI.md`, `AGENTS.md` | default | Wrapper root and context-file compatibility. |
 | Cursor | `skill-root` / `repo-instruction` | `~/.cursor/skills`, `.cursor/rules`, `AGENTS.md` | default | Project rules remain the preferred Cursor-native surface. |
 | OpenCode | `skill-root` | `~/.config/opencode/skills` | default | Canonical OpenCode skill root. |
-| OpenCode legacy | `skill-root` | `~/.opencode/skills` | report-only | Compatibility root; do not use as canonical install target. |
+| OpenCode legacy | `skill-root` | `~/.opencode/skills` | report-only | Legacy compatibility root; do not use as a sync target when `~/.config/opencode/skills` exists. |
 | Kiro | `skill-root` / `repo-instruction` | `~/.kiro/skills`, `~/.kiro/steering`, `.kiro/steering`, `AGENTS.md` | default | Steering files are separate from skill-root sync. |
-| Hermes Agent/Desktop | `skill-root` | `~/.hermes/skills` | report-only | Install only the wrapper skill and run `skill-router preflight --json` only for user-submitted prompts as an internal adapter; do not full-copy the corpus. |
+| Hermes Agent/Desktop | `skill-root` | `~/.hermes/skills` | installed-wrapper | Install only the wrapper skill and run `skill-router preflight --json` only for user-submitted prompts as an internal adapter; do not full-copy the corpus. |
 | Hermes Agent source | `skill-root` | `~/.hermes/hermes-agent/skills` | report-only special | Source/bundled skill tree; adapter-specific wrapper updates only. |
-| OpenClaw global | `skill-root` | `~/.openclaw/skills` | report-only | AgentSkills-compatible root observed locally; wrapper-only until semantics are confirmed. |
+| OpenClaw global | `skill-root` | `~/.openclaw/skills` | installed-wrapper | AgentSkills-compatible root observed locally; wrapper-only. |
 | OpenClaw workspace | `skill-root` | `~/.openclaw/workspace/skills` | report-only special | Workspace-scoped root; do not mutate with generic full-copy sync. |
 | Kimi / OpenClaw | `skill-root` | `~/.kimi_openclaw/workspace/skills` | report-only special | Do not mutate with generic full-copy sync. |
 | Cline | `skill-root` / `repo-instruction` | `~/.cline/skills`, `.cline/skills`, `.clinerules` | report-only | Cline supports on-demand skills; report-only until local install semantics are confirmed. |
-| Continue | `repo-instruction` | `.continue/rules` and hub rules | report-only | Rules are the primary compatibility surface. |
-| Windsurf | `repo-instruction` | `.windsurf/rules` and memories | report-only | Use compact rules or MCP; no generic skill-copy target yet. |
-| Roo Code | `repo-instruction` | `.roo` rules and related config | report-only | Keep report-only until current project-rule and skill semantics are confirmed. |
-| Qwen Code | `repo-instruction` | `QWEN.md` / AGENTS-style project guidance | report-only | Open-source terminal agent; adapter semantics remain report-only. |
+| Continue | `skill-root` / `repo-instruction` | `~/.continue/skills`, `.continue/rules`, and hub rules | installed-wrapper | Wrapper-only in the local skill root; rules remain the primary compatibility surface. |
+| Windsurf | `skill-root` / `repo-instruction` | `~/.windsurf/skills`, `.windsurf/rules`, and memories | installed-wrapper | Wrapper-only in the local skill root; use compact rules or MCP for project behavior. |
+| Roo Code | `skill-root` / `repo-instruction` | `~/.roo/skills`, `.roo` rules and related config | installed-wrapper | Wrapper-only in the local skill root; project rules stay separate. |
+| Qwen Code | `skill-root` / `repo-instruction` | `~/.qwen/skills`, `QWEN.md` / AGENTS-style project guidance | installed-wrapper | Wrapper-only in the local skill root; keep prompts compact. |
 | GitHub Copilot | `repo-instruction` | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Compact repository instructions and path-scoped instructions only. |
 | VS Code Copilot | `repo-instruction` | `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Same repo instruction model, IDE-scoped behavior. |
 | Aider | `repo-instruction` | `CONVENTIONS.md` | report-only | Add router pointer only when intentionally included in chat. |

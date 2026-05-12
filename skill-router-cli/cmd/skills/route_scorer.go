@@ -128,6 +128,9 @@ func isEligibleRouteCandidate(candidate routeCandidate) bool {
 	if candidate.score < automaticRouteMinScore {
 		return false
 	}
+	if candidate.meta {
+		return true
+	}
 	e := candidate.evidence
 	if e.uninstallIntent && !e.uninstallSupport {
 		return false

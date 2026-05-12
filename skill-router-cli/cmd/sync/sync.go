@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -85,6 +86,22 @@ var propagateAllCmd = &cobra.Command{
 	},
 }
 
+var installedCmd = &cobra.Command{
+	Use:   "installed",
+	Short: "Propagate the compact wrapper to installed local AI skill roots",
+	Long: `Propagate only compact wrapper skills to installed local skill-root adapters.
+This updates detected local clients without copying the full skill corpus and
+skips workspace/source trees that should not be mutated generically.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		roots := installedWrapperRoots()
+		counts, err := skillsync.Propagate(skillsync.SourceDir(), roots, false)
+		for _, root := range roots {
+			fmt.Printf("  %-40s [%d skills]\n", root, counts[root])
+		}
+		return err
+	},
+}
+
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show sync status across default agent roots",
@@ -158,6 +175,7 @@ func init() {
 	Cmd.AddCommand(allCmd)
 	Cmd.AddCommand(repoCmd)
 	Cmd.AddCommand(propagateAllCmd)
+	Cmd.AddCommand(installedCmd)
 	Cmd.AddCommand(statusCmd)
 	Cmd.AddCommand(matrixCmd)
 }
@@ -168,6 +186,37 @@ func propagateToRoots(fullCopy bool) error {
 		fmt.Printf("  %-40s [%d skills]\n", root, counts[root])
 	}
 	return err
+}
+
+func installedWrapperRoots() []string {
+	roots := []string{}
+	seen := map[string]bool{}
+	for _, spec := range platform.AgentRootSpecs() {
+		if spec.Adapter != "skill-root" || spec.Path == "" || skipGenericInstalledSync(spec.ID) {
+			continue
+		}
+		if !spec.DefaultSync && !pathExists(spec.Path) && !pathExists(filepath.Dir(spec.Path)) {
+			continue
+		}
+		if seen[spec.Path] {
+			continue
+		}
+		seen[spec.Path] = true
+		roots = append(roots, spec.Path)
+	}
+	return roots
+}
+
+func skipGenericInstalledSync(id string) bool {
+	return id == "opencode-legacy" || strings.Contains(id, "workspace") || strings.Contains(id, "source")
+}
+
+func pathExists(path string) bool {
+	if path == "" {
+		return false
+	}
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 func buildMatrix() []matrixRow {

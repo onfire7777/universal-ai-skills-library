@@ -72,7 +72,11 @@ foreach ($bridge in $bridges) {
 Write-Host "[5/6] Creating watchdog scheduled task..." -ForegroundColor Yellow
 Unregister-ScheduledTask -TaskName "UniversalAI-McpWatchdog" -Confirm:$false -ErrorAction SilentlyContinue
 
-schtasks /Create /TN "UniversalAI-McpWatchdog" /TR "wscript.exe `"$InstallDir\run_hidden.vbs`" `"$InstallDir\mcp_watchdog.ps1`"" /SC MINUTE /MO 5 /F | Out-Null
+$watchdogAction = "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$InstallDir\mcp_watchdog.ps1`""
+& schtasks.exe /Create /TN "UniversalAI-McpWatchdog" /TR $watchdogAction /SC MINUTE /MO 5 /F | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Failed to create scheduled task: UniversalAI-McpWatchdog"
+}
 Write-Host "  Created watchdog task (every 5 minutes, hidden)"
 
 # 6. Start everything
@@ -85,8 +89,12 @@ foreach ($bridge in $bridges) {
     Start-ScheduledTask -TaskName $bridge.Name
     Write-Host "  Started: $($bridge.Name)"
 }
-Start-ScheduledTask -TaskName "UniversalAI-McpWatchdog"
-Write-Host "  Started: UniversalAI-McpWatchdog"
+try {
+    Start-ScheduledTask -TaskName "UniversalAI-McpWatchdog" -ErrorAction Stop
+    Write-Host "  Started: UniversalAI-McpWatchdog"
+} catch {
+    Write-Warning "  Watchdog task was created but Windows refused a manual start for this trigger. It will run on its schedule."
+}
 
 Write-Host ""
 Write-Host "=== Setup Complete ===" -ForegroundColor Green

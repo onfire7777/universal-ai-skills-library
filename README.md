@@ -102,6 +102,7 @@ skill-router skills sources         # Show read-only external skill roots
 skill-router skills sources --refresh # Refresh the local external skill index
 skill-router doctor                # Check local AI stack health
 skill-router sync matrix           # Read-only agent support matrix
+skill-router sync installed        # Propagate the compact wrapper to installed local AI roots
 skill-router skills validate-manifest # Validate manifest.json against skills/
 skill-router mcp status            # Check optional MCP bridge endpoints
 skill-router audit <path>          # Run audit workflows
