@@ -28,15 +28,17 @@ Use only when a client requires physical skills and the user explicitly accepts 
 ## Current CLI behavior
 
 - `skill-router sync matrix` is read-only and safe.
+- `skill-router sync installed` updates every detected local skill-root adapter with the compact wrapper only.
 - `skill-router sync propagate`, `skill-router sync all`, `skill-router update`, `skill-router skills install`, and `skill-router skills propagate` are wrapper-only by default.
 - Full-copy installation requires the explicit `--full-copy` flag.
 - Default writes are limited to conservative roots returned by `platform.AgentRoots()`.
-- Newly detected roots such as Windsurf, Roo, Continue, Qwen, and Kimi/OpenClaw are report-only until adapter semantics are confirmed.
+- Workspace/source trees and hosted/repo-instruction adapters remain report-only unless a client-specific adapter is added.
 
 ## Explicit command shape
 
 ```bash
 skill-router sync matrix
+skill-router sync installed
 skill-router sync propagate
 skill-router sync propagate --full-copy
 skill-router skills install --target ~/.codex/skills

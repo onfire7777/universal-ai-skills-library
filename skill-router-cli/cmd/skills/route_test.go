@@ -51,6 +51,9 @@ func TestRouterMaintenancePromptAllowsMetaSkill(t *testing.T) {
 	if !isRouterMaintenancePrompt("improve the skill router automatic routing accuracy") {
 		t.Fatal("expected automatic router accuracy prompt to be detected")
 	}
+	if !isRouterMaintenancePrompt("make sure the universal AI tools are cleanly installed and synced across all AI services") {
+		t.Fatal("expected universal AI setup prompt to be detected")
+	}
 	if isRouterMaintenancePrompt("use the universal ai skills card creator skill") {
 		t.Fatal("card creator prompt should route to the task skill, not router maintenance")
 	}
@@ -75,6 +78,20 @@ func TestRouterMaintenancePromptPrefersMetaSkill(t *testing.T) {
 	}
 	if best.name != "universal-ai-skills" {
 		t.Fatalf("expected maintenance routing to prefer universal-ai-skills, got %s", best.name)
+	}
+}
+
+func TestUniversalAISetupPromptPrefersSetupOverGithub(t *testing.T) {
+	prompt := "please make sure the universal AI tools is cleanly and universally installed not redundant and clean everything's updated on the GitHub and in all the different AI services that I have on my computer that I use"
+	preflight, err := buildRoutePreflight(prompt, routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionRoute {
+		t.Fatalf("expected route, got %s: %s", preflight.Decision, preflight.Reason)
+	}
+	if preflight.Best.name != "universal-ai-setup" {
+		t.Fatalf("expected universal-ai-setup, got %s", preflight.Best.name)
 	}
 }
 

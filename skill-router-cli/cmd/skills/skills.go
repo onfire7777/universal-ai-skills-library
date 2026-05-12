@@ -694,7 +694,74 @@ func isRouterMaintenancePrompt(prompt string) bool {
 		strings.Contains(normalized, "routing router") ||
 		strings.Contains(normalized, "automatic routing") ||
 		strings.Contains(normalized, "universal ai skills setup") ||
-		strings.Contains(normalized, "universal ai skills router")
+		strings.Contains(normalized, "universal ai skills router") ||
+		isUniversalAIControlPlanePrompt(normalized)
+}
+
+func isUniversalAIControlPlanePrompt(normalized string) bool {
+	if !containsAnyNormalized(normalized, []string{
+		"universal ai",
+		"cross ai",
+		"cross agent",
+		"different ai services",
+		"all ai services",
+		"ai platforms",
+		"ai services",
+	}) {
+		return false
+	}
+	return containsAnyNormalized(normalized, []string{
+		"audit",
+		"clean",
+		"cleanup",
+		"config",
+		"configure",
+		"consolidate",
+		"install",
+		"installed",
+		"normalize",
+		"redundant",
+		"setup",
+		"sync",
+		"synced",
+		"update",
+		"updated",
+	})
+}
+
+func applyMetaMaintenanceBoost(prompt string, candidate routeCandidate) routeCandidate {
+	if !candidate.meta || !isRouterMaintenancePrompt(prompt) {
+		return candidate
+	}
+	normalized := normalizeForMatch(prompt)
+	boost := automaticRouteMinScore + 90
+	switch strings.ToLower(strings.TrimSpace(candidate.name)) {
+	case "universal-ai-setup":
+		if isUniversalAIControlPlanePrompt(normalized) {
+			boost = automaticRouteMinScore + 170
+		}
+	case "universal-ai-config":
+		if containsAnyNormalized(normalized, []string{"config", "configure", "permissions", "policy"}) {
+			boost = automaticRouteMinScore + 150
+		}
+	case "universal-ai-skills", "skill-router":
+		if containsAnyNormalized(normalized, []string{"router", "routing", "preflight", "skill selection"}) {
+			boost = automaticRouteMinScore + 160
+		}
+	}
+	if candidate.score < boost {
+		candidate.score = boost
+	}
+	return candidate
+}
+
+func containsAnyNormalized(value string, needles []string) bool {
+	for _, needle := range needles {
+		if strings.Contains(value, needle) {
+			return true
+		}
+	}
+	return false
 }
 
 func normalizeForMatch(value string) string {

@@ -1,6 +1,6 @@
 {
   "name": "universal-ai-skills",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "Universal CLI-first skill router and AI stack manager. Use one CLI to auto-route real user prompts, load 1,805 canonical skills plus indexed local external skills on demand, run audits, generate CLIs, and manage optional MCP bridges.",
   "author": {
     "name": "onfire7777",

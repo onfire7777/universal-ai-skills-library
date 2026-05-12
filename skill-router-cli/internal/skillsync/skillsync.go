@@ -13,7 +13,7 @@ import (
 
 // DefaultWrapperSkills are the only skills propagated by default.
 // They keep every agent connected to the router without copying the corpus.
-var DefaultWrapperSkills = []string{"universal-ai-skills", "printable-cards"}
+var DefaultWrapperSkills = []string{"universal-ai-skills"}
 
 // SourceDir returns the canonical repository skill source directory.
 func SourceDir() string {
