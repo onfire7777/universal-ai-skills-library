@@ -149,6 +149,9 @@ func isEligibleRouteCandidate(candidate routeCandidate) bool {
 	if e.uninstallIntent && !e.uninstallSupport {
 		return false
 	}
+	if isGenericSingleTokenName(candidate.name) && !hasSpecificEvidenceForGenericName(e) {
+		return false
+	}
 	if e.exactName || e.exactAlias {
 		return e.exactStrongTokens > 0 || len(e.matchedStrongTokens) > 0
 	}
@@ -170,6 +173,24 @@ func isEligibleRouteCandidate(candidate routeCandidate) bool {
 		return true
 	}
 	if e.descriptionStrongHits >= 4 && len(e.matchedStrongTokens) >= 3 {
+		return true
+	}
+	return false
+}
+
+func isGenericSingleTokenName(name string) bool {
+	tokens := routeTokens(name)
+	return len(tokens) == 1 && routeGenericActionTokens[tokens[0].value]
+}
+
+func hasSpecificEvidenceForGenericName(e routeEvidence) bool {
+	if e.exactSource && e.nameStrongHits >= 1 {
+		return true
+	}
+	if e.descriptionStrongHits >= 2 && len(e.matchedStrongTokens) >= 2 {
+		return true
+	}
+	if e.descriptionPhraseHit && e.descriptionStrongHits >= 1 && len(e.matchedStrongTokens) >= 1 {
 		return true
 	}
 	return false
@@ -623,14 +644,24 @@ var routeStopTokens = map[string]bool{
 var routeWeakTokens = map[string]bool{
 	"agent": true, "agents": true, "ai": true, "app": true, "apps": true,
 	"assistant": true, "automation": true, "beautiful": true, "client": true, "code": true,
-	"config": true, "configuration": true, "creat": true, "create": true,
+	"config": true, "configuration": true, "configure": true, "configured": true, "creat": true, "create": true,
 	"creation": true, "directory": true, "file": true, "files": true,
 	"fix": true, "folder": true, "global": true, "local": true,
 	"make": true, "model": true, "models": true, "platform": true, "plugin": true,
 	"plugins": true, "project": true, "prompt": true, "prompts": true,
+	"inspect": true, "live": true, "normal": true, "normalize": true,
+	"optimize": true, "optimized": true, "optimiz": true,
 	"run": true, "setup": true, "skill": true, "skills": true, "state": true, "task": true,
 	"tool": true, "tools": true, "universal": true, "workflow": true,
 	"workflows": true,
+}
+
+var routeGenericActionTokens = map[string]bool{
+	"build": true, "check": true, "config": true, "configure": true,
+	"create": true, "creat": true, "debug": true, "fix": true,
+	"generate": true, "inspect": true, "install": true, "normalize": true,
+	"optimize": true, "optimiz": true, "review": true, "run": true,
+	"setup": true, "sync": true, "test": true, "update": true,
 }
 
 var routeUninstallIntentTokens = map[string]bool{

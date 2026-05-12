@@ -15,6 +15,8 @@ For every new substantive user prompt, internally invoke the preflight before re
 
 The preflight uses deterministic local scoring plus host-AI review for compact ambiguous packets. It does not call another model API and does not need extra API keys.
 
+Keep preflight internal and quiet. Do not show planning chatter like "Need load..." or "skill is not installed" to the user; use `skill-router skill <name>` instead of host-native skill tools for router-selected universal skills.
+
 Use `skill-router route --explain "<user prompt>"` to debug unexpected routes. Prefer no route over a weak or ambiguous route.
 
 Keep context compact. Load only the skill needed for the current task. Use MCP bridges only when a persistent endpoint is required.
