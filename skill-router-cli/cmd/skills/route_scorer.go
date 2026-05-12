@@ -161,7 +161,9 @@ func isEligibleRouteCandidate(candidate routeCandidate) bool {
 	if e.embeddedNamePhraseHit || e.embeddedAliasPhraseHit {
 		return len(e.matchedStrongTokens) > 0
 	}
-	if e.descriptionPhraseHit && len(e.matchedStrongTokens) > 0 {
+	if e.descriptionPhraseHit &&
+		len(e.matchedStrongTokens) > 0 &&
+		(e.descriptionStrongHits >= 2 || (e.descriptionStrongHits >= 1 && e.descriptionWeakHits >= 1)) {
 		return true
 	}
 	if e.nameStrongHits+e.aliasStrongHits >= 1 && e.descriptionStrongHits >= 1 {
@@ -299,10 +301,11 @@ func scoreRouteFields(prompt, name string, aliases []string, description, source
 
 func evidenceScore(e routeEvidence) int {
 	score := 0
-	if e.exactName {
+	hasStrongEvidence := e.exactStrongTokens > 0 || len(e.matchedStrongTokens) > 0
+	if e.exactName && hasStrongEvidence {
 		score += 120 + e.exactStrongTokens*12
 	}
-	if e.exactAlias {
+	if e.exactAlias && hasStrongEvidence {
 		score += 135 + e.exactStrongTokens*12
 	}
 	if e.exactSource {
@@ -314,7 +317,8 @@ func evidenceScore(e routeEvidence) int {
 	if e.embeddedAliasPhraseHit {
 		score += 90
 	}
-	if e.descriptionPhraseHit {
+	if e.descriptionPhraseHit &&
+		(e.descriptionStrongHits >= 2 || (e.descriptionStrongHits >= 1 && e.descriptionWeakHits >= 1)) {
 		score += 70
 	}
 	score += e.nameStrongHits * 30
@@ -621,10 +625,10 @@ var routeWeakTokens = map[string]bool{
 	"assistant": true, "automation": true, "beautiful": true, "client": true, "code": true,
 	"config": true, "configuration": true, "creat": true, "create": true,
 	"creation": true, "directory": true, "file": true, "files": true,
-	"folder": true, "global": true, "local": true,
+	"fix": true, "folder": true, "global": true, "local": true,
 	"make": true, "model": true, "models": true, "platform": true, "plugin": true,
 	"plugins": true, "project": true, "prompt": true, "prompts": true,
-	"setup": true, "skill": true, "skills": true, "task": true,
+	"run": true, "setup": true, "skill": true, "skills": true, "state": true, "task": true,
 	"tool": true, "tools": true, "universal": true, "workflow": true,
 	"workflows": true,
 }
