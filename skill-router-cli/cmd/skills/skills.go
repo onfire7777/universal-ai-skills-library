@@ -240,10 +240,10 @@ var RouteCmd = &cobra.Command{
 	Short: "Pick and load the best skill for a prompt",
 	Long: `Pick and load the best skill for a natural-language prompt.
 
-This is the automatic CLI routing path for agents. It scores canonical skills
-first, including aliases such as card-creator -> printable-cards, then searches
-read-only local external roots only when needed. It requires a confident match
-and returns an error for generic prompts.`,
+This is the automatic CLI routing path for agents. It scores every canonical
+skill in manifest.json plus compatibility aliases, then searches read-only local
+external roots only when needed. It requires a confident match and returns an
+error for generic prompts.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
@@ -283,7 +283,11 @@ var PreflightCmd = &cobra.Command{
 The preflight first applies deterministic evidence gates. When configured and
 needed, it emits a compact host-AI review packet for the already-running AI
 agent to reason over. It never calls a separate model API or requires router
-API keys.`,
+API keys.
+
+Automatic hook adapters should pass --hook-event. When a hook event is supplied,
+preflight only routes for real user-prompt events and no-ops for tool, session,
+stop, background, or lifecycle events.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
@@ -421,8 +425,10 @@ func init() {
 	sourcesCmd.Flags().Bool("refresh", false, "Refresh local external skill index after scanning sources")
 	RouteCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
 	AutoCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
+	AutoCmd.Flags().String("hook-event", "", "Hook event name; automatic loading no-ops unless this is UserPromptSubmit")
 	PreflightCmd.Flags().Bool("explain", false, "Print route scoring diagnostics")
 	PreflightCmd.Flags().Bool("json", false, "Print structured JSON preflight output")
+	PreflightCmd.Flags().String("hook-event", "", "Hook event name; preflight no-ops unless this is UserPromptSubmit")
 	propagateCmd.Flags().Bool("dry-run", false, "Show target roots without copying")
 	propagateCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
@@ -612,8 +618,10 @@ func matchesExternalSkill(s externalSkill, query string) bool {
 }
 
 type routeOptions struct {
-	optional bool
-	explain  bool
+	optional         bool
+	explain          bool
+	hookEvent        string
+	enforceHookEvent bool
 }
 
 func routePrompt(prompt string) error {
@@ -655,7 +663,16 @@ func routePromptWithOptions(prompt string, opts routeOptions) error {
 
 func routeOptionsFromCommand(cmd *cobra.Command, optional bool) (routeOptions, error) {
 	explain, _ := cmd.Flags().GetBool("explain")
-	return routeOptions{optional: optional, explain: explain}, nil
+	opts := routeOptions{optional: optional, explain: explain}
+	if cmd.Flags().Lookup("hook-event") != nil {
+		hookEvent, _ := cmd.Flags().GetString("hook-event")
+		if hookEvent == "" {
+			hookEvent = os.Getenv("SKILL_ROUTER_HOOK_EVENT")
+		}
+		opts.hookEvent = hookEvent
+		opts.enforceHookEvent = strings.TrimSpace(hookEvent) != ""
+	}
+	return opts, nil
 }
 
 func isMetaRoutingSkill(name string) bool {

@@ -41,7 +41,7 @@ universal-ai-skills-library/
 ```bash
 skill-router skill <name>
 skill-router skill search <query>
-skill-router preflight --json "<latest user prompt>"
+skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"
 skill-router route "<prompt>"
 skill-router route --explain "<prompt>"
 skill-router skill list
@@ -53,17 +53,22 @@ skill-router skills sources
 ## Automatic Skill Selection
 
 Users should not have to command the router manually. Agent adapters should treat
-skill selection as an internal preflight before each substantive prompt:
+skill selection as an internal preflight for each real user-submitted prompt:
 
-1. Run `skill-router preflight --json "<latest user prompt>"` internally.
-2. If `decision` is `route`, load `skill-router skill <best.name>` and follow that skill.
+1. If this is wired through a hook, run `skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"` only from the user-prompt hook. For host-AI-internal prechecks without a hook adapter, `skill-router preflight --json "<latest user prompt>"` is acceptable.
+2. If `decision` is `route`, perform a compact host-AI sanity check before loading: the selected skill name or description must clearly match the user's core task, object, and action. If it only matches generic modifiers like "issue", "problem", "install", "setup", "local", "AI", or "skill", continue normally with no skill.
 3. If `decision` is `ambiguous` or `host_ai_review.required` is true, the current host AI reviews only the listed candidates and either loads one clearly matching skill or continues with no skill.
 4. If `decision` is `no_route` and no host review is requested, continue normally.
 
+Automatic skill routing must not run from tool hooks, session-start hooks, stop
+hooks, compaction/resume hooks, assistant messages, tool outputs, status checks,
+or background jobs. Those hooks may still belong to other systems such as
+Context Mode; they just must not trigger skill loading.
+
 The router does not call a separate LLM API and does not need extra API keys.
 The deterministic preflight handles exact aliases, strong domain evidence, and
-near-tie refusal; the already-running host AI supplies the final judgment only
-for compact candidate packets.
+near-tie refusal; the already-running host AI supplies the final sanity check
+and candidate judgment without loading irrelevant skills.
 
 ## Install Or Build
 
@@ -86,7 +91,8 @@ C:\Users\burni\go\bin\manus.exe       # compatibility alias
 skill-router skill <name>          # Print one SKILL.md
 skill-router skill search <query>  # Search canonical skills plus read-only local external roots
 skill-router skill search --refresh <query> # Rebuild external index before searching
-skill-router preflight --json "<prompt>" # Internal adapter preflight; does not load a skill
+skill-router preflight --hook-event UserPromptSubmit --json "<prompt>" # Hook adapter preflight; does not load a skill
+skill-router preflight --json "<prompt>" # Manual/internal host-AI preflight; does not load a skill
 skill-router auto "<prompt>"       # Compatibility wrapper for older agent rules
 skill-router route "<prompt>"      # Explicit route; errors when no confident skill applies
 skill-router route --explain "<prompt>" # Show top candidates and evidence gates
@@ -131,10 +137,11 @@ Detailed policy: `docs/UNIVERSAL_COMPATIBILITY.md`.
 ## Redundancy Policy
 
 The canonical library keeps one physical copy per canonical skill ID under `skills/`.
-Legacy names resolve through aliases, not duplicate directories. For example,
-`card-creator` resolves to the existing full `printable-cards` skill.
-`skill-router route "use the card creator skill to make a Mother's Day card"`
-selects that same exact Manus-origin `printable-cards` skill.
+Legacy names resolve through aliases, not duplicate directories. The router scores
+the entire 1,805-skill manifest on every substantive prompt; aliases only help old
+names resolve to the right canonical skill. For example, `card-creator` resolves to
+the existing full `printable-cards` skill, but that is one compatibility alias, not
+the scope of the router.
 
 Automatic routing is intentionally conservative. It ranks canonical and read-only
 external skills together, requires strong evidence such as exact aliases, matched
@@ -163,12 +170,12 @@ If a workflow can run through `skill-router`, use the CLI. If it needs a long-ru
 
 ```text
 Use Universal AI Skills Router for skills:
-- before each substantive prompt, internally run skill-router preflight --json "<latest user prompt>"
+- for each real user-submitted prompt, internally run skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>" if invoked by a hook, or skill-router preflight --json "<latest user prompt>" if invoked directly by the host AI
 - skill-router skill <name>
 - skill-router skill search <query>
 - skill-router doctor
 
-If preflight returns route, load that one skill. If it returns ambiguous or host_ai_review.required, the current host AI chooses from only the listed candidates or continues without a skill. Keep always-loaded instructions compact. Do not paste the full skills corpus into global rules. MCP bridges are optional adapters for persistent endpoint workflows.
+Never run automatic skill loading from tool/session/stop/background hooks. If preflight returns route, sanity-check the route and load that one skill only if it clearly matches the user's core task. If it returns ambiguous or host_ai_review.required, the current host AI chooses from only the listed candidates or continues without a skill. Keep always-loaded instructions compact. Do not paste the full skills corpus into global rules. MCP bridges are optional adapters for persistent endpoint workflows.
 ```
 
 ## Verification

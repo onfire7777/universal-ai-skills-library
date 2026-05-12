@@ -8988,6 +8988,14 @@
       "name": "onefilellm",
       "directory": "skills/onefilellm",
       "description": "Use when aggregating local files, directories, GitHub repositories/issues/PRs, documentation pages, PDFs, arXiv/DOI/PMID sources, YouTube transcripts, stdin, or clipboard text into a single LLM-ready XML context file using the locally installed jimmc414/onefilellm CLI. Use for context packaging, source bundling, repo-to-text conversion, and multi-source research ingestion.",
+      "aliases": [
+        "one llm",
+        "llm-ready xml",
+        "llm ready xml context",
+        "single llm ready xml",
+        "repo to xml context",
+        "repo to text"
+      ],
       "has_scripts": true,
       "scripts": [
         "scripts/run_onefilellm.py"
@@ -13067,7 +13075,7 @@
     {
       "name": "universal-ai-skills",
       "directory": "skills/universal-ai-skills",
-      "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically. This skill routes through the `skill-router` CLI instead of relying on the native client skill list.",
+      "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list.",
       "has_scripts": false,
       "scripts": []
     },

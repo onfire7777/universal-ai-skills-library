@@ -16,6 +16,7 @@ const (
 
 type routePreflight struct {
 	Prompt     string
+	HookEvent  string
 	Decision   routeDecision
 	Reason     string
 	Best       routeCandidate
@@ -42,6 +43,14 @@ type candidateJSON struct {
 const routeHostReviewMinScore = 55
 
 func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, error) {
+	if opts.enforceHookEvent && !isUserPromptHookEvent(opts.hookEvent) {
+		return routePreflight{
+			Prompt:    prompt,
+			HookEvent: strings.TrimSpace(opts.hookEvent),
+			Decision:  routeDecisionNoRoute,
+			Reason:    fmt.Sprintf("automatic routing is disabled for hook event %q; it only runs for user prompt submission events", strings.TrimSpace(opts.hookEvent)),
+		}, nil
+	}
 	manifest, err := loadManifest()
 	if err != nil {
 		return routePreflight{}, err
@@ -78,6 +87,7 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 
 	preflight := routePreflight{
 		Prompt:     prompt,
+		HookEvent:  strings.TrimSpace(opts.hookEvent),
 		RawBest:    bestRaw,
 		Candidates: candidates,
 	}
@@ -94,8 +104,10 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 		preflight.Decision = routeDecisionNoRoute
 		if bestRaw.score == 0 {
 			preflight.Reason = "no lexical candidate survived preflight"
+		} else if bestRaw.evidence.uninstallIntent && !bestRaw.evidence.uninstallSupport {
+			preflight.Reason = fmt.Sprintf("best candidate %s scored %d but was rejected because the prompt asks for uninstall/removal and the skill does not support uninstall work", bestRaw.name, bestRaw.score)
 		} else {
-			preflight.Reason = fmt.Sprintf("best candidate %s scored %d below threshold %d", bestRaw.name, bestRaw.score, automaticRouteMinScore)
+			preflight.Reason = fmt.Sprintf("best candidate %s scored %d but failed evidence gates", bestRaw.name, bestRaw.score)
 			if bestRaw.score >= routeHostReviewMinScore {
 				preflight.HostReview = buildHostAIReview(topRouteCandidates(rawCandidates, 5), "The deterministic router found only weak evidence. The current host AI may load one listed skill only if the user intent clearly matches its name and description; otherwise continue normally.")
 			}
@@ -164,6 +176,7 @@ func printPreflight(preflight routePreflight, explain bool) {
 func printPreflightJSON(preflight routePreflight, explain bool) error {
 	out := struct {
 		Prompt     string          `json:"prompt"`
+		HookEvent  string          `json:"hook_event,omitempty"`
 		Decision   routeDecision   `json:"decision"`
 		Reason     string          `json:"reason"`
 		Best       *candidateJSON  `json:"best,omitempty"`
@@ -172,6 +185,7 @@ func printPreflightJSON(preflight routePreflight, explain bool) error {
 		Top        []candidateJSON `json:"top,omitempty"`
 	}{
 		Prompt:     preflight.Prompt,
+		HookEvent:  preflight.HookEvent,
 		Decision:   preflight.Decision,
 		Reason:     preflight.Reason,
 		HostReview: preflight.HostReview,
@@ -208,5 +222,16 @@ func routeCandidateJSON(candidate routeCandidate) candidateJSON {
 		Score:       candidate.score,
 		Eligible:    isEligibleRouteCandidate(candidate),
 		Description: strings.TrimSpace(candidate.description),
+	}
+}
+
+func isUserPromptHookEvent(event string) bool {
+	normalized := normalizeRouteText(event)
+	normalized = strings.ReplaceAll(normalized, " ", "")
+	switch normalized {
+	case "", "userpromptsubmit", "userprompt", "userpromptevent", "promptsubmit", "userinput", "usermessage":
+		return true
+	default:
+		return false
 	}
 }

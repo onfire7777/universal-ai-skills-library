@@ -1,6 +1,6 @@
 ---
 name: universal-ai-skills
-description: Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically. This skill routes through the `skill-router` CLI instead of relying on the native client skill list.
+description: Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list.
 ---
 
 # Universal AI Skills Router
@@ -9,19 +9,21 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Primary binary: `C:\Users\burni\go\bin\skill-router.exe`.
 - Legacy alias: `C:\Users\burni\go\bin\manus.exe`.
 - For every new substantive user prompt, perform skill selection automatically as an internal preflight. Do not wait for the user to run a command.
+- Hook scope is strict: automatic skill selection belongs only to real user prompt submission events, such as Codex/Claude `UserPromptSubmit`. Do not run or load routed skills from tool hooks, session-start hooks, stop hooks, compaction/resume hooks, background jobs, assistant messages, tool outputs, or status checks.
 - Internal preflight protocol:
-  1. Run `skill-router preflight --json "<latest user prompt>"` silently.
-  2. If `decision` is `route`, load `skill-router skill <best.name>` and follow that one skill.
+  1. Run `skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"` silently when invoked from a hook adapter. If there is no hook adapter and the host AI is doing the precheck internally, `skill-router preflight --json "<latest user prompt>"` is acceptable.
+  2. If `decision` is `route`, perform a compact host-AI sanity check before loading: the selected skill name or description must clearly match the user's core task, object, and action. If it only matches generic modifiers like "issue", "problem", "install", "setup", "local", "AI", or "skill", continue normally with no skill instead of loading a mismatched skill.
   3. If `decision` is `ambiguous` or `host_ai_review.required` is true, the current host AI reviews only the listed candidates and either loads one clearly matching skill or continues with no skill.
   4. If `decision` is `no_route` and no host review is requested, continue normally.
+- Never load a routed skill just because the CLI returned `decision=route` when the current host AI can see the route is irrelevant.
 - The router does not call another LLM API and does not need extra API keys. The already-running host AI supplies judgment only for compact ambiguous candidate packets.
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
-- Use `skill-router route "<user prompt>"` for explicit routing checks that should fail when no confident skill applies.
+- Use `skill-router preflight --hook-event UserPromptSubmit --json "<user prompt>"` for automatic hook prechecks. Use `skill-router preflight --json "<user prompt>"` for manual/internal host-AI prechecks. Use `skill-router route "<user prompt>"` only for explicit routing checks that should load the winning skill or fail when no confident skill applies.
 - Use `skill-router route --explain "<user prompt>"` when a route looks wrong; it prints the top candidates, score, source, evidence gates, and ambiguity behavior.
-- Automatic routing should prefer no route over a weak route. It ranks canonical and read-only external skills together, requires exact aliases or strong multi-token evidence, and refuses ambiguous near-ties.
+- Automatic routing should prefer no route over a weak route. It scores the full 1,805-skill canonical corpus and read-only external skills together, requires exact aliases or strong multi-token evidence, and refuses ambiguous near-ties.
 - If a user says "universal AI skills <thing>", do not decide from the native client skill list. Run `skill-router skill search <thing>` or `skill-router skill <thing>` first.
-- If the user asks for `card creator`, `card-creator`, a printable greeting card, Mother's Day card, birthday card, or foldable card, load `skill-router skill card-creator`. It resolves to the canonical `printable-cards` skill.
+- Compatibility aliases, such as `card-creator`, resolve through the manifest to their canonical skills. Do not hardcode one skill family as the router's scope.
 - Use `skill-router skills sources` to inspect read-only local external skill roots.
 - Use `skill-router skills sources --refresh` after adding or removing external skill roots.
 - Keep always-loaded instructions compact. Do not paste the full skill corpus into global rules.
