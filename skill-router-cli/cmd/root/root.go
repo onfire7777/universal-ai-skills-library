@@ -17,7 +17,9 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/doctor"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/files"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/find"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gbrain"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gmail"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gstack"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gws"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/hf"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/infra"
@@ -34,7 +36,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/web"
 )
 
-const Version = "2.1.8"
+const Version = "2.2.0"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -44,11 +46,12 @@ multi-model auditing, oracle queries, file organization, model selection,
 platform API integrations, CLI generation, database management, email,
 Hugging Face, Google Workspace, automation, and local AI setup.
 
-Consolidates 1,805 repo skills, indexed local external skills, 4 optional MCP bridges,
+Consolidates 1,807 repo skills, indexed local external skills, 4 optional MCP bridges,
 6 MCP connectors (Supabase, HuggingFace, Make, Gmail, SkillSeekers, MemPalace),
 multi-model code auditor, multi-model oracle, file organizer,
 model selector, music prompter, chat summarizer, skill debugger,
 context anchoring, internet skill finder, GitHub gem seeker,
+GStack engineering workflow adapters, GBrain knowledge brain integration,
 SimilarWeb analytics, persistent computing, CLI Printing Press,
 and platform-specific adapters into one context-efficient tool.
 
@@ -75,6 +78,8 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  hf          Hugging Face Hub (models, datasets, papers)")
 		fmt.Println("  find        Search for skills, tools, and GitHub solutions")
 		fmt.Println("  web         Website analytics via SimilarWeb")
+		fmt.Println("  gstack      GStack engineering workflows and browser/PDF tools")
+		fmt.Println("  gbrain      GBrain personal knowledge brain CLI adapter")
 		fmt.Println()
 		fmt.Println("Productivity:")
 		fmt.Println("  files       Organize, deduplicate, rename, and clean up files")
@@ -124,6 +129,8 @@ func init() {
 	rootCmd.AddCommand(hf.Cmd)
 	rootCmd.AddCommand(find.Cmd)
 	rootCmd.AddCommand(web.Cmd)
+	rootCmd.AddCommand(gstack.Cmd)
+	rootCmd.AddCommand(gbrain.Cmd)
 
 	// Productivity
 	rootCmd.AddCommand(files.Cmd)

@@ -38,6 +38,8 @@ These are the upstream repositories from which skills were sourced and normalize
 | [jlowin/fastmcp](https://github.com/jlowin/fastmcp) | FastMCP server patterns |
 | [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) | MCP server discovery |
 | [asynkron/openskills](https://github.com/asynkron/openskills) | OpenSkills standard, skill format spec |
+| [garrytan/gstack](https://github.com/garrytan/gstack) | GStack engineering workflow skills, browser automation tooling, QA/review/ship methodology. Installed once at `~/.gstack/gstack` and indexed read-only through generated namespaced `gstack-*` skills. |
+| [garrytan/gbrain](https://github.com/garrytan/gbrain) | GBrain personal knowledge brain, brain-first retrieval, Minions/durable jobs, and GBrain skillpack. Installed once at `~/gbrain`, runtime state at `~/.gbrain`, and indexed read-only by the router. |
 | Various community contributors | Security, DevOps, writing, design, data skills |
 
 ## Local AI Platform Installations

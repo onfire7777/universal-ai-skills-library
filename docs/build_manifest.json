@@ -1,14 +1,14 @@
 {
   "schema": "universal-ai-skills-build-manifest/v2",
-  "generated_at": "2026-05-11T16:34:24.486Z",
+  "generated_at": "2026-05-12T00:00:00.000Z",
   "source_of_truth": "C:\\Users\\burni\\universal-ai-skills-library\\skills",
   "router_source": "C:\\Users\\burni\\universal-ai-skills-library\\skill-router-cli",
   "primary_binary": "skill-router",
   "legacy_binary_alias": "manus",
-  "skill_count": 1805,
-  "directories_total": 1805,
+  "skill_count": 1807,
+  "directories_total": 1807,
   "missing_skill_md": [],
-  "alias_count": 137,
+  "alias_count": 1855,
   "merged_legacy_directories": [
     {
       "legacy_directory": "anthropic_administrator-automation",
@@ -191,6 +191,176 @@
     ]
   },
   "skills": [
+    {
+      "name": "chat-summarizer",
+      "directory": "skills/chat-summarizer",
+      "description": "Generate a comprehensive, AI-optimized summary of the current AI session. Use when the user asks to summarize this chat, create a session summary, generate a handoff document, capture what was done, or save progress for continuation in a new chat or another AI client.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/format_summary.py"
+      ]
+    },
+    {
+      "name": "context-anchor",
+      "directory": "skills/context-anchor",
+      "description": "Set and maintain a persistent core topic or purpose for the entire AI session. Use when the user sets a core topic, anchors context, says \"let's focus on X\", \"today we're building Y\", \"we're working on Z\", or asks the assistant to stay on track across a long task.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/anchor.py"
+      ]
+    },
+    {
+      "name": "file-organizer",
+      "directory": "skills/file-organizer",
+      "description": "Comprehensive file organization suite. Use for cleaning up messy folders, arranging the desktop, finding duplicates, renaming files intelligently, and categorizing files by type or date. Includes safety features like dry-run mode and undo capabilities.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/arrange_desktop.py",
+        "scripts/cleanup_files.py",
+        "scripts/find_duplicates.py",
+        "scripts/generate_plan.py",
+        "scripts/generate_report.py",
+        "scripts/organize_files.py",
+        "scripts/rename_files.py",
+        "scripts/scan_files.py",
+        "scripts/undo_operations.py"
+      ]
+    },
+    {
+      "name": "manus-api",
+      "directory": "skills/manus-api",
+      "description": "Manus API compatibility adapter. Manage tasks, projects, and other data in Manus via API, or create Manus tasks programmatically when a workflow specifically needs Manus-hosted agentic capabilities.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "universal-ai-config",
+      "directory": "skills/universal-ai-config",
+      "description": "Configure and audit the local universal AI skills setup across Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, Manus compatibility surfaces, plugin manifests, optional MCP bridges, and global instruction files. Use when the user asks to organize, consolidate, optimize, rename, or repair the cross-AI skill router configuration.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "universal-ai-skills",
+      "directory": "skills/universal-ai-skills",
+      "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "gstack",
+      "directory": "skills/gstack",
+      "description": "Universal adapter for Garry Tan's gstack engineering skill stack. Use when the user asks for gstack, gstack office-hours, gstack review, gstack QA, gstack shipping, gstack security review, gstack browser/PDF tooling, or gstack integration with Claude Code, Codex, OpenCode, Hermes, OpenClaw, Kiro, Cursor, or GBrain.",
+      "aliases": [
+        "garrytan-gstack",
+        "garry-tan-gstack",
+        "gstack-skills",
+        "gstack-router"
+      ],
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "gbrain",
+      "directory": "skills/gbrain",
+      "description": "Universal adapter for Garry Tan's GBrain personal knowledge brain. Use when the user asks for GBrain, brain-first retrieval, local PGLite brain setup, gbrain query/search/import/sync/embed, GBrain skills, Minions, durable agent jobs, soul-audit, brain maintenance, or integrating GBrain with gstack, Hermes, OpenClaw, Claude Code, or Codex.",
+      "aliases": [
+        "garrytan-gbrain",
+        "garry-tan-gbrain",
+        "gbrain-skills",
+        "brain-first"
+      ],
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "model-selector",
+      "directory": "skills/model-selector",
+      "description": "Set and manage the preferred backbone LLM for compatible AI-agent workflows. Supports manual model selection, automatic best-model selection based on task type, and a cached/refreshable leaderboard of the latest frontier models from OpenRouter. Toggle on/off via chat commands. Use when the user says \"model-selector\", \"set model\", \"change model\", \"best model\", \"auto model\", \"switch model\", \"model-selector on\", \"model-selector off\", \"list models\", \"show models\", \"model status\", \"recommend model\", \"refresh models\", or asks which AI model to use for a task.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/model_selector.py"
+      ]
+    },
+    {
+      "name": "multi-model-code-auditor",
+      "directory": "skills/multi-model-code-auditor",
+      "description": "Run a comprehensive security, privacy, and bug audit on any codebase using the absolute best frontier AI models via OpenRouter API. Dynamically discovers the latest models, uses model-specific elite prompt engineering, merges findings by consensus, implements fixes, and runs a verification re-audit. Use when the user requests a code audit, security review, vulnerability scan, bug audit, or asks to review code with multiple AI models.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/cross_compare.py",
+        "scripts/run_audit.py"
+      ]
+    },
+    {
+      "name": "multi-model-oracle",
+      "directory": "skills/multi-model-oracle",
+      "description": "Get a merged answer from a configured multi-model pool. Automatically prompt-engineers the query first, queries available models in parallel, and merges results into one best answer. Use when the user wants a best-effort answer, model comparison, multi-model response, oracle answer, or consensus synthesis.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/oracle.py"
+      ]
+    },
+    {
+      "name": "music-prompter",
+      "directory": "skills/music-prompter",
+      "description": "MUST read this skill BEFORE entering generate mode for music tasks. Covers prompt crafting framework, structure syntax, and multi-clip strategy.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "persistent-computing",
+      "directory": "skills/persistent-computing",
+      "description": "MUST read when a task needs persistent services, Docker, fixed IPs, background jobs, heavy compute, reusable environments, or always-on infrastructure beyond the current AI sandbox. Covers local desktop, managed cloud computer, and third-party cloud options, including Manus compatibility where relevant.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "prompt-engineer",
+      "directory": "skills/prompt-engineer",
+      "description": "Create a highly optimized prompt for an AI agent based on user input. Use when the user asks to improve, rewrite, or optimize a prompt, or when they want to learn how to write better prompts for agentic AI workflows. Requires OPENROUTER_API_KEY and/or OPENAI_API_KEY environment variables.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/optimize_prompt.py"
+      ]
+    },
+    {
+      "name": "skill-creator",
+      "directory": "skills/skill-creator",
+      "description": "Guide for creating or updating portable AI skills via specialized knowledge, workflows, scripts, references, or tool integrations. For any skill modification or improvement request, read this skill first and follow its update workflow.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/init_skill.py",
+        "scripts/quick_validate.py"
+      ]
+    },
+    {
+      "name": "skill-debugger",
+      "directory": "skills/skill-debugger",
+      "description": "Deep dual-model debugging of AI skills using reasoning model and fast synthesis model. Use when asked to debug a skill, find bugs in a skill, review a skill for issues, fix a broken skill, or audit a skill's quality. Also use when a skill is not working correctly or producing unexpected results.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/debug_skill.py"
+      ]
+    },
+    {
+      "name": "skill-sync",
+      "directory": "skills/skill-sync",
+      "description": "Sync and install skills from a GitHub skills repository into a local or global AI skill root. Use when the user asks to install skills, update skills, sync skills from GitHub, load a skill library, or ensure cross-AI skill roots are up to date.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/sync_skills.py"
+      ]
+    },
+    {
+      "name": "ultimate-skill-creator",
+      "directory": "skills/ultimate-skill-creator",
+      "description": "The definitive end-to-end pipeline for creating the highest quality portable AI skills. Orchestrates six individual skills in sequence — each run fully, separately, and in its entirety — to produce elite, production-grade skills. Use when the user explicitly requests the full pipeline, says \"ultimate skill\", \"ultimate skill creator\", \"ultimate skill creation\", \"best skill\", \"best skill creator\", \"full pipeline\", \"full skill pipeline\", or specifically asks for maximum quality skill creation with all optimization stages. For simple skill creation without the full pipeline, use skill-creator instead.",
+      "has_scripts": true,
+      "scripts": [
+        "scripts/preflight_check.py"
+      ]
+    },
     {
       "name": "21risk-automation",
       "directory": "skills/21risk-automation",
@@ -2257,15 +2427,6 @@
       "scripts": []
     },
     {
-      "name": "chat-summarizer",
-      "directory": "skills/chat-summarizer",
-      "description": "Generate a comprehensive, AI-optimized summary of the current AI session. Use when the user asks to summarize this chat, create a session summary, generate a handoff document, capture what was done, or save progress for continuation in a new chat or another AI client.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/format_summary.py"
-      ]
-    },
-    {
       "name": "chatbotkit-automation",
       "directory": "skills/chatbotkit-automation",
       "description": "Automate Chatbotkit tasks via Rube MCP (Composio). Always search tools first for current schemas.",
@@ -3210,15 +3371,6 @@
       "description": "Automate Contentful Graphql tasks via Rube MCP (Composio). Always search tools first for current schemas.",
       "has_scripts": false,
       "scripts": []
-    },
-    {
-      "name": "context-anchor",
-      "directory": "skills/context-anchor",
-      "description": "Set and maintain a persistent core topic or purpose for the entire AI session. Use when the user sets a core topic, anchors context, says \"let's focus on X\", \"today we're building Y\", \"we're working on Z\", or asks the assistant to stay on track across a long task.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/anchor.py"
-      ]
     },
     {
       "name": "context-engineering-advisor",
@@ -4975,23 +5127,6 @@
       "description": "Translate Figma nodes into production-ready code with 1:1 visual fidelity using the Figma MCP workflow (design context, screenshots, assets, and project-convention translation). Trigger when the user provides Figma URLs or node IDs, or asks to implement designs or components that must match Figma specs. Requires a working Figma MCP server connection.",
       "has_scripts": false,
       "scripts": []
-    },
-    {
-      "name": "file-organizer",
-      "directory": "skills/file-organizer",
-      "description": "Comprehensive file organization suite. Use for cleaning up messy folders, arranging the desktop, finding duplicates, renaming files intelligently, and categorizing files by type or date. Includes safety features like dry-run mode and undo capabilities.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/arrange_desktop.py",
-        "scripts/cleanup_files.py",
-        "scripts/find_duplicates.py",
-        "scripts/generate_plan.py",
-        "scripts/generate_report.py",
-        "scripts/organize_files.py",
-        "scripts/rename_files.py",
-        "scripts/scan_files.py",
-        "scripts/undo_operations.py"
-      ]
     },
     {
       "name": "files-com-automation",
@@ -8099,13 +8234,6 @@
       "scripts": []
     },
     {
-      "name": "manus-api",
-      "directory": "skills/manus-api",
-      "description": "Manus API compatibility adapter. Manage tasks, projects, and other data in Manus via API, or create Manus tasks programmatically when a workflow specifically needs Manus-hosted agentic capabilities.",
-      "has_scripts": false,
-      "scripts": []
-    },
-    {
       "name": "many-chat-automation",
       "directory": "skills/many-chat-automation",
       "description": "Automate ManyChat tasks via Rube MCP (Composio): chatbot flows, subscribers, broadcasts, and messenger automation. Always search tools first for current schemas.",
@@ -8428,15 +8556,6 @@
       "scripts": []
     },
     {
-      "name": "model-selector",
-      "directory": "skills/model-selector",
-      "description": "Set and manage the preferred backbone LLM for compatible AI-agent workflows. Supports manual model selection, automatic best-model selection based on task type, and a cached/refreshable leaderboard of the latest frontier models from OpenRouter. Toggle on/off via chat commands. Use when the user says \"model-selector\", \"set model\", \"change model\", \"best model\", \"auto model\", \"switch model\", \"model-selector on\", \"model-selector off\", \"list models\", \"show models\", \"model status\", \"recommend model\", \"refresh models\", or asks which AI model to use for a task.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/model_selector.py"
-      ]
-    },
-    {
       "name": "modelry-automation",
       "directory": "skills/modelry-automation",
       "description": "Automate Modelry tasks via Rube MCP (Composio). Always search tools first for current schemas.",
@@ -8560,25 +8679,6 @@
       ]
     },
     {
-      "name": "multi-model-code-auditor",
-      "directory": "skills/multi-model-code-auditor",
-      "description": "Run a comprehensive security, privacy, and bug audit on any codebase using the absolute best frontier AI models via OpenRouter API. Dynamically discovers the latest models, uses model-specific elite prompt engineering, merges findings by consensus, implements fixes, and runs a verification re-audit. Use when the user requests a code audit, security review, vulnerability scan, bug audit, or asks to review code with multiple AI models.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/cross_compare.py",
-        "scripts/run_audit.py"
-      ]
-    },
-    {
-      "name": "multi-model-oracle",
-      "directory": "skills/multi-model-oracle",
-      "description": "Get a merged answer from a configured multi-model pool. Automatically prompt-engineers the query first, queries available models in parallel, and merges results into one best answer. Use when the user wants a best-effort answer, model comparison, multi-model response, oracle answer, or consensus synthesis.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/oracle.py"
-      ]
-    },
-    {
       "name": "multi-repo-git-ops",
       "directory": "skills/multi-repo-git-ops",
       "description": "Manages git operations (branching, committing, pushing) across multi-repo systems with git submodules. Use this skill whenever the user wants to create a feature branch, commit changes, push code, sync submodules, or manage branches across the parent repo and service repos. Also use when implementing BMAD stories that touch one or more services, or when the user asks about git workflow in a multi-repo project. Triggers on phrases like \"create branch\", \"commit changes\", \"push to remote\", \"sync submodules\", \"start working on story\", \"update service branch\", or any git operation that spans parent and submodule repos.",
@@ -8596,13 +8696,6 @@
       "name": "muse",
       "directory": "skills/muse",
       "description": "Define and manage design tokens, apply tokens to existing code, and build design systems. Responsible for token system design, unifying spacing, color, and typography, and supporting dark mode. Used when design token design and UI consistency are required.",
-      "has_scripts": false,
-      "scripts": []
-    },
-    {
-      "name": "music-prompter",
-      "directory": "skills/music-prompter",
-      "description": "MUST read this skill BEFORE entering generate mode for music tasks. Covers prompt crafting framework, structure syntax, and multi-clip strategy.",
       "has_scripts": false,
       "scripts": []
     },
@@ -9372,13 +9465,6 @@
       "scripts": []
     },
     {
-      "name": "persistent-computing",
-      "directory": "skills/persistent-computing",
-      "description": "MUST read when a task needs persistent services, Docker, fixed IPs, background jobs, heavy compute, reusable environments, or always-on infrastructure beyond the current AI sandbox. Covers local desktop, managed cloud computer, and third-party cloud options, including Manus compatibility where relevant.",
-      "has_scripts": false,
-      "scripts": []
-    },
-    {
       "name": "persistiq-automation",
       "directory": "skills/persistiq-automation",
       "description": "Automate Persistiq tasks via Rube MCP (Composio). Always search tools first for current schemas.",
@@ -9961,15 +10047,6 @@
       "description": "Use when managing project uncertainty through structured risk tracking, identifying and assessing risks with probability×impact scoring (risk matrix), assigning risk owners and mitigation plans, tracking contingencies and triggers, monitoring risk evolution over project lifecycle, or when user mentions risk register, risk assessment, risk management, risk mitigation, probability-impact matrix, or asks \"what could go wrong with this project?\".",
       "has_scripts": false,
       "scripts": []
-    },
-    {
-      "name": "prompt-engineer",
-      "directory": "skills/prompt-engineer",
-      "description": "Create a highly optimized prompt for an AI agent based on user input. Use when the user asks to improve, rewrite, or optimize a prompt, or when they want to learn how to write better prompts for agentic AI workflows. Requires OPENROUTER_API_KEY and/or OPENAI_API_KEY environment variables.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/optimize_prompt.py"
-      ]
     },
     {
       "name": "prompt-engineering",
@@ -11397,25 +11474,6 @@
       "scripts": []
     },
     {
-      "name": "skill-creator",
-      "directory": "skills/skill-creator",
-      "description": "Guide for creating or updating portable AI skills via specialized knowledge, workflows, scripts, references, or tool integrations. For any skill modification or improvement request, read this skill first and follow its update workflow.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/init_skill.py",
-        "scripts/quick_validate.py"
-      ]
-    },
-    {
-      "name": "skill-debugger",
-      "directory": "skills/skill-debugger",
-      "description": "Deep dual-model debugging of AI skills using reasoning model and fast synthesis model. Use when asked to debug a skill, find bugs in a skill, review a skill for issues, fix a broken skill, or audit a skill's quality. Also use when a skill is not working correctly or producing unexpected results.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/debug_skill.py"
-      ]
-    },
-    {
       "name": "skill-deployer",
       "directory": "skills/skill-deployer",
       "description": "Manus UI compatibility adapter for deploying skills through the gRPC-web API. Packages skills as zips, uploads/deletes/syncs per-project skill sets, and curates domain-relevant skills using LLM analysis. Use only when filesystem skills must be visible in the Manus UI sidebar or synchronized across Manus projects.",
@@ -11467,15 +11525,6 @@
       "description": "A skill that creates new Claude skills and automatically shares them on Slack using Rube for seamless team collaboration and skill discovery.",
       "has_scripts": false,
       "scripts": []
-    },
-    {
-      "name": "skill-sync",
-      "directory": "skills/skill-sync",
-      "description": "Sync and install skills from a GitHub skills repository into a local or global AI skill root. Use when the user asks to install skills, update skills, sync skills from GitHub, load a skill library, or ensure cross-AI skill roots are up to date.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/sync_skills.py"
-      ]
     },
     {
       "name": "skyfire-automation",
@@ -13036,15 +13085,6 @@
       "scripts": []
     },
     {
-      "name": "ultimate-skill-creator",
-      "directory": "skills/ultimate-skill-creator",
-      "description": "The definitive end-to-end pipeline for creating the highest quality portable AI skills. Orchestrates six individual skills in sequence — each run fully, separately, and in its entirety — to produce elite, production-grade skills. Use when the user explicitly requests the full pipeline, says \"ultimate skill\", \"ultimate skill creator\", \"ultimate skill creation\", \"best skill\", \"best skill creator\", \"full pipeline\", \"full skill pipeline\", or specifically asks for maximum quality skill creation with all optimization stages. For simple skill creation without the full pipeline, use skill-creator instead.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/preflight_check.py"
-      ]
-    },
-    {
       "name": "unione-automation",
       "directory": "skills/unione-automation",
       "description": "Automate Unione tasks via Rube MCP (Composio). Always search tools first for current schemas.",
@@ -13059,23 +13099,9 @@
       "scripts": []
     },
     {
-      "name": "universal-ai-config",
-      "directory": "skills/universal-ai-config",
-      "description": "Configure and audit the local universal AI skills setup across Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, Manus compatibility surfaces, plugin manifests, optional MCP bridges, and global instruction files. Use when the user asks to organize, consolidate, optimize, rename, or repair the cross-AI skill router configuration.",
-      "has_scripts": false,
-      "scripts": []
-    },
-    {
       "name": "universal-ai-setup",
       "directory": "skills/universal-ai-setup",
       "description": "Manage this repository as the user's universal AI setup hub for OpenSkills, source repo inventory, bootstrap scripts, skill audits, and cross-agent operating rules.",
-      "has_scripts": false,
-      "scripts": []
-    },
-    {
-      "name": "universal-ai-skills",
-      "directory": "skills/universal-ai-skills",
-      "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list.",
       "has_scripts": false,
       "scripts": []
     },

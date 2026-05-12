@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # Universal AI Skills Library Installer
-# Installs the unified 1,805-skill library into the target skills directory
+# Installs the unified 1,807-skill library into the target skills directory
 #
 # Usage:
 #   From cloned repo:  bash install.sh [--target /path/to/skills]
@@ -25,7 +25,7 @@ done
 
 echo "============================================================"
 echo "  Universal AI Skills Library Installer"
-echo "  1,805 Unified Skills"
+echo "  1,807 Unified Skills"
 echo "============================================================"
 echo ""
 echo "  Target directory: $TARGET_DIR"
