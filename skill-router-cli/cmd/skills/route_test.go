@@ -1,6 +1,10 @@
 package skills
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func TestRouteScoringPrefersPrintableCardsForCardCreatorPrompt(t *testing.T) {
 	prompt := "use the universal AI skills card creator skill to create a beautiful mothers day card"
@@ -165,5 +169,83 @@ func TestAutomaticRoutingRejectsAmbiguousNearTie(t *testing.T) {
 	}
 	if !isAmbiguousRoute(best, second) {
 		t.Fatalf("expected near-tie to be ambiguous, best=%s/%d second=%s/%d", best.name, best.score, second.name, second.score)
+	}
+}
+
+func TestPreflightRoutesPrintableCardsForCardCreatorPrompt(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("use the universal AI skills card creator skill to create a beautiful mothers day card", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionRoute {
+		t.Fatalf("expected route decision, got %s: %s", preflight.Decision, preflight.Reason)
+	}
+	if preflight.Best.name != "printable-cards" {
+		t.Fatalf("expected printable-cards, got %s", preflight.Best.name)
+	}
+	if preflight.HostReview != nil {
+		t.Fatalf("confident route should not require host AI review")
+	}
+}
+
+func TestPreflightKeepsGenericPromptQuiet(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("thanks that makes sense", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionNoRoute {
+		t.Fatalf("expected no_route for generic prompt, got %s", preflight.Decision)
+	}
+	if preflight.HostReview != nil {
+		t.Fatalf("generic no-route prompt should not request host AI review")
+	}
+}
+
+func TestPreflightProvidesHostReviewForAmbiguousRoute(t *testing.T) {
+	configurePreflightTest(t)
+	t.Setenv("OPENAI_API_KEY", "")
+	t.Setenv("OPENROUTER_API_KEY", "")
+	t.Setenv("ANTHROPIC_API_KEY", "")
+	externalRoot := t.TempDir()
+	createExternalTestSkill(t, externalRoot, "test-failing-test", "Diagnose and fix a failing test.")
+	createExternalTestSkill(t, externalRoot, "testing", "General testing workflows for fixing failing tests.")
+	t.Setenv("SKILL_ROUTER_EXTERNAL_SKILL_ROOTS", externalRoot)
+	preflight, err := buildRoutePreflight("debug this failing test", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionAmbiguous {
+		t.Fatalf("expected ambiguous decision, got %s: %s", preflight.Decision, preflight.Reason)
+	}
+	if preflight.HostReview == nil || !preflight.HostReview.Required {
+		t.Fatalf("ambiguous route should include host AI review packet")
+	}
+	if len(preflight.HostReview.Candidates) < 2 {
+		t.Fatalf("host AI review should include multiple candidates, got %d", len(preflight.HostReview.Candidates))
+	}
+}
+
+func configurePreflightTest(t *testing.T) {
+	t.Helper()
+	repoRoot, err := filepath.Abs(filepath.Join("..", "..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("USERPROFILE", t.TempDir())
+	t.Setenv("SKILL_ROUTER_REPO_DIR", repoRoot)
+	t.Setenv("SKILL_ROUTER_CONFIG_DIR", t.TempDir())
+}
+
+func createExternalTestSkill(t *testing.T, root, name, description string) {
+	t.Helper()
+	dir := filepath.Join(root, name)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	body := "---\nname: " + name + "\ndescription: " + description + "\n---\n\n# " + name + "\n"
+	if err := os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte(body), 0644); err != nil {
+		t.Fatal(err)
 	}
 }

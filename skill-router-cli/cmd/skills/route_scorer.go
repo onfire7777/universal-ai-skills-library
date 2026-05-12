@@ -10,11 +10,13 @@ import (
 const automaticRouteMinMargin = 18
 
 type routeCandidate struct {
-	name     string
-	score    int
-	external bool
-	meta     bool
-	evidence routeEvidence
+	name        string
+	description string
+	sourceID    string
+	score       int
+	external    bool
+	meta        bool
+	evidence    routeEvidence
 }
 
 type routeEvidence struct {
@@ -51,20 +53,23 @@ type fieldMatch struct {
 func manifestRouteCandidate(prompt string, s manifestSkill) routeCandidate {
 	evidence := scoreRouteFields(prompt, s.Name, s.Aliases, s.Description, "")
 	return routeCandidate{
-		name:     s.Name,
-		score:    evidenceScore(evidence),
-		meta:     isMetaRoutingSkill(s.Name),
-		evidence: evidence,
+		name:        s.Name,
+		description: s.Description,
+		score:       evidenceScore(evidence),
+		meta:        isMetaRoutingSkill(s.Name),
+		evidence:    evidence,
 	}
 }
 
 func externalRouteCandidate(prompt string, s externalSkill) routeCandidate {
 	evidence := scoreRouteFields(prompt, s.Name, nil, s.Description, s.SourceID)
 	return routeCandidate{
-		name:     s.Name,
-		score:    evidenceScore(evidence),
-		external: true,
-		evidence: evidence,
+		name:        s.Name,
+		description: s.Description,
+		sourceID:    s.SourceID,
+		score:       evidenceScore(evidence),
+		external:    true,
+		evidence:    evidence,
 	}
 }
 

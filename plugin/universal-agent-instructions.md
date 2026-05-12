@@ -1,7 +1,13 @@
 # Universal AI Skills Router Rule
 
 - Canonical source: `C:\Users\burni\universal-ai-skills-library`.
-- For every new substantive user prompt, run `skill-router auto "<latest user prompt>"` before responding. If it prints a skill, follow that skill. If it says no route, continue normally.
+- For every new substantive user prompt, perform skill selection automatically as an internal preflight. Do not wait for the user to ask for routing.
+- Internal preflight protocol:
+  1. Run `skill-router preflight --json "<latest user prompt>"` silently.
+  2. If `decision` is `route`, load `skill-router skill <best.name>` and follow that one skill.
+  3. If `decision` is `ambiguous` or `host_ai_review.required` is true, use the current host AI to choose from only the listed candidates, or continue with no skill if none clearly fits.
+  4. If `decision` is `no_route` and no host review is requested, continue normally.
+- The router does not call a separate LLM API and does not need extra API keys.
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
 - Use `skill-router route "<user prompt>"` when an explicit routing check should fail if no confident skill applies.
