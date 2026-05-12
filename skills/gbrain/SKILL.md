@@ -11,6 +11,11 @@ GBrain is a real CLI-backed personal knowledge brain. It is not just a skill
 pack. The universal stack keeps the upstream checkout and local brain state in
 one place, then exposes GBrain skills and commands through `skill-router`.
 
+On Windows, the canonical GBrain binary is
+`C:\Users\burni\.bun\bin\gbrain.exe`. The compatibility shim
+`C:\Users\burni\go\bin\gbrain.cmd` delegates to it so AI hosts with an older
+inherited PATH still resolve `gbrain` without duplicating the install.
+
 ## Core Commands
 
 ```bash
