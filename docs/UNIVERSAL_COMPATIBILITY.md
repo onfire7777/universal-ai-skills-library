@@ -48,6 +48,7 @@ Full skill bodies are loaded only when needed:
 
 ```bash
 skill-router skill search <query>
+skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"
 skill-router preflight --json "<latest user prompt>"
 skill-router route --explain "<prompt>"
 skill-router skill <name>
@@ -84,15 +85,27 @@ Aliases that collide with an existing canonical skill id are recorded in
 
 Canonical skill directories must be unique by ID and content. Do not create a new
 top-level skill directory for an old name when an alias can preserve compatibility.
-Example: `card-creator` is an alias for `printable-cards`, because the full card
-creator skill already exists there.
+Aliases are compatibility entries for the full corpus, not a separate routing
+system and not a reason to special-case one skill. Example: `card-creator` is an
+alias for `printable-cards`, because the full card creator skill already exists
+there.
 For automatic natural-language routing, agents run
-`skill-router preflight --json "<latest user prompt>"` as an internal precheck.
-If the JSON decision is `route`, the agent then loads exactly one skill with
-`skill-router skill <best.name>`. If the decision is `ambiguous`, the already
+`skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"`
+from user-prompt hooks, or `skill-router preflight --json "<latest user prompt>"`
+when the already-running host AI performs the precheck internally.
+If the JSON decision is `route`, the agent first sanity-checks that the selected
+skill clearly matches the user's core task, object, and action; only then does
+it load exactly one skill with `skill-router skill <best.name>`. If the route is
+only a generic modifier match, such as issue/problem/install/setup/local, the
+agent continues with no skill. If the decision is `ambiguous`, the already
 running host AI chooses only from the listed candidates or continues with no
-skill. Card creator and Mother's Day card prompts must route to the exact
-Manus-origin `printable-cards` skill.
+skill. This same flow applies to all 1,805 canonical skills and indexed external
+skills; specific alias examples must not be treated as router scope limits.
+
+Automatic skill routing is user-prompt scoped. Tool hooks, session-start hooks,
+stop hooks, compaction/resume hooks, assistant messages, tool outputs, status
+checks, and background jobs may belong to other adapters, but they must not run
+or load routed skills.
 
 Third-party caches and marketplaces under Claude, Codex, Manus-compatible, and
 other AI roots remain read-only external sources. This keeps the universal setup

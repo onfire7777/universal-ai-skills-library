@@ -100,6 +100,40 @@ func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
 	}
 }
 
+func TestRouteStemKeepsIssuesAsStopToken(t *testing.T) {
+	if got := routeStemToken("issues"); got != "issue" {
+		t.Fatalf("expected issues to stem to issue, got %q", got)
+	}
+	for _, token := range routeTokens("without causing any issues or breaking anything") {
+		if token.value == "issu" || token.value == "issue" {
+			t.Fatalf("expected issues to be removed as a stop token, got %#v", token)
+		}
+	}
+}
+
+func TestAutomaticRoutingRejectsOpenClawUninstallAsIssues(t *testing.T) {
+	prompt := "please do a full clean uninstall completely without causing any issues or breaking anything of my openclaw local install"
+	toIssues := manifestRouteCandidate(prompt, manifestSkill{
+		Name:        "to-issues",
+		Description: "Break a plan, spec, or PRD into independently-grabbable issues on the project issue tracker using tracer-bullet vertical slices. Use when user wants to convert a plan into issues, create implementation tickets, or break down work into issues.",
+	})
+	if isEligibleRouteCandidate(toIssues) {
+		t.Fatalf("expected uninstall safety prompt to reject to-issues, got score %d evidence %#v", toIssues.score, toIssues.evidence)
+	}
+}
+
+func TestUninstallIntentRejectsInstallOnlySkill(t *testing.T) {
+	prompt := "please do a clean uninstall of my openclaw local install"
+	installer := externalRouteCandidate(prompt, externalSkill{
+		Name:        "gate-mcp-installer",
+		Description: "One-click installer and configurator for Gate MCP in OpenClaw. Use when the user wants to install mcporter CLI, configure Gate MCP, verify setup, or troubleshoot connectivity issues.",
+		SourceID:    "claude-repos",
+	})
+	if isEligibleRouteCandidate(installer) {
+		t.Fatalf("expected uninstall intent to reject install-only OpenClaw skill, got score %d evidence %#v", installer.score, installer.evidence)
+	}
+}
+
 func TestAutomaticRoutingRejectsBroadAgentKeywordMatch(t *testing.T) {
 	prompt := "i just downloaded hermes agent tell me about what to do first"
 	mail := manifestSkill{
@@ -189,6 +223,90 @@ func TestPreflightRoutesPrintableCardsForCardCreatorPrompt(t *testing.T) {
 	}
 }
 
+func TestPreflightRoutesAcrossCanonicalLibrary(t *testing.T) {
+	configurePreflightTest(t)
+	cases := []struct {
+		prompt string
+		want   string
+	}{
+		{"write pytest fixtures and mocking tests for a python module", "python-testing-patterns"},
+		{"review this code for SQL injection and authentication security", "sql-injection-testing"},
+		{"create an architecture decision record for choosing postgres", "architecture-decision-records"},
+		{"convert a github repo into one llm ready xml context file", "onefilellm"},
+		{"train a Hugging Face transformer model on a text dataset", "transformers"},
+		{"organize and rename messy files in this folder", "file-organizer"},
+	}
+	for _, tc := range cases {
+		preflight, err := buildRoutePreflight(tc.prompt, routeOptions{hookEvent: "UserPromptSubmit", enforceHookEvent: true})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if preflight.Decision != routeDecisionRoute || preflight.Best.name != tc.want {
+			t.Fatalf("prompt %q: expected %s route, got decision=%s best=%s reason=%s", tc.prompt, tc.want, preflight.Decision, preflight.Best.name, preflight.Reason)
+		}
+	}
+}
+
+func TestGenericFileOrganizationDoesNotRouteToInvoiceOrganizer(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("organize and rename messy files in this folder", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Best.name != "file-organizer" {
+		t.Fatalf("expected generic file cleanup to route to file-organizer, got %s", preflight.Best.name)
+	}
+	invoice := manifestRouteCandidate("organize and rename messy files in this folder", manifestSkill{
+		Name:        "invoice-organizer",
+		Description: "Automatically organizes invoices and receipts for tax preparation by reading messy files, extracting key information, renaming them consistently, and sorting them into logical folders. Turns hours of manual bookkeeping into minutes of automated organization.",
+	})
+	if isEligibleRouteCandidate(invoice) {
+		t.Fatalf("invoice-organizer should require invoice/receipt/tax evidence for a generic file organization prompt, got score %d evidence %#v", invoice.score, invoice.evidence)
+	}
+}
+
+func TestCreateIssueDoesNotRideGenericCreateVerb(t *testing.T) {
+	prompt := "create a beautiful mothers day card"
+	createIssue := manifestRouteCandidate(prompt, manifestSkill{
+		Name:        "create-issue",
+		Description: "Create an issue in GitHub or Jira.",
+	})
+	if isEligibleRouteCandidate(createIssue) {
+		t.Fatalf("generic create verb should not make create-issue eligible, got score %d evidence %#v", createIssue.score, createIssue.evidence)
+	}
+	creatingIssues := externalRouteCandidate(prompt, externalSkill{
+		Name:        "creating-issues",
+		Description: "Issue creation expertise and convention enforcement. Auto-invokes when creating issues, writing issue descriptions, asking about issue best practices, or needing help with issue titles.",
+		SourceID:    "claude-repos",
+	})
+	if isEligibleRouteCandidate(creatingIssues) {
+		t.Fatalf("generic creation words should not make creating-issues eligible, got score %d evidence %#v", creatingIssues.score, creatingIssues.evidence)
+	}
+}
+
+func TestPreflightRoutesOnlyForUserPromptHookEvent(t *testing.T) {
+	configurePreflightTest(t)
+	prompt := "use the universal AI skills card creator skill to create a beautiful mothers day card"
+	preflight, err := buildRoutePreflight(prompt, routeOptions{hookEvent: "PreToolUse", enforceHookEvent: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionNoRoute {
+		t.Fatalf("expected no_route for PreToolUse hook event, got %s", preflight.Decision)
+	}
+	if preflight.Best.name != "" || preflight.HostReview != nil {
+		t.Fatalf("non-user hook event should not score or request host review, got best=%s review=%#v", preflight.Best.name, preflight.HostReview)
+	}
+
+	preflight, err = buildRoutePreflight(prompt, routeOptions{hookEvent: "UserPromptSubmit", enforceHookEvent: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionRoute || preflight.Best.name != "printable-cards" {
+		t.Fatalf("expected UserPromptSubmit to route printable-cards, got %s/%s", preflight.Decision, preflight.Best.name)
+	}
+}
+
 func TestPreflightKeepsGenericPromptQuiet(t *testing.T) {
 	configurePreflightTest(t)
 	preflight, err := buildRoutePreflight("thanks that makes sense", routeOptions{})
@@ -200,6 +318,24 @@ func TestPreflightKeepsGenericPromptQuiet(t *testing.T) {
 	}
 	if preflight.HostReview != nil {
 		t.Fatalf("generic no-route prompt should not request host AI review")
+	}
+}
+
+func TestPreflightRejectsOpenClawUninstallPrompt(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("please do a full clean uninstall completely without causing any issues or breaking anything of my openclaw local install", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision == routeDecisionRoute && preflight.Best.name == "to-issues" {
+		t.Fatalf("expected preflight not to route OpenClaw uninstall prompt to to-issues")
+	}
+	if preflight.HostReview != nil {
+		for _, candidate := range preflight.HostReview.Candidates {
+			if candidate.Name == "to-issues" {
+				t.Fatalf("expected irrelevant to-issues candidate not to be sent for host review")
+			}
+		}
 	}
 }
 

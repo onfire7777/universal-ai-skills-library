@@ -49,7 +49,7 @@ The matrix reports:
 | OpenCode | `skill-root` | `~/.config/opencode/skills` | default | Canonical OpenCode skill root. |
 | OpenCode legacy | `skill-root` | `~/.opencode/skills` | report-only | Compatibility root; do not use as canonical install target. |
 | Kiro | `skill-root` / `repo-instruction` | `~/.kiro/skills`, `~/.kiro/steering`, `.kiro/steering`, `AGENTS.md` | default | Steering files are separate from skill-root sync. |
-| Hermes Agent/Desktop | `skill-root` | `~/.hermes/skills` | report-only | Install only the wrapper skill and run `skill-router preflight --json` as an internal adapter; do not full-copy the corpus. |
+| Hermes Agent/Desktop | `skill-root` | `~/.hermes/skills` | report-only | Install only the wrapper skill and run `skill-router preflight --json` only for user-submitted prompts as an internal adapter; do not full-copy the corpus. |
 | Hermes Agent source | `skill-root` | `~/.hermes/hermes-agent/skills` | report-only special | Source/bundled skill tree; adapter-specific wrapper updates only. |
 | OpenClaw global | `skill-root` | `~/.openclaw/skills` | report-only | AgentSkills-compatible root observed locally; wrapper-only until semantics are confirmed. |
 | OpenClaw workspace | `skill-root` | `~/.openclaw/workspace/skills` | report-only special | Workspace-scoped root; do not mutate with generic full-copy sync. |

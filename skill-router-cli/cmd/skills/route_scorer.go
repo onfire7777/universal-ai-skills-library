@@ -26,6 +26,7 @@ type routeEvidence struct {
 	exactStrongTokens          int
 	nameStrongHits             int
 	nameWeakHits               int
+	nameStrongTokenCount       int
 	aliasStrongHits            int
 	aliasWeakHits              int
 	descriptionStrongHits      int
@@ -36,6 +37,8 @@ type routeEvidence struct {
 	matchedStrongTokens        map[string]bool
 	strongPromptTokenCount     int
 	meaningfulPromptTokenCount int
+	uninstallIntent            bool
+	uninstallSupport           bool
 }
 
 type routeToken struct {
@@ -126,6 +129,9 @@ func isEligibleRouteCandidate(candidate routeCandidate) bool {
 		return false
 	}
 	e := candidate.evidence
+	if e.uninstallIntent && !e.uninstallSupport {
+		return false
+	}
 	if e.exactName || e.exactAlias {
 		return e.exactStrongTokens > 0 || len(e.matchedStrongTokens) > 0
 	}
@@ -206,12 +212,15 @@ func scoreRouteFields(prompt, name string, aliases []string, description, source
 		matchedStrongTokens:        map[string]bool{},
 		strongPromptTokenCount:     countStrongRouteTokens(promptTokens),
 		meaningfulPromptTokenCount: len(promptTokens),
+		uninstallIntent:            routeHasAnyToken(promptTokens, routeUninstallIntentTokens),
 	}
 	if len(promptTokens) == 0 {
 		return evidence
 	}
 
 	nameTokens := routeTokens(name)
+	evidence.nameStrongTokenCount = countStrongRouteTokens(nameTokens)
+	evidence.uninstallSupport = evidence.uninstallSupport || routeHasAnyToken(nameTokens, routeUninstallSupportTokens)
 	nameMatch := evaluateFieldMatch(nameTokens, querySet)
 	recordFieldMatch(&evidence, nameMatch)
 	evidence.nameStrongHits = nameMatch.strongHits
@@ -231,6 +240,7 @@ func scoreRouteFields(prompt, name string, aliases []string, description, source
 		if len(aliasTokens) == 0 {
 			continue
 		}
+		evidence.uninstallSupport = evidence.uninstallSupport || routeHasAnyToken(aliasTokens, routeUninstallSupportTokens)
 		if routeContainsTokenPhrase(promptTokens, aliasTokens) {
 			evidence.exactAlias = true
 			evidence.exactStrongTokens = maxInt(evidence.exactStrongTokens, countStrongRouteTokens(aliasTokens))
@@ -249,6 +259,7 @@ func scoreRouteFields(prompt, name string, aliases []string, description, source
 	evidence.aliasWeakHits = bestAlias.weakHits
 
 	descriptionTokens := routeTokens(description)
+	evidence.uninstallSupport = evidence.uninstallSupport || routeHasAnyToken(descriptionTokens, routeUninstallSupportTokens)
 	descriptionMatch := evaluateFieldMatch(descriptionTokens, querySet)
 	recordFieldMatch(&evidence, descriptionMatch)
 	evidence.descriptionStrongHits = descriptionMatch.strongHits
@@ -257,6 +268,7 @@ func scoreRouteFields(prompt, name string, aliases []string, description, source
 
 	if sourceID != "" {
 		sourceTokens := routeTokens(sourceID)
+		evidence.uninstallSupport = evidence.uninstallSupport || routeHasAnyToken(sourceTokens, routeUninstallSupportTokens)
 		sourceMatch := evaluateFieldMatch(sourceTokens, querySet)
 		recordFieldMatch(&evidence, sourceMatch)
 		if routeContainsTokenPhrase(promptTokens, sourceTokens) && len(sourceTokens) > 0 {
@@ -303,10 +315,25 @@ func evidenceScore(e routeEvidence) int {
 	if e.descriptionStrongHits >= 3 {
 		score += 12
 	}
+	score -= unmatchedNameSpecificityPenalty(e)
+	if score < 0 {
+		score = 0
+	}
 	if len(e.matchedStrongTokens) == 0 && e.exactStrongTokens == 0 {
 		return minInt(score, automaticRouteMinScore-1)
 	}
 	return score
+}
+
+func unmatchedNameSpecificityPenalty(e routeEvidence) int {
+	unmatched := e.nameStrongTokenCount - e.nameStrongHits
+	if unmatched <= 0 || e.nameStrongHits == 0 {
+		return 0
+	}
+	if e.exactName || e.exactAlias || e.embeddedNamePhraseHit || e.embeddedAliasPhraseHit {
+		return 0
+	}
+	return unmatched * 90
 }
 
 func evaluateFieldMatch(fieldTokens []routeToken, querySet map[string]routeToken) fieldMatch {
@@ -449,6 +476,9 @@ func routeStemToken(token string) string {
 	if len(token) > 5 && strings.HasSuffix(token, "ies") {
 		return strings.TrimSuffix(token, "ies") + "y"
 	}
+	if len(token) > 5 && strings.HasSuffix(token, "ues") {
+		return strings.TrimSuffix(token, "s")
+	}
 	if len(token) > 6 && strings.HasSuffix(token, "ing") {
 		return strings.TrimSuffix(token, "ing")
 	}
@@ -523,6 +553,15 @@ func commonPrefixLength(a, b string) int {
 	return limit
 }
 
+func routeHasAnyToken(tokens []routeToken, allowed map[string]bool) bool {
+	for _, token := range tokens {
+		if allowed[token.value] {
+			return true
+		}
+	}
+	return false
+}
+
 func minInt(a, b int) int {
 	if a < b {
 		return a
@@ -555,17 +594,28 @@ var routeStopTokens = map[string]bool{
 	"those": true, "to": true, "too": true, "use": true, "very": true,
 	"want": true, "was": true, "we": true, "what": true, "when": true,
 	"where": true, "which": true, "who": true, "why": true, "will": true,
-	"with": true, "would": true, "you": true, "your": true,
+	"with": true, "without": true, "would": true, "you": true, "your": true,
+	"anything": true, "anyth": true, "caus": true, "complete": true,
+	"completely": true, "full": true,
 }
 
 var routeWeakTokens = map[string]bool{
 	"agent": true, "agents": true, "ai": true, "app": true, "apps": true,
-	"assistant": true, "automation": true, "client": true, "code": true,
-	"config": true, "configuration": true, "directory": true, "file": true,
-	"files": true, "folder": true, "global": true, "local": true,
-	"model": true, "models": true, "platform": true, "plugin": true,
+	"assistant": true, "automation": true, "beautiful": true, "client": true, "code": true,
+	"config": true, "configuration": true, "creat": true, "create": true,
+	"creation": true, "directory": true, "file": true, "files": true,
+	"folder": true, "global": true, "local": true,
+	"make": true, "model": true, "models": true, "platform": true, "plugin": true,
 	"plugins": true, "project": true, "prompt": true, "prompts": true,
 	"setup": true, "skill": true, "skills": true, "task": true,
 	"tool": true, "tools": true, "universal": true, "workflow": true,
 	"workflows": true,
+}
+
+var routeUninstallIntentTokens = map[string]bool{
+	"remove": true, "removal": true, "uninstall": true, "uninstaller": true,
+}
+
+var routeUninstallSupportTokens = map[string]bool{
+	"delete": true, "remove": true, "removal": true, "uninstall": true, "uninstaller": true,
 }
