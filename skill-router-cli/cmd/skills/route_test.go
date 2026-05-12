@@ -425,6 +425,31 @@ func TestFixSkillStillRoutesWithSpecificTestEvidence(t *testing.T) {
 	}
 }
 
+func TestGenericStatusQuestionDoesNotRouteToGenericActionSkills(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("is this normal supposed to happen? is this optimized", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionNoRoute {
+		t.Fatalf("expected generic status question to no-route, got decision=%s best=%s reason=%s", preflight.Decision, preflight.Best.name, preflight.Reason)
+	}
+	if preflight.HostReview != nil {
+		t.Fatalf("generic status question should not request host review")
+	}
+}
+
+func TestInternalPlanningStylePromptDoesNotRouteToConfigure(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("Need inspect live config + available providers first. Secrets scrubbed.", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision == routeDecisionRoute && preflight.Best.name == "configure" {
+		t.Fatalf("expected internal planning-style prompt not to route to configure")
+	}
+}
+
 func TestPreflightRoutesOnlyForUserPromptHookEvent(t *testing.T) {
 	configurePreflightTest(t)
 	prompt := "use the universal AI skills card creator skill to create a beautiful mothers day card"

@@ -65,6 +65,12 @@ hooks, compaction/resume hooks, assistant messages, tool outputs, status checks,
 or background jobs. Those hooks may still belong to other systems such as
 Context Mode; they just must not trigger skill loading.
 
+Preflight should stay internal and quiet. Adapters should not expose planning
+notes like `Need load...`, `best route is external`, or `skill is not installed`
+to the user. Router-selected universal skills are loaded with
+`skill-router skill <name>` rather than host-native skill viewers, so the full
+corpus does not need to be installed in every client.
+
 The router does not call a separate LLM API and does not need extra API keys.
 The deterministic preflight handles exact aliases, strong domain evidence, and
 near-tie refusal; the already-running host AI supplies the final sanity check

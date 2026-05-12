@@ -1,5 +1,5 @@
 {
-  "version": "2.2.1",
+  "version": "2.2.2",
   "generated": "2026-05-12",
   "description": "Universal AI Skills Library manifest - machine-readable catalog of all canonical skills. All skill directories live under skills/ and are loaded on demand through the Universal AI Skills Router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",

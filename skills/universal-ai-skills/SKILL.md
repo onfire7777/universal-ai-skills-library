@@ -15,7 +15,9 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
   2. If `decision` is `route`, perform a compact host-AI sanity check before loading: the selected skill name or description must clearly match the user's core task, object, and action. If it only matches generic modifiers like "issue", "problem", "install", "setup", "local", "AI", or "skill", continue normally with no skill instead of loading a mismatched skill.
   3. If `decision` is `ambiguous` or `host_ai_review.required` is true, the current host AI reviews only the listed candidates and either loads one clearly matching skill or continues with no skill.
   4. If `decision` is `no_route` and no host review is requested, continue normally.
+- Keep preflight internal and quiet. Do not expose chain-of-thought-like notes such as "Need load...", "best route is external", or "skill is not installed"; report only the final selected skill when it materially affects the user's request.
 - Never load a routed skill just because the CLI returned `decision=route` when the current host AI can see the route is irrelevant.
+- On hosts with native skill tools, do not use native `skill_view`/`read skill` for router-selected universal skills. Load routed universal skills with `skill-router skill <name>` so the skill does not need to be installed in that host's local skill registry.
 - The router does not call another LLM API and does not need extra API keys. The already-running host AI supplies judgment only for compact ambiguous candidate packets.
 - Use `skill-router skill <name>` to load one skill on demand.
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
