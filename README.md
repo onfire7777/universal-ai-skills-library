@@ -1,6 +1,6 @@
 # Universal AI Skills Library
 
-CLI-first skill routing for Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini CLI, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, and local desktop AI setups.
+CLI-first skill routing for Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini CLI, OpenCode, OpenSkills, Hermes Agent, Paperclip agents, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, and local desktop AI setups.
 
 The repository keeps a large skill corpus available without loading it all into every agent context. The source of truth is `skills/`; the router is `skill-router-cli/`; plugin metadata lives in `plugin/`.
 
@@ -107,6 +107,7 @@ skill-router sync matrix           # Read-only agent support matrix
 skill-router sync installed        # Propagate the compact wrapper to installed local AI roots
 skill-router skills validate-manifest # Validate manifest.json against skills/
 skill-router mcp status            # Check optional MCP bridge endpoints
+skill-router sync paperclip        # Install compact Paperclip wrapper + AGENTS.md adapter
 skill-router gstack status         # Check gstack source, generated skills, and runtime artifacts
 skill-router gbrain status         # Check GBrain CLI and local brain health
 skill-router audit <path>          # Run audit workflows
@@ -155,12 +156,22 @@ external skills together, requires strong evidence such as exact aliases, matche
 domain phrases, or multi-token task descriptions, and refuses ambiguous near-ties
 instead of loading a questionable skill. Use `--explain` when debugging a route.
 
-Installed Claude, Codex, Manus-compatible, and other AI skill roots are integrated
+Installed Claude, Codex, Paperclip, Manus-compatible, and other AI skill roots are integrated
 as read-only external sources. The router can search and load unique local skills
 from those roots, but the repo does not bulk-copy third-party caches or marketplace
 checkouts into `skills/`. The external index is cached locally at
 `%USERPROFILE%\.skill-router\external-skills-index.json` and can be refreshed with
 `skill-router skills sources --refresh`.
+
+Paperclip is integrated with a compact adapter instead of a full skill copy:
+`skill-router sync paperclip` writes one wrapper skill to
+`%USERPROFILE%\.paperclip\skills\universal-ai-skills` and one Paperclip agent
+instruction file at `%USERPROFILE%\.paperclip\universal-ai-skills\AGENTS.md`.
+Paperclip company agents should point `instructionsFilePath` at that file and
+load full skills through `skill-router skill <name>` only when the preflight route
+passes host sanity checks. Paperclip's native runtime skills are indexed
+read-only as an external source so the universal router can find them without
+duplicating or mutating Paperclip's package files.
 
 Third-party source repos that need their own runtimes stay installed once and are
 indexed read-only. Current examples are gstack at

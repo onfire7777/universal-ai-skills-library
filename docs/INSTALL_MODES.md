@@ -29,6 +29,7 @@ Use only when a client requires physical skills and the user explicitly accepts 
 
 - `skill-router sync matrix` is read-only and safe.
 - `skill-router sync installed` updates every detected local skill-root adapter with the compact wrapper only.
+- `skill-router sync paperclip` updates the Paperclip wrapper root and compact Paperclip agent instructions only.
 - `skill-router sync propagate`, `skill-router sync all`, `skill-router update`, `skill-router skills install`, and `skill-router skills propagate` are wrapper-only by default.
 - Full-copy installation requires the explicit `--full-copy` flag.
 - Default writes are limited to conservative roots returned by `platform.AgentRoots()`.
@@ -39,6 +40,7 @@ Use only when a client requires physical skills and the user explicitly accepts 
 ```bash
 skill-router sync matrix
 skill-router sync installed
+skill-router sync paperclip
 skill-router sync propagate
 skill-router sync propagate --full-copy
 skill-router skills install --target ~/.codex/skills

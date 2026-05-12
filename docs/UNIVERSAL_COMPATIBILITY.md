@@ -60,7 +60,7 @@ skill-router skills sources --refresh
 
 The router treats every AI client as one of these adapter types:
 
-1. **Native skill-root adapters** read `skills/<name>/SKILL.md`-style packages directly or through a compatible root. Examples: OpenSkills, Claude Code, OpenCode, Cline, OpenHands, Hermes Agent, OpenClaw, Codex local roots.
+1. **Native skill-root adapters** read `skills/<name>/SKILL.md`-style packages directly or through a compatible root. Examples: OpenSkills, Claude Code, OpenCode, Cline, OpenHands, Hermes Agent, Paperclip local agents, OpenClaw, Codex local roots.
 2. **Repository instruction adapters** read compact project guidance files rather than full skill packages. Examples: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.continue/rules`, `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `.kiro/steering`, `.junie/guidelines.md`, `CONVENTIONS.md`.
 3. **Hosted/API/MCP adapters** cannot be safely modeled as local folders. Examples: ChatGPT Custom GPTs, ChatGPT Apps SDK, ChatGPT connectors, Claude Cowork, Devin, Amazon Q Developer, Sourcegraph Cody, and hosted OpenHands. Use APIs, Actions, MCP, or compact uploaded instructions.
 
@@ -72,6 +72,14 @@ Adding a platform to the matrix is report-only by default. It becomes a default 
 - docs explain whether the adapter uses `skill-root`, `repo-instruction`, or `hosted` mode.
 
 The goal is universal availability without universal duplication. A platform can be fully supported through search/load/route, MCP, Actions, or project instructions without receiving a physical copy of all canonical skills.
+
+Paperclip uses a combined adapter: one wrapper skill under
+`%USERPROFILE%\.paperclip\skills` plus a compact agent instruction file under
+`%USERPROFILE%\.paperclip\universal-ai-skills\AGENTS.md`. The Paperclip company
+database may register that wrapper as a company skill, but it must not import the
+full universal corpus. Paperclip agents keep Paperclip-native company skills for
+board/API work and call `skill-router` only when the prompt-scoped preflight
+selects a clearly relevant universal skill.
 
 ## Alias Policy
 

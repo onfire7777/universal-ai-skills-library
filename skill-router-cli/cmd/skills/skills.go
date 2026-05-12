@@ -813,6 +813,8 @@ func externalSkillRoots() []externalSkillRoot {
 		{ID: "kiro", Path: filepath.Join(home, ".kiro", "skills")},
 		{ID: "hermes", Path: filepath.Join(home, ".hermes", "skills")},
 		{ID: "hermes-agent-source", Path: filepath.Join(home, ".hermes", "hermes-agent", "skills")},
+		{ID: "paperclip", Path: platform.PaperclipSkillsDir()},
+		{ID: "paperclip-runtime", Path: filepath.Join(home, ".paperclip", "runtime", "node_modules", "@paperclipai", "server", "skills")},
 		{ID: "openclaw-global", Path: filepath.Join(home, ".openclaw", "skills")},
 		{ID: "openclaw-workspace", Path: filepath.Join(home, ".openclaw", "workspace", "skills")},
 		{ID: "cline", Path: filepath.Join(home, ".cline", "skills")},
