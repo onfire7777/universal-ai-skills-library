@@ -26,7 +26,10 @@ Use namespaced skill names such as `gstack-review`, `gstack-qa`,
 - Upstream: <https://github.com/garrytan/gbrain>
 - Local source: `%USERPROFILE%\gbrain`
 - Runtime state: `%USERPROFILE%\.gbrain`
-- CLI: `gbrain` from `%USERPROFILE%\.bun\bin`
+- Canonical CLI: `gbrain` from `%USERPROFILE%\.bun\bin`
+- Windows compatibility shims:
+  - `%USERPROFILE%\go\bin\bun.cmd`
+  - `%USERPROFILE%\go\bin\gbrain.cmd`
 - Router sources:
   - `gbrain-source`: `~\gbrain\skills`
   - `gbrain-user`: `~\.gbrain\skills`
@@ -48,3 +51,9 @@ gbrain --version
 
 Warnings for missing optional API keys are acceptable when vector embeddings or
 provider-backed query expansion are not configured.
+
+The `bun.cmd` and `gbrain.cmd` shims are thin delegates, not duplicate installs.
+They exist because long-running AI desktop clients can inherit an older PATH
+before `%USERPROFILE%\.bun\bin` was added. The canonical binaries stay in
+`.bun\bin`; the shims only make the same tools visible from already-running
+agent shells whose PATH already includes `%USERPROFILE%\go\bin`.

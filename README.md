@@ -83,6 +83,8 @@ On Windows the installed binaries are:
 ```text
 %USERPROFILE%\go\bin\skill-router.exe
 %USERPROFILE%\go\bin\manus.exe       # compatibility alias
+%USERPROFILE%\go\bin\bun.cmd         # thin shim to %USERPROFILE%\.bun\bin\bun.exe
+%USERPROFILE%\go\bin\gbrain.cmd      # thin shim to %USERPROFILE%\.bun\bin\gbrain.exe
 ```
 
 ## Common Commands
@@ -165,6 +167,9 @@ indexed read-only. Current examples are gstack at
 `%USERPROFILE%\.gstack\gstack` and GBrain at `%USERPROFILE%\gbrain`.
 Generated gstack host skills are loaded through namespaced `gstack-*` entries so
 they do not collide with generic skills such as `review`, `qa`, or `ship`.
+GBrain's canonical CLI lives under `%USERPROFILE%\.bun\bin`; Windows command
+shims in `%USERPROFILE%\go\bin` keep `bun` and `gbrain` resolvable for
+already-running AI hosts that inherited PATH before Bun was installed.
 
 ## MCP Policy
 

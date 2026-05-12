@@ -99,6 +99,42 @@ function Install-SkillToTarget {
     return "installed"
 }
 
+function Ensure-CommandShim {
+    param(
+        [string]$Name,
+        [string]$TargetExe
+    )
+
+    if (-not (Test-Path -LiteralPath $TargetExe)) {
+        return "missing-target"
+    }
+
+    $goBin = Join-Path $env:USERPROFILE "go\bin"
+    if (-not (Test-Path -LiteralPath $goBin)) {
+        return "missing-bin"
+    }
+
+    $shimPath = Join-Path $goBin "$Name.cmd"
+    $targetName = Split-Path -Leaf $TargetExe
+    $shimBody = "@echo off`r`n`"%USERPROFILE%\.bun\bin\$targetName`" %*"
+
+    if (Test-Path -LiteralPath $shimPath) {
+        $existingShim = (Get-Content -LiteralPath $shimPath -Raw).Replace("`r`n", "`n").TrimEnd("`n")
+        $expectedShim = $shimBody.Replace("`r`n", "`n").TrimEnd("`n")
+        if ($existingShim -eq $expectedShim) {
+            return "exists"
+        }
+    }
+
+    if ($DryRun) {
+        Write-Host "    [DRY RUN] Would write command shim $shimPath"
+        return "dry-run"
+    }
+
+    Set-Content -LiteralPath $shimPath -Value $shimBody -Encoding ASCII
+    return "installed"
+}
+
 $configuredCount = 0
 $skippedCount = 0
 
@@ -144,6 +180,14 @@ Write-Host "=== Installation Complete ===" -ForegroundColor Green
 Write-Host "  Platforms configured: $configuredCount"
 Write-Host "  Platforms skipped:    $skippedCount"
 Write-Host ""
+
+$bunBin = Join-Path $env:USERPROFILE ".bun\bin"
+$bunShim = Ensure-CommandShim -Name "bun" -TargetExe (Join-Path $bunBin "bun.exe")
+$gbrainShim = Ensure-CommandShim -Name "gbrain" -TargetExe (Join-Path $bunBin "gbrain.exe")
+if ($bunShim -notin @("missing-target", "missing-bin") -or $gbrainShim -notin @("missing-target", "missing-bin")) {
+    Write-Host "Command shims: bun=$bunShim | gbrain=$gbrainShim" -ForegroundColor Cyan
+    Write-Host ""
+}
 
 if ($FullCopy) {
     Write-Host "Full-copy mode was explicitly requested. This is not the recommended default." -ForegroundColor Yellow

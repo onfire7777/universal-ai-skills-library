@@ -88,6 +88,28 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			}
 			return out, nil
 		})
+		check("Bun", func() (string, error) {
+			bun := findCommand("bun", filepath.Join(platform.HomeDir(), ".bun", "bin", exeName("bun")))
+			if bun == "" {
+				return "", fmt.Errorf("not found in PATH or ~/.bun/bin")
+			}
+			out, err := runner.RunCommandCapture(bun, "--version")
+			if err != nil {
+				return "", err
+			}
+			return out, nil
+		})
+		check("GBrain CLI", func() (string, error) {
+			gbrain := findCommand("gbrain", filepath.Join(platform.HomeDir(), ".bun", "bin", exeName("gbrain")))
+			if gbrain == "" {
+				return "", fmt.Errorf("not found in PATH or ~/.bun/bin")
+			}
+			out, err := runner.RunCommandCapture(gbrain, "--version")
+			if err != nil {
+				return "", err
+			}
+			return out, nil
+		})
 		check("GitHub CLI", func() (string, error) {
 			out, err := runner.RunCommandCapture("gh", "--version")
 			if err != nil {
@@ -251,18 +273,30 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 }
 
 func findPP() string {
-	if p, err := exec.LookPath("printing-press"); err == nil {
+	home, _ := os.UserHomeDir()
+	return findCommand("printing-press", filepath.Join(home, "go", "bin", exeName("printing-press")))
+}
+
+func findCommand(name string, fallbacks ...string) string {
+	if p, err := exec.LookPath(name); err == nil {
 		return p
 	}
-	home, _ := os.UserHomeDir()
-	goBin := filepath.Join(home, "go", "bin", "printing-press")
-	if runtime.GOOS == "windows" {
-		goBin += ".exe"
-	}
-	if _, err := os.Stat(goBin); err == nil {
-		return goBin
+	for _, candidate := range fallbacks {
+		if candidate == "" {
+			continue
+		}
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
 	}
 	return ""
+}
+
+func exeName(name string) string {
+	if runtime.GOOS == "windows" {
+		return name + ".exe"
+	}
+	return name
 }
 
 func pathExists(path string) bool {

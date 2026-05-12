@@ -1,11 +1,14 @@
 package gbrain
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -36,7 +39,18 @@ func status() error {
 	}
 	fmt.Println()
 	fmt.Println("Doctor:")
-	return runGBrain("doctor", "--json")
+	stdout, stderr, err := captureGBrain("doctor", "--json")
+	if err != nil {
+		printCaptured(stdout, stderr)
+		return err
+	}
+	report, err := parseDoctorReport(stdout)
+	if err != nil {
+		printCaptured(stdout, stderr)
+		return err
+	}
+	printDoctorSummary(report)
+	return nil
 }
 
 func runGBrain(args ...string) error {
@@ -50,6 +64,79 @@ func runGBrain(args ...string) error {
 	command.Stdin = os.Stdin
 	command.Env = withBunOnPath(os.Environ())
 	return command.Run()
+}
+
+type doctorReport struct {
+	Status      string `json:"status"`
+	HealthScore int    `json:"health_score"`
+	Checks      []struct {
+		Name    string `json:"name"`
+		Status  string `json:"status"`
+		Message string `json:"message"`
+	} `json:"checks"`
+}
+
+func captureGBrain(args ...string) (string, string, error) {
+	bin := findGBrain()
+	if bin == "" {
+		return "", "", fmt.Errorf("gbrain not found; expected it on PATH or at %s", filepath.Join(platform.HomeDir(), ".bun", "bin", windowsExe("gbrain")))
+	}
+	command := exec.Command(bin, args...)
+	command.Stdin = os.Stdin
+	command.Env = withBunOnPath(os.Environ())
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	command.Stdout = &stdout
+	command.Stderr = &stderr
+	err := command.Run()
+	return stdout.String(), stderr.String(), err
+}
+
+func parseDoctorReport(stdout string) (doctorReport, error) {
+	for _, line := range strings.Split(stdout, "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "{") {
+			continue
+		}
+		var report doctorReport
+		if err := json.Unmarshal([]byte(line), &report); err != nil {
+			return doctorReport{}, err
+		}
+		return report, nil
+	}
+	return doctorReport{}, fmt.Errorf("gbrain doctor did not return JSON")
+}
+
+func printDoctorSummary(report doctorReport) {
+	warnings := 0
+	errors := 0
+	for _, check := range report.Checks {
+		switch check.Status {
+		case "warn":
+			warnings++
+		case "error", "fail":
+			errors++
+		}
+	}
+	fmt.Printf("  status: %s\n", report.Status)
+	fmt.Printf("  health_score: %d\n", report.HealthScore)
+	fmt.Printf("  warnings: %d\n", warnings)
+	fmt.Printf("  errors: %d\n", errors)
+	for _, check := range report.Checks {
+		if check.Status == "ok" {
+			continue
+		}
+		fmt.Printf("  - %s: %s (%s)\n", check.Name, check.Message, check.Status)
+	}
+}
+
+func printCaptured(stdout string, stderr string) {
+	if strings.TrimSpace(stdout) != "" {
+		fmt.Fprint(os.Stdout, stdout)
+	}
+	if strings.TrimSpace(stderr) != "" {
+		fmt.Fprint(os.Stderr, stderr)
+	}
 }
 
 func findGBrain() string {
