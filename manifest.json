@@ -1,6 +1,6 @@
 {
-  "version": "2.1",
-  "generated": "2026-05-11",
+  "version": "2.2",
+  "generated": "2026-05-12",
   "description": "Universal AI Skills Library manifest - machine-readable catalog of all canonical skills. All skill directories live under skills/ and are loaded on demand through the Universal AI Skills Router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
   "core_skills": [
@@ -57,6 +57,32 @@
       "name": "universal-ai-skills",
       "directory": "skills/universal-ai-skills",
       "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "gstack",
+      "directory": "skills/gstack",
+      "description": "Universal adapter for Garry Tan's gstack engineering skill stack. Use when the user asks for gstack, gstack office-hours, gstack review, gstack QA, gstack shipping, gstack security review, gstack browser/PDF tooling, or gstack integration with Claude Code, Codex, OpenCode, Hermes, OpenClaw, Kiro, Cursor, or GBrain.",
+      "aliases": [
+        "garrytan-gstack",
+        "garry-tan-gstack",
+        "gstack-skills",
+        "gstack-router"
+      ],
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "gbrain",
+      "directory": "skills/gbrain",
+      "description": "Universal adapter for Garry Tan's GBrain personal knowledge brain. Use when the user asks for GBrain, brain-first retrieval, local PGLite brain setup, gbrain query/search/import/sync/embed, GBrain skills, Minions, durable agent jobs, soul-audit, brain maintenance, or integrating GBrain with gstack, Hermes, OpenClaw, Claude Code, or Codex.",
+      "aliases": [
+        "garrytan-gbrain",
+        "garry-tan-gbrain",
+        "gbrain-skills",
+        "brain-first"
+      ],
       "has_scripts": false,
       "scripts": []
     },
@@ -13921,8 +13947,8 @@
       "scripts": []
     }
   ],
-  "total_skills": 1805,
-  "alias_count": 137,
+  "total_skills": 1807,
+  "alias_count": 1855,
   "routing": {
     "primary_access": "skill-router skill <name>",
     "legacy_access": "manus skill <name>",

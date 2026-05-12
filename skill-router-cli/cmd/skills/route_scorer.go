@@ -66,7 +66,7 @@ func manifestRouteCandidate(prompt string, s manifestSkill) routeCandidate {
 
 func externalRouteCandidate(prompt string, s externalSkill) routeCandidate {
 	evidence := scoreRouteFields(prompt, s.Name, nil, s.Description, s.SourceID)
-	return routeCandidate{
+	candidate := routeCandidate{
 		name:        s.Name,
 		description: s.Description,
 		sourceID:    s.SourceID,
@@ -74,6 +74,7 @@ func externalRouteCandidate(prompt string, s externalSkill) routeCandidate {
 		external:    true,
 		evidence:    evidence,
 	}
+	return applyExplicitExternalSourceBoost(prompt, candidate)
 }
 
 func scoreManifestSkill(prompt string, s manifestSkill) int {
@@ -122,6 +123,19 @@ func sortRouteCandidates(candidates []routeCandidate) {
 		}
 		return candidates[i].score > candidates[j].score
 	})
+}
+
+func applyExplicitExternalSourceBoost(prompt string, candidate routeCandidate) routeCandidate {
+	normalizedPrompt := normalizeRouteText(prompt)
+	name := strings.ToLower(candidate.name)
+	source := strings.ToLower(candidate.sourceID)
+	switch {
+	case strings.Contains(normalizedPrompt, "gstack") && (strings.HasPrefix(name, "gstack-") || strings.Contains(source, "gstack")):
+		candidate.score += 140
+	case strings.Contains(normalizedPrompt, "gbrain") && (strings.Contains(name, "gbrain") || strings.Contains(source, "gbrain")):
+		candidate.score += 120
+	}
+	return candidate
 }
 
 func isEligibleRouteCandidate(candidate routeCandidate) bool {

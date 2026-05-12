@@ -30,7 +30,7 @@ universal-ai-skills-library/
 ├── README.md
 ├── manifest.json
 ├── skill-router-cli/       # Go CLI source for the universal router
-├── skills/                 # Source-of-truth skill corpus: 1,805 canonical skills
+├── skills/                 # Source-of-truth skill corpus: 1,807 canonical skills
 ├── plugin/                 # Universal plugin metadata plus Codex/Claude adapters
 ├── infrastructure/         # Optional persistent MCP bridge scripts
 └── docs/                   # Architecture, compatibility, and migration notes
@@ -105,6 +105,8 @@ skill-router sync matrix           # Read-only agent support matrix
 skill-router sync installed        # Propagate the compact wrapper to installed local AI roots
 skill-router skills validate-manifest # Validate manifest.json against skills/
 skill-router mcp status            # Check optional MCP bridge endpoints
+skill-router gstack status         # Check gstack source, generated skills, and runtime artifacts
+skill-router gbrain status         # Check GBrain CLI and local brain health
 skill-router audit <path>          # Run audit workflows
 skill-router oracle <question>     # Query multi-model oracle flow
 skill-router print <api>           # Generate API-specific CLI scaffolds
@@ -115,6 +117,8 @@ skill-router print <api>           # Generate API-specific CLI scaffolds
 Core universal workflow skills include:
 
 - `universal-ai-config` - audit and repair the cross-AI setup
+- `gstack` - compact adapter for Garry Tan's gstack engineering workflow skills and browser/PDF tools
+- `gbrain` - compact adapter for Garry Tan's GBrain personal knowledge brain, brain-first retrieval, and durable jobs
 - `skill-creator` - create portable AI skills
 - `skill-sync` - sync skills into local or global roots
 - `skill-debugger` - debug one skill with configured model roles
@@ -139,7 +143,7 @@ Detailed policy: `docs/UNIVERSAL_COMPATIBILITY.md`.
 
 The canonical library keeps one physical copy per canonical skill ID under `skills/`.
 Legacy names resolve through aliases, not duplicate directories. The router scores
-the entire 1,805-skill manifest on every substantive prompt; aliases only help old
+the entire 1,807-skill manifest on every substantive prompt; aliases only help old
 names resolve to the right canonical skill. For example, `card-creator` resolves to
 the existing full `printable-cards` skill, but that is one compatibility alias, not
 the scope of the router.
@@ -155,6 +159,12 @@ from those roots, but the repo does not bulk-copy third-party caches or marketpl
 checkouts into `skills/`. The external index is cached locally at
 `%USERPROFILE%\.skill-router\external-skills-index.json` and can be refreshed with
 `skill-router skills sources --refresh`.
+
+Third-party source repos that need their own runtimes stay installed once and are
+indexed read-only. Current examples are gstack at
+`%USERPROFILE%\.gstack\gstack` and GBrain at `%USERPROFILE%\gbrain`.
+Generated gstack host skills are loaded through namespaced `gstack-*` entries so
+they do not collide with generic skills such as `review`, `qa`, or `ship`.
 
 ## MCP Policy
 
@@ -191,7 +201,7 @@ skill-router sync matrix
 skill-router doctor
 ```
 
-Expected current corpus size: 1,805 canonical skills. `validate-manifest` fails on
+Expected current corpus size: 1,807 canonical skills. `validate-manifest` fails on
 duplicate names, duplicate directories, unsafe paths, missing `SKILL.md` files,
 unindexed canonical directories, and identical canonical `SKILL.md` content.
 

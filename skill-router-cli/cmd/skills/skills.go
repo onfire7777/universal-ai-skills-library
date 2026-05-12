@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -815,6 +816,11 @@ func externalSkillRoots() []externalSkillRoot {
 		{ID: "openclaw-global", Path: filepath.Join(home, ".openclaw", "skills")},
 		{ID: "openclaw-workspace", Path: filepath.Join(home, ".openclaw", "workspace", "skills")},
 		{ID: "cline", Path: filepath.Join(home, ".cline", "skills")},
+		{ID: "gstack-gbrain", Path: filepath.Join(home, ".gstack", "gstack", ".gbrain", "skills")},
+		{ID: "gstack-codex", Path: filepath.Join(home, ".gstack", "gstack", ".agents", "skills")},
+		{ID: "gstack-openclaw", Path: filepath.Join(home, ".gstack", "gstack", "openclaw", "skills")},
+		{ID: "gbrain-source", Path: filepath.Join(home, "gbrain", "skills")},
+		{ID: "gbrain-user", Path: filepath.Join(home, ".gbrain", "skills")},
 	}
 	if extra := os.Getenv("SKILL_ROUTER_EXTERNAL_SKILL_ROOTS"); extra != "" {
 		for i, path := range filepath.SplitList(extra) {
@@ -856,24 +862,9 @@ func findExternalSkills(canonical map[string]bool, refresh bool) ([]externalSkil
 		if _, err := os.Stat(root.Path); err != nil {
 			continue
 		}
-		err := filepath.WalkDir(root.Path, func(path string, entry os.DirEntry, err error) error {
-			if err != nil {
-				return nil
-			}
-			if entry.IsDir() {
-				name := entry.Name()
-				if name == ".git" || name == "node_modules" || name == "__pycache__" {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			if !strings.EqualFold(entry.Name(), "SKILL.md") {
-				return nil
-			}
-			name, description := readSkillFrontmatter(path)
-			if name == "" {
-				name = filepath.Base(filepath.Dir(path))
-			}
+		err := walkExternalSkillMarkdown(root.Path, func(path string) error {
+			frontmatterName, description := readSkillFrontmatter(path)
+			name := externalSkillName(root, path, frontmatterName)
 			key := strings.ToLower(strings.TrimSpace(name))
 			if key == "" || canonical[key] || seen[key] {
 				return nil
@@ -916,18 +907,8 @@ func findExternalSkillMarkdown(key string, canonical map[string]bool) (string, b
 			continue
 		}
 		var found string
-		_ = filepath.WalkDir(root.Path, func(path string, entry os.DirEntry, err error) error {
-			if err != nil || found != "" {
-				return nil
-			}
-			if entry.IsDir() {
-				name := entry.Name()
-				if name == ".git" || name == "node_modules" || name == "__pycache__" {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			if !strings.EqualFold(entry.Name(), "SKILL.md") {
+		_ = walkExternalSkillMarkdown(root.Path, func(path string) error {
+			if found != "" {
 				return nil
 			}
 			dirName := strings.ToLower(filepath.Base(filepath.Dir(path)))
@@ -1023,10 +1004,30 @@ func readSkillFrontmatter(path string) (string, string) {
 	}
 	name := ""
 	description := ""
+	blockKey := ""
+	blockLines := []string{}
+	flushBlock := func() {
+		if blockKey == "description" && len(blockLines) > 0 {
+			description = strings.Join(blockLines, " ")
+			description = strings.Join(strings.Fields(description), " ")
+		}
+		blockKey = ""
+		blockLines = nil
+	}
 	for _, line := range lines[1:] {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "---" {
+			flushBlock()
 			break
+		}
+		if blockKey != "" {
+			if strings.HasPrefix(line, " ") || strings.HasPrefix(line, "\t") || trimmed == "" {
+				if trimmed != "" {
+					blockLines = append(blockLines, trimmed)
+				}
+				continue
+			}
+			flushBlock()
 		}
 		key, value, ok := strings.Cut(trimmed, ":")
 		if !ok {
@@ -1037,7 +1038,12 @@ func readSkillFrontmatter(path string) (string, string) {
 		case "name":
 			name = value
 		case "description":
-			description = value
+			if value == "|" || value == ">" {
+				blockKey = "description"
+				blockLines = []string{}
+			} else {
+				description = value
+			}
 		}
 	}
 	return name, description
@@ -1050,25 +1056,10 @@ func countExternalRootSkills(root externalSkillRoot, canonical map[string]bool) 
 	total := 0
 	unique := 0
 	seen := map[string]bool{}
-	_ = filepath.WalkDir(root.Path, func(path string, entry os.DirEntry, err error) error {
-		if err != nil {
-			return nil
-		}
-		if entry.IsDir() {
-			name := entry.Name()
-			if name == ".git" || name == "node_modules" || name == "__pycache__" {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if !strings.EqualFold(entry.Name(), "SKILL.md") {
-			return nil
-		}
+	_ = walkExternalSkillMarkdown(root.Path, func(path string) error {
 		total++
-		name, _ := readSkillFrontmatter(path)
-		if name == "" {
-			name = filepath.Base(filepath.Dir(path))
-		}
+		frontmatterName, _ := readSkillFrontmatter(path)
+		name := externalSkillName(root, path, frontmatterName)
 		key := strings.ToLower(strings.TrimSpace(name))
 		if key != "" && !canonical[key] && !seen[key] {
 			seen[key] = true
@@ -1077,6 +1068,71 @@ func countExternalRootSkills(root externalSkillRoot, canonical map[string]bool) 
 		return nil
 	})
 	return total, unique
+}
+
+func walkExternalSkillMarkdown(rootPath string, visit func(path string) error) error {
+	rootPath = filepath.Clean(rootPath)
+	return filepath.WalkDir(rootPath, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if path == rootPath {
+			return nil
+		}
+		if entry.IsDir() {
+			if shouldSkipExternalDir(entry.Name()) {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if strings.EqualFold(entry.Name(), "SKILL.md") {
+			return visit(path)
+		}
+		if shouldSkipExternalDir(entry.Name()) || !isImmediateChild(rootPath, path) {
+			return nil
+		}
+		if info, statErr := os.Stat(path); statErr == nil && info.IsDir() {
+			candidate := filepath.Join(path, "SKILL.md")
+			if _, skillErr := os.Stat(candidate); skillErr == nil {
+				return visit(candidate)
+			}
+		}
+		return nil
+	})
+}
+
+func externalSkillName(root externalSkillRoot, skillPath, frontmatterName string) string {
+	dirName := filepath.Base(filepath.Dir(skillPath))
+	if strings.HasPrefix(strings.ToLower(dirName), "gstack-") {
+		return dirName
+	}
+	if strings.TrimSpace(frontmatterName) != "" {
+		return frontmatterName
+	}
+	return dirName
+}
+
+func isImmediateChild(rootPath, path string) bool {
+	parent := filepath.Clean(filepath.Dir(path))
+	if runtime.GOOS == "windows" {
+		return strings.EqualFold(parent, rootPath)
+	}
+	return parent == rootPath
+}
+
+func shouldSkipExternalDir(name string) bool {
+	switch name {
+	case ".git", "node_modules", "__pycache__", "dist", "build":
+		return true
+	case "gstack":
+		// The upstream gstack root uses generic skill names such as review, qa,
+		// and ship. The universal stack indexes generated namespaced gstack-*
+		// skills instead, so skip raw root installs discovered through
+		// ~/.claude/skills or other agent roots to avoid routing collisions.
+		return true
+	default:
+		return false
+	}
 }
 
 func hasAlias(s manifestSkill, key string) bool {

@@ -109,6 +109,72 @@ func TestNamedAISoftwareStatusPromptPrefersSetupOverAppUpgrade(t *testing.T) {
 	}
 }
 
+func TestGStackPromptRoutesToGStackAdapter(t *testing.T) {
+	prompt := "use gstack review and QA before shipping this branch"
+	gstack := manifestRouteCandidate(prompt, manifestSkill{
+		Name:        "gstack",
+		Description: "Universal adapter for Garry Tan's gstack engineering skill stack. Use when the user asks for gstack, gstack review, gstack QA, gstack shipping, gstack security review, gstack browser/PDF tooling, or gstack integration.",
+		Aliases:     []string{"garrytan-gstack", "gstack-skills"},
+	})
+	if !isEligibleRouteCandidate(gstack) {
+		t.Fatalf("expected gstack adapter to be eligible, got score %d evidence %#v", gstack.score, gstack.evidence)
+	}
+}
+
+func TestGBrainPromptRoutesToGBrainAdapter(t *testing.T) {
+	prompt := "set up gbrain local pglite brain and make the brain-first retrieval skills available"
+	gbrain := manifestRouteCandidate(prompt, manifestSkill{
+		Name:        "gbrain",
+		Description: "Universal adapter for Garry Tan's GBrain personal knowledge brain. Use when the user asks for GBrain, brain-first retrieval, local PGLite brain setup, gbrain query/search/import/sync/embed, GBrain skills, Minions, durable agent jobs, soul-audit, brain maintenance, or integrating GBrain with gstack.",
+		Aliases:     []string{"garrytan-gbrain", "gbrain-skills", "brain-first"},
+	})
+	if !isEligibleRouteCandidate(gbrain) {
+		t.Fatalf("expected gbrain adapter to be eligible, got score %d evidence %#v", gbrain.score, gbrain.evidence)
+	}
+}
+
+func TestNamespacedGStackExternalSkillBeatsGenericReview(t *testing.T) {
+	prompt := "load gstack cso for a security audit"
+	gstackCSO := externalRouteCandidate(prompt, externalSkill{
+		Name:        "gstack-cso",
+		Description: "Run gstack's security officer workflow for OWASP, STRIDE, and code security audits.",
+		SourceID:    "gstack-gbrain",
+	})
+	if !isEligibleRouteCandidate(gstackCSO) {
+		t.Fatalf("expected gstack-cso external skill to be eligible, got score %d evidence %#v", gstackCSO.score, gstackCSO.evidence)
+	}
+}
+
+func TestPreflightPrefersExplicitGStackExternalSkill(t *testing.T) {
+	configurePreflightTest(t)
+	externalRoot := t.TempDir()
+	createExternalTestSkillWithName(t, externalRoot, "gstack-cso", "cso", "|\n  Chief Security Officer mode for gstack security audits, OWASP reviews,\n  STRIDE threat modeling, and vulnerability scans.")
+	t.Setenv("SKILL_ROUTER_EXTERNAL_SKILL_ROOTS", externalRoot)
+
+	preflight, err := buildRoutePreflight("load gstack cso for a security audit", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionRoute {
+		t.Fatalf("expected route, got %s: %s", preflight.Decision, preflight.Reason)
+	}
+	if preflight.Best.name != "gstack-cso" {
+		t.Fatalf("expected explicit gstack-cso route, got %s with runner-up %s", preflight.Best.name, preflight.Second.name)
+	}
+}
+
+func TestReadSkillFrontmatterParsesBlockDescription(t *testing.T) {
+	root := t.TempDir()
+	createExternalTestSkillWithName(t, root, "gstack-cso", "cso", "|\n  Chief Security Officer mode.\n  OWASP and STRIDE security audits.")
+	name, description := readSkillFrontmatter(filepath.Join(root, "gstack-cso", "SKILL.md"))
+	if name != "cso" {
+		t.Fatalf("expected cso name, got %q", name)
+	}
+	if description != "Chief Security Officer mode. OWASP and STRIDE security audits." {
+		t.Fatalf("unexpected description: %q", description)
+	}
+}
+
 func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
 	genericPrompt := "thanks, that makes sense"
 	printable := manifestSkill{
@@ -406,12 +472,16 @@ func configurePreflightTest(t *testing.T) {
 }
 
 func createExternalTestSkill(t *testing.T, root, name, description string) {
+	createExternalTestSkillWithName(t, root, name, name, description)
+}
+
+func createExternalTestSkillWithName(t *testing.T, root, directoryName, frontmatterName, description string) {
 	t.Helper()
-	dir := filepath.Join(root, name)
+	dir := filepath.Join(root, directoryName)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	body := "---\nname: " + name + "\ndescription: " + description + "\n---\n\n# " + name + "\n"
+	body := "---\nname: " + frontmatterName + "\ndescription: " + description + "\n---\n\n# " + frontmatterName + "\n"
 	if err := os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte(body), 0644); err != nil {
 		t.Fatal(err)
 	}

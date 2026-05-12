@@ -21,7 +21,7 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
 - Use `skill-router preflight --hook-event UserPromptSubmit --json "<user prompt>"` for automatic hook prechecks. Use `skill-router preflight --json "<user prompt>"` for manual/internal host-AI prechecks. Use `skill-router route "<user prompt>"` only for explicit routing checks that should load the winning skill or fail when no confident skill applies.
 - Use `skill-router route --explain "<user prompt>"` when a route looks wrong; it prints the top candidates, score, source, evidence gates, and ambiguity behavior.
-- Automatic routing should prefer no route over a weak route. It scores the full 1,805-skill canonical corpus and read-only external skills together, requires exact aliases or strong multi-token evidence, and refuses ambiguous near-ties.
+- Automatic routing should prefer no route over a weak route. It scores the full 1,807-skill canonical corpus and read-only external skills together, requires exact aliases or strong multi-token evidence, and refuses ambiguous near-ties.
 - If a user says "universal AI skills <thing>", do not decide from the native client skill list. Run `skill-router skill search <thing>` or `skill-router skill <thing>` first.
 - Compatibility aliases, such as `card-creator`, resolve through the manifest to their canonical skills. Do not hardcode one skill family as the router's scope.
 - Use `skill-router skills sources` to inspect read-only local external skill roots.
@@ -30,6 +30,7 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Treat `skills/` as source data and `skill-router-cli/` as the router source.
 - Treat legacy skill names as aliases. Do not duplicate a skill directory when one canonical skill already contains the full implementation.
 - Local Claude, Codex, Manus-compatible, and other AI skill roots are searched read-only by the router; promote external skills into `skills/` only after audit and dedupe.
+- Third-party source repos such as gstack (`%USERPROFILE%\.gstack\gstack`) and GBrain (`%USERPROFILE%\gbrain`) are indexed read-only. Load namespaced gstack skills such as `gstack-review`, `gstack-qa`, or `gstack-cso` on demand instead of copying them into every AI root.
 - Prefer CLI calls for skill access and deterministic local workflows.
 - Run MCP bridges only for persistent endpoint services that cannot be replaced by direct CLI calls.
 - Treat AI platform compatibility as adapter-based:

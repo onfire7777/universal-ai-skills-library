@@ -14,7 +14,7 @@
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
 - Use `skill-router preflight --hook-event UserPromptSubmit --json "<user prompt>"` for automatic hook prechecks. Use `skill-router preflight --json "<user prompt>"` for manual/internal host-AI prechecks. Use `skill-router route "<user prompt>"` only when an explicit routing check should load the winning skill or fail if no confident skill applies.
 - Use `skill-router route --explain "<user prompt>"` to debug unexpected routes; prefer no route over a weak or ambiguous route.
-- The router scores the full 1,805-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.
+- The router scores the full 1,807-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.
 - Do not preload the full skills corpus into context.
 - Treat `skills/` as source data and `skill-router-cli/` as the router source.
 - MCP bridges are optional adapters for persistent endpoint workflows only.
