@@ -1,27 +1,26 @@
 package make
 
 import (
-	"fmt"
-	"strings"
+	"encoding/json"
 
 	"github.com/spf13/cobra"
 
-	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/mcpcli"
 )
 
 // Cmd is the top-level make command group.
 var Cmd = &cobra.Command{
 	Use:   "make",
-	Short: "Run Make.com automation scenarios",
+	Short: "Run Make.com scenarios through an optional MCP connector",
 	Long: `Discover and run pre-configured "On demand" scenarios in Make platform.
-Delegates to the Make MCP connector for scenario execution.`,
+Delegates to an optional Make MCP connector adapter for scenario execution.`,
 }
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List available Make.com scenarios",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runner.RunCommand("manus-mcp-cli", "tool", "list", "--server", "make")
+		return mcpcli.ListTools("make")
 	},
 }
 
@@ -34,7 +33,11 @@ var runCmd = &cobra.Command{
 		if input == "" {
 			input = "{}"
 		}
-		return runner.RunCommand("manus-mcp-cli", "tool", "call", args[0], "--server", "make", "--input", input)
+		var payload any
+		if err := json.Unmarshal([]byte(input), &payload); err != nil {
+			return err
+		}
+		return mcpcli.CallTool("make", args[0], payload)
 	},
 }
 
@@ -43,7 +46,4 @@ func init() {
 
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(runCmd)
-
-	_ = strings.Join // suppress
-	_ = fmt.Sprintf
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -40,7 +39,14 @@ var showCmd = &cobra.Command{
 			fmt.Println(string(data))
 			fmt.Println()
 		}
-		// Check for .manus/instructions.md
+		// Check for neutral Universal AI instructions first.
+		universalInstr := filepath.Join(dir, ".universal-ai", "instructions.md")
+		if data, err := os.ReadFile(universalInstr); err == nil {
+			fmt.Println("=== .universal-ai/instructions.md ===")
+			fmt.Println(string(data))
+			fmt.Println()
+		}
+		// Check for .manus/instructions.md as a compatibility surface.
 		manusInstr := filepath.Join(dir, ".manus", "instructions.md")
 		if data, err := os.ReadFile(manusInstr); err == nil {
 			fmt.Println("=== .manus/instructions.md ===")
@@ -52,7 +58,7 @@ var showCmd = &cobra.Command{
 
 var createCmd = &cobra.Command{
 	Use:   "create <type> [directory]",
-	Short: "Create a context anchor (agents, claude, manus, codex)",
+	Short: "Create a context anchor (agents, universal, claude, codex, manus-compat)",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		anchorType := args[0]
@@ -75,11 +81,17 @@ var createCmd = &cobra.Command{
 			path := filepath.Join(instrDir, "instructions.md")
 			template := "# Claude Code Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
-		case "manus":
+		case "universal", "universal-ai":
+			instrDir := filepath.Join(dir, ".universal-ai")
+			os.MkdirAll(instrDir, 0755)
+			path := filepath.Join(instrDir, "instructions.md")
+			template := "# Universal AI Instructions\n\n## Project Context\n\n## Skill Routing\n\nUse `skill-router preflight --json` as an internal precheck and `skill-router skill <name>` for one-skill-on-demand loading.\n\n## Constraints\n"
+			return os.WriteFile(path, []byte(template), 0644)
+		case "manus", "manus-compat":
 			instrDir := filepath.Join(dir, ".manus")
 			os.MkdirAll(instrDir, 0755)
 			path := filepath.Join(instrDir, "instructions.md")
-			template := "# Manus Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
+			template := "# Manus Compatibility Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
 		case "codex":
 			instrDir := filepath.Join(dir, ".codex")
@@ -88,7 +100,7 @@ var createCmd = &cobra.Command{
 			template := "# Codex Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
 		default:
-			return fmt.Errorf("unknown anchor type: %s (valid: agents, claude, manus, codex)", anchorType)
+			return fmt.Errorf("unknown anchor type: %s (valid: agents, universal, claude, codex, manus-compat)", anchorType)
 		}
 	},
 }
@@ -108,7 +120,7 @@ var propagateCmd = &cobra.Command{
 			return fmt.Errorf("no AGENTS.md found in %s - create one first with 'skill-router context create agents'", dir)
 		}
 
-		platforms := []string{".claude", ".manus", ".codex", ".cursor", ".gemini", ".kiro", filepath.Join(".config", "opencode"), ".agent"}
+		platforms := []string{".universal-ai", ".claude", ".manus", ".codex", ".cursor", ".gemini", ".kiro", filepath.Join(".config", "opencode"), ".agent"}
 		for _, p := range platforms {
 			instrDir := filepath.Join(dir, p)
 			os.MkdirAll(instrDir, 0755)
@@ -146,5 +158,4 @@ func init() {
 	Cmd.AddCommand(createCmd)
 	Cmd.AddCommand(propagateCmd)
 	Cmd.AddCommand(editCmd)
-	_ = strings.Join // suppress
 }

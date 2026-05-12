@@ -34,7 +34,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/web"
 )
 
-const Version = "2.1.3"
+const Version = "2.1.4"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -78,10 +78,10 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println()
 		fmt.Println("Productivity:")
 		fmt.Println("  files       Organize, deduplicate, rename, and clean up files")
-		fmt.Println("  gmail       Gmail operations (read, send, search)")
+		fmt.Println("  gmail       Gmail operations (optional MCP connector)")
 		fmt.Println("  gws         Google Workspace (Drive, Docs, Sheets, Slides)")
-		fmt.Println("  db          Supabase database management")
-		fmt.Println("  make        Run Make.com automation scenarios")
+		fmt.Println("  db          Supabase database management (optional MCP connector)")
+		fmt.Println("  make        Run Make.com scenarios (optional MCP connector)")
 		fmt.Println("  schedule    Manage scheduled and automated tasks")
 		fmt.Println()
 		fmt.Println("Development:")

@@ -11,6 +11,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/mcpcli"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
 )
@@ -101,6 +102,12 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			}
 			out, _ := runner.RunCommandCapture(pp, "--version")
 			return out, nil
+		})
+		optional("Optional MCP Connector CLI", func() (string, error) {
+			if !mcpcli.Available() {
+				return "", mcpcli.MissingError()
+			}
+			return "available", nil
 		})
 
 		fmt.Println()
@@ -232,8 +239,10 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 		// --- Summary ---
 		bold.Println("Summary:")
 		fmt.Printf("  Passed: %d | Warnings: %d | Failed: %d\n", pass, warn, fail)
-		if fail == 0 {
+		if fail == 0 && warn == 0 {
 			green.Println("\n  All systems operational.")
+		} else if fail == 0 {
+			yellow.Println("\n  Required systems operational. Review warnings for optional adapters or missing API keys.")
 		} else {
 			yellow.Printf("\n  %d issue(s) detected. Run 'skill-router update' to fix.\n", fail)
 		}
