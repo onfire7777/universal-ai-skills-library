@@ -242,24 +242,60 @@ and returns an error for generic prompts.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		explain, _ := cmd.Flags().GetBool("explain")
-		return routePromptWithOptions(prompt, routeOptions{explain: explain})
+		opts, err := routeOptionsFromCommand(cmd, false)
+		if err != nil {
+			return err
+		}
+		return routePromptWithOptions(prompt, opts)
 	},
 }
 
 var AutoCmd = &cobra.Command{
 	Use:   "auto <prompt>",
-	Short: "Automatically load an applicable skill for a prompt",
-	Long: `Automatically check a natural-language prompt before an agent responds.
+	Short: "Compatibility wrapper for automatic skill loading",
+	Long: `Compatibility wrapper for older agent rules.
 
 If a confident skill applies, this prints that full SKILL.md. If the prompt is
 generic or below the confidence threshold, it exits successfully with a short
-no-route message so agents can continue normally.`,
+no-route message so agents can continue normally. New adapters should prefer
+skill-router preflight --json and use the host AI to arbitrate ambiguous packets.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		explain, _ := cmd.Flags().GetBool("explain")
-		return routePromptWithOptions(prompt, routeOptions{optional: true, explain: explain})
+		opts, err := routeOptionsFromCommand(cmd, true)
+		if err != nil {
+			return err
+		}
+		return routePromptWithOptions(prompt, opts)
+	},
+}
+
+var PreflightCmd = &cobra.Command{
+	Use:   "preflight <prompt>",
+	Short: "Run the smart skill-routing precheck without loading a skill",
+	Long: `Run the same smart preflight used by auto and route.
+
+The preflight first applies deterministic evidence gates. When configured and
+needed, it emits a compact host-AI review packet for the already-running AI
+agent to reason over. It never calls a separate model API or requires router
+API keys.`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		prompt := strings.Join(args, " ")
+		opts, err := routeOptionsFromCommand(cmd, false)
+		if err != nil {
+			return err
+		}
+		jsonOutput, _ := cmd.Flags().GetBool("json")
+		preflight, err := buildRoutePreflight(prompt, opts)
+		if err != nil {
+			return err
+		}
+		if jsonOutput {
+			return printPreflightJSON(preflight, opts.explain)
+		}
+		printPreflight(preflight, opts.explain)
+		return nil
 	},
 }
 
@@ -375,6 +411,8 @@ func init() {
 	sourcesCmd.Flags().Bool("refresh", false, "Refresh local external skill index after scanning sources")
 	RouteCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
 	AutoCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
+	PreflightCmd.Flags().Bool("explain", false, "Print route scoring diagnostics")
+	PreflightCmd.Flags().Bool("json", false, "Print structured JSON preflight output")
 	propagateCmd.Flags().Bool("dry-run", false, "Show target roots without copying")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
 
@@ -388,6 +426,7 @@ func init() {
 	Cmd.AddCommand(searchCmd)
 	Cmd.AddCommand(RouteCmd)
 	Cmd.AddCommand(AutoCmd)
+	Cmd.AddCommand(PreflightCmd)
 	Cmd.AddCommand(sourcesCmd)
 	Cmd.AddCommand(propagateCmd)
 	Cmd.AddCommand(ultimateCmd)
@@ -633,67 +672,41 @@ func routePrompt(prompt string) error {
 }
 
 func routePromptWithOptions(prompt string, opts routeOptions) error {
-	manifest, err := loadManifest()
+	preflight, err := buildRoutePreflight(prompt, opts)
 	if err != nil {
 		return err
 	}
-	candidates := []routeCandidate{}
-	bestRaw := routeCandidate{}
-	maintenancePrompt := isRouterMaintenancePrompt(prompt)
-	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
-		next := manifestRouteCandidate(prompt, s)
-		if next.score > bestRaw.score {
-			bestRaw = next
-		}
-		if next.meta && !maintenancePrompt {
-			continue
-		}
-		candidates = append(candidates, next)
-	}
-	external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
-	if err != nil {
-		return err
-	}
-	for _, s := range external {
-		next := externalRouteCandidate(prompt, s)
-		if next.score > bestRaw.score {
-			bestRaw = next
-		}
-		candidates = append(candidates, next)
-	}
-	sortRouteCandidates(candidates)
 	if opts.explain {
-		printRouteExplanation(candidates)
+		printPreflight(preflight, true)
 	}
-	best, second, ok := chooseRouteCandidate(candidates)
-	if maintenancePrompt {
-		if metaBest, metaSecond, metaOK := chooseRouteCandidate(filterMetaRouteCandidates(candidates)); metaOK {
-			best, second, ok = metaBest, metaSecond, true
-		}
-	}
-	if !ok {
+	if preflight.Decision != routeDecisionRoute {
 		if opts.optional {
-			fmt.Println("No skill route: generic prompt.")
+			if preflight.HostReview != nil {
+				printPreflight(preflight, false)
+			} else {
+				fmt.Println("No skill route: generic prompt.")
+			}
 			return nil
 		}
-		if bestRaw.score == 0 {
+		if preflight.RawBest.score == 0 {
 			return fmt.Errorf("no skill matched prompt; try `skill-router skill search %s`", prompt)
 		}
-		return fmt.Errorf("no confident skill matched prompt (best: %s, score %d, threshold %d); try `skill-router skill search %s`", bestRaw.name, bestRaw.score, automaticRouteMinScore, prompt)
-	}
-	if isAmbiguousRoute(best, second) {
-		if opts.optional {
-			fmt.Printf("No skill route: ambiguous prompt (best: %s, runner-up: %s).\n", best.name, second.name)
-			return nil
+		if preflight.Decision == routeDecisionAmbiguous {
+			return fmt.Errorf("ambiguous skill route (best: %s score %d, runner-up: %s score %d); try `skill-router skill search %s`", preflight.Best.name, preflight.Best.score, preflight.Second.name, preflight.Second.score, prompt)
 		}
-		return fmt.Errorf("ambiguous skill route (best: %s score %d, runner-up: %s score %d); try `skill-router skill search %s`", best.name, best.score, second.name, second.score, prompt)
+		return fmt.Errorf("no confident skill matched prompt (best: %s, score %d, threshold %d); try `skill-router skill search %s`", preflight.RawBest.name, preflight.RawBest.score, automaticRouteMinScore, prompt)
 	}
 	source := "canonical"
-	if best.external {
+	if preflight.Best.external {
 		source = "external"
 	}
-	fmt.Printf("Route: %s (%s, score %d)\n\n", best.name, source, best.score)
-	return printSkill(best.name)
+	fmt.Printf("Route: %s (%s, score %d)\n\n", preflight.Best.name, source, preflight.Best.score)
+	return printSkill(preflight.Best.name)
+}
+
+func routeOptionsFromCommand(cmd *cobra.Command, optional bool) (routeOptions, error) {
+	explain, _ := cmd.Flags().GetBool("explain")
+	return routeOptions{optional: optional, explain: explain}, nil
 }
 
 func isMetaRoutingSkill(name string) bool {

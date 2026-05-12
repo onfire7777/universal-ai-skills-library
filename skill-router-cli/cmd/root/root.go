@@ -34,7 +34,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/web"
 )
 
-const Version = "2.1.2"
+const Version = "2.1.3"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -59,7 +59,8 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		bold.Println("skill-router - Universal AI Skills Router v" + Version)
 		fmt.Println()
 		fmt.Println("Core Commands:")
-		fmt.Println("  auto        Per-prompt preflight: load a skill only when one confidently applies")
+		fmt.Println("  preflight   Smart skill-routing precheck with optional AI arbitration")
+		fmt.Println("  auto        Compatibility wrapper for older automatic-routing rules")
 		fmt.Println("  route       Pick and load the best skill for a prompt")
 		fmt.Println("  skill       Load one skill on demand: skill-router skill <name>")
 		fmt.Println("  skills      Manage canonical and local external AI skills on demand")
@@ -109,6 +110,7 @@ func Execute() error {
 func init() {
 	// Core
 	rootCmd.AddCommand(skills.Cmd)
+	rootCmd.AddCommand(skills.PreflightCmd)
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)
 	rootCmd.AddCommand(mcp.Cmd)

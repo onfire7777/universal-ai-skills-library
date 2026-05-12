@@ -28,7 +28,7 @@ universal-ai-skills-library/
 ```bash
 skill-router skill <name>
 skill-router skill search <query>
-skill-router auto "<latest user prompt>"
+skill-router preflight --json "<latest user prompt>"
 skill-router route "<prompt>"
 skill-router route --explain "<prompt>"
 skill-router skill list
@@ -36,6 +36,21 @@ skill-router skills sources
 ```
 
 `manus` remains a legacy compatibility executable for existing local rules and scripts. New docs and local setup should prefer `skill-router`.
+
+## Automatic Skill Selection
+
+Users should not have to command the router manually. Agent adapters should treat
+skill selection as an internal preflight before each substantive prompt:
+
+1. Run `skill-router preflight --json "<latest user prompt>"` internally.
+2. If `decision` is `route`, load `skill-router skill <best.name>` and follow that skill.
+3. If `decision` is `ambiguous` or `host_ai_review.required` is true, the current host AI reviews only the listed candidates and either loads one clearly matching skill or continues with no skill.
+4. If `decision` is `no_route` and no host review is requested, continue normally.
+
+The router does not call a separate LLM API and does not need extra API keys.
+The deterministic preflight handles exact aliases, strong domain evidence, and
+near-tie refusal; the already-running host AI supplies the final judgment only
+for compact candidate packets.
 
 ## Install Or Build
 
@@ -58,7 +73,8 @@ On Windows the installed binaries are:
 skill-router skill <name>          # Print one SKILL.md
 skill-router skill search <query>  # Search canonical skills plus read-only local external roots
 skill-router skill search --refresh <query> # Rebuild external index before searching
-skill-router auto "<prompt>"       # Default per-prompt preflight; no-op on generic prompts
+skill-router preflight --json "<prompt>" # Internal adapter preflight; does not load a skill
+skill-router auto "<prompt>"       # Compatibility wrapper for older agent rules
 skill-router route "<prompt>"      # Explicit route; errors when no confident skill applies
 skill-router route --explain "<prompt>" # Show top candidates and evidence gates
 skill-router skill list            # List all skills from manifest.json
@@ -134,11 +150,12 @@ If a workflow can run through `skill-router`, use the CLI. If it needs a long-ru
 
 ```text
 Use Universal AI Skills Router for skills:
+- before each substantive prompt, internally run skill-router preflight --json "<latest user prompt>"
 - skill-router skill <name>
 - skill-router skill search <query>
 - skill-router doctor
 
-Keep always-loaded instructions compact. Do not paste the full skills corpus into global rules. MCP bridges are optional adapters for persistent endpoint workflows.
+If preflight returns route, load that one skill. If it returns ambiguous or host_ai_review.required, the current host AI chooses from only the listed candidates or continues without a skill. Keep always-loaded instructions compact. Do not paste the full skills corpus into global rules. MCP bridges are optional adapters for persistent endpoint workflows.
 ```
 
 ## Verification
