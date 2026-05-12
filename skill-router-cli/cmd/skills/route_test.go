@@ -381,6 +381,50 @@ func TestCreateIssueDoesNotRideGenericCreateVerb(t *testing.T) {
 	}
 }
 
+func TestGenericFixAndRunVerbsDoNotRouteWithoutDomainEvidence(t *testing.T) {
+	prompt := "please fix the hermes heartbeat run state issue"
+	fix := externalRouteCandidate(prompt, externalSkill{
+		Name:        "fix",
+		Description: "Fix failing or flaky Playwright tests.",
+		SourceID:    "claude-repos",
+	})
+	if isEligibleRouteCandidate(fix) || fix.score >= automaticRouteMinScore {
+		t.Fatalf("generic fix verb should not route to Playwright fix skill, got score %d evidence %#v", fix.score, fix.evidence)
+	}
+	run := externalRouteCandidate(prompt, externalSkill{
+		Name:        "run",
+		Description: "One-shot lifecycle command that chains init, baseline, spawn, eval, and merge.",
+		SourceID:    "claude-repos",
+	})
+	if isEligibleRouteCandidate(run) || run.score >= automaticRouteMinScore {
+		t.Fatalf("generic run verb should not route to lifecycle run skill, got score %d evidence %#v", run.score, run.evidence)
+	}
+}
+
+func TestDescriptionPhraseNeedsMultipleDomainTokens(t *testing.T) {
+	prompt := "please fix the hermes heartbeat run state issue"
+	transformers := externalRouteCandidate(prompt, externalSkill{
+		Name:        "transformers-js",
+		Description: "Use Transformers.js to run state-of-the-art machine learning models directly in JavaScript/TypeScript.",
+		SourceID:    "codex-cache",
+	})
+	if isEligibleRouteCandidate(transformers) || transformers.score >= automaticRouteMinScore {
+		t.Fatalf("incidental state/run phrase should not route to transformers-js, got score %d evidence %#v", transformers.score, transformers.evidence)
+	}
+}
+
+func TestFixSkillStillRoutesWithSpecificTestEvidence(t *testing.T) {
+	prompt := "fix the flaky Playwright test that fails in CI"
+	fix := externalRouteCandidate(prompt, externalSkill{
+		Name:        "fix",
+		Description: "Fix failing or flaky Playwright tests.",
+		SourceID:    "claude-repos",
+	})
+	if !isEligibleRouteCandidate(fix) {
+		t.Fatalf("specific Playwright test prompt should still route to fix skill, got score %d evidence %#v", fix.score, fix.evidence)
+	}
+}
+
 func TestPreflightRoutesOnlyForUserPromptHookEvent(t *testing.T) {
 	configurePreflightTest(t)
 	prompt := "use the universal AI skills card creator skill to create a beautiful mothers day card"
