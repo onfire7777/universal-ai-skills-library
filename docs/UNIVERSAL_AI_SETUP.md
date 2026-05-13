@@ -148,6 +148,14 @@ Paperclip:
   clients.
 - Context Mode remains scratch/context-window infrastructure. It must not be
   used as the durable memory source when MemPalace is available.
+- Context Mode is installed as a real MCP/context-routing tool, not just a note
+  in instructions. The sync step registers it in Codex config and refreshes
+  Codex hooks from the installed Context Mode template, including PreToolUse,
+  PostToolUse, SessionStart, PreCompact, UserPromptSubmit, and Stop.
+- Lightpanda is the on-demand headless browser runtime. The clean default keeps
+  persistent Lightpanda bridge services disabled, but the wrappers under
+  `C:\Users\burni\.lightpanda-ai` must be able to fetch pages and start CDP
+  when Docker Desktop's Linux engine is running.
 - GBrain is a structured knowledge mirror and query surface. It can receive
   explicit saved memory notes, but it does not replace MemPalace as the shared
   memory source.
@@ -166,6 +174,7 @@ Installed-stack validation:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1 -CheckInstalled
 powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIStack.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIAdapters.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda
 skill-router skills validate-manifest
 skill-router doctor
 ```

@@ -116,6 +116,17 @@ use `Search-UniversalAIMemory.ps1` before answering from prior decisions and
 project facts. Context Mode is not long-term memory; it is scratch/context
 protection. GBrain can mirror explicit saved memories for structured lookup.
 
+Context Mode is verified as an actual MCP/context tool, not only an instruction
+block. The Universal AI Stack sync registers it in Codex MCP config and refreshes
+Codex hook wiring from the installed Context Mode template. Lightpanda is
+verified through its intended on-demand paths: one-shot markdown fetch and CDP
+startup against `http://127.0.0.1:9222`, while keeping persistent bridge tasks
+disabled for the low-resource profile. Use:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda
+```
+
 ### External Tool Adapters
 
 The router indexes selected external skill/tool roots read-only instead of copying them into the canonical corpus by default. This includes GStack/GBrain and platform-specific local skill roots. External skills can be loaded when they clearly match a prompt, but canonical promotion should happen only after audit and dedupe.

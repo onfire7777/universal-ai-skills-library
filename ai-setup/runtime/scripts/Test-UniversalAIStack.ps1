@@ -115,6 +115,7 @@ $result = [ordered]@{
       skillSeekers8875 = -not (Test-ListeningPort 8875)
       memPalace8876 = -not (Test-ListeningPort 8876)
       contextMode8877 = -not (Test-ListeningPort 8877)
+      lightpanda8878 = -not (Test-ListeningPort 8878)
     }
   }
   startup = $startup
