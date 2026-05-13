@@ -3,6 +3,7 @@ package sync
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
@@ -84,5 +85,21 @@ func TestCountSkillMarkdown(t *testing.T) {
 	write("two/nested")
 	if got := countSkillMarkdown(root); got != 2 {
 		t.Fatalf("countSkillMarkdown = %d, want 2", got)
+	}
+}
+
+func TestPaperclipInstructionsContentIncludesUniversalMarkers(t *testing.T) {
+	t.Setenv("USERPROFILE", t.TempDir())
+	content := paperclipInstructionsContent()
+	for _, want := range []string{
+		"## Universal AI Stack Adapter",
+		"## Universal AI Skill Corpus Access",
+		"Do not copy or install those full skill bodies",
+		"skill-router preflight",
+		"skill-router skill <name>",
+	} {
+		if !strings.Contains(content, want) {
+			t.Fatalf("paperclip instructions missing %q", want)
+		}
 	}
 }
