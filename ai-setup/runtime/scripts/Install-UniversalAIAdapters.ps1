@@ -28,6 +28,7 @@ function Ensure-InstructionFile {
   $marker = '## Universal AI Stack Adapter'
   $corpusMarker = '## Universal AI Skill Corpus Access'
   $memoryMarker = '## Universal Shared Memory'
+  $sourceMarker = '## Universal Source Integrations'
   $stackRoot = Join-Path $HomeDir '.universal-ai-stack'
   $skillSource = Join-Path $HomeDir 'universal-ai-skills-library'
   $skillCorpus = Join-Path $skillSource 'skills'
@@ -70,6 +71,15 @@ $memoryMarker
 - Lightpanda is the shared headless browser/fetch runtime. Use ``$lightpandaFetch`` or ``skill-router skill lightpanda-browser`` for browser retrieval; do not treat browser snapshots as memory unless a distilled fact is explicitly saved through MemPalace.
 - Persistent MCP bridge services remain disabled by default for low resource use. Direct CLI wrappers are the universal baseline; enable MCP only for clients that need live tool endpoints.
 "@
+  $sourceBlock = @"
+
+$sourceMarker
+- Source integrations are shared pointers and wrappers, not copied upstream repos. The portable registry is ``$stackRoot\config\source-integrations.json``.
+- Lightpanda is the shared headless browser/fetch runtime for page retrieval, extraction, JavaScript loading, and CDP automation. Use native web search when the host provides it; use Lightpanda for controlled page fetch/extraction after search.
+- Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys.
+- GSkills/GStack live as read-only external skill sources under ``$HomeDir\.gstack\gstack``. Load namespaced skills such as ``gstack-review``, ``gstack-qa``, ``gstack-cso``, and ``gstack-browse`` through ``skill-router`` on demand.
+- GBrain source and state stay in ``$HomeDir\gbrain`` and ``$HomeDir\.gbrain``. Do not vendor GBrain skills or GStack skills into this AI root.
+"@
 
   $existing = Read-Text -Path $Path
   $changed = $false
@@ -89,18 +99,22 @@ $memoryMarker
       $content += "`r`n" + $memoryBlock
       $changed = $true
     }
+    if (!$content.Contains($sourceMarker)) {
+      $content += "`r`n" + $sourceBlock
+      $changed = $true
+    }
     if ($changed) {
       Write-Utf8NoBom -Path $Path -Content ($content.TrimEnd() + "`r`n")
     }
-    return [ordered]@{ path = $Path; changed = $changed; marker = $true; corpusMarker = $true; memoryMarker = $true }
+    return [ordered]@{ path = $Path; changed = $changed; marker = $true; corpusMarker = $true; memoryMarker = $true; sourceMarker = $true }
   }
   if ([string]::IsNullOrWhiteSpace($existing)) {
-    $content = "# $Title`r`n$block`r`n$memoryBlock`r`n"
+    $content = "# $Title`r`n$block`r`n$corpusBlock`r`n$memoryBlock`r`n$sourceBlock`r`n"
   } else {
-    $content = $existing.TrimEnd() + "`r`n" + $block + "`r`n" + $memoryBlock + "`r`n"
+    $content = $existing.TrimEnd() + "`r`n" + $block + "`r`n" + $corpusBlock + "`r`n" + $memoryBlock + "`r`n" + $sourceBlock + "`r`n"
   }
   Write-Utf8NoBom -Path $Path -Content $content
-  return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true; memoryMarker = $true }
+  return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true; memoryMarker = $true; sourceMarker = $true }
 }
 
 function Ensure-SkillWrapper {

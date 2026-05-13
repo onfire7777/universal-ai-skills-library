@@ -19,6 +19,8 @@
 - The router scores the full 1,807-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.
 - Do not preload the full skills corpus into context.
 - Treat `skills/` as source data and `skill-router-cli/` as the router source.
+- Source capabilities are shared through the installed source registry at `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`: Lightpanda for controlled fetch/CDP, Context Mode for scratch/context continuity, MemPalace for durable memory, host-native web search for fresh search, GBrain for structured lookup, and GSkills/GStack for read-only namespaced skills.
+- Keep source integrations pointer-based. Do not vendor Lightpanda, Context Mode, MemPalace, GBrain, or GSkills/GStack source trees into each AI root, and do not add web-search API keys unless the user explicitly configures a provider.
 - MCP bridges are optional adapters for persistent endpoint workflows only.
 - Legacy compatibility: `manus skill <name>` may be used only when a client has not moved to `skill-router` yet.
 - Universal compatibility is adapter-based:

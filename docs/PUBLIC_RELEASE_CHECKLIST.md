@@ -16,8 +16,10 @@ with another user.
 - `docs/README.md`
 - `docs/UNIVERSAL_AI_SETUP.md`
 - `docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md`
+- `docs/SOURCE_INTEGRATIONS.md`
 - `docs/DESIGN_AND_MESSAGING.md`
 - `docs/assets/universal-ai-skills-hero.svg`
+- `ai-setup/runtime/config/source-integrations.json`
 - `ai-setup/scripts/public-release-audit.ps1`
 
 ## Required Properties
@@ -29,6 +31,9 @@ with another user.
 - no committed local state, logs, OAuth sessions, browser profiles, or model files
 - local model fallback is lazy and resource-guarded
 - MCP bridges remain optional
+- source integrations are pointer-based and public-safe
+- Lightpanda, Context Mode, MemPalace, web search, GBrain, and GSkills/GStack
+  are documented and validated without vendoring private state
 - command names prefer `skill-router`; `manus` is compatibility-only
 - docs describe the actual scripts and runtime paths
 - manifest validates against `skills/`
