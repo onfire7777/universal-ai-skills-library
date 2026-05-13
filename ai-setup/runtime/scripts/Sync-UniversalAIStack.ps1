@@ -8,6 +8,7 @@ $SecretsEnv = Join-Path $Root 'secrets\.env'
 $HermesEnv = Join-Path $env:USERPROFILE '.hermes\.env'
 $PaperclipConfig = Join-Path $env:USERPROFILE '.paperclip\instances\default\config.json'
 $KimiConfig = Join-Path $env:USERPROFILE '.kimi\config.toml'
+$CodexConfig = Join-Path $env:USERPROFILE '.codex\config.toml'
 $StateDir = Join-Path $Root 'state'
 
 function Read-EnvFile {
@@ -106,6 +107,118 @@ function Redact-PaperclipConfigBackup {
   }
 }
 
+function Ensure-CodexContextModeMcp {
+  param([string]$Path)
+
+  $contextModeCmd = Join-Path $env:APPDATA 'npm\context-mode.cmd'
+  if (!(Test-Path -LiteralPath $contextModeCmd)) {
+    return [ordered]@{
+      path = $Path
+      changed = $false
+      present = $false
+      error = "context-mode command missing: $contextModeCmd"
+    }
+  }
+
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
+  $text = ''
+  if (Test-Path -LiteralPath $Path) {
+    $text = [System.IO.File]::ReadAllText($Path)
+  }
+
+  $block = @"
+
+[mcp_servers."context-mode"]
+command = '$contextModeCmd'
+args = []
+"@
+
+  $changed = $false
+  if ($text -notmatch '(?m)^\[mcp_servers\."context-mode"\]') {
+    $text = $text.TrimEnd() + "`r`n" + $block + "`r`n"
+    $changed = $true
+  } elseif ($text -notmatch [regex]::Escape("command = '$contextModeCmd'")) {
+    $pattern = '(?ms)^\[mcp_servers\."context-mode"\]\s*.*?(?=^\[|\z)'
+    $replacement = $block.TrimStart() + "`r`n"
+    $text = [regex]::Replace($text, $pattern, $replacement, 1)
+    $changed = $true
+  }
+
+  if ($changed) {
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $text.TrimEnd() + "`r`n", $utf8NoBom)
+  }
+
+  return [ordered]@{
+    path = $Path
+    changed = $changed
+    present = $true
+    command = $contextModeCmd
+  }
+}
+
+function Ensure-ObjectProperty {
+  param(
+    [psobject]$Object,
+    [string]$Name,
+    [object]$Value
+  )
+  if ($Object.PSObject.Properties.Name -contains $Name) {
+    $Object.$Name = $Value
+  } else {
+    $Object | Add-Member -MemberType NoteProperty -Name $Name -Value $Value
+  }
+}
+
+function Ensure-CodexContextModeHooks {
+  param([string]$Path)
+
+  $template = Join-Path $env:APPDATA 'npm\node_modules\context-mode\configs\codex\hooks.json'
+  if (!(Test-Path -LiteralPath $template)) {
+    return [ordered]@{ path = $Path; changed = $false; present = $false; error = "context-mode Codex hook template missing: $template" }
+  }
+
+  $templateJson = Get-Content -LiteralPath $template -Raw | ConvertFrom-Json
+  $existingJson = [pscustomobject]@{ hooks = [pscustomobject]@{} }
+  if (Test-Path -LiteralPath $Path) {
+    try {
+      $existingJson = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+    } catch {
+      $existingJson = [pscustomobject]@{ hooks = [pscustomobject]@{} }
+    }
+  }
+  if (!($existingJson.PSObject.Properties.Name -contains 'hooks')) {
+    Ensure-ObjectProperty -Object $existingJson -Name 'hooks' -Value ([pscustomobject]@{})
+  }
+
+  foreach ($event in $templateJson.hooks.PSObject.Properties.Name) {
+    $templateEntries = @($templateJson.hooks.$event)
+    $existingEntries = @()
+    if ($existingJson.hooks.PSObject.Properties.Name -contains $event) {
+      $existingEntries = @($existingJson.hooks.$event)
+    }
+    $nonContextEntries = @(
+      $existingEntries | Where-Object {
+        $commands = @($_.hooks | ForEach-Object { $_.command })
+        -not [bool]($commands -match 'context-mode hook codex')
+      }
+    )
+    Ensure-ObjectProperty -Object $existingJson.hooks -Name $event -Value (@($nonContextEntries) + @($templateEntries))
+  }
+
+  $newText = $existingJson | ConvertTo-Json -Depth 20
+  $oldText = ''
+  if (Test-Path -LiteralPath $Path) { $oldText = [System.IO.File]::ReadAllText($Path) }
+  $changed = ($newText.Trim() -ne $oldText.Trim())
+  if ($changed) {
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $newText.TrimEnd() + "`r`n", $utf8NoBom)
+  }
+
+  return [ordered]@{ path = $Path; changed = $changed; present = $true; template = $template }
+}
+
 New-Item -ItemType Directory -Force -Path $StateDir | Out-Null
 
 $central = Read-EnvFile -Path $SecretsEnv
@@ -182,6 +295,9 @@ if (Test-Path -LiteralPath $KimiConfig) {
   }
 }
 
+$codexContextModeReport = Ensure-CodexContextModeMcp -Path $CodexConfig
+$codexContextModeHooksReport = Ensure-CodexContextModeHooks -Path (Join-Path $env:USERPROFILE '.codex\hooks.json')
+
 $hermesConfigReport = $null
 $hermesConfigScript = Join-Path $Root 'scripts\Configure-HermesUniversalAI.ps1'
 if (Test-Path -LiteralPath $hermesConfigScript) {
@@ -213,7 +329,11 @@ $report = [ordered]@{
   paperclipConfiguredForUniversalRouter = $true
   paperclipKeyStoredAsRouterCompatibilityCopy = $true
   kimiApiKeyCentralized = (Test-Path -LiteralPath $KimiConfig) -and -not ([System.IO.File]::ReadAllText($KimiConfig) -match 'api_key\s*=\s*"sk-')
+  codexContextModeMcpConfigured = [bool]$codexContextModeReport.present -and -not [bool]$codexContextModeReport.error
+  codexContextModeHooksConfigured = [bool]$codexContextModeHooksReport.present -and -not [bool]$codexContextModeHooksReport.error
   agentAdaptersSynced = [bool]$adapterReport -and -not [bool]$adapterReport.error
+  codexContextMode = $codexContextModeReport
+  codexContextModeHooks = $codexContextModeHooksReport
   activeSecretKeys = @($merged.Keys | Where-Object { $_ -match 'KEY|TOKEN' -and $merged[$_] } | Sort-Object)
   canceledProviderKeysEmpty = @{
     OPENAI_API_KEY = -not [bool]$merged['OPENAI_API_KEY']
