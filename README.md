@@ -31,6 +31,7 @@ universal-ai-skills-library/
 ├── manifest.json
 ├── skill-router-cli/       # Go CLI source for the universal router
 ├── skills/                 # Source-of-truth skill corpus: 1,807 canonical skills
+├── ai-setup/               # Portable Universal AI Stack runtime, templates, install scripts
 ├── plugin/                 # Universal plugin metadata plus Codex/Claude adapters
 ├── infrastructure/         # Optional persistent MCP bridge scripts
 └── docs/                   # Architecture, compatibility, and migration notes
@@ -84,14 +85,22 @@ cd universal-ai-skills-library/skill-router-cli
 go build -o "$HOME/go/bin/skill-router" .
 ```
 
-On Windows the installed binaries are:
+On Windows, build the router and install the portable Universal AI Stack from the repo:
+
+```powershell
+git clone https://github.com/onfire7777/universal-ai-skills-library.git
+cd universal-ai-skills-library
+go build -o "$env:USERPROFILE\go\bin\skill-router.exe" .\skill-router-cli
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\install-universal-ai-stack.ps1 -InstallStartup -StartNow
+```
+
+The install script materializes the repo-owned runtime into:
 
 ```text
-%USERPROFILE%\go\bin\skill-router.exe
-%USERPROFILE%\go\bin\manus.exe       # compatibility alias
-%USERPROFILE%\go\bin\bun.cmd         # thin shim to %USERPROFILE%\.bun\bin\bun.exe
-%USERPROFILE%\go\bin\gbrain.cmd      # thin shim to %USERPROFILE%\.bun\bin\gbrain.exe
+%USERPROFILE%\.universal-ai-stack
 ```
+
+It keeps secrets, logs, generated state, OAuth sessions, and downloaded model files out of git.
 
 ## Common Commands
 
@@ -120,6 +129,17 @@ skill-router audit <path>          # Run audit workflows
 skill-router oracle <question>     # Query multi-model oracle flow
 skill-router print <api>           # Generate API-specific CLI scaffolds
 ```
+
+Portable AI stack commands:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\install-universal-ai-stack.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1 -CheckInstalled
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIStack.ps1"
+```
+
+See `docs/UNIVERSAL_AI_SETUP.md` for the model registry, failover policy, Hermes/Paperclip integration, and security contract.
 
 ## Core Skill Groups
 

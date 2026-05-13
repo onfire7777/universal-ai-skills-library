@@ -1,0 +1,155 @@
+# Universal AI Setup
+
+The Universal AI Skills Library is the source repo for both the skill corpus and the portable local AI stack configuration. A clean clone should be able to recreate the stack without depending on private files under `%USERPROFILE%`.
+
+## Source Of Truth
+
+- Skill corpus: `skills/`
+- Router CLI source: `skill-router-cli/`
+- Portable stack runtime: `ai-setup/runtime/`
+- Portable manifests: `ai-setup/manifests/`
+- Install/validate scripts: `ai-setup/scripts/`
+
+Machine-local generated folders such as `%USERPROFILE%\.universal-ai-stack`, `%USERPROFILE%\.hermes`, `%USERPROFILE%\.paperclip`, logs, state, secrets, OAuth files, and downloaded models are not source of truth. They are install targets.
+
+## Install Contract
+
+From a fresh clone:
+
+```powershell
+git clone https://github.com/onfire7777/universal-ai-skills-library.git
+cd universal-ai-skills-library
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\install-universal-ai-stack.ps1 -InstallStartup -StartNow
+```
+
+The installer copies the repo-owned runtime into:
+
+```text
+%USERPROFILE%\.universal-ai-stack
+```
+
+It expands portable placeholders, creates a local `secrets\.env`, generates local API guard keys if missing, and optionally syncs compact adapter instructions into supported local AI clients. It does not commit or print secrets.
+
+## Model-Specific Configuration
+
+The canonical model registry is:
+
+```text
+ai-setup/runtime/config/model-registry.json
+```
+
+Primary:
+
+- `gpt-5.5`
+- Provider: `openai-codex`
+- Access: host CLI/session auth
+- Reasoning: `xhigh`
+- Service tier: `fast`
+- Context target: `1,000,000` when supported by the host
+
+Primary HTTP/API fallback:
+
+- `kimi-k2.6-thinking`
+- Provider: Moonshot/Kimi OpenAI-compatible API
+- Model: `kimi-k2.6`
+- Context: `262,144`
+- Router normalization: `temperature=1`, `top_p=0.95`, minimum `max_tokens=256`, strips unsupported top-k/repetition fields
+
+Local final fallback:
+
+- `qwen3-coder-30b-a3b-q4`
+- Runtime: llama.cpp / llama-server
+- Model file: `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`
+- Context: `16,384`
+- Batch: `384`
+- UBatch: `192`
+- Threads: `6`
+- Parallel: `1`
+- Flash attention: on
+- KV cache: `q4_0` / `q4_0`
+- Idle timeout: `600` seconds
+
+Disabled/manual local records:
+
+- `qwen3-coder-next-q5`
+- `qwen2.5-coder-32b-q4`
+
+These are not automatic services because they are heavier or may not be installed. They stay documented so the fallback order is explicit without creating broken endpoints.
+
+## Routing Policy
+
+The repo-owned routing policy is:
+
+```text
+ai-setup/runtime/config/routing-policy.json
+```
+
+The failover order remains:
+
+1. `gpt-5.5`
+2. `kimi-k2.6-thinking`
+3. `claude-opus-4.7`
+4. `qwen3-coder-30b-a3b-q4`
+5. `qwen3-coder-next-q5`
+6. `qwen2.5-coder-32b-q4`
+
+The local HTTP router can only expose OpenAI-compatible HTTP providers. It therefore exposes `auto-coding`, `primary-api`, `local-coding`, `qwen3-coder-30b-a3b-q4`, and `kimi-k2.6-thinking`. Host-session providers such as GPT and Claude remain available through native clients and are intentionally not converted into a generic local API.
+
+## Cross-Agent Skill Access
+
+Every local AI client gets compact router instructions and, where supported, one wrapper skill. The full 1,807-skill corpus remains in this repo and is loaded on demand:
+
+```powershell
+skill-router preflight --json "<latest user prompt>"
+skill-router skill <skill-name>
+skill-router skill search <query>
+```
+
+Do not copy the full corpus into every AI root. The adapter model is universal because all clients point at the same router and corpus, not because every client owns a duplicate copy.
+
+## Hermes And Paperclip
+
+Hermes:
+
+- Primary model: `gpt-5.5`
+- Provider: `openai-codex`
+- Reasoning: `xhigh`
+- Fallback provider: Universal AI Stack router
+- Compression model: `kimi-k2.6-thinking`
+- Max iterations: `30`
+- Cron tick: `600` seconds
+- Discord free response: enabled when configured
+
+Paperclip:
+
+- Provider: OpenAI-compatible
+- Base URL: `http://127.0.0.1:18100/v1`
+- Model: `auto-coding`
+
+## Security Rules
+
+- Never commit `%USERPROFILE%\.universal-ai-stack\secrets\.env`.
+- Never commit OAuth/session files from OpenAI, Claude, Kimi, or browser profiles.
+- Keep canceled `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`, and `CLAUDE_API_KEY` blank unless intentionally re-enabled.
+- Keep Kimi as the primary API fallback when API use is unavoidable.
+- Keep MCP bridges disabled by default; enable them only when a workflow requires a persistent endpoint.
+
+## Validation
+
+Repo/template validation:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1
+```
+
+Installed-stack validation:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1 -CheckInstalled
+powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIStack.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIAdapters.ps1
+skill-router skills validate-manifest
+skill-router doctor
+```
+
+`skill-router doctor` may warn that optional persistent MCP bridge ports are down. That is normal for the low-resource profile unless the active task needs those endpoints.

@@ -1,0 +1,148 @@
+{
+  "schema": "universal-ai-stack.model-registry.v1",
+  "updated": "2026-05-12",
+  "purpose": "Portable canonical model registry for local AI tools, agents, automations, and fallback routing.",
+  "credentialPolicy": {
+    "sourceOfTruth": "{{USERPROFILE}}\\.universal-ai-stack\\secrets\\.env",
+    "template": "{{USERPROFILE}}\\.universal-ai-stack\\env\\.env.template",
+    "doNotCommit": true,
+    "preferSessionAuth": true,
+    "apiFallbackOnlyWhenRequired": true
+  },
+  "canonicalAliases": {
+    "auto-coding": "Route through the best available HTTP-capable coding model with failover.",
+    "primary-coding": "gpt-5.5",
+    "primary-api": "kimi-k2.6-thinking",
+    "local-coding": "qwen3-coder-30b-a3b-q4"
+  },
+  "models": [
+    {
+      "id": "gpt-5.5",
+      "displayName": "GPT-5.5",
+      "provider": "openai-codex",
+      "routeKind": "host-cli-session",
+      "enabled": true,
+      "priority": 1,
+      "model": "gpt-5.5",
+      "reasoningEffort": "xhigh",
+      "serviceTier": "fast",
+      "contextLength": 1000000,
+      "accessPriority": ["official-cli-browser-auth", "session-auth", "api-only-if-required"],
+      "notes": "Primary for Hermes/Codex-style hosts that can use OpenAI CLI or browser/session auth. Not exposed through the local HTTP router unless an official API key is intentionally added."
+    },
+    {
+      "id": "kimi-k2.6-thinking",
+      "displayName": "Kimi 2.6 Thinking",
+      "provider": "moonshot-ai",
+      "routeKind": "openai-compatible-http",
+      "enabled": true,
+      "priority": 2,
+      "model": "kimi-k2.6",
+      "baseUrl": "https://api.moonshot.ai/v1",
+      "apiKeyEnv": "KIMI_API_KEY",
+      "reasoningEffort": "thinking",
+      "contextLength": 262144,
+      "providerRequestDefaults": {
+        "temperature": 1,
+        "top_p": 0.95,
+        "minMaxTokens": 256,
+        "stripUnsupported": ["top_k", "repeat_penalty", "repetition_penalty"]
+      },
+      "accessPriority": ["official-cli-session-auth", "api-when-required"],
+      "notes": "Primary paid API fallback and default HTTP-routeable cloud model. Router normalizes request parameters because this model rejects generic low-temperature coding defaults."
+    },
+    {
+      "id": "claude-opus-4.7",
+      "displayName": "Claude Opus 4.7",
+      "provider": "claude-cli",
+      "routeKind": "host-cli-session",
+      "enabled": true,
+      "priority": 3,
+      "model": "claude-opus-4.7",
+      "reasoningEffort": "max",
+      "contextLength": 1000000,
+      "accessPriority": ["claude-cli-session-auth", "api-only-if-required"],
+      "notes": "Fallback for hosts that can call Claude CLI/session auth. Not exposed through the local HTTP router without an Anthropic API key."
+    },
+    {
+      "id": "qwen3-coder-30b-a3b-q4",
+      "displayName": "Qwen3-Coder-30B-A3B-Instruct Q4_K_M",
+      "provider": "local-llama-cpp",
+      "routeKind": "openai-compatible-http",
+      "enabled": true,
+      "priority": 4,
+      "model": "qwen3-coder-local",
+      "baseUrl": "http://127.0.0.1:18080/v1",
+      "healthUrl": "http://127.0.0.1:18080/health",
+      "contextLength": 16384,
+      "gpu": "RTX 4090 class, 24GB VRAM",
+      "launchMode": "lazy",
+      "modelPath": "{{QWEN3_CODER_30B_A3B_Q4_GGUF}}",
+      "llamaServer": "{{LLAMA_SERVER_EXE}}",
+      "quant": "Q4_K_M",
+      "profile": {
+        "ctxSize": 16384,
+        "nGpuLayers": 999,
+        "flashAttention": true,
+        "batchSize": 384,
+        "ubatchSize": 192,
+        "threads": 6,
+        "parallel": 1,
+        "cacheTypeK": "q4_0",
+        "cacheTypeV": "q4_0",
+        "idleTimeoutSeconds": 600
+      },
+      "samplingProfiles": {
+        "coding": {
+          "temperature": 0.3,
+          "top_p": 0.8,
+          "top_k": 20,
+          "repetition_penalty": 1.05
+        },
+        "assistant": {
+          "temperature": 0.6,
+          "top_p": 0.8,
+          "top_k": 20,
+          "repetition_penalty": 1.05
+        },
+        "planning": {
+          "temperature": 0.65,
+          "top_p": 0.8,
+          "top_k": 20,
+          "repetition_penalty": 1.05
+        }
+      },
+      "notes": "Installed local coding fallback for Hermes/Paperclip. Lazy proxy stays light; llama.cpp backend loads only after cloud-routeable providers fail or when explicitly selected."
+    },
+    {
+      "id": "qwen3-coder-next-q5",
+      "displayName": "Qwen3-Coder-Next Q5_K_M",
+      "provider": "local-llama-cpp",
+      "routeKind": "openai-compatible-http",
+      "enabled": false,
+      "priority": 5,
+      "model": "qwen3-coder-next-q5",
+      "baseUrl": "http://127.0.0.1:18084/v1",
+      "healthUrl": "http://127.0.0.1:18084/health",
+      "contextLength": 131072,
+      "gpu": "RTX 4090 class, 24GB VRAM",
+      "launchMode": "manual",
+      "notes": "Disabled by default: stronger but too memory-heavy for clean 24GB VRAM multitasking unless explicitly requested."
+    },
+    {
+      "id": "qwen2.5-coder-32b-q4",
+      "displayName": "Qwen2.5-Coder-32B-Instruct Q4_K_M",
+      "provider": "local-llama-cpp",
+      "routeKind": "openai-compatible-http",
+      "enabled": false,
+      "priority": 6,
+      "model": "qwen2.5-coder-32b-q4",
+      "baseUrl": "http://127.0.0.1:18081/v1",
+      "healthUrl": "http://127.0.0.1:18081/health",
+      "contextLength": 65536,
+      "gpu": "RTX 4090 class, 24GB VRAM",
+      "launchMode": "manual",
+      "notes": "Disabled until the GGUF is actually installed. Keep as optional local fallback, not an automatic missing-file service."
+    }
+  ]
+}
