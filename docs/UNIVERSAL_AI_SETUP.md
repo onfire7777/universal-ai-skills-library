@@ -175,6 +175,13 @@ Paperclip:
 - Keep canceled `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`, and `CLAUDE_API_KEY` blank unless intentionally re-enabled.
 - Keep Kimi as the primary API fallback when API use is unavoidable.
 - Keep MCP bridges disabled by default; enable them only when a workflow requires a persistent endpoint.
+- Source capabilities are recorded in
+  `ai-setup/runtime/config/source-integrations.json` and installed to
+  `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`. This is
+  a public-safe registry of pointers and policies for Lightpanda, Context Mode,
+  MemPalace, host-native web search, GBrain, and GSkills/GStack. It does not
+  vendor private source checkouts, browser sessions, secrets, or full external
+  skill trees into the repo.
 - Shared memory is centralized through MemPalace, with helper wrappers in
   `%USERPROFILE%\.universal-ai-stack\scripts`:
   `Search-UniversalAIMemory.ps1` for lookup and `Save-UniversalAIMemory.ps1`
@@ -201,6 +208,10 @@ Paperclip:
   persistent Lightpanda bridge services disabled, but the wrappers under
   `%USERPROFILE%\.lightpanda-ai` must be able to fetch pages and start CDP
   when Docker Desktop's Linux engine is running.
+- Web search remains host-native. If the active AI host has a web/search tool,
+  use that for fresh search. Use Lightpanda for controlled page retrieval,
+  extraction, JavaScript loading, and CDP after a search target is known; do not
+  commit search-provider API keys or run a default local search proxy.
 - GBrain is a structured knowledge mirror and query surface. It can receive
   explicit saved memory notes, but it does not replace MemPalace as the shared
   memory source. Its default text embedding provider is the local
@@ -208,6 +219,10 @@ Paperclip:
   `http://127.0.0.1:18084/v1` with 1024 dimensions. Do not reintroduce
   `text-embedding-3-large` or 1536-dimensional GBrain text embeddings unless
   the brain database is intentionally rebuilt for that provider.
+- GSkills/GStack are read-only external skill sources indexed by
+  `skill-router`. Load namespaced skills such as `gstack-review`, `gstack-qa`,
+  `gstack-cso`, and `gstack-browse` on demand. Do not copy the full GStack or
+  GBrain skill trees into every AI client.
 
 ## Validation
 

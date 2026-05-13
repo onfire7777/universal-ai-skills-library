@@ -12,7 +12,8 @@ instead of copying every skill into every AI client.
 - PowerShell on Windows
 - Optional: Python 3.11+ for the Windows Universal AI Stack runtime
 - Optional: llama.cpp, local GGUF models, Hermes Agent, Paperclip, MemPalace,
-  GBrain, Context Mode, or Lightpanda for advanced local workflows
+  GBrain, GSkills/GStack, Context Mode, Lightpanda, or host-native web search
+  for advanced local workflows
 
 ## Windows
 
@@ -120,6 +121,28 @@ router-only install:
 ```powershell
 .\install.ps1 -SkipStackInstall
 ```
+
+## Optional Source Integrations
+
+The repo installs a portable source-integration registry at:
+
+```text
+%USERPROFILE%\.universal-ai-stack\config\source-integrations.json
+```
+
+It describes how AI clients should use:
+
+- Lightpanda for controlled headless browser fetch, extraction, and CDP work
+- Context Mode for context-window protection and long-output routing
+- MemPalace as the authoritative durable memory store
+- host-native web search when the AI host provides a web/search tool
+- GBrain as the structured searchable memory mirror
+- GSkills/GStack as read-only external skill sources loaded through
+  `skill-router`
+
+These integrations are intentionally pointer-based. The installer does not copy
+full external repos, browser sessions, secrets, or the whole GStack/GBrain skill
+trees into every AI client.
 
 ## Validate
 

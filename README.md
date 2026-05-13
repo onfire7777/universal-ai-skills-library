@@ -45,6 +45,8 @@ prompt needs a matching skill.
 - optional Universal AI Stack runtime for model routing, health checks,
   Hermes/Paperclip integration, shared memory, local embeddings, and guarded
   local Qwen fallback
+- portable source integration registry for Lightpanda, Context Mode,
+  MemPalace, host-native web search, GBrain, and GSkills/GStack
 - optional MCP bridge scripts for workflows that truly need persistent endpoints
 - public-safe install, validation, and release-audit scripts
 
@@ -175,6 +177,8 @@ It provides:
 - local Qwen embedding service for GBrain memory search
 - Hermes Agent and Paperclip configuration helpers
 - shared memory helpers for MemPalace plus GBrain mirror lookup
+- source integration policy for Lightpanda, Context Mode, MemPalace, web
+  search, GBrain, and GSkills/GStack without vendoring those tools into the repo
 - health-check and adapter-validation scripts
 
 The default local coding fallback is:
@@ -189,6 +193,10 @@ guarded so it refuses to start when free RAM or VRAM is too low.
 See [Universal AI Setup](docs/UNIVERSAL_AI_SETUP.md) and
 [Universal AI Connection Configs](docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md) for
 the full model and client integration map.
+
+See [Source Integrations](docs/SOURCE_INTEGRATIONS.md) for the public-safe
+version of the shared source layer: Lightpanda, Context Mode, MemPalace, web
+search, GBrain, and GSkills/GStack.
 
 ## Compatibility Model
 
@@ -255,6 +263,7 @@ Pop-Location
 - [Quickstart](docs/QUICKSTART.md)
 - [Universal AI Setup](docs/UNIVERSAL_AI_SETUP.md)
 - [Universal AI Connection Configs](docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md)
+- [Source Integrations](docs/SOURCE_INTEGRATIONS.md)
 - [Architecture](docs/ARCHITECTURE_V2.md)
 - [Compatibility](docs/UNIVERSAL_COMPATIBILITY.md)
 - [Install Modes](docs/INSTALL_MODES.md)

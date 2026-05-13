@@ -30,6 +30,7 @@ $required = @(
   'ai-setup\runtime\config\model-registry.json',
   'ai-setup\runtime\config\routing-policy.json',
   'ai-setup\runtime\config\integrations.json',
+  'ai-setup\runtime\config\source-integrations.json',
   'ai-setup\runtime\env\.env.template',
   'ai-setup\scripts\install-universal-ai-stack.ps1',
   'ai-setup\scripts\validate-universal-ai-stack.ps1',
@@ -43,6 +44,7 @@ $required = @(
   'docs\QUICKSTART.md',
   'docs\PUBLIC_RELEASE_CHECKLIST.md',
   'docs\DESIGN_AND_MESSAGING.md',
+  'docs\SOURCE_INTEGRATIONS.md',
   'docs\assets\universal-ai-skills-hero.svg',
   'docs\UNIVERSAL_AI_SETUP.md',
   'docs\AI_REPO_TOOLS_SUMMARY.md'
@@ -54,6 +56,7 @@ foreach ($rel in $required) {
 $modelRegistry = Read-Json (Join-Path $RepoRoot 'ai-setup\runtime\config\model-registry.json')
 $routingPolicy = Read-Json (Join-Path $RepoRoot 'ai-setup\runtime\config\routing-policy.json')
 $integrations = Read-Json (Join-Path $RepoRoot 'ai-setup\runtime\config\integrations.json')
+$sourceIntegrations = Read-Json (Join-Path $RepoRoot 'ai-setup\runtime\config\source-integrations.json')
 $sourceRepos = Read-Json (Join-Path $RepoRoot 'ai-setup\manifests\source-repos.json')
 $curated = Read-Json (Join-Path $RepoRoot 'ai-setup\manifests\curated-skills.json')
 
@@ -137,8 +140,41 @@ if ($integrations) {
   }
 }
 
-if ($sourceRepos -and !$sourceRepos.canonical.universalAiSkillsLibrary) {
-  Add-Failure 'source-repos.json missing canonical universalAiSkillsLibrary record.'
+if ($sourceIntegrations) {
+  $sources = @($sourceIntegrations.sources)
+  $sourceIds = @($sources | ForEach-Object { $_.id })
+  foreach ($id in 'lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack') {
+    if ($sourceIds -notcontains $id) { Add-Failure "Source integration missing: $id" }
+  }
+  foreach ($id in 'mempalace', 'context-mode', 'lightpanda') {
+    $source = $sources | Where-Object { $_.id -eq $id } | Select-Object -First 1
+    if ($source -and $source.defaultState -notmatch 'disabled') {
+      Add-Failure "Source integration $id must default persistent bridges off for low-resource installs."
+    }
+  }
+  $gbrain = $sources | Where-Object { $_.id -eq 'gbrain' } | Select-Object -First 1
+  if ($gbrain) {
+    if ($gbrain.embeddingModel -ne 'qwen3-embedding-0.6b-q8') { Add-Failure 'GBrain source integration must use qwen3-embedding-0.6b-q8.' }
+    if ($gbrain.embeddingEndpoint -ne 'http://127.0.0.1:18084/v1') { Add-Failure 'GBrain source integration must use local embedding endpoint http://127.0.0.1:18084/v1.' }
+  }
+  $gskills = $sources | Where-Object { $_.id -eq 'gskills-gstack' } | Select-Object -First 1
+  if ($gskills -and $gskills.installMode -ne 'external-readonly-index') {
+    Add-Failure 'GSkills/GStack source integration must remain external-readonly-index.'
+  }
+  $webSearch = $sources | Where-Object { $_.id -eq 'web-search' } | Select-Object -First 1
+  if ($webSearch -and $webSearch.installMode -ne 'host-owned-no-local-service') {
+    Add-Failure 'Web search source integration must stay host-owned and no-local-service by default.'
+  }
+}
+
+if ($sourceRepos) {
+  if (!$sourceRepos.canonical.universalAiSkillsLibrary) {
+    Add-Failure 'source-repos.json missing canonical universalAiSkillsLibrary record.'
+  }
+  $externalSourceIds = @($sourceRepos.optionalExternalSources | ForEach-Object { $_.id })
+  foreach ($id in 'gstack', 'gbrain', 'mempalace', 'context-mode', 'lightpanda', 'web-search') {
+    if ($externalSourceIds -notcontains $id) { Add-Failure "source-repos.json missing optional external source: $id" }
+  }
 }
 if ($curated -and @($curated.wrapperSkills | Where-Object { $_.name -eq 'universal-ai-skills' }).Count -eq 0) {
   Add-Failure 'curated-skills.json missing universal-ai-skills wrapper record.'
@@ -170,10 +206,10 @@ foreach ($file in $scanFiles) {
 }
 
 if ($CheckInstalled) {
-  foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json', 'bin\universal_ai_router.py', 'scripts\Test-UniversalAIStack.ps1') {
+  foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json', 'config\source-integrations.json', 'bin\universal_ai_router.py', 'scripts\Test-UniversalAIStack.ps1') {
     if (!(Test-Path -LiteralPath (Join-Path $InstalledRoot $rel))) { Add-Failure "Installed stack missing $rel" }
   }
-  foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json') {
+  foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json', 'config\source-integrations.json') {
     $path = Join-Path $InstalledRoot $rel
     if (Test-Path -LiteralPath $path) { [void](Read-Json $path) }
   }

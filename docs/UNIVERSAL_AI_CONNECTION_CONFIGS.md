@@ -16,6 +16,7 @@ Do not make each AI client an independent install. Each client should point back
 | `ai-setup/runtime/bin/local_qwen_proxy.py` | Repo-owned lazy llama.cpp proxy with RAM/VRAM guards, request-size guard, hidden backend startup, idle shutdown, and below-normal process priority. | Local Qwen coding fallback and GBrain embedding proxy. |
 | `ai-setup/runtime/config/routing-policy.json` | Failover, timeouts, retry limits, circuit breaker, agent safety limits, supervisor cadence, and cost policy. | Universal router, Hermes fallback behavior, Paperclip model selection, local-model startup policy. |
 | `ai-setup/runtime/config/integrations.json` | Service inventory and launch commands. Defines the universal router, Hermes gateway, Paperclip, local Qwen coding proxy, and GBrain embedding proxy. | Startup supervisor, health checks, Windows login item, local HTTP services. |
+| `ai-setup/runtime/config/source-integrations.json` | Portable source registry for Lightpanda, Context Mode, MemPalace, host-native web search, GBrain, and GSkills/GStack. | All AI adapters through compact instructions; installed stack under `%USERPROFILE%\.universal-ai-stack\config`. |
 | `ai-setup/runtime/config/mcp-policy.json` | Low-resource MCP policy. Keeps persistent bridges disabled unless an endpoint workflow needs them. | MemPalace, Context Mode, Skill Seekers, Lightpanda. |
 | `ai-setup/runtime/env/.env.template` | Secret names and non-secret defaults. | Central install env under `%USERPROFILE%\.universal-ai-stack\secrets\.env`. |
 | `ai-setup/runtime/scripts/Install-UniversalAIAdapters.ps1` | Installs compact universal instructions and wrapper skills into supported AI roots. | Codex, Claude, Cursor, Kimi, Hermes, Paperclip, Aion, OpenCode, Continue, Kiro, Gemini, Qwen, Roo, Windsurf, Aider, OpenHands, OpenClaw, Manus-compatible roots. |
@@ -36,6 +37,7 @@ These are generated or updated by the installer/sync scripts. They should not be
 | `%USERPROFILE%\.universal-ai-stack\secrets\.env` | Central secret store. | Never print or commit. Compatibility copies may be written only where a tool requires a local env key. |
 | `%USERPROFILE%\.universal-ai-stack\logs\` | Runtime logs. | Logs should redact secrets and rotate. |
 | `%USERPROFILE%\.universal-ai-stack\state\` | Generated health and runtime state. | Useful for diagnostics, not portable source. |
+| `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json` | Installed source registry. | Shared source policies for Lightpanda, Context Mode, MemPalace, web search, GBrain, and GSkills/GStack. |
 | `%USERPROFILE%\.hermes\config.yaml` | Hermes agent config. | Points Hermes at GPT-5.5 host auth plus universal router fallback and shared safety limits. |
 | `%USERPROFILE%\.hermes\.env` | Hermes environment. | Contains Discord and gateway compatibility values. Real secrets stay out of git. |
 | `%USERPROFILE%\.paperclip\instances\default\config.json` | Paperclip model config. | Uses OpenAI-compatible endpoint `http://127.0.0.1:18100/v1` with model `auto-coding`. |
@@ -44,6 +46,8 @@ These are generated or updated by the installer/sync scripts. They should not be
 | `%USERPROFILE%\.lightpanda-ai\*.cmd` and `*.ps1` | Lightpanda one-shot fetch and CDP wrappers. | On-demand browser runtime, not the Windows default browser. |
 | `%USERPROFILE%\.mempalace\palace` | Durable shared memory. | Authoritative long-term memory store. |
 | `%USERPROFILE%\.gbrain` and `%USERPROFILE%\gbrain` | Structured GBrain state and source. | Searchable mirror that uses the local Qwen embedding endpoint. |
+| `%USERPROFILE%\.gstack\gstack` | GSkills/GStack source checkout. | Read-only external skill source; use namespaced `gstack-*` skills through `skill-router`. |
+| Host web/search tool | Fresh web research. | Host-owned capability, not a repo-owned background service or committed API key. |
 
 ## Connection Graph
 
@@ -66,6 +70,8 @@ flowchart TD
   A --> M["Context Mode hooks and MCP"]
   A --> N["Lightpanda fetch/CDP wrappers"]
   N --> O["Docker Lightpanda CDP :9222"]
+  A --> R["Host-native web search"]
+  C --> S["GSkills/GStack external index"]
 
   P["Hermes Gateway :8642"] --> F
   Q["Paperclip :3100"] --> F
@@ -83,8 +89,10 @@ Each local AI client gets the same compact policy:
 6. Use `Save-UniversalAIMemory.ps1` only for explicit durable memories or confirmed project facts.
 7. Keep Context Mode for context-window protection, not durable memory.
 8. Keep Lightpanda on demand for browser automation and scraping.
-9. Use the universal router for OpenAI-compatible model fallback.
-10. Do not copy the full skill corpus, MCP manifests, or secret files into the client root.
+9. Use host-native web search for fresh search when available; use Lightpanda for controlled page retrieval/extraction, not as a default search-engine proxy.
+10. Load GSkills/GStack and GBrain skills through `skill-router`; do not vendor those upstream trees into client roots.
+11. Use the universal router for OpenAI-compatible model fallback.
+12. Do not copy the full skill corpus, MCP manifests, or secret files into the client root.
 
 ## Model Connection Rules
 
@@ -109,6 +117,10 @@ Paperclip and Hermes should use `auto-coding` through `http://127.0.0.1:18100/v1
 - Keep one local generative model registered by default: `qwen3-coder-30b-a3b-q4`.
 - Keep one local embedding model registered by default: `qwen3-embedding-0.6b-q8`.
 - Keep MCP bridges disabled by default. Enable only when an endpoint workflow needs them.
+- Keep source integrations pointer-based. Do not vendor Lightpanda, Context Mode,
+  MemPalace, GBrain, or GSkills/GStack source trees into every AI root.
+- Keep web search host-owned by default. Do not commit web-search provider keys
+  or run a search proxy unless the user explicitly configures one.
 - Keep startup hidden and supervised. Do not create visible command prompt launchers.
 - Keep canceled OpenAI/OpenRouter/Anthropic/Claude API keys empty unless intentionally re-enabled.
 - Keep Kimi as the paid API fallback when API usage is unavoidable.
@@ -127,6 +139,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $env:USERPROFILE\.universal-
 skill-router skills validate-manifest
 skill-router doctor
 skill-router mcp status
+skill-router skill search gstack
+skill-router skill search gbrain
 gbrain stats
 mempalace status
 ```
@@ -139,6 +153,10 @@ Expected clean state:
 - Context Mode hooks parse without unsupported regex look-around.
 - Lightpanda fetch and CDP work when Docker Linux engine is available.
 - MemPalace and GBrain are both reachable.
+- GSkills/GStack and GBrain source skills are discoverable through
+  `skill-router` without being copied into every AI root.
+- Web search remains a host-native source with no committed API key or default
+  background proxy.
 - Persistent MCP bridge ports can be down in the low-resource profile.
 
 ## Change Procedure

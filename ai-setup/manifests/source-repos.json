@@ -107,6 +107,21 @@
       "loadPolicy": "optional-mcp-or-direct-cli"
     },
     {
+      "id": "context-mode",
+      "pathTemplate": "%APPDATA%\\npm\\context-mode.cmd",
+      "loadPolicy": "shared-cli-and-codex-hooks"
+    },
+    {
+      "id": "lightpanda",
+      "pathTemplate": "{{USERPROFILE}}\\.lightpanda-ai",
+      "loadPolicy": "on-demand-wrapper"
+    },
+    {
+      "id": "web-search",
+      "pathTemplate": "host-native",
+      "loadPolicy": "host-owned-no-local-service"
+    },
+    {
       "id": "skill-seekers",
       "pathTemplate": "{{USERPROFILE}}\\.skill-seekers",
       "loadPolicy": "optional-mcp-or-direct-cli"

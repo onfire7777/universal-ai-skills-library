@@ -7,6 +7,7 @@ $HomeDir = $env:USERPROFILE
 $Root = Join-Path $HomeDir '.universal-ai-stack'
 $StateDir = Join-Path $Root 'state'
 $AdapterConfig = Join-Path $Root 'config\agent-adapters.json'
+$SourceIntegrationConfig = Join-Path $Root 'config\source-integrations.json'
 $CanonicalSkillsRoot = Join-Path $HomeDir 'universal-ai-skills-library\skills'
 
 function Read-Text {
@@ -99,11 +100,29 @@ if (Test-Path -LiteralPath $AdapterConfig) {
       corpusAccessPolicyPresent = $instructionText.Contains('## Universal AI Skill Corpus Access') -or $instructionText.Contains('Do not copy or install those full skill bodies')
       sharedMemoryPolicyPresent = $instructionText.Contains('## Universal Shared Memory') -and $instructionText.Contains('Save-UniversalAIMemory.ps1') -and $instructionText.Contains('Search-UniversalAIMemory.ps1')
       sharedMemoryEmbeddingPolicyPresent = $instructionText.Contains('qwen3-embedding-0.6b') -and $instructionText.Contains('MemPalace remains the authoritative durable memory store')
+      sourceIntegrationsPolicyPresent = $instructionText.Contains('## Universal Source Integrations') -and $instructionText.Contains('source-integrations.json') -and $instructionText.Contains('GSkills/GStack') -and $instructionText.Contains('Web search is host-owned')
       skillFile = $skillPath
       skillPresent = (Test-Path -LiteralPath $skillPath)
     }
   }
 }
+
+$sourceIntegrationSummary = [ordered]@{ present = $false; requiredSourcesPresent = $false; sourceIds = @() }
+if (Test-Path -LiteralPath $SourceIntegrationConfig) {
+  $sourceIntegrationSummary.present = $true
+  try {
+    $sourceCfg = Get-Content -LiteralPath $SourceIntegrationConfig -Raw | ConvertFrom-Json
+    $ids = @($sourceCfg.sources | ForEach-Object { $_.id })
+    $sourceIntegrationSummary.sourceIds = $ids
+    $requiredSourceIds = @('lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack')
+    $sourceIntegrationSummary.requiredSourcesPresent = (@($requiredSourceIds | Where-Object { $ids -notcontains $_ }).Count -eq 0)
+  } catch {
+    $sourceIntegrationSummary.error = $_.Exception.Message
+  }
+}
+$sourceIntegrationFailures = @()
+if (!$sourceIntegrationSummary.present) { $sourceIntegrationFailures += 'sourceIntegrations.configPresent' }
+if (!$sourceIntegrationSummary.requiredSourcesPresent) { $sourceIntegrationFailures += 'sourceIntegrations.requiredSourcesPresent' }
 
 $manifestPath = Join-Path (Split-Path -Parent $CanonicalSkillsRoot) 'manifest.json'
 $canonicalSkillCount = 0
@@ -211,8 +230,10 @@ $result = [ordered]@{
     hermesExternalSource = $hermesConfig.Contains('universal-ai-skills-library\skills') -or $hermesConfig.Contains('universal-ai-skills-library/skills')
   }
   adapterConfigPresent = (Test-Path -LiteralPath $AdapterConfig)
+  sourceIntegrations = $sourceIntegrationSummary
+  sourceIntegrationFailures = $sourceIntegrationFailures
   adapters = $adapterResults
-  adapterFailures = @($adapterResults | Where-Object { -not $_.markerPresent -or -not $_.corpusAccessPolicyPresent -or -not $_.sharedMemoryPolicyPresent -or -not $_.sharedMemoryEmbeddingPolicyPresent -or -not $_.skillPresent } | ForEach-Object { $_.name })
+  adapterFailures = @($adapterResults | Where-Object { -not $_.markerPresent -or -not $_.corpusAccessPolicyPresent -or -not $_.sharedMemoryPolicyPresent -or -not $_.sharedMemoryEmbeddingPolicyPresent -or -not $_.sourceIntegrationsPolicyPresent -or -not $_.skillPresent } | ForEach-Object { $_.name })
   memory = [ordered]@{
     mempalaceCommand = [bool]$mempalaceCommand
     mempalaceMcpCommand = [bool](Get-Command mempalace-mcp -ErrorAction SilentlyContinue)

@@ -1,0 +1,99 @@
+{
+  "schema": "universal-ai-stack.source-integrations.v1",
+  "updated": "2026-05-13",
+  "policy": "Source integrations are shared pointers and wrappers. Do not vendor upstream source trees or duplicate full skill bodies into AI client roots.",
+  "sources": [
+    {
+      "id": "lightpanda",
+      "label": "Lightpanda",
+      "kind": "headless-browser",
+      "purpose": "AI-controlled browser runtime for scraping, JavaScript-rendered page loading, markdown extraction, semantic DOM extraction, form workflows, and CDP automation when graphical rendering is not required.",
+      "installMode": "on-demand-wrapper",
+      "localRoot": "{{USERPROFILE}}\\.lightpanda-ai",
+      "wrappers": [
+        "{{USERPROFILE}}\\.lightpanda-ai\\lightpanda-fetch.cmd",
+        "{{USERPROFILE}}\\.lightpanda-ai\\lightpanda-mcp.cmd",
+        "{{USERPROFILE}}\\.lightpanda-ai\\lightpanda-serve.ps1",
+        "{{USERPROFILE}}\\.lightpanda-ai\\lightpanda-stop.ps1"
+      ],
+      "defaultState": "persistent-bridge-disabled",
+      "validation": "Test-UniversalAIContextTools.ps1",
+      "notes": "Docker-backed on Windows. Use native web search for search-engine queries; use Lightpanda for page retrieval, extraction, and CDP workflows."
+    },
+    {
+      "id": "context-mode",
+      "label": "Context Mode",
+      "kind": "context-continuity",
+      "purpose": "Context-window protection, long-output routing, and indexed session continuity.",
+      "installMode": "shared-cli-and-codex-hooks",
+      "command": "%APPDATA%\\npm\\context-mode.cmd",
+      "codexConfig": "{{USERPROFILE}}\\.codex\\config.toml",
+      "codexHooks": "{{USERPROFILE}}\\.codex\\hooks.json",
+      "defaultState": "persistent-bridge-disabled",
+      "validation": "Test-UniversalAIContextTools.ps1",
+      "notes": "Context Mode is scratch/context infrastructure. Do not store durable facts here when MemPalace is available."
+    },
+    {
+      "id": "mempalace",
+      "label": "MemPalace",
+      "kind": "durable-memory",
+      "purpose": "Authoritative shared memory and prior-decision lookup across local AI clients.",
+      "installMode": "shared-cli-wrapper",
+      "localRoot": "{{USERPROFILE}}\\.mempalace\\palace",
+      "searchWrapper": "{{USERPROFILE}}\\.universal-ai-stack\\scripts\\Search-UniversalAIMemory.ps1",
+      "saveWrapper": "{{USERPROFILE}}\\.universal-ai-stack\\scripts\\Save-UniversalAIMemory.ps1",
+      "defaultState": "mcp-bridge-disabled-cli-enabled",
+      "validation": "Test-UniversalAIAdapters.ps1",
+      "notes": "Never store secrets, raw logs, temporary scratch notes, or unverified guesses in durable memory."
+    },
+    {
+      "id": "web-search",
+      "label": "Web search",
+      "kind": "host-native-source",
+      "purpose": "Fresh web research through the host AI's native web/search tools when available.",
+      "installMode": "host-owned-no-local-service",
+      "fallbacks": [
+        "lightpanda-fetch for page retrieval and extraction",
+        "tavily-web skill when the user supplies a Tavily key",
+        "browser plugin or host browser automation when graphical rendering is required"
+      ],
+      "defaultState": "no-background-process",
+      "validation": "public-release-audit.ps1",
+      "notes": "This repo does not proxy or scrape search engines by default. Keep web search credentials out of repo config."
+    },
+    {
+      "id": "gbrain",
+      "label": "GBrain",
+      "kind": "structured-knowledge-mirror",
+      "purpose": "Brain-first retrieval, structured local lookup, explicit memory mirror, and durable agent context.",
+      "installMode": "external-readonly-source-plus-local-state",
+      "sourceRoot": "{{USERPROFILE}}\\gbrain",
+      "stateRoot": "{{USERPROFILE}}\\.gbrain",
+      "cli": "gbrain",
+      "indexedSkillSources": [
+        "gbrain-source",
+        "gbrain-user"
+      ],
+      "embeddingModel": "qwen3-embedding-0.6b-q8",
+      "embeddingEndpoint": "http://127.0.0.1:18084/v1",
+      "validation": "Test-UniversalAIAdapters.ps1",
+      "notes": "GBrain mirrors explicit saved memories and offers structured lookup. MemPalace remains the authoritative durable memory store."
+    },
+    {
+      "id": "gskills-gstack",
+      "label": "GSkills / GStack",
+      "kind": "external-skill-source",
+      "purpose": "Read-only engineering process skills and GStack/GBrain skill sources indexed by skill-router.",
+      "installMode": "external-readonly-index",
+      "sourceRoot": "{{USERPROFILE}}\\.gstack\\gstack",
+      "indexedSkillSources": [
+        "gstack-gbrain",
+        "gstack-codex",
+        "gstack-openclaw"
+      ],
+      "skillNamePattern": "gstack-*",
+      "validation": "skill-router doctor",
+      "notes": "Load namespaced skills such as gstack-review, gstack-qa, gstack-cso, and gstack-browse on demand. Do not copy the full GStack or GBrain skill trees into AI roots."
+    }
+  ]
+}
