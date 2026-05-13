@@ -59,6 +59,7 @@ if ($modelRegistry) {
     if ([int]$qwen.contextLength -ne 16384) { Add-Failure "Qwen context should be 16384, got $($qwen.contextLength)" }
     if ([int]$qwen.profile.batchSize -ne 384) { Add-Failure "Qwen batch should be 384, got $($qwen.profile.batchSize)" }
     if ([int]$qwen.profile.ubatchSize -ne 192) { Add-Failure "Qwen ubatch should be 192, got $($qwen.profile.ubatchSize)" }
+    if ([int]$qwen.profile.nGpuLayers -ne 99) { Add-Failure "Qwen nGpuLayers should be 99, got $($qwen.profile.nGpuLayers)" }
     if ([int]$qwen.profile.parallel -ne 1) { Add-Failure "Qwen parallel should be 1, got $($qwen.profile.parallel)" }
   }
   $kimi = $models | Where-Object { $_.id -eq 'kimi-k2.6-thinking' } | Select-Object -First 1
@@ -73,6 +74,7 @@ if ($modelRegistry) {
     if ([int]$embedding.embeddingDimensions -ne 1024) { Add-Failure "GBrain embedding dimensions should be 1024, got $($embedding.embeddingDimensions)" }
     if ($embedding.routeKind -ne 'openai-compatible-http') { Add-Failure "GBrain embedding routeKind should be openai-compatible-http, got $($embedding.routeKind)" }
     if ($embedding.profile.embeddingOnly -ne $true) { Add-Failure 'GBrain embedding profile must be embeddingOnly.' }
+    if ([int]$embedding.profile.nGpuLayers -ne 99) { Add-Failure "GBrain embedding nGpuLayers should be 99, got $($embedding.profile.nGpuLayers)" }
   }
   foreach ($disabled in 'qwen3-coder-next-q5', 'qwen2.5-coder-32b-q4') {
     $m = $models | Where-Object { $_.id -eq $disabled } | Select-Object -First 1
@@ -95,6 +97,16 @@ if ($integrations) {
   $services = @($integrations.services)
   foreach ($svc in 'universal-router', 'hermes-gateway', 'paperclip', 'qwen3-coder-30b-a3b', 'gbrain-embeddings') {
     if (@($services | Where-Object { $_.id -eq $svc }).Count -eq 0) { Add-Failure "Integration service missing: $svc" }
+  }
+  foreach ($svc in 'qwen3-coder-30b-a3b', 'gbrain-embeddings') {
+    $service = $services | Where-Object { $_.id -eq $svc } | Select-Object -First 1
+    if ($service) {
+      $start = @($service.start)
+      $idx = [array]::IndexOf($start, '--n-gpu-layers')
+      if ($idx -lt 0 -or $idx -ge ($start.Count - 1) -or $start[$idx + 1] -ne '99') {
+        Add-Failure "Integration service $svc must pass --n-gpu-layers 99."
+      }
+    }
   }
 }
 
