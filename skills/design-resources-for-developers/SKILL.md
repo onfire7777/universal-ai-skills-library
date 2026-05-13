@@ -12,7 +12,7 @@ Use this skill to find practical design resources before building, redesigning, 
 
 - Upstream repository: `https://github.com/bradtraversy/design-resources-for-developers`
 - Integrated source commit: `6d9884e7260076e0eced4ac9f3be7665a91a9476`
-- Local source checkout: `C:\Users\burni\.design-resources-for-developers\design-resources-for-developers`
+- Local source checkout: `%USERPROFILE%\.design-resources-for-developers\design-resources-for-developers`
 
 ## Workflow
 

@@ -9,7 +9,7 @@ This repository is a universal AI skills setup. The default interface is platfor
 - Universal setup skill: `universal-ai-config`
 - Optional MCP runtime directory: `C:\ProgramData\universal-ai-mcps`
 - Optional MCP scheduled task prefix: `UniversalAI-*`
-- Local tools directory: `C:\Users\burni\.universal-ai\tools`
+- Local tools directory: `%USERPROFILE%\.universal-ai\tools`
 - Current corpus: 1,807 canonical skills, with legacy/display aliases stored in `manifest.json` and `docs/compatibility_aliases.json`
 - Local external skill roots: searchable and loadable read-only through `skill-router`; not copied into `skills/` unless intentionally promoted.
 
@@ -148,8 +148,8 @@ If the CLI can do the work without a long-running service, do not add or start a
 Shared durable memory should still work when MCP bridges are disabled. The
 portable baseline is:
 
-- save: `powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\burni\.universal-ai-stack\scripts\Save-UniversalAIMemory.ps1 -Source "<client>" -Note "<memory>"`
-- search: `powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\burni\.universal-ai-stack\scripts\Search-UniversalAIMemory.ps1 -Query "<query>"`
+- save: `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Save-UniversalAIMemory.ps1" -Source "<client>" -Note "<memory>"`
+- search: `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Search-UniversalAIMemory.ps1" -Query "<query>"`
 
 Those wrappers write to the shared Universal AI Stack memory folder, mine the
 note into MemPalace, and mirror it into GBrain when available. Do not use

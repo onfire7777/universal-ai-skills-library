@@ -1,9 +1,0 @@
-{
-  "name": "infographic-scripts",
-  "private": true,
-  "type": "module",
-  "description": "Utilities for infographic",
-  "scripts": {
-    "test": "npx -y bun test"
-  }
-}

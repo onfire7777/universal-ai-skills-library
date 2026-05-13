@@ -5,7 +5,7 @@ description: Use when the user explicitly asks for gstack, Garry Tan's AI engine
 
 # GStack Universal Adapter
 
-Canonical upstream checkout: `C:\Users\burni\.gstack\gstack`
+Canonical upstream checkout: `%USERPROFILE%\.gstack\gstack`
 
 Use this as the compact entrypoint for Garry Tan's gstack without copying all
 generated host skills into every AI root. The full upstream skills remain in the
@@ -41,24 +41,24 @@ skill-router skill search "gstack browser"
 
 The upstream build produces Windows executables in the canonical checkout:
 
-- `C:\Users\burni\.gstack\gstack\browse\dist\browse.exe`
-- `C:\Users\burni\.gstack\gstack\browse\dist\find-browse.exe`
-- `C:\Users\burni\.gstack\gstack\design\dist\design.exe`
-- `C:\Users\burni\.gstack\gstack\make-pdf\dist\pdf.exe`
+- `%USERPROFILE%\.gstack\gstack\browse\dist\browse.exe`
+- `%USERPROFILE%\.gstack\gstack\browse\dist\find-browse.exe`
+- `%USERPROFILE%\.gstack\gstack\design\dist\design.exe`
+- `%USERPROFILE%\.gstack\gstack\make-pdf\dist\pdf.exe`
 
 Prefer the skill instructions before invoking a tool directly. The gstack skills
 contain the expected workflow, safety checks, and artifact conventions.
 
 ## Integration Policy
 
-- Keep `C:\Users\burni\.gstack\gstack` as the single upstream source checkout.
+- Keep `%USERPROFILE%\.gstack\gstack` as the single upstream source checkout.
 - Keep generated gstack skill docs indexed read-only by the router.
 - Do not bulk-copy gstack skills into every agent root.
 - Use junctions or symlinks only where an upstream tool expects a fixed path.
 - For GBrain-aware coding workflows, prefer the generated GBrain host skills
-  under `C:\Users\burni\.gstack\gstack\.gbrain\skills`.
+  under `%USERPROFILE%\.gstack\gstack\.gbrain\skills`.
 - For OpenClaw-native conversational methods, use the upstream native skills
-  under `C:\Users\burni\.gstack\gstack\openclaw\skills`.
+  under `%USERPROFILE%\.gstack\gstack\openclaw\skills`.
 
 ## Maintenance
 

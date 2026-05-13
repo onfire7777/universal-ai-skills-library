@@ -1,9 +1,0 @@
-{
-  "name": "image-generation-scripts",
-  "private": true,
-  "type": "module",
-  "description": "CLI for async text-to-image and image-to-image (Bun)",
-  "scripts": {
-    "test": "npx -y bun test"
-  }
-}

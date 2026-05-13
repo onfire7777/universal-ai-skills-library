@@ -5,15 +5,15 @@ description: Use when the user asks for GBrain, personal knowledge brain setup, 
 
 # GBrain Universal Adapter
 
-Canonical upstream checkout: `C:\Users\burni\gbrain`
+Canonical upstream checkout: `%USERPROFILE%\gbrain`
 
 GBrain is a real CLI-backed personal knowledge brain. It is not just a skill
 pack. The universal stack keeps the upstream checkout and local brain state in
 one place, then exposes GBrain skills and commands through `skill-router`.
 
 On Windows, the canonical GBrain binary is
-`C:\Users\burni\.bun\bin\gbrain.exe`. The compatibility shim
-`C:\Users\burni\go\bin\gbrain.cmd` delegates to it so AI hosts with an older
+`%USERPROFILE%\.bun\bin\gbrain.exe`. The compatibility shim
+`%USERPROFILE%\go\bin\gbrain.cmd` delegates to it so AI hosts with an older
 inherited PATH still resolve `gbrain` without duplicating the install.
 
 ## Core Commands
@@ -42,7 +42,7 @@ only for those optional features.
 The upstream GBrain skills are indexed from:
 
 ```text
-C:\Users\burni\gbrain\skills
+%USERPROFILE%\gbrain\skills
 ```
 
 Examples:
@@ -69,16 +69,16 @@ skill-router skill query
 
 For setup or repair, read the upstream installer flow first:
 
-```bash
-Get-Content C:\Users\burni\gbrain\INSTALL_FOR_AGENTS.md
-Get-Content C:\Users\burni\gbrain\AGENTS.md
-Get-Content C:\Users\burni\gbrain\docs\GBRAIN_VERIFY.md
+```powershell
+Get-Content "$env:USERPROFILE\gbrain\INSTALL_FOR_AGENTS.md"
+Get-Content "$env:USERPROFILE\gbrain\AGENTS.md"
+Get-Content "$env:USERPROFILE\gbrain\docs\GBRAIN_VERIFY.md"
 ```
 
 ## Integration Policy
 
-- Keep `C:\Users\burni\gbrain` as the single upstream source checkout.
-- Keep `C:\Users\burni\.gbrain` for GBrain runtime state such as PGLite data and
+- Keep `%USERPROFILE%\gbrain` as the single upstream source checkout.
+- Keep `%USERPROFILE%\.gbrain` for GBrain runtime state such as PGLite data and
   user-level GBrain skills.
 - Do not vendor GBrain's full skill tree into every AI root.
 - Use `skill-router` for on-demand loading and `gbrain` for persistent brain
@@ -90,9 +90,9 @@ Get-Content C:\Users\burni\gbrain\docs\GBRAIN_VERIFY.md
 
 Follow the upstream upgrade path:
 
-```bash
-git -C C:\Users\burni\gbrain pull --ff-only
-cd C:\Users\burni\gbrain
+```powershell
+git -C "$env:USERPROFILE\gbrain" pull --ff-only
+Set-Location "$env:USERPROFILE\gbrain"
 bun install
 gbrain init
 gbrain post-upgrade

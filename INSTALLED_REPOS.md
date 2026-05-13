@@ -13,12 +13,9 @@ This document catalogs all repositories in the `onfire7777` GitHub account that 
 
 ## Application Repositories
 
-| Repository | Purpose | Status |
-|:---|:---|:---|
-| [jakes-ai-va-desktop](https://github.com/onfire7777/jakes-ai-va-desktop) | Jake's AI Virtual Assistant — desktop application | Active |
-| [jakes-ai-va-release-manager](https://github.com/onfire7777/jakes-ai-va-release-manager) | Private release manager for Jake's AI VA desktop releases | Active |
-| [ai-file-organizer](https://github.com/onfire7777/ai-file-organizer) | AI-powered file organization utility | Active |
-| [pineflow](https://github.com/onfire7777/pineflow) | Workflow automation platform | Active |
+Application-specific and private repositories are intentionally not listed in
+this public catalog. Keep this file focused on reusable universal AI
+infrastructure, compatibility layers, and open source skill sources.
 
 ## Development Infrastructure
 
@@ -61,7 +58,13 @@ To install the universal router and keep skills context-light, run:
 
 ```powershell
 # From the repo root
-.\install.sh
+.\install.ps1
+```
+
+Linux, macOS, and WSL:
+
+```bash
+bash install.sh
 ```
 
 New automation should prefer `skill-router skill <name>` and avoid copying the full corpus into every always-loaded instruction file.

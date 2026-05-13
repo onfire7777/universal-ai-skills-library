@@ -36,8 +36,8 @@ Compatibility adapter types:
 
 1. Run `skill-router --version`.
 2. Run `skill-router skill search <topic>` and `skill-router skill <name>` for the current task.
-3. Verify `C:\Users\burni\universal-ai-skills-library\skills` is the preferred corpus source.
-4. Verify `C:\Users\burni\go\bin\skill-router.exe` is on PATH.
+3. Verify `%USERPROFILE%\universal-ai-skills-library\skills` is the preferred corpus source.
+4. Verify `%USERPROFILE%\go\bin\skill-router.exe` is on PATH.
 5. Check `skill-router sync matrix` for supported platform adapters.
 6. Check `skill-router doctor`.
 7. Check `skill-router mcp status`.
@@ -48,13 +48,13 @@ Compatibility adapter types:
 
 Keep these compact:
 
-- `C:\Users\burni\.agent\AGENTS.md`
-- `C:\Users\burni\.codex\AGENTS.md`
-- `C:\Users\burni\.claude\CLAUDE.md`
-- `C:\Users\burni\.cursor\rules\openskills.md`
-- `C:\Users\burni\.gemini\GEMINI.md`
-- `C:\Users\burni\.config\opencode\AGENTS.md`
-- `C:\Users\burni\.manus\MANUS_LOCAL_INTEGRATION.md`
+- `%USERPROFILE%\.agent\AGENTS.md`
+- `%USERPROFILE%\.codex\AGENTS.md`
+- `%USERPROFILE%\.claude\CLAUDE.md`
+- `%USERPROFILE%\.cursor\rules\openskills.md`
+- `%USERPROFILE%\.gemini\GEMINI.md`
+- `%USERPROFILE%\.config\opencode\AGENTS.md`
+- `%USERPROFILE%\.manus\MANUS_LOCAL_INTEGRATION.md`
 
 Minimum rule:
 

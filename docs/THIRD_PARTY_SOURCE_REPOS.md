@@ -12,11 +12,11 @@ memory, embeddings, Context Mode, Lightpanda, Hermes, and Paperclip, see
 ## GStack
 
 - Upstream: <https://github.com/garrytan/gstack>
-- Local source: `C:\Users\burni\.gstack\gstack`
+- Local source: `%USERPROFILE%\.gstack\gstack`
 - Runtime artifacts:
-  - `C:\Users\burni\.gstack\gstack\browse\dist\browse.exe`
-  - `C:\Users\burni\.gstack\gstack\design\dist\design.exe`
-  - `C:\Users\burni\.gstack\gstack\make-pdf\dist\pdf.exe`
+  - `%USERPROFILE%\.gstack\gstack\browse\dist\browse.exe`
+  - `%USERPROFILE%\.gstack\gstack\design\dist\design.exe`
+  - `%USERPROFILE%\.gstack\gstack\make-pdf\dist\pdf.exe`
 - Router sources:
   - `gstack-gbrain`: `~\.gstack\gstack\.gbrain\skills`
   - `gstack-codex`: `~\.gstack\gstack\.agents\skills`
@@ -28,12 +28,12 @@ Use namespaced skill names such as `gstack-review`, `gstack-qa`,
 ## GBrain
 
 - Upstream: <https://github.com/garrytan/gbrain>
-- Local source: `C:\Users\burni\gbrain`
-- Runtime state: `C:\Users\burni\.gbrain`
-- Canonical CLI: `gbrain` from `C:\Users\burni\.bun\bin`
+- Local source: `%USERPROFILE%\gbrain`
+- Runtime state: `%USERPROFILE%\.gbrain`
+- Canonical CLI: `gbrain` from `%USERPROFILE%\.bun\bin`
 - Windows compatibility shims:
-  - `C:\Users\burni\go\bin\bun.cmd`
-  - `C:\Users\burni\go\bin\gbrain.cmd`
+  - `%USERPROFILE%\go\bin\bun.cmd`
+  - `%USERPROFILE%\go\bin\gbrain.cmd`
 - Router sources:
   - `gbrain-source`: `~\gbrain\skills`
   - `gbrain-user`: `~\.gbrain\skills`
@@ -66,6 +66,6 @@ service is healthy.
 
 The `bun.cmd` and `gbrain.cmd` shims are thin delegates, not duplicate installs.
 They exist because long-running AI desktop clients can inherit an older PATH
-before `C:\Users\burni\.bun\bin` was added. The canonical binaries stay in
+before `%USERPROFILE%\.bun\bin` was added. The canonical binaries stay in
 `.bun\bin`; the shims only make the same tools visible from already-running
-agent shells whose PATH already includes `C:\Users\burni\go\bin`.
+agent shells whose PATH already includes `%USERPROFILE%\go\bin`.

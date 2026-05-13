@@ -155,7 +155,14 @@ foreach ($file in $scanFiles) {
   } else {
     $rel = $full
   }
-  if ($text -match 'C:\\Users\\burni') { Add-Failure "Hard-coded local user path in $rel" }
+  $currentUser = [regex]::Escape($env:USERNAME)
+  $localUserPatterns = @(
+    ('C:' + '\\Users\\' + $currentUser + '(?=\\|/|`|''|"|\s|$)'),
+    ('C:' + '\\\\Users\\\\' + $currentUser + '(?=\\\\|/|`|''|"|\s|$)')
+  )
+  foreach ($pattern in $localUserPatterns) {
+    if ($currentUser -and $text -match $pattern) { Add-Failure "Hard-coded current-user path in $rel" }
+  }
   if ($rel -notmatch 'Sanitize-UniversalAISecrets\.ps1' -and $text -match 'sk-(proj|ant|or|wy)[A-Za-z0-9_-]{16,}') {
     Add-Failure "Potential committed provider secret in $rel"
   }

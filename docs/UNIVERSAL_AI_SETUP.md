@@ -176,7 +176,7 @@ Paperclip:
 - Keep Kimi as the primary API fallback when API use is unavoidable.
 - Keep MCP bridges disabled by default; enable them only when a workflow requires a persistent endpoint.
 - Shared memory is centralized through MemPalace, with helper wrappers in
-  `C:\Users\burni\.universal-ai-stack\scripts`:
+  `%USERPROFILE%\.universal-ai-stack\scripts`:
   `Search-UniversalAIMemory.ps1` for lookup and `Save-UniversalAIMemory.ps1`
   for explicit durable saves. These wrappers are the cross-client baseline for
   Hermes, Paperclip, Codex, Claude, Cursor, Kimi, Aion, OpenCode, and related
@@ -199,7 +199,7 @@ Paperclip:
   has unsupported matcher look-around, or loses that timeout.
 - Lightpanda is the on-demand headless browser runtime. The clean default keeps
   persistent Lightpanda bridge services disabled, but the wrappers under
-  `C:\Users\burni\.lightpanda-ai` must be able to fetch pages and start CDP
+  `%USERPROFILE%\.lightpanda-ai` must be able to fetch pages and start CDP
   when Docker Desktop's Linux engine is running.
 - GBrain is a structured knowledge mirror and query surface. It can receive
   explicit saved memory notes, but it does not replace MemPalace as the shared
@@ -221,9 +221,9 @@ Installed-stack validation:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1 -CheckInstalled
-powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIStack.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIAdapters.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIStack.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIAdapters.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1" -Deep -StartLightpanda
 skill-router skills validate-manifest
 skill-router doctor
 gbrain stats

@@ -1,8 +1,8 @@
 {
   "schema": "universal-ai-skills-build-manifest/v2",
   "generated_at": "2026-05-12T00:00:00.000Z",
-  "source_of_truth": "C:\\Users\\burni\\universal-ai-skills-library\\skills",
-  "router_source": "C:\\Users\\burni\\universal-ai-skills-library\\skill-router-cli",
+  "source_of_truth": "%USERPROFILE%\\universal-ai-skills-library\\skills",
+  "router_source": "%USERPROFILE%\\universal-ai-skills-library\\skill-router-cli",
   "primary_binary": "skill-router",
   "legacy_binary_alias": "manus",
   "skill_count": 1807,

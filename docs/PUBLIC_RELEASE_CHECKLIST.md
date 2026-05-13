@@ -24,6 +24,7 @@ with another user.
 
 - install path is router-first
 - no default full-copy install into agent roots
+- no tracked duplicate corpus under `plugin-codex/skills`
 - no committed real secrets
 - no committed local state, logs, OAuth sessions, browser profiles, or model files
 - local model fallback is lazy and resource-guarded

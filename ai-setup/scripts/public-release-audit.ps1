@@ -89,6 +89,22 @@ if (Test-Path -LiteralPath $readme) {
   }
 }
 
+Invoke-Check -Name 'no tracked plugin-codex skill mirror' -Script {
+  if (Get-Command git -ErrorAction SilentlyContinue) {
+    Push-Location $RepoRoot
+    try {
+      $trackedMirror = @(& git ls-files 'plugin-codex/skills' 2>$null)
+      if ($trackedMirror.Count -gt 0) {
+        throw "plugin-codex/skills has $($trackedMirror.Count) tracked files; it should stay an ignored local junction to skills/."
+      }
+    } finally {
+      Pop-Location
+    }
+  } else {
+    Add-Warning 'git not found; skipped plugin-codex/skills tracking check.'
+  }
+}
+
 $skipDirs = @(
   '\.git\',
   '\node_modules\',
@@ -96,7 +112,8 @@ $skipDirs = @(
   '\build\',
   '\venv\',
   '\.venv\',
-  '\__pycache__\'
+  '\__pycache__\',
+  '\plugin-codex\skills\'
 )
 $secretPatterns = [ordered]@{
   OpenAIProject = 'sk-proj-[A-Za-z0-9_-]{20,}'
@@ -105,6 +122,15 @@ $secretPatterns = [ordered]@{
   AwsAccessKey = 'AKIA[0-9A-Z]{16}'
   DiscordAssignment = '(?m)^DISCORD_BOT_TOKEN[ \t]*=[ \t]*[^\r\n#]{20,}'
   ProviderAssignment = '(?m)^(OPENAI_API_KEY|ANTHROPIC_API_KEY|CLAUDE_API_KEY|OPENROUTER_API_KEY|KIMI_API_KEY)[ \t]*=[ \t]*[^\r\n#]{20,}'
+}
+$privacyPatterns = [ordered]@{}
+$privateProjectRepoPattern = [regex]::Escape(('jakes' + '-ai-va'))
+$privateProjectNamePattern = [regex]::Escape(('Jake' + "'" + 's AI VA'))
+$privacyPatterns.PrivateProjectBrand = "(?i)$privateProjectRepoPattern|$privateProjectNamePattern"
+if ($env:USERNAME) {
+  $currentUser = [regex]::Escape($env:USERNAME)
+  $privacyPatterns.CurrentWindowsUserPath = ('C:' + '\\Users\\' + $currentUser + '(?=\\|/|`|''|"|\s|$)')
+  $privacyPatterns.CurrentWindowsUserPathEscaped = ('C:' + '\\\\Users\\\\' + $currentUser + '(?=\\\\|/|`|''|"|\s|$)')
 }
 
 $scanFiles = Get-ChildItem -LiteralPath $RepoRoot -Recurse -File -Force |
@@ -119,8 +145,13 @@ $scanFiles = Get-ChildItem -LiteralPath $RepoRoot -Recurse -File -Force |
 
 foreach ($file in $scanFiles) {
   $rel = Get-RelativePath -Path $file.FullName
-  if ($rel -eq 'docs\build_manifest.json' -or $rel -eq 'manifest.json') { continue }
   $text = [System.IO.File]::ReadAllText($file.FullName)
+  foreach ($name in $privacyPatterns.Keys) {
+    if ($text -match $privacyPatterns[$name]) {
+      Add-Failure "Potential personal/private-info pattern $name in $rel"
+    }
+  }
+  if ($rel -eq 'docs\build_manifest.json' -or $rel -eq 'manifest.json') { continue }
   foreach ($name in $secretPatterns.Keys) {
     if ($text -match $secretPatterns[$name]) {
       if ($text -match 'your-api-key|your_api_key|example|fake|placeholder|sk-\.\.\.') { continue }

@@ -12,9 +12,9 @@ Use this skill to collect multiple sources into one XML-style context payload fo
 
 - Upstream repository: `https://github.com/jimmc414/onefilellm`
 - Integrated source commit: `99c51a2cbe8cc01c0db037a9f800ca31fae9c2cd`
-- Local checkout: `C:\Users\burni\.onefilellm\onefilellm`
-- Isolated venv CLI: `C:\Users\burni\.onefilellm\venv\Scripts\onefilellm.exe`
-- Windows shim: `C:\Users\burni\.onefilellm\bin\onefilellm.cmd`
+- Local checkout: `%USERPROFILE%\.onefilellm\onefilellm`
+- Isolated venv CLI: `%USERPROFILE%\.onefilellm\venv\Scripts\onefilellm.exe`
+- Windows shim: `%USERPROFILE%\.onefilellm\bin\onefilellm.cmd`
 
 ## README-Grounded Usage
 
@@ -31,9 +31,9 @@ python scripts/run_onefilellm.py --help-topic examples
 
 Equivalent direct commands:
 
-```bash
-C:\Users\burni\.onefilellm\venv\Scripts\onefilellm.exe --help
-C:\Users\burni\.onefilellm\bin\onefilellm.cmd --help-topic crawling
+```powershell
+& "$env:USERPROFILE\.onefilellm\venv\Scripts\onefilellm.exe" --help
+& "$env:USERPROFILE\.onefilellm\bin\onefilellm.cmd" --help-topic crawling
 ```
 
 ## References

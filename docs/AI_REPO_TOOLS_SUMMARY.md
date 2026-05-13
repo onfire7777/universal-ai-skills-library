@@ -115,7 +115,7 @@ Current local bridge roles:
 
 The router itself does not require MCP. Normal skill selection and skill loading work through the CLI.
 For durable memory, the universal baseline is direct CLI access to one shared
-MemPalace palace at `C:\Users\burni\.mempalace\palace`. Client adapters should
+MemPalace palace at `%USERPROFILE%\.mempalace\palace`. Client adapters should
 use `Search-UniversalAIMemory.ps1` before answering from prior decisions and
 `Save-UniversalAIMemory.ps1` only for explicit durable memories or confirmed
 project facts. Context Mode is not long-term memory; it is scratch/context
@@ -137,7 +137,7 @@ fetch and CDP startup against `http://127.0.0.1:9222`, while keeping persistent
 bridge tasks disabled for the low-resource profile. Use:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1" -Deep -StartLightpanda
 ```
 
 ### External Tool Adapters

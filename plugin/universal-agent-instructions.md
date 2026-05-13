@@ -1,6 +1,6 @@
 # Universal AI Skills Router Rule
 
-- Canonical source: `C:\Users\burni\universal-ai-skills-library`.
+- Canonical source: `%USERPROFILE%\universal-ai-skills-library`.
 - For every new substantive user prompt, perform skill selection automatically as an internal preflight. Do not wait for the user to ask for routing.
 - Hook scope is strict: automatic skill selection belongs only to real user prompt submission events, such as Codex/Claude `UserPromptSubmit`. Do not run or load routed skills from tool hooks, session-start hooks, stop hooks, compaction/resume hooks, background jobs, assistant messages, tool outputs, or status checks.
 - Internal preflight protocol:
@@ -25,4 +25,4 @@
   - `skill-root` clients load `SKILL.md` wrappers and call the CLI on demand.
   - `repo-instruction` clients get compact pointers in `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md`.
   - `hosted` clients such as ChatGPT or Claude Cowork use Actions, Apps SDK, MCP, API, or uploaded instructions instead of local full-copy sync.
-- Paperclip local agents use a combined adapter: one wrapper skill at `C:\Users\burni\.paperclip\skills\universal-ai-skills` plus compact instructions at `C:\Users\burni\.paperclip\universal-ai-skills\AGENTS.md`. Keep Paperclip-native company skills for board/API work and call `skill-router` only for prompt-scoped universal skill selection.
+- Paperclip local agents use a combined adapter: one wrapper skill at `%USERPROFILE%\.paperclip\skills\universal-ai-skills` plus compact instructions at `%USERPROFILE%\.paperclip\universal-ai-skills\AGENTS.md`. Keep Paperclip-native company skills for board/API work and call `skill-router` only for prompt-scoped universal skill selection.

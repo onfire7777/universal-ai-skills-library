@@ -1,8 +1,8 @@
 # Universal AI Skills Router For Paperclip Agents
 
-Canonical source: `C:\Users\burni\universal-ai-skills-library`.
+Canonical source: `%USERPROFILE%\universal-ai-skills-library`.
 Router command: `skill-router`.
-Absolute fallback: `C:\Users\burni\go\bin\skill-router.exe`.
+Absolute fallback: `%USERPROFILE%\go\bin\skill-router.exe`.
 
 Paperclip-specific operating rule:
 

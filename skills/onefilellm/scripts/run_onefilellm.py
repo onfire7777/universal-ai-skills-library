@@ -9,17 +9,24 @@ import sys
 from pathlib import Path
 
 
-CLI = Path(r"C:\Users\burni\.onefilellm\venv\Scripts\onefilellm.exe")
+def default_cli() -> Path:
+    override = os.environ.get("ONEFILELLM_CLI")
+    if override:
+        return Path(override)
+    if os.name == "nt":
+        return Path.home() / ".onefilellm" / "venv" / "Scripts" / "onefilellm.exe"
+    return Path.home() / ".onefilellm" / "venv" / "bin" / "onefilellm"
 
 
 def main() -> int:
-    if not CLI.exists():
-        print(f"OneFileLLM CLI not found: {CLI}", file=sys.stderr)
+    cli = default_cli()
+    if not cli.exists():
+        print(f"OneFileLLM CLI not found: {cli}", file=sys.stderr)
         return 127
 
     env = os.environ.copy()
     env.setdefault("PYTHONUTF8", "1")
-    return subprocess.call([str(CLI), *sys.argv[1:]], env=env)
+    return subprocess.call([str(cli), *sys.argv[1:]], env=env)
 
 
 if __name__ == "__main__":

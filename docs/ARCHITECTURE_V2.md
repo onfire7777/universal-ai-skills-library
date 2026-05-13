@@ -69,7 +69,7 @@ universal-ai-skills-library/
 | API adapter | `manus-api` | N/A, platform-specific by design |
 | MCP task prefix | `UniversalAI-*` | old `Manus-*` tasks are cleanup-only compatibility targets |
 | MCP runtime dir | `C:\ProgramData\universal-ai-mcps` | old `C:\ProgramData\manus-mcps` is historical log/cache data |
-| Local tool dir | `C:\Users\burni\.universal-ai\tools` | `C:\Users\burni\.manus\tools` may be a compatibility junction |
+| Local tool dir | `%USERPROFILE%\.universal-ai\tools` | `%USERPROFILE%\.manus\tools` may be a compatibility junction |
 
 Detailed compatibility rules live in `docs/UNIVERSAL_COMPATIBILITY.md`.
 The repo-owned config connection map lives in

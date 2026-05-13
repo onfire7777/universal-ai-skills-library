@@ -12,9 +12,9 @@ Use this skill when a YouTube transcript must come back in English.
 
 - Upstream repository: `https://github.com/jdepoix/youtube-transcript-api`
 - Integrated source commit: `85c859450c014d860297ab9fd4f88145c47ff2e2`
-- Local checkout: `C:\Users\burni\.youtube-transcript-api\youtube-transcript-api`
-- Isolated venv CLI: `C:\Users\burni\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe`
-- English-enforcing shim: `C:\Users\burni\.youtube-transcript-api\bin\youtube-transcript-english.cmd`
+- Local checkout: `%USERPROFILE%\.youtube-transcript-api\youtube-transcript-api`
+- Isolated venv CLI: `%USERPROFILE%\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe`
+- English-enforcing shim: `%USERPROFILE%\.youtube-transcript-api\bin\youtube-transcript-english.cmd`
 
 ## README-Grounded Usage
 
@@ -22,24 +22,24 @@ The upstream README states that `YouTubeTranscriptApi().fetch(video_id)` default
 
 Use the bundled English wrapper first:
 
-```bash
-C:\Users\burni\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py "https://www.youtube.com/watch?v=VIDEO_ID"
-C:\Users\burni\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py VIDEO_ID --format json --output transcript.json
-C:\Users\burni\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py VIDEO_ID --format srt --output transcript.srt
-C:\Users\burni\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py VIDEO_ID --ai-model gpt-4o-mini
+```powershell
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py "https://www.youtube.com/watch?v=VIDEO_ID"
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py VIDEO_ID --format json --output transcript.json
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py VIDEO_ID --format srt --output transcript.srt
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py VIDEO_ID --ai-model gpt-4o-mini
 ```
 
 Equivalent direct command:
 
-```bash
-C:\Users\burni\.youtube-transcript-api\bin\youtube-transcript-english.cmd VIDEO_ID --format text
+```powershell
+& "$env:USERPROFILE\.youtube-transcript-api\bin\youtube-transcript-english.cmd" VIDEO_ID --format text
 ```
 
 Use the upstream CLI when exact upstream behavior is needed:
 
-```bash
-C:\Users\burni\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe VIDEO_ID --languages en --format json
-C:\Users\burni\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe --list-transcripts VIDEO_ID
+```powershell
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe" VIDEO_ID --languages en --format json
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe" --list-transcripts VIDEO_ID
 ```
 
 ## English Output Policy
