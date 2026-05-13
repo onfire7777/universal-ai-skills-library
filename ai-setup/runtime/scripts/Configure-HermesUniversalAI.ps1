@@ -176,10 +176,17 @@ sessions["vacuum_after_prune"] = True
 sessions["min_interval_hours"] = 24
 
 path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
+backup_removed = False
+try:
+    backup.unlink()
+    backup_removed = True
+except OSError:
+    backup_removed = False
 
 report = {
     "hermesConfig": str(path),
     "backup": str(backup),
+    "backupRemoved": backup_removed,
     "primaryProvider": data.get("model", {}).get("provider"),
     "primaryModel": data.get("model", {}).get("default"),
     "fallbackProvider": data.get("fallback_providers", [{}])[0].get("provider"),

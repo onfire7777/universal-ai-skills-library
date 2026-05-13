@@ -139,5 +139,15 @@ Prefer CLI execution for local, one-shot workflows. Use MCP only when a workflow
 - browser/CDP automation: Lightpanda MCP
 
 If the CLI can do the work without a long-running service, do not add or start an MCP server.
+Shared durable memory should still work when MCP bridges are disabled. The
+portable baseline is:
+
+- save: `powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Save-UniversalAIMemory.ps1 -Source "<client>" -Note "<memory>"`
+- search: `powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Search-UniversalAIMemory.ps1 -Query "<query>"`
+
+Those wrappers write to the shared Universal AI Stack memory folder, mine the
+note into MemPalace, and mirror it into GBrain when available. Do not use
+Context Mode as durable memory, and do not store secrets or raw logs in shared
+memory.
 Lightpanda is optional and Docker-backed; when Docker Desktop Linux engine is off,
 the watchdog skips Lightpanda instead of restart-looping it.

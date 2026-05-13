@@ -52,6 +52,7 @@ if (Test-Path -LiteralPath $AdapterConfig) {
       instructionPresent = (Test-Path -LiteralPath $adapter.instructions)
       markerPresent = $instructionText.Contains('## Universal AI Stack Adapter')
       corpusAccessPolicyPresent = $instructionText.Contains('## Universal AI Skill Corpus Access') -or $instructionText.Contains('Do not copy or install those full skill bodies')
+      sharedMemoryPolicyPresent = $instructionText.Contains('## Universal Shared Memory') -and $instructionText.Contains('Save-UniversalAIMemory.ps1') -and $instructionText.Contains('Search-UniversalAIMemory.ps1')
       skillFile = $skillPath
       skillPresent = (Test-Path -LiteralPath $skillPath)
     }
@@ -102,7 +103,16 @@ $result = [ordered]@{
   }
   adapterConfigPresent = (Test-Path -LiteralPath $AdapterConfig)
   adapters = $adapterResults
-  adapterFailures = @($adapterResults | Where-Object { -not $_.markerPresent -or -not $_.corpusAccessPolicyPresent -or -not $_.skillPresent } | ForEach-Object { $_.name })
+  adapterFailures = @($adapterResults | Where-Object { -not $_.markerPresent -or -not $_.corpusAccessPolicyPresent -or -not $_.sharedMemoryPolicyPresent -or -not $_.skillPresent } | ForEach-Object { $_.name })
+  memory = [ordered]@{
+    mempalaceCommand = [bool](Get-Command mempalace -ErrorAction SilentlyContinue)
+    mempalaceMcpCommand = [bool](Get-Command mempalace-mcp -ErrorAction SilentlyContinue)
+    mempalacePalacePresent = Test-Path -LiteralPath (Join-Path $HomeDir '.mempalace\palace')
+    gbrainCommand = [bool](Get-Command gbrain -ErrorAction SilentlyContinue)
+    gbrainStatePresent = Test-Path -LiteralPath (Join-Path $HomeDir '.gbrain')
+    saveScriptPresent = Test-Path -LiteralPath (Join-Path $Root 'scripts\Save-UniversalAIMemory.ps1')
+    searchScriptPresent = Test-Path -LiteralPath (Join-Path $Root 'scripts\Search-UniversalAIMemory.ps1')
+  }
   providerConfig = [ordered]@{
     kimiDefaultManaged = $kimiConfig.Contains('default_model = "kimi-code/kimi-for-coding"')
     kimiApiKeyNotDuplicatedInConfig = -not [bool]($kimiConfig -match 'api_key\s*=\s*"sk-')
@@ -136,6 +146,11 @@ $result = [ordered]@{
 
 $result['providerConfigFailures'] = @(
   $result.providerConfig.GetEnumerator() |
+    Where-Object { $_.Value -eq $false } |
+    ForEach-Object { $_.Key }
+)
+$result['memoryConfigFailures'] = @(
+  $result.memory.GetEnumerator() |
     Where-Object { $_.Value -eq $false } |
     ForEach-Object { $_.Key }
 )

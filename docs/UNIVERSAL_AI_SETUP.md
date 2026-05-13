@@ -140,6 +140,17 @@ Paperclip:
 - Keep canceled `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`, and `CLAUDE_API_KEY` blank unless intentionally re-enabled.
 - Keep Kimi as the primary API fallback when API use is unavoidable.
 - Keep MCP bridges disabled by default; enable them only when a workflow requires a persistent endpoint.
+- Shared memory is centralized through MemPalace, with helper wrappers in
+  `%USERPROFILE%\.universal-ai-stack\scripts`:
+  `Search-UniversalAIMemory.ps1` for lookup and `Save-UniversalAIMemory.ps1`
+  for explicit durable saves. These wrappers are the cross-client baseline for
+  Hermes, Paperclip, Codex, Claude, Cursor, Kimi, Aion, OpenCode, and related
+  clients.
+- Context Mode remains scratch/context-window infrastructure. It must not be
+  used as the durable memory source when MemPalace is available.
+- GBrain is a structured knowledge mirror and query surface. It can receive
+  explicit saved memory notes, but it does not replace MemPalace as the shared
+  memory source.
 
 ## Validation
 
