@@ -61,6 +61,8 @@ var statusCmd = &cobra.Command{
 			statusStr := ""
 			if status {
 				statusStr = green.Sprint("UP")
+			} else if taskDisabled(b.Task) {
+				statusStr = green.Sprint("DISABLED")
 			} else if b.Optional && b.RequiresPath != "" && !pathExists(b.RequiresPath) {
 				statusStr = yellow.Sprint("SKIPPED")
 			} else {
@@ -251,6 +253,17 @@ func pathExists(path string) bool {
 	}
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+func taskDisabled(taskName string) bool {
+	if taskName == "" || runtime.GOOS != "windows" {
+		return false
+	}
+	out, err := runner.RunCommandCapture("schtasks", "/query", "/tn", taskName, "/fo", "list")
+	if err != nil {
+		return false
+	}
+	return strings.Contains(out, "Disabled")
 }
 
 func startBridge(b Bridge) error {
