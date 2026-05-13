@@ -86,6 +86,7 @@ Repo-owned files include:
 - `docs/UNIVERSAL_AI_SETUP.md`
 
 This makes the setup cloneable and reinstallable as a repository. Machine-local secrets, logs, state, OAuth sessions, and downloaded GGUF files remain outside the repo.
+`Test-UniversalAIStack.ps1` reports startup entries, real visible shell wrappers, and duplicate service workers so architecture drift is caught without mistaking the current diagnostic shell for a runaway command window.
 
 Current model policy:
 
@@ -115,6 +116,8 @@ use `Search-UniversalAIMemory.ps1` before answering from prior decisions and
 `Save-UniversalAIMemory.ps1` only for explicit durable memories or confirmed
 project facts. Context Mode is not long-term memory; it is scratch/context
 protection. GBrain can mirror explicit saved memories for structured lookup.
+The search wrapper uses GBrain keyword fallback when phrase search misses an
+imported shared-memory page.
 
 Context Mode is verified as an actual MCP/context tool, not only an instruction
 block. The Universal AI Stack sync registers it in Codex MCP config and refreshes

@@ -97,7 +97,7 @@ Safety defaults:
 - One attempt per provider and a 240-second global router deadline.
 - Provider circuit breaker opens for 10 minutes after repeated failures.
 - One local model agent by default; local Qwen runs through a lazy proxy and keeps llama.cpp unloaded until needed.
-- Supervisor cadence is 600 seconds and startup is hidden.
+- Supervisor cadence is 600 seconds and startup is hidden. `Test-UniversalAIStack.ps1` checks real visible shell wrappers separately from its own diagnostic process and reports duplicate service workers so port conflicts and redundant model/gateway launches are visible.
 - Long autonomous loops require explicit confirmation at the client layer.
 
 ## Cross-Agent Skill Access
@@ -145,7 +145,10 @@ Paperclip:
   `Search-UniversalAIMemory.ps1` for lookup and `Save-UniversalAIMemory.ps1`
   for explicit durable saves. These wrappers are the cross-client baseline for
   Hermes, Paperclip, Codex, Claude, Cursor, Kimi, Aion, OpenCode, and related
-  clients.
+  clients. The lookup wrapper queries MemPalace first, then GBrain. If GBrain's
+  phrase search returns no result for a multi-word query, the wrapper falls back
+  to meaningful individual terms so imported shared-memory pages are still
+  discoverable.
 - Context Mode remains scratch/context-window infrastructure. It must not be
   used as the durable memory source when MemPalace is available.
 - Context Mode is installed as a real MCP/context-routing tool, not just a note
