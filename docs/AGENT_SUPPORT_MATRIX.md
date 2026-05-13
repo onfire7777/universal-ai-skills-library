@@ -9,6 +9,10 @@ skill-router skill <name>
 
 Agent roots should usually contain a small `universal-ai-skills` wrapper instead of a physical copy of all 1,807 canonical skills.
 
+For the exact repo-owned configs and installed files that wire these roots into
+the shared router, model registry, memory, embeddings, Context Mode, Lightpanda,
+Hermes, and Paperclip, see `UNIVERSAL_AI_CONNECTION_CONFIGS.md`.
+
 ## Compatibility layers
 
 Universal support is modeled in three layers:

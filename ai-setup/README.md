@@ -11,6 +11,10 @@ It is intentionally split into:
 
 The repo owns templates and code. The machine owns secrets, logs, generated state, OAuth sessions, and downloaded model files.
 
+For the exact config map that connects each AI client, router, model endpoint,
+memory system, embedding service, Context Mode, and Lightpanda, see
+`../docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md`.
+
 ## Install
 
 ```powershell

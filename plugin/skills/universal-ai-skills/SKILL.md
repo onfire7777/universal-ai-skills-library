@@ -8,6 +8,7 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Canonical source: `C:\Users\burni\universal-ai-skills-library`.
 - Primary binary: `C:\Users\burni\go\bin\skill-router.exe`.
 - Legacy alias: `C:\Users\burni\go\bin\manus.exe`.
+- Universal connection map: `C:\Users\burni\universal-ai-skills-library\docs\UNIVERSAL_AI_CONNECTION_CONFIGS.md`.
 - For every new substantive user prompt, perform skill selection automatically as an internal preflight. Do not wait for the user to run a command.
 - Hook scope is strict: automatic skill selection belongs only to real user prompt submission events, such as Codex/Claude `UserPromptSubmit`. Do not run or load routed skills from tool hooks, session-start hooks, stop hooks, compaction/resume hooks, background jobs, assistant messages, tool outputs, or status checks.
 - Internal preflight protocol:
@@ -33,8 +34,15 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Treat legacy skill names as aliases. Do not duplicate a skill directory when one canonical skill already contains the full implementation.
 - Local Claude, Codex, Manus-compatible, and other AI skill roots are searched read-only by the router; promote external skills into `skills/` only after audit and dedupe.
 - Third-party source repos such as gstack (`C:\Users\burni\.gstack\gstack`) and GBrain (`C:\Users\burni\gbrain`) are indexed read-only. Load namespaced gstack skills such as `gstack-review`, `gstack-qa`, or `gstack-cso` on demand instead of copying them into every AI root.
+- Universal shared memory uses MemPalace as the authoritative durable store and GBrain as the structured searchable mirror. Use `C:\Users\burni\.universal-ai-stack\scripts\Search-UniversalAIMemory.ps1` for lookup and `C:\Users\burni\.universal-ai-stack\scripts\Save-UniversalAIMemory.ps1` for confirmed durable saves. Saved notes are imported into GBrain and embedded with the local `qwen3-embedding-0.6b` service at `http://127.0.0.1:18084/v1`.
 - Prefer CLI calls for skill access and deterministic local workflows.
 - Run MCP bridges only for persistent endpoint services that cannot be replaced by direct CLI calls.
+- Treat AI platform compatibility as adapter-based:
+  - `skill-root` for clients that discover `SKILL.md` packages, such as OpenSkills, Claude Code, Codex, OpenCode, Cline, OpenHands, Hermes Agent, Paperclip local agents, and OpenClaw.
+  - `repo-instruction` for clients that read files such as `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md`.
+  - `hosted` for ChatGPT, Claude Cowork, Devin, Amazon Q Developer, Sourcegraph Cody, Augment, and similar tools that need Actions, Apps SDK, MCP, API, or uploaded-instruction adapters rather than local skill-root sync.
+- Paperclip uses a combined adapter: `skill-router sync paperclip` installs one wrapper skill under `C:\Users\burni\.paperclip\skills` and compact Paperclip agent instructions under `C:\Users\burni\.paperclip\universal-ai-skills\AGENTS.md`. Keep Paperclip company skills native and route universal skills through the CLI only when the preflight route is relevant.
+- Use `skill-router sync matrix` before changing any agent root or compatibility adapter.
 
 Optional local MCP endpoints:
 

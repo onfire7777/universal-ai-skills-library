@@ -2,6 +2,10 @@
 
 The Universal AI Skills Router supports three conceptual install modes. Keep them distinct.
 
+The concrete connection map for these install modes lives in
+`UNIVERSAL_AI_CONNECTION_CONFIGS.md`. Use that file when verifying which
+repo-owned config installs or updates a local AI client.
+
 ## 1. Wrapper install — default/recommended
 
 A small `universal-ai-skills` skill is installed into an agent root. The wrapper tells the agent to call:

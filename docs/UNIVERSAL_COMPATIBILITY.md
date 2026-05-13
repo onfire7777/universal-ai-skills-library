@@ -13,6 +13,12 @@ This repository is a universal AI skills setup. The default interface is platfor
 - Current corpus: 1,807 canonical skills, with legacy/display aliases stored in `manifest.json` and `docs/compatibility_aliases.json`
 - Local external skill roots: searchable and loadable read-only through `skill-router`; not copied into `skills/` unless intentionally promoted.
 
+For the concrete config files that connect clients, model routing, memory,
+embeddings, Context Mode, Lightpanda, Hermes, and Paperclip, see
+`UNIVERSAL_AI_CONNECTION_CONFIGS.md`. This compatibility policy defines how
+platforms should be classified; the connection map defines which repo-owned
+files and installed machine files implement those classifications.
+
 ## Naming Rules
 
 Use universal names for shared infrastructure:

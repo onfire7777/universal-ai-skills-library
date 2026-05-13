@@ -8,6 +8,7 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Canonical source: `C:\Users\burni\universal-ai-skills-library`.
 - Primary binary: `C:\Users\burni\go\bin\skill-router.exe`.
 - Legacy alias: `C:\Users\burni\go\bin\manus.exe`.
+- Universal connection map: `C:\Users\burni\universal-ai-skills-library\docs\UNIVERSAL_AI_CONNECTION_CONFIGS.md`.
 - For every new substantive user prompt, perform skill selection automatically as an internal preflight. Do not wait for the user to run a command.
 - Hook scope is strict: automatic skill selection belongs only to real user prompt submission events, such as Codex/Claude `UserPromptSubmit`. Do not run or load routed skills from tool hooks, session-start hooks, stop hooks, compaction/resume hooks, background jobs, assistant messages, tool outputs, or status checks.
 - Internal preflight protocol:
