@@ -1,0 +1,156 @@
+param(
+  [switch]$JsonOnly
+)
+
+$ErrorActionPreference = 'Stop'
+$HomeDir = $env:USERPROFILE
+$Root = Join-Path $HomeDir '.universal-ai-stack'
+$StateDir = Join-Path $Root 'state'
+$ConfigDir = Join-Path $Root 'config'
+$SourceSkill = Join-Path $HomeDir 'universal-ai-skills-library\skills\universal-ai-skills\SKILL.md'
+$FallbackSkill = Join-Path $HomeDir '.agent\skills\universal-ai-skills\SKILL.md'
+
+function Write-Utf8NoBom {
+  param([string]$Path, [string]$Content)
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
+  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+  [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+}
+
+function Read-Text {
+  param([string]$Path)
+  if (!(Test-Path -LiteralPath $Path)) { return '' }
+  return [System.IO.File]::ReadAllText($Path)
+}
+
+function Ensure-InstructionFile {
+  param([string]$Path, [string]$Title)
+  $marker = '## Universal AI Stack Adapter'
+  $corpusMarker = '## Universal AI Skill Corpus Access'
+  $stackRoot = Join-Path $HomeDir '.universal-ai-stack'
+  $skillSource = Join-Path $HomeDir 'universal-ai-skills-library'
+  $skillCorpus = Join-Path $skillSource 'skills'
+  $secretEnv = Join-Path $stackRoot 'secrets\.env'
+  $healthScript = Join-Path $stackRoot 'scripts\Test-UniversalAIStack.ps1'
+  $block = @"
+
+$marker
+- Universal AI Stack root: ``$stackRoot``.
+- Universal skill source: ``$skillSource``.
+- Full skill corpus: all canonical skills under ``$skillCorpus`` are available through ``skill-router``. Do not copy or install those full skill bodies into this AI's local root.
+- For every new substantive user prompt, run ``skill-router preflight --json "<latest user prompt>"`` before loading skills. Do not run it for assistant text, tool output, startup hooks, status checks, or background jobs.
+- If the router decision is ``route``, sanity-check that the selected skill matches the user's core task, object, and action, then load only that skill with ``skill-router skill <skill-name>``. Use ``skill-router skill search <query>`` when the skill name is unknown.
+- Keep always-loaded instructions compact. Do not paste or copy the full skills corpus into this agent.
+- Model policy: prefer GPT-5.5 with xhigh reasoning through official CLI/session auth, then Kimi 2.6 Thinking, then Claude Opus 4.7, then local Qwen fallbacks.
+- OpenAI-compatible endpoint: ``http://127.0.0.1:18100/v1`` with local-first model ``local-coding`` or automatic model ``auto-coding`` and ``UNIVERSAL_AI_STACK_API_KEY`` from ``$secretEnv``. Never print or paste secrets.
+- Check stack health with ``skill-router doctor``, ``skill-router mcp status``, and ``powershell -NoProfile -ExecutionPolicy Bypass -File $healthScript``.
+"@
+  $corpusBlock = @"
+
+$corpusMarker
+- This AI has access to the full centralized skill corpus through ``skill-router`` only: ``$skillCorpus``.
+- Keep this AI's local skill root to compact wrapper/adapters and native client-specific skills. Do not install, download, paste, or duplicate the full skill corpus into this root.
+- Automatic routing flow: run ``skill-router preflight --json "<latest user prompt>"`` for real user prompts, reject weak/generic matches, then load exactly one needed skill with ``skill-router skill <name>``.
+"@
+
+  $existing = Read-Text -Path $Path
+  if ($existing.Contains($marker)) {
+    if ($existing.Contains($corpusMarker)) {
+      return [ordered]@{ path = $Path; changed = $false; marker = $true; corpusMarker = $true }
+    }
+    $content = $existing.TrimEnd() + "`r`n" + $corpusBlock + "`r`n"
+    Write-Utf8NoBom -Path $Path -Content $content
+    return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true }
+  }
+  if ([string]::IsNullOrWhiteSpace($existing)) {
+    $content = "# $Title`r`n$block`r`n"
+  } else {
+    $content = $existing.TrimEnd() + "`r`n" + $block + "`r`n"
+  }
+  Write-Utf8NoBom -Path $Path -Content $content
+  return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true }
+}
+
+function Ensure-SkillWrapper {
+  param([string]$SkillsRoot)
+  if (!(Test-Path -LiteralPath $SourceSkill)) {
+    if (!(Test-Path -LiteralPath $FallbackSkill)) {
+      return [ordered]@{ path = (Join-Path $SkillsRoot 'universal-ai-skills\SKILL.md'); changed = $false; present = $false; error = 'source skill missing' }
+    }
+    $src = $FallbackSkill
+  } else {
+    $src = $SourceSkill
+  }
+
+  $destDir = Join-Path $SkillsRoot 'universal-ai-skills'
+  $dest = Join-Path $destDir 'SKILL.md'
+  New-Item -ItemType Directory -Force -Path $destDir | Out-Null
+  $changed = $false
+  if (!(Test-Path -LiteralPath $dest) -or ((Get-FileHash -LiteralPath $src).Hash -ne (Get-FileHash -LiteralPath $dest).Hash)) {
+    Copy-Item -LiteralPath $src -Destination $dest -Force
+    $changed = $true
+  }
+  return [ordered]@{ path = $dest; changed = $changed; present = (Test-Path -LiteralPath $dest) }
+}
+
+New-Item -ItemType Directory -Force -Path $StateDir, $ConfigDir | Out-Null
+
+$adapters = @(
+  @{ name = 'agent'; instructions = "$HomeDir\.agent\AGENTS.md"; skills = "$HomeDir\.agent\skills" },
+  @{ name = 'agents'; instructions = "$HomeDir\.agents\AGENTS.md"; skills = "$HomeDir\.agents\skills" },
+  @{ name = 'codex'; instructions = "$HomeDir\.codex\AGENTS.md"; skills = "$HomeDir\.codex\skills" },
+  @{ name = 'aion-codex-home'; instructions = "$HomeDir\AppData\Roaming\AionUi\codex-home\AGENTS.md"; skills = "$HomeDir\AppData\Roaming\AionUi\codex-home\skills" },
+  @{ name = 'claude'; instructions = "$HomeDir\.claude\CLAUDE.md"; skills = "$HomeDir\.claude\skills" },
+  @{ name = 'cursor'; instructions = "$HomeDir\.cursor\rules\openskills.md"; skills = "$HomeDir\.cursor\skills" },
+  @{ name = 'continue'; instructions = "$HomeDir\.continue\AGENTS.md"; skills = "$HomeDir\.continue\skills" },
+  @{ name = 'gemini'; instructions = "$HomeDir\.gemini\GEMINI.md"; skills = "$HomeDir\.gemini\skills" },
+  @{ name = 'hermes'; instructions = "$HomeDir\.hermes\AGENTS.md"; skills = "$HomeDir\.hermes\skills" },
+  @{ name = 'kimi'; instructions = "$HomeDir\.kimi\AGENTS.md"; skills = "$HomeDir\.kimi\skills" },
+  @{ name = 'kiro'; instructions = "$HomeDir\.kiro\steering\universal-ai-stack.md"; skills = "$HomeDir\.kiro\skills" },
+  @{ name = 'manus'; instructions = "$HomeDir\.manus\AGENTS.md"; skills = "$HomeDir\.manus\skills" },
+  @{ name = 'opencode-home'; instructions = "$HomeDir\.opencode\AGENTS.md"; skills = "$HomeDir\.opencode\skills" },
+  @{ name = 'opencode-config'; instructions = "$HomeDir\.config\opencode\AGENTS.md"; skills = "$HomeDir\.config\opencode\skills" },
+  @{ name = 'openhands'; instructions = "$HomeDir\.openhands\AGENTS.md"; skills = "$HomeDir\.openhands\skills" },
+  @{ name = 'openclaw'; instructions = "$HomeDir\.openclaw\AGENTS.md"; skills = "$HomeDir\.openclaw\skills" },
+  @{ name = 'paperclip'; instructions = "$HomeDir\.paperclip\universal-ai-skills\AGENTS.md"; skills = "$HomeDir\.paperclip\skills" },
+  @{ name = 'qwen'; instructions = "$HomeDir\.qwen\AGENTS.md"; skills = "$HomeDir\.qwen\skills" },
+  @{ name = 'roo'; instructions = "$HomeDir\.roo\AGENTS.md"; skills = "$HomeDir\.roo\skills" },
+  @{ name = 'windsurf'; instructions = "$HomeDir\.windsurf\AGENTS.md"; skills = "$HomeDir\.windsurf\skills" },
+  @{ name = 'aider'; instructions = "$HomeDir\.aider\OPENSKILLS.md"; skills = "$HomeDir\.aider\skills" }
+)
+
+$results = New-Object System.Collections.Generic.List[object]
+foreach ($adapter in $adapters) {
+  $instruction = Ensure-InstructionFile -Path $adapter.instructions -Title "$($adapter.name) Universal AI Adapter"
+  $skill = Ensure-SkillWrapper -SkillsRoot $adapter.skills
+  $results.Add([ordered]@{
+      name = $adapter.name
+      instructions = $instruction
+      skill = $skill
+    }) | Out-Null
+}
+
+$config = [ordered]@{
+  schema = 'universal-ai-stack.agent-adapters.v1'
+  updated = (Get-Date).ToString('yyyy-MM-dd')
+  sourceSkill = $SourceSkill
+  adapters = $adapters
+}
+$report = [ordered]@{
+  time = (Get-Date).ToString('o')
+  root = $Root
+  adapterCount = $results.Count
+  changedInstructionFiles = @($results | Where-Object { $_.instructions.changed } | ForEach-Object { $_.name })
+  changedSkillWrappers = @($results | Where-Object { $_.skill.changed } | ForEach-Object { $_.name })
+  missingSkillWrappers = @($results | Where-Object { -not $_.skill.present } | ForEach-Object { $_.name })
+  adapters = $results
+}
+
+Write-Utf8NoBom -Path (Join-Path $ConfigDir 'agent-adapters.json') -Content ($config | ConvertTo-Json -Depth 8)
+Write-Utf8NoBom -Path (Join-Path $StateDir 'last-adapter-audit.json') -Content ($report | ConvertTo-Json -Depth 10)
+
+if ($JsonOnly) {
+  $report | ConvertTo-Json -Depth 10
+} else {
+  $report | ConvertTo-Json -Depth 10
+}

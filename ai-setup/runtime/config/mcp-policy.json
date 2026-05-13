@@ -1,0 +1,38 @@
+{
+  "schema": "universal-ai-stack.mcp-policy.v1",
+  "updated": "2026-05-12",
+  "policy": "CLI-first; MCP only for persistent endpoint workflows.",
+  "bridges": [
+    {
+      "id": "mempalace",
+      "purpose": "Durable memory and prior-decision lookup.",
+      "expectedPort": 8876,
+      "enabled": false
+    },
+    {
+      "id": "context-mode",
+      "purpose": "Long-output routing and indexed context continuity.",
+      "expectedPort": 8877,
+      "enabled": false
+    },
+    {
+      "id": "skill-seekers",
+      "purpose": "Skill creation, packaging, upload, and install workflows.",
+      "expectedPort": 8875,
+      "enabled": false
+    },
+    {
+      "id": "lightpanda",
+      "purpose": "Persistent browser/CDP automation when graphical rendering is not required.",
+      "expectedPort": 8878,
+      "enabled": false
+    }
+  ],
+  "rules": [
+    "Use skill-router skill <name> for on-demand skill bodies.",
+    "Do not copy the full skills corpus into always-loaded instructions.",
+    "Do not run MCP bridges for simple one-shot CLI work.",
+    "Default install keeps persistent MCP bridge scheduled tasks disabled; enable only for explicit endpoint workflows.",
+    "Keep secrets in the central Universal AI Stack env, not in MCP manifests."
+  ]
+}

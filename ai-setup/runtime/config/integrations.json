@@ -1,0 +1,84 @@
+{
+  "schema": "universal-ai-stack.integrations.v1",
+  "updated": "2026-05-12",
+  "paths": {
+    "root": "{{USERPROFILE}}\\.universal-ai-stack",
+    "repoRoot": "{{REPO_ROOT}}",
+    "secretsEnv": "{{USERPROFILE}}\\.universal-ai-stack\\secrets\\.env",
+    "hermesRoot": "{{USERPROFILE}}\\.hermes",
+    "hermesConfig": "{{USERPROFILE}}\\.hermes\\config.yaml",
+    "hermesEnv": "{{USERPROFILE}}\\.hermes\\.env",
+    "hermesPythonw": "{{HERMES_PYTHONW}}",
+    "paperclipRoot": "{{USERPROFILE}}\\.paperclip",
+    "paperclipConfig": "{{USERPROFILE}}\\.paperclip\\instances\\default\\config.json",
+    "paperclipLauncher": "{{USERPROFILE}}\\.paperclip\\start-paperclip-with-hermes.py",
+    "kimiConfig": "{{USERPROFILE}}\\.kimi\\config.toml",
+    "agentAdapters": "{{USERPROFILE}}\\.universal-ai-stack\\config\\agent-adapters.json",
+    "qwenProxy": "{{QWEN_PROXY_PY}}",
+    "llamaCppRoot": "{{LLAMA_CPP_ROOT}}",
+    "startupFolder": "{{STARTUP_FOLDER}}"
+  },
+  "services": [
+    {
+      "id": "universal-router",
+      "kind": "http-router",
+      "healthUrl": "http://127.0.0.1:18100/health",
+      "start": ["{{HERMES_PYTHONW}}", "{{USERPROFILE}}\\.universal-ai-stack\\bin\\universal_ai_router.py"]
+    },
+    {
+      "id": "hermes-gateway",
+      "kind": "agent-gateway",
+      "healthUrl": "http://127.0.0.1:8642/health",
+      "start": ["{{HERMES_PYTHONW}}", "-m", "hermes_cli.main", "gateway", "run", "--replace"]
+    },
+    {
+      "id": "paperclip",
+      "kind": "agent-app",
+      "healthUrl": "http://127.0.0.1:3100/api/health",
+      "start": ["{{HERMES_PYTHONW}}", "{{USERPROFILE}}\\.paperclip\\start-paperclip-with-hermes.py"]
+    },
+    {
+      "id": "qwen3-coder-30b-a3b",
+      "kind": "local-model-proxy",
+      "healthUrl": "http://127.0.0.1:18080/health",
+      "start": [
+        "{{HERMES_PYTHONW}}",
+        "{{QWEN_PROXY_PY}}",
+        "--name",
+        "qwen3-coder-30b-a3b",
+        "--listen-port",
+        "18080",
+        "--backend-port",
+        "18082",
+        "--alias",
+        "qwen3-coder-local",
+        "--model",
+        "{{QWEN3_CODER_30B_A3B_Q4_GGUF}}",
+        "--ctx-size",
+        "16384",
+        "--llama-server",
+        "{{LLAMA_SERVER_EXE}}",
+        "--batch-size",
+        "384",
+        "--ubatch-size",
+        "192",
+        "--threads",
+        "6",
+        "--parallel",
+        "1",
+        "--flash-attn",
+        "on",
+        "--cache-type-k",
+        "q4_0",
+        "--cache-type-v",
+        "q4_0",
+        "--idle-timeout",
+        "600"
+      ]
+    }
+  ],
+  "adapterScripts": {
+    "install": "{{USERPROFILE}}\\.universal-ai-stack\\scripts\\Install-UniversalAIAdapters.ps1",
+    "test": "{{USERPROFILE}}\\.universal-ai-stack\\scripts\\Test-UniversalAIAdapters.ps1"
+  }
+}

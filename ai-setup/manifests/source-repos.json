@@ -1,0 +1,115 @@
+{
+  "schema": "universal-ai-setup.source-repos.v1",
+  "updated": "2026-05-12",
+  "purpose": "Portable inventory of source repositories and runtime roots used by the Universal AI Skills Library installer. Paths are templates and must be resolved by install scripts.",
+  "canonical": {
+    "universalAiSkillsLibrary": {
+      "role": "source-of-truth",
+      "pathTemplate": "{{REPO_ROOT}}",
+      "skillCorpus": "{{REPO_ROOT}}\\skills",
+      "routerSource": "{{REPO_ROOT}}\\skill-router-cli",
+      "repoRemote": "https://github.com/onfire7777/universal-ai-skills-library.git"
+    }
+  },
+  "localRuntimeTargets": {
+    "universalAiStack": "{{USERPROFILE}}\\.universal-ai-stack",
+    "secretsEnv": "{{USERPROFILE}}\\.universal-ai-stack\\secrets\\.env",
+    "localAiRuntime": "{{USERPROFILE}}\\.local-ai",
+    "defaultQwenModelRoot": "D:\\AI\\models\\qwen3-coder-30b-a3b",
+    "defaultQwenProxyRoot": "D:\\AI\\local-qwen-fallback"
+  },
+  "managedClientRoots": [
+    {
+      "id": "codex",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.codex\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.codex\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "claude",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.claude\\CLAUDE.md",
+      "skills": "{{USERPROFILE}}\\.claude\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "cursor",
+      "kind": "repo-instruction",
+      "instructions": "{{USERPROFILE}}\\.cursor\\rules\\openskills.md",
+      "skills": "{{USERPROFILE}}\\.cursor\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "hermes",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.hermes\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.hermes\\skills",
+      "mode": "custom-plus-wrapper"
+    },
+    {
+      "id": "paperclip",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.paperclip\\universal-ai-skills\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.paperclip\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "opencode",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.config\\opencode\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.config\\opencode\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "gemini",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.gemini\\GEMINI.md",
+      "skills": "{{USERPROFILE}}\\.gemini\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "kiro",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.kiro\\steering\\universal-ai-stack.md",
+      "skills": "{{USERPROFILE}}\\.kiro\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "kimi",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.kimi\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.kimi\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "qwen",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.qwen\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.qwen\\skills",
+      "mode": "compact-wrapper"
+    }
+  ],
+  "optionalExternalSources": [
+    {
+      "id": "gstack",
+      "pathTemplate": "{{USERPROFILE}}\\.gstack\\gstack",
+      "loadPolicy": "read-only-indexed-through-skill-router"
+    },
+    {
+      "id": "gbrain",
+      "pathTemplate": "{{USERPROFILE}}\\gbrain",
+      "loadPolicy": "read-only-indexed-through-skill-router"
+    },
+    {
+      "id": "mempalace",
+      "pathTemplate": "{{USERPROFILE}}\\.mempalace\\palace",
+      "loadPolicy": "optional-mcp-or-direct-cli"
+    },
+    {
+      "id": "skill-seekers",
+      "pathTemplate": "{{USERPROFILE}}\\.skill-seekers",
+      "loadPolicy": "optional-mcp-or-direct-cli"
+    }
+  ]
+}

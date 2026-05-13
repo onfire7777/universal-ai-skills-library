@@ -1,0 +1,49 @@
+# Universal AI Setup
+
+This folder makes the local Universal AI Stack reproducible from the repository.
+
+It is intentionally split into:
+
+- `manifests/`: portable inventory and install policy.
+- `runtime/`: router, supervisor, config templates, and client sync scripts.
+- `scripts/install-universal-ai-stack.ps1`: materializes the runtime into `%USERPROFILE%\.universal-ai-stack`.
+- `scripts/validate-universal-ai-stack.ps1`: validates model-specific config, portability, and secret hygiene.
+
+The repo owns templates and code. The machine owns secrets, logs, generated state, OAuth sessions, and downloaded model files.
+
+## Install
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\install-universal-ai-stack.ps1 -InstallStartup -StartNow
+```
+
+Optional Kimi key:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\install-universal-ai-stack.ps1 -KimiApiKey "<key>"
+```
+
+## Validate
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1 -CheckInstalled
+```
+
+## Model Policy
+
+Primary host-session model:
+
+1. `gpt-5.5`, `xhigh`, fast tier, through official CLI/session auth.
+
+HTTP/API fallback order:
+
+1. `kimi-k2.6-thinking`
+2. `qwen3-coder-30b-a3b-q4`
+
+Registered but disabled/manual:
+
+1. `qwen3-coder-next-q5`
+2. `qwen2.5-coder-32b-q4`
+
+Local default is Qwen3-Coder-30B-A3B-Instruct `Q4_K_M` at 16k context. Heavy local models are final fallback only and should not load until a request needs them.

@@ -1,0 +1,51 @@
+{
+  "schema": "universal-ai-setup.curated-skills.v1",
+  "updated": "2026-05-12",
+  "purpose": "Curated always-known skills and wrappers for the Universal AI setup. This file is an index only; full skill bodies stay in the canonical skills corpus and are loaded on demand.",
+  "canonicalCorpus": "{{REPO_ROOT}}\\skills",
+  "wrapperSkills": [
+    {
+      "name": "universal-ai-skills",
+      "path": "{{REPO_ROOT}}\\skills\\universal-ai-skills",
+      "installMode": "compact-wrapper",
+      "required": true,
+      "description": "Tells host AIs to call skill-router preflight/search/skill instead of copying the corpus."
+    },
+    {
+      "name": "universal-ai-setup",
+      "path": "{{REPO_ROOT}}\\skills\\universal-ai-setup",
+      "installMode": "load-on-demand",
+      "required": true,
+      "description": "Maintains this repository as the AI setup hub."
+    },
+    {
+      "name": "universal-ai-config",
+      "path": "{{REPO_ROOT}}\\skills\\universal-ai-config",
+      "installMode": "load-on-demand",
+      "required": true,
+      "description": "Audits and repairs cross-agent router-first configuration."
+    }
+  ],
+  "routingRules": {
+    "preflightCommand": "skill-router preflight --json \"<latest user prompt>\"",
+    "loadCommand": "skill-router skill <skill-name>",
+    "searchCommand": "skill-router skill search <query>",
+    "maxAutoLoadedSkills": 1,
+    "rejectWeakGenericMatches": true,
+    "doNotRunFor": [
+      "assistant messages",
+      "tool outputs",
+      "startup hooks",
+      "stop hooks",
+      "compaction or resume hooks",
+      "background jobs",
+      "status checks"
+    ]
+  },
+  "securityRules": [
+    "Do not copy full skill bodies into local AI roots.",
+    "Do not commit secrets, API keys, OAuth session files, logs, or generated state.",
+    "Keep hosted-agent adapters compact and instruction-only unless an explicit MCP/API bridge is configured.",
+    "Run skill-router skills validate-manifest after corpus changes."
+  ]
+}

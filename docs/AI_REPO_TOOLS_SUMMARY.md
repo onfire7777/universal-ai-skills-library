@@ -17,29 +17,33 @@ The stack provides one universal entry point for AI skill selection, local AI-to
 - `skill-router sync installed` propagates only the compact `universal-ai-skills` wrapper into local AI roots.
 - `skill-router sync matrix` reports local agent compatibility and avoids unsafe full-copy sync.
 - `skill-router doctor` checks local runtimes, agent roots, optional MCP bridges, and required files.
+- `ai-setup/scripts/install-universal-ai-stack.ps1` installs the repo-owned Universal AI Stack runtime into `%USERPROFILE%\.universal-ai-stack`.
+- `ai-setup/scripts/validate-universal-ai-stack.ps1` verifies the portable model registry, routing policy, templates, secret hygiene, and optional installed stack.
 
 ## Major Components
 
 ### Canonical Skill Corpus
 
-Path: `C:\Users\burni\universal-ai-skills-library\skills`
+Repo path: `skills/`
+
+Default Windows clone path: `%USERPROFILE%\universal-ai-skills-library\skills`
 
 This is the source of truth for all canonical skills. Skills stay here and are loaded only when needed. The latest validation reported 18 core skills plus 1,789 library skills, for 1,807 total, with no duplicate names, no duplicate directories, no duplicate `SKILL.md` bodies, no missing `SKILL.md` files, and no manifest drift.
 
 ### Router CLI
 
-Path: `C:\Users\burni\universal-ai-skills-library\skill-router-cli`
+Repo path: `skill-router-cli/`
 
 Installed binaries:
 
-- `C:\Users\burni\go\bin\skill-router.exe`
-- `C:\Users\burni\go\bin\manus.exe` as a compatibility alias
+- `%USERPROFILE%\go\bin\skill-router.exe`
+- `%USERPROFILE%\go\bin\manus.exe` as a compatibility alias
 
 The CLI routes prompts, loads skills, searches skills, validates the repo, syncs wrappers, checks local health, manages optional MCP bridge services, and exposes utility command groups for audits, oracle answers, files, GStack, GBrain, Hugging Face, Google Workspace, Gmail, databases, schedules, and related local AI workflows.
 
 ### Universal Wrapper Skill
 
-Path: `C:\Users\burni\universal-ai-skills-library\skills\universal-ai-skills`
+Repo path: `skills/universal-ai-skills`
 
 This is the small always-available skill installed into local AI roots. Its job is to tell each AI client how to call `skill-router` instead of relying on that client having every skill installed locally.
 
@@ -49,8 +53,8 @@ Important rule: routed universal skills must be loaded through `skill-router ski
 
 Paths:
 
-- `C:\Users\burni\universal-ai-skills-library\plugin`
-- `C:\Users\burni\universal-ai-skills-library\plugin-codex`
+- `plugin/`
+- `plugin-codex/`
 
 These files describe how Codex, Claude, and similar clients should use the router. They keep context small, route only real user prompts, and prevent automatic skill loading from tool hooks, session hooks, stop hooks, background jobs, assistant messages, or tool output.
 
@@ -62,9 +66,38 @@ Known supported local roots include Codex, Claude, OpenSkills `.agent`, Manus-co
 
 Hosted tools such as ChatGPT, Claude Cowork, Devin, Amazon Q Developer, Sourcegraph Cody, Augment, and similar platforms should use adapter instructions, Apps/Actions/MCP/API bridges, or uploaded compact rules instead of local full-copy sync.
 
+### Portable Universal AI Stack
+
+Repo path: `ai-setup/`
+
+The portable stack setup now lives in the repo instead of only in `%USERPROFILE%\.universal-ai-stack`.
+
+Repo-owned files include:
+
+- `ai-setup/runtime/bin/universal_ai_router.py`
+- `ai-setup/runtime/bin/universal_ai_stack_supervisor.py`
+- `ai-setup/runtime/config/model-registry.json`
+- `ai-setup/runtime/config/routing-policy.json`
+- `ai-setup/runtime/config/integrations.json`
+- `ai-setup/runtime/env/.env.template`
+- `ai-setup/runtime/scripts/*.ps1`
+- `ai-setup/manifests/source-repos.json`
+- `ai-setup/manifests/curated-skills.json`
+- `docs/UNIVERSAL_AI_SETUP.md`
+
+This makes the setup cloneable and reinstallable as a repository. Machine-local secrets, logs, state, OAuth sessions, and downloaded GGUF files remain outside the repo.
+
+Current model policy:
+
+- Primary host-session model: `gpt-5.5`, `xhigh`, fast tier, via OpenAI/Codex CLI or browser/session auth.
+- API fallback: `kimi-k2.6-thinking`, OpenAI-compatible Moonshot API, normalized to `temperature=1` and `top_p=0.95`.
+- Claude fallback: `claude-opus-4.7`, max reasoning, host CLI/session auth when supported.
+- Local final fallback: `qwen3-coder-30b-a3b-q4`, `Q4_K_M`, 16k context, llama.cpp CUDA, batch `384`, ubatch `192`, threads `6`, parallel `1`, q4 KV cache, 10-minute idle timeout.
+- Disabled/manual local records: `qwen3-coder-next-q5` and `qwen2.5-coder-32b-q4`.
+
 ### Optional MCP Bridge Infrastructure
 
-Path: `C:\Users\burni\universal-ai-skills-library\infrastructure`
+Repo path: `infrastructure/`
 
 MCP bridges are optional. They should run only when a persistent endpoint workflow is needed.
 
@@ -104,6 +137,7 @@ Incorrect behavior that has been fixed:
 - Hermes Agent itself reports an upstream update is available, but its source checkout is dirty. Updating it should be done in a separate controlled pass to avoid overwriting or mixing local edits.
 - Some optional API-backed tools report missing keys in the current process, such as OpenRouter, OpenAI, Manus, Exa, Tavily, Firecrawl, or similar optional providers. These do not block local skill routing.
 - MCP bridges are available, but they are optional. The clean default is CLI-first routing and skill loading.
+- Downloaded local model files are not committed to the repo. The installer expects the Qwen3-Coder GGUF path to be supplied or to exist at the documented default.
 
 ## Bottom Line
 
