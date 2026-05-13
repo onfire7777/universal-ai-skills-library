@@ -13,6 +13,7 @@ Do not make each AI client an independent install. Each client should point back
 | File | Role | Connected Surfaces |
 | --- | --- | --- |
 | `ai-setup/runtime/config/model-registry.json` | Canonical model and embedding registry. Defines `gpt-5.5`, `kimi-k2.6-thinking`, `claude-opus-4.7`, `qwen3-coder-30b-a3b-q4`, and `qwen3-embedding-0.6b-q8`. | Hermes, Paperclip, universal router, local Qwen proxy, GBrain embeddings. |
+| `ai-setup/runtime/bin/local_qwen_proxy.py` | Repo-owned lazy llama.cpp proxy with RAM/VRAM guards, request-size guard, hidden backend startup, idle shutdown, and below-normal process priority. | Local Qwen coding fallback and GBrain embedding proxy. |
 | `ai-setup/runtime/config/routing-policy.json` | Failover, timeouts, retry limits, circuit breaker, agent safety limits, supervisor cadence, and cost policy. | Universal router, Hermes fallback behavior, Paperclip model selection, local-model startup policy. |
 | `ai-setup/runtime/config/integrations.json` | Service inventory and launch commands. Defines the universal router, Hermes gateway, Paperclip, local Qwen coding proxy, and GBrain embedding proxy. | Startup supervisor, health checks, Windows login item, local HTTP services. |
 | `ai-setup/runtime/config/mcp-policy.json` | Low-resource MCP policy. Keeps persistent bridges disabled unless an endpoint workflow needs them. | MemPalace, Context Mode, Skill Seekers, Lightpanda. |
@@ -97,7 +98,7 @@ HTTP-routeable models:
 - `kimi-k2.6-thinking` is the primary paid API fallback.
 - `qwen3-coder-30b-a3b-q4` is the local final generative fallback.
 - `qwen3-embedding-0.6b-q8` is the local embedding model for GBrain and shared memory search.
-- The local llama.cpp profiles use `--n-gpu-layers 99`, 16k context for coding, 8k server context for embeddings, and one local parallel slot to keep Windows responsive.
+- The local llama.cpp profiles use `--n-gpu-layers 99`, 16k context for coding, 8k server context for embeddings, and one local parallel slot to keep Windows responsive. The coding proxy refuses backend startup below `20GB` free VRAM or `6GB` free RAM, rejects request bodies over `8MB`, and runs `llama-server` below-normal priority.
 
 Paperclip and Hermes should use `auto-coding` through `http://127.0.0.1:18100/v1` when they need a generic OpenAI-compatible endpoint.
 

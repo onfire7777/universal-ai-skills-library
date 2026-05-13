@@ -26,6 +26,7 @@ $required = @(
   'ai-setup\manifests\curated-skills.json',
   'ai-setup\runtime\bin\universal_ai_router.py',
   'ai-setup\runtime\bin\universal_ai_stack_supervisor.py',
+  'ai-setup\runtime\bin\local_qwen_proxy.py',
   'ai-setup\runtime\config\model-registry.json',
   'ai-setup\runtime\config\routing-policy.json',
   'ai-setup\runtime\config\integrations.json',
@@ -61,6 +62,10 @@ if ($modelRegistry) {
     if ([int]$qwen.profile.ubatchSize -ne 192) { Add-Failure "Qwen ubatch should be 192, got $($qwen.profile.ubatchSize)" }
     if ([int]$qwen.profile.nGpuLayers -ne 99) { Add-Failure "Qwen nGpuLayers should be 99, got $($qwen.profile.nGpuLayers)" }
     if ([int]$qwen.profile.parallel -ne 1) { Add-Failure "Qwen parallel should be 1, got $($qwen.profile.parallel)" }
+    if ([double]$qwen.resourceGuards.minFreeVramGb -lt 20) { Add-Failure 'Qwen local fallback must require at least 20GB free VRAM before backend startup.' }
+    if ([double]$qwen.resourceGuards.minFreeRamGb -lt 6) { Add-Failure 'Qwen local fallback must require at least 6GB free RAM before backend startup.' }
+    if ([int]$qwen.resourceGuards.maxRequestBodyMb -gt 8) { Add-Failure 'Qwen local fallback max request body should stay <= 8MB.' }
+    if ($qwen.resourceGuards.processPriority -ne 'below-normal') { Add-Failure 'Qwen local fallback must run llama-server below-normal priority.' }
   }
   $kimi = $models | Where-Object { $_.id -eq 'kimi-k2.6-thinking' } | Select-Object -First 1
   if ($kimi) {
@@ -75,6 +80,8 @@ if ($modelRegistry) {
     if ($embedding.routeKind -ne 'openai-compatible-http') { Add-Failure "GBrain embedding routeKind should be openai-compatible-http, got $($embedding.routeKind)" }
     if ($embedding.profile.embeddingOnly -ne $true) { Add-Failure 'GBrain embedding profile must be embeddingOnly.' }
     if ([int]$embedding.profile.nGpuLayers -ne 99) { Add-Failure "GBrain embedding nGpuLayers should be 99, got $($embedding.profile.nGpuLayers)" }
+    if ([double]$embedding.resourceGuards.minFreeVramGb -lt 1) { Add-Failure 'GBrain embedding fallback must require at least 1GB free VRAM before backend startup.' }
+    if ([int]$embedding.resourceGuards.maxRequestBodyMb -gt 2) { Add-Failure 'GBrain embedding max request body should stay <= 2MB.' }
   }
   foreach ($disabled in 'qwen3-coder-next-q5', 'qwen2.5-coder-32b-q4') {
     $m = $models | Where-Object { $_.id -eq $disabled } | Select-Object -First 1
@@ -105,6 +112,15 @@ if ($integrations) {
       $idx = [array]::IndexOf($start, '--n-gpu-layers')
       if ($idx -lt 0 -or $idx -ge ($start.Count - 1) -or $start[$idx + 1] -ne '99') {
         Add-Failure "Integration service $svc must pass --n-gpu-layers 99."
+      }
+      foreach ($requiredArg in '--log-dir', '--min-free-vram-gb', '--min-free-ram-gb', '--max-body-mb', '--process-priority') {
+        if ($start -notcontains $requiredArg) {
+          Add-Failure "Integration service $svc must pass $requiredArg resource guard."
+        }
+      }
+      $priorityIdx = [array]::IndexOf($start, '--process-priority')
+      if ($priorityIdx -lt 0 -or $priorityIdx -ge ($start.Count - 1) -or $start[$priorityIdx + 1] -ne 'below-normal') {
+        Add-Failure "Integration service $svc must run with --process-priority below-normal."
       }
     }
   }

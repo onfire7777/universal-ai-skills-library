@@ -94,6 +94,14 @@
         "cacheTypeV": "q4_0",
         "idleTimeoutSeconds": 600
       },
+      "resourceGuards": {
+        "minFreeVramGb": 20,
+        "minFreeRamGb": 6,
+        "maxRequestBodyMb": 8,
+        "processPriority": "below-normal",
+        "startupTimeoutSeconds": 600,
+        "requestTimeoutSeconds": 300
+      },
       "samplingProfiles": {
         "coding": {
           "temperature": 0.3,
@@ -144,6 +152,14 @@
         "threads": 4,
         "parallel": 1,
         "idleTimeoutSeconds": 600
+      },
+      "resourceGuards": {
+        "minFreeVramGb": 1,
+        "minFreeRamGb": 2,
+        "maxRequestBodyMb": 2,
+        "processPriority": "below-normal",
+        "startupTimeoutSeconds": 180,
+        "requestTimeoutSeconds": 120
       },
       "notes": "Local shared-memory embedding model for GBrain semantic/vector search. The proxy stays light and starts llama.cpp only on embedding requests."
     }

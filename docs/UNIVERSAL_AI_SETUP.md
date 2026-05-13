@@ -11,6 +11,7 @@ embeddings, Context Mode, and Lightpanda, see
 - Skill corpus: `skills/`
 - Router CLI source: `skill-router-cli/`
 - Portable stack runtime: `ai-setup/runtime/`
+- Local Qwen lazy proxy source: `ai-setup/runtime/bin/local_qwen_proxy.py`
 - Portable manifests: `ai-setup/manifests/`
 - Install/validate scripts: `ai-setup/scripts/`
 
@@ -63,6 +64,8 @@ Local final fallback:
 
 - `qwen3-coder-30b-a3b-q4`
 - Runtime: llama.cpp / llama-server
+- Proxy: repo-owned `local_qwen_proxy.py`, installed to
+  `%USERPROFILE%\.universal-ai-stack\bin`
 - Model file: `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`
 - Context: `16,384`
 - GPU layers: `99`
@@ -73,6 +76,10 @@ Local final fallback:
 - Flash attention: on
 - KV cache: `q4_0` / `q4_0`
 - Idle timeout: `600` seconds
+- Resource guards: refuse backend startup below `20GB` free VRAM or `6GB`
+  free RAM, reject local-model request bodies over `8MB`, run `llama-server`
+  at below-normal Windows process priority, and cap local request waits at
+  `300` seconds.
 
 Local shared-memory embedding model:
 
@@ -87,6 +94,9 @@ Local shared-memory embedding model:
 - Pooling: `last`
 - Purpose: GBrain semantic/vector search and shared-memory mirror lookup
 - API cost: none; this replaces paid OpenAI embeddings for GBrain text vectors
+- Resource guards: refuse backend startup below `1GB` free VRAM or `2GB`
+  free RAM, reject embedding request bodies over `2MB`, and run below-normal
+  priority.
 
 Only configured local generative model:
 
@@ -116,6 +126,9 @@ Safety defaults:
 - One attempt per provider and a 240-second global router deadline.
 - Provider circuit breaker opens for 10 minutes after repeated failures.
 - One local model agent by default; local Qwen runs through a lazy proxy and keeps llama.cpp unloaded until needed.
+- The local Qwen proxy performs a pre-start RAM/VRAM guard check and returns a
+  controlled local-provider error instead of loading the 30B model when the PC
+  is already under pressure.
 - Supervisor cadence is 600 seconds and startup is hidden. `Test-UniversalAIStack.ps1` checks real visible shell wrappers separately from its own diagnostic process and reports duplicate service workers so port conflicts and redundant model/gateway launches are visible.
 - Long autonomous loops require explicit confirmation at the client layer.
 
