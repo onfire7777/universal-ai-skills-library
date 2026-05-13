@@ -41,9 +41,8 @@ HTTP/API fallback order:
 1. `kimi-k2.6-thinking`
 2. `qwen3-coder-30b-a3b-q4`
 
-Registered but disabled/manual:
+Only configured local model:
 
-1. `qwen3-coder-next-q5`
-2. `qwen2.5-coder-32b-q4`
+1. `qwen3-coder-30b-a3b-q4`
 
-Local default is Qwen3-Coder-30B-A3B-Instruct `Q4_K_M` at 16k context. Heavy local models are final fallback only and should not load until a request needs them.
+Local default is Qwen3-Coder-30B-A3B-Instruct `Q4_K_M` at 16k context. Heavier local model records are intentionally not registered in the default stack so Hermes/Paperclip cannot route to stale or missing endpoints.

@@ -38,8 +38,6 @@ router_provider = {
         "local-coding",
         "qwen3-coder-30b-a3b-q4",
         "kimi-k2.6-thinking",
-        "qwen3-coder-next-q5",
-        "qwen2.5-coder-32b-q4",
     ],
 }
 
@@ -83,22 +81,41 @@ data["fallback_providers"] = [{
 agent = data.setdefault("agent", {})
 agent["reasoning_effort"] = "xhigh"
 agent["service_tier"] = "fast"
-agent["gateway_notify_interval"] = 180
+agent["gateway_timeout"] = 900
+agent["gateway_timeout_warning"] = 300
+agent["gateway_notify_interval"] = 120
 agent["max_turns"] = 30
 agent["max_iterations"] = 30
+agent["max_tool_calls"] = 60
+agent["api_max_retries"] = 2
 
 compression = data.setdefault("compression", {})
 compression.update({
     "enabled": True,
-    "threshold": 0.60,
+    "threshold": 0.25,
     "target_ratio": 0.35,
-    "protect_last_n": 12,
+    "protect_last_n": 8,
     "hygiene_hard_message_limit": 250,
 })
+
+tool_loop_guardrails = data.setdefault("tool_loop_guardrails", {})
+tool_loop_guardrails["warnings_enabled"] = True
+tool_loop_guardrails["hard_stop_enabled"] = True
+warn_after = tool_loop_guardrails.setdefault("warn_after", {})
+warn_after["exact_failure"] = 2
+warn_after["same_tool_failure"] = 3
+warn_after["idempotent_no_progress"] = 2
+hard_stop_after = tool_loop_guardrails.setdefault("hard_stop_after", {})
+hard_stop_after["exact_failure"] = 4
+hard_stop_after["same_tool_failure"] = 5
+hard_stop_after["idempotent_no_progress"] = 4
 
 cron = data.setdefault("cron", {})
 cron["tick_interval_seconds"] = 600
 cron["max_parallel_jobs"] = 1
+kanban = data.setdefault("kanban", {})
+kanban["dispatch_interval_seconds"] = 600
+kanban["failure_limit"] = 2
 
 aux = data.setdefault("auxiliary", {})
 
@@ -126,7 +143,7 @@ for task, timeout in {
     "mcp": 60,
     "title_generation": 60,
     "triage_specifier": 120,
-    "curator": 600,
+    "curator": 300,
 }.items():
     route_aux(task, "auto-coding", timeout)
 
@@ -144,6 +161,19 @@ api_server = platforms.setdefault("api_server", {})
 api_server["enabled"] = True
 api_server.setdefault("extra", {})["port"] = 8642
 api_server.setdefault("extra", {})["host"] = "127.0.0.1"
+
+delegation = data.setdefault("delegation", {})
+delegation["max_iterations"] = 20
+delegation["child_timeout_seconds"] = 600
+delegation["max_concurrent_children"] = 1
+delegation["max_spawn_depth"] = 1
+delegation["subagent_auto_approve"] = False
+
+sessions = data.setdefault("sessions", {})
+sessions["auto_prune"] = True
+sessions["retention_days"] = 30
+sessions["vacuum_after_prune"] = True
+sessions["min_interval_hours"] = 24
 
 path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
 

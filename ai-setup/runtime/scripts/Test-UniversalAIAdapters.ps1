@@ -71,6 +71,8 @@ if ($secrets['UNIVERSAL_AI_STACK_API_KEY']) {
 
 $kimiConfig = Read-Text -Path "$HomeDir\.kimi\config.toml"
 $hermesConfig = Read-Text -Path "$HomeDir\.hermes\config.yaml"
+$removedHermesModelAliases = @('qwen3-coder-next-q5', 'qwen2.5-coder-32b-q4') |
+  Where-Object { $hermesConfig.Contains($_) }
 $paperclipConfigPath = "$HomeDir\.paperclip\instances\default\config.json"
 $paperclipOk = $false
 $paperclipModelOk = $false
@@ -103,13 +105,15 @@ $result = [ordered]@{
   adapterFailures = @($adapterResults | Where-Object { -not $_.markerPresent -or -not $_.corpusAccessPolicyPresent -or -not $_.skillPresent } | ForEach-Object { $_.name })
   providerConfig = [ordered]@{
     kimiDefaultManaged = $kimiConfig.Contains('default_model = "kimi-code/kimi-for-coding"')
-    kimiApiKeyDuplicatedInConfig = [bool]($kimiConfig -match 'api_key\s*=\s*"sk-')
+    kimiApiKeyNotDuplicatedInConfig = -not [bool]($kimiConfig -match 'api_key\s*=\s*"sk-')
     hermesPrimaryLocalOrCodex = [bool]($hermesConfig -match '(?s)model:\s*(?:.|\n)*provider:\s*(universal-router|openai-codex)')
     hermesReasoningXhigh = [bool]($hermesConfig -match 'reasoning_effort:\s*xhigh')
     hermesUniversalRouterProvider = [bool]($hermesConfig -match '(?s)providers:\s*(?:.|\n)*universal-router:\s*(?:.|\n)*base_url:\s*http://127\.0\.0\.1:18100/v1')
     hermesFallbackUniversalRouter = [bool]($hermesConfig -match '(?s)fallback_providers:\s*-\s*provider:\s*universal-router\s*model:\s*auto-coding')
     hermesAuxCompressionUniversalLongContext = [bool]($hermesConfig -match '(?s)compression:\s*(?:.|\n)*provider:\s*universal-router\s*model:\s*(kimi-k2\.6-thinking|auto-coding)(?:.|\n)*context_length:\s*(262144|[6-9][4-9][0-9]{3,})')
     hermesNoAnthropicFallback = -not [bool]($hermesConfig -match '(?s)fallback_providers:\s*(?:.|\n)*provider:\s*anthropic')
+    hermesNoRemovedLocalModelAliases = ($removedHermesModelAliases.Count -eq 0)
+    hermesToolLoopHardStop = [bool]($hermesConfig -match 'hard_stop_enabled:\s*true')
     hermesDiscordFreeResponse = [bool]($hermesConfig -match 'require_mention:\s*false')
     paperclipRouter = $paperclipOk
     paperclipModelUniversalAlias = $paperclipModelOk
@@ -129,6 +133,12 @@ $result = [ordered]@{
     universalHiddenLauncherPresent = ($startupNames -contains 'Universal_AI_Stack_Hidden.vbs')
   }
 }
+
+$result['providerConfigFailures'] = @(
+  $result.providerConfig.GetEnumerator() |
+    Where-Object { $_.Value -eq $false } |
+    ForEach-Object { $_.Key }
+)
 
 New-Item -ItemType Directory -Force -Path $StateDir | Out-Null
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)

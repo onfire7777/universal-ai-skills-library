@@ -95,6 +95,17 @@ function Random-Token {
   return [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_')
 }
 
+function Redact-PaperclipConfigBackup {
+  param([string]$Path)
+  if (!(Test-Path -LiteralPath $Path)) { return }
+  $text = [System.IO.File]::ReadAllText($Path)
+  $redacted = [regex]::Replace($text, '("apiKey"\s*:\s*")[^"]+(")', '$1[REDACTED_UNIVERSAL_ROUTER_KEY]$2')
+  if ($redacted -ne $text) {
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $redacted, $utf8NoBom)
+  }
+}
+
 New-Item -ItemType Directory -Force -Path $StateDir | Out-Null
 
 $central = Read-EnvFile -Path $SecretsEnv
@@ -136,6 +147,7 @@ Write-EnvFile -Path $HermesEnv -Values $merged
 if (Test-Path -LiteralPath $PaperclipConfig) {
   $backup = "$PaperclipConfig.bak-universal-$(Get-Date -Format yyyyMMdd-HHmmss)"
   Copy-Item -LiteralPath $PaperclipConfig -Destination $backup -Force
+  Redact-PaperclipConfigBackup -Path $backup
   $paperclip = Get-Content -LiteralPath $PaperclipConfig -Raw | ConvertFrom-Json
   if (!$paperclip.llm) {
     $paperclip | Add-Member -MemberType NoteProperty -Name llm -Value ([pscustomobject]@{})
@@ -197,6 +209,7 @@ $report = [ordered]@{
   hermesEnv = (Test-Path -LiteralPath $HermesEnv)
   hermesConfiguredForUniversalRouter = [bool]$hermesConfigReport -and -not [bool]$hermesConfigReport.error -and $hermesConfigReport.fallbackProvider -eq 'universal-router'
   paperclipConfiguredForUniversalRouter = $true
+  paperclipKeyStoredAsRouterCompatibilityCopy = $true
   kimiApiKeyCentralized = (Test-Path -LiteralPath $KimiConfig) -and -not ([System.IO.File]::ReadAllText($KimiConfig) -match 'api_key\s*=\s*"sk-')
   agentAdaptersSynced = [bool]$adapterReport -and -not [bool]$adapterReport.error
   activeSecretKeys = @($merged.Keys | Where-Object { $_ -match 'KEY|TOKEN' -and $merged[$_] } | Sort-Object)

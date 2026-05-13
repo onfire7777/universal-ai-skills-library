@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -55,10 +56,76 @@ setup_logging()
 REGISTRY = load_json(CONFIG_DIR / "model-registry.json")
 POLICY = load_json(CONFIG_DIR / "routing-policy.json")
 ENV = load_env(SECRETS_ENV)
+CIRCUIT_LOCK = threading.Lock()
+CIRCUIT_STATE: dict[str, dict[str, Any]] = {}
 
 
 def registry_models() -> list[dict[str, Any]]:
     return REGISTRY.get("models", [])
+
+
+def retry_policy() -> dict[str, Any]:
+    return POLICY.get("retry", {})
+
+
+def circuit_config() -> dict[str, Any]:
+    return retry_policy().get("circuitBreaker", {})
+
+
+def circuit_enabled() -> bool:
+    return bool(circuit_config().get("enabled", False))
+
+
+def circuit_snapshot() -> dict[str, Any]:
+    now = time.time()
+    with CIRCUIT_LOCK:
+        return {
+            provider: {
+                **state,
+                "open": float(state.get("openedUntil", 0)) > now,
+                "remainingSeconds": max(0, int(float(state.get("openedUntil", 0)) - now)),
+            }
+            for provider, state in CIRCUIT_STATE.items()
+        }
+
+
+def circuit_is_open(provider_id: str) -> bool:
+    if not circuit_enabled():
+        return False
+    now = time.time()
+    with CIRCUIT_LOCK:
+        state = CIRCUIT_STATE.get(provider_id)
+        if not state:
+            return False
+        opened_until = float(state.get("openedUntil", 0))
+        if opened_until > now:
+            return True
+        if opened_until:
+            state["openedUntil"] = 0
+        return False
+
+
+def record_provider_success(provider_id: str) -> None:
+    if not circuit_enabled():
+        return
+    with CIRCUIT_LOCK:
+        CIRCUIT_STATE.pop(provider_id, None)
+
+
+def record_provider_failure(provider_id: str) -> None:
+    if not circuit_enabled():
+        return
+    cfg = circuit_config()
+    threshold = int(cfg.get("failureThreshold", 2))
+    cooldown = int(cfg.get("cooldownSeconds", 600))
+    now = time.time()
+    with CIRCUIT_LOCK:
+        state = CIRCUIT_STATE.setdefault(provider_id, {"failures": 0, "openedUntil": 0})
+        state["failures"] = int(state.get("failures", 0)) + 1
+        state["lastFailureAt"] = int(now)
+        if state["failures"] >= threshold:
+            state["openedUntil"] = now + cooldown
+            logging.warning("provider circuit opened provider=%s cooldown=%ss", provider_id, cooldown)
 
 
 def model_by_id(model_id: str) -> dict[str, Any] | None:
@@ -174,7 +241,7 @@ def normalize_provider_payload(model: dict[str, Any], payload: dict[str, Any]) -
     return provider_payload
 
 
-def call_provider(model: dict[str, Any], payload: dict[str, Any]) -> tuple[int, bytes, str]:
+def call_provider(model: dict[str, Any], payload: dict[str, Any], timeout_override: float | None = None) -> tuple[int, bytes, str]:
     provider_payload = normalize_provider_payload(model, payload)
     base_url = model.get("baseUrl", "").rstrip("/")
     url = f"{base_url}/chat/completions"
@@ -187,7 +254,9 @@ def call_provider(model: dict[str, Any], payload: dict[str, Any]) -> tuple[int, 
         headers["Authorization"] = f"Bearer {api_key}"
     data = json.dumps(provider_payload).encode("utf-8")
     request = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    timeout = int(POLICY.get("retry", {}).get("timeoutSeconds", 180))
+    timeout = int(retry_policy().get("timeoutSeconds", 180))
+    if timeout_override is not None:
+        timeout = max(1, min(timeout, int(timeout_override)))
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return response.status, response.read(), response.headers.get("Content-Type", "application/json")
 
@@ -227,6 +296,7 @@ class RouterHandler(BaseHTTPRequestHandler):
                     "service": "universal-ai-stack-router",
                     "time": int(time.time()),
                     "models": [provider_health(m) for m in registry_models()],
+                    "circuitBreakers": circuit_snapshot(),
                 },
             )
             return
@@ -255,27 +325,48 @@ class RouterHandler(BaseHTTPRequestHandler):
             return
         candidates = choose_candidates(payload.get("model"))
         failures: list[dict[str, Any]] = []
-        fallback_status = set(POLICY.get("retry", {}).get("fallbackHttpStatus", []))
+        retry_cfg = retry_policy()
+        fallback_status = set(retry_cfg.get("fallbackHttpStatus", []))
+        max_attempts = int(retry_cfg.get("totalProviderAttempts", len(candidates) or 1))
+        global_timeout = int(retry_cfg.get("globalTimeoutSeconds", retry_cfg.get("timeoutSeconds", 180)))
+        deadline = time.monotonic() + max(1, global_timeout)
+        attempts = 0
         for model in candidates:
+            provider_id = model.get("id", "unknown")
+            if attempts >= max_attempts:
+                failures.append({"provider": provider_id, "status": "attempt_budget_exhausted", "error": "global provider attempt budget exhausted"})
+                break
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                failures.append({"provider": provider_id, "status": "global_timeout", "error": f"global timeout exceeded after {global_timeout}s"})
+                break
+            if circuit_is_open(provider_id):
+                failures.append({"provider": provider_id, "status": "circuit_open", "error": "provider temporarily skipped after repeated failures"})
+                logging.warning("provider skipped because circuit is open provider=%s", provider_id)
+                continue
             try:
-                status, data, content_type = call_provider(model, payload)
+                attempts += 1
+                status, data, content_type = call_provider(model, payload, remaining)
                 self.send_response(status)
                 self.send_header("Content-Type", content_type)
                 self.send_header("Content-Length", str(len(data)))
                 self.send_header("X-Universal-AI-Provider", model["id"])
                 self.end_headers()
                 self.wfile.write(data)
+                record_provider_success(provider_id)
                 logging.info("routed model=%s via provider=%s status=%s", payload.get("model"), model["id"], status)
                 return
             except urllib.error.HTTPError as exc:
                 body = exc.read().decode("utf-8", errors="replace")[:1200]
-                failures.append({"provider": model.get("id"), "status": exc.code, "error": body})
-                logging.warning("provider failed provider=%s status=%s", model.get("id"), exc.code)
+                failures.append({"provider": provider_id, "status": exc.code, "error": body})
+                record_provider_failure(provider_id)
+                logging.warning("provider failed provider=%s status=%s", provider_id, exc.code)
                 if exc.code not in fallback_status:
                     break
             except Exception as exc:  # noqa: BLE001
-                failures.append({"provider": model.get("id"), "status": type(exc).__name__, "error": str(exc)[:500]})
-                logging.warning("provider failed provider=%s error=%s", model.get("id"), exc)
+                failures.append({"provider": provider_id, "status": type(exc).__name__, "error": str(exc)[:500]})
+                record_provider_failure(provider_id)
+                logging.warning("provider failed provider=%s error=%s", provider_id, exc)
         response_json(
             self,
             503,

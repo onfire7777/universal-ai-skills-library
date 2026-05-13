@@ -26,10 +26,25 @@
   "retry": {
     "maxAttemptsPerProvider": 1,
     "totalProviderAttempts": 4,
+    "globalTimeoutSeconds": 240,
     "timeoutSeconds": 180,
     "retryableHttpStatus": [408, 409, 425, 429, 500, 502, 503, 504],
     "fallbackHttpStatus": [400, 401, 403, 408, 409, 425, 429, 500, 502, 503, 504],
-    "backoffSeconds": [1, 3, 8]
+    "backoffSeconds": [1, 3, 8],
+    "circuitBreaker": {
+      "enabled": true,
+      "failureThreshold": 2,
+      "cooldownSeconds": 600
+    }
+  },
+  "agentSafety": {
+    "maxConcurrentLocalAgents": 1,
+    "maxConcurrentCloudAgents": 2,
+    "maxTaskRuntimeSeconds": 900,
+    "maxAgentIterations": 30,
+    "maxToolCalls": 60,
+    "stopOnRepeatedError": true,
+    "requireConfirmationForLongRunningLoops": true
   },
   "costPolicy": {
     "preferSubscriptionCliAuth": true,

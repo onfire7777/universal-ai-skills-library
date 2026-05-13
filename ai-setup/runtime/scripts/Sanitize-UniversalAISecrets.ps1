@@ -12,6 +12,7 @@ $targets = @(
   "$HomeDir\.paperclip\instances\default\config.json.backup",
   "$HomeDir\.paperclip\instances\default\config.json.bak-*",
   "$HomeDir\.hermes\.env.bak*",
+  "$HomeDir\.hermes\config.yaml.bak*",
   "$HomeDir\.hermes\sessions\*.json",
   "$HomeDir\.hermes\sessions\*.jsonl",
   "$HomeDir\.hermes\logs\*.log",
@@ -70,6 +71,13 @@ foreach ($path in ($files | Sort-Object)) {
 
   $counts = [ordered]@{}
   $updated = $text
+  if ($path -match '\\\.paperclip\\instances\\default\\config\.json(\.backup|\.bak-)') {
+    $matches = [regex]::Matches($updated, '("apiKey"\s*:\s*")[^"]+(")')
+    if ($matches.Count -gt 0) {
+      $counts['paperclipRouterKey'] = $matches.Count
+      $updated = [regex]::Replace($updated, '("apiKey"\s*:\s*")[^"]+(")', '$1[REDACTED_UNIVERSAL_ROUTER_KEY]$2')
+    }
+  }
   foreach ($name in $patterns.Keys) {
     $matches = [regex]::Matches($updated, $patterns[$name])
     if ($matches.Count -gt 0) {

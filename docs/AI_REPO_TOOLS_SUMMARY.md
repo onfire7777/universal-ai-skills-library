@@ -93,7 +93,7 @@ Current model policy:
 - API fallback: `kimi-k2.6-thinking`, OpenAI-compatible Moonshot API, normalized to `temperature=1` and `top_p=0.95`.
 - Claude fallback: `claude-opus-4.7`, max reasoning, host CLI/session auth when supported.
 - Local final fallback: `qwen3-coder-30b-a3b-q4`, `Q4_K_M`, 16k context, llama.cpp CUDA, batch `384`, ubatch `192`, threads `6`, parallel `1`, q4 KV cache, 10-minute idle timeout.
-- Disabled/manual local records: `qwen3-coder-next-q5` and `qwen2.5-coder-32b-q4`.
+- The default stack intentionally registers no other local model aliases. Older Qwen3-Next and Qwen2.5-Coder records were removed so missing/heavy models cannot be selected accidentally.
 
 ### Optional MCP Bridge Infrastructure
 
