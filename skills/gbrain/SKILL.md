@@ -69,10 +69,10 @@ skill-router skill query
 
 For setup or repair, read the upstream installer flow first:
 
-```bash
-Get-Content %USERPROFILE%\gbrain\INSTALL_FOR_AGENTS.md
-Get-Content %USERPROFILE%\gbrain\AGENTS.md
-Get-Content %USERPROFILE%\gbrain\docs\GBRAIN_VERIFY.md
+```powershell
+Get-Content "$env:USERPROFILE\gbrain\INSTALL_FOR_AGENTS.md"
+Get-Content "$env:USERPROFILE\gbrain\AGENTS.md"
+Get-Content "$env:USERPROFILE\gbrain\docs\GBRAIN_VERIFY.md"
 ```
 
 ## Integration Policy
@@ -90,9 +90,9 @@ Get-Content %USERPROFILE%\gbrain\docs\GBRAIN_VERIFY.md
 
 Follow the upstream upgrade path:
 
-```bash
-git -C %USERPROFILE%\gbrain pull --ff-only
-cd %USERPROFILE%\gbrain
+```powershell
+git -C "$env:USERPROFILE\gbrain" pull --ff-only
+Set-Location "$env:USERPROFILE\gbrain"
 bun install
 gbrain init
 gbrain post-upgrade

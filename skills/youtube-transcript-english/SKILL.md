@@ -22,24 +22,24 @@ The upstream README states that `YouTubeTranscriptApi().fetch(video_id)` default
 
 Use the bundled English wrapper first:
 
-```bash
-%USERPROFILE%\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py "https://www.youtube.com/watch?v=VIDEO_ID"
-%USERPROFILE%\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py VIDEO_ID --format json --output transcript.json
-%USERPROFILE%\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py VIDEO_ID --format srt --output transcript.srt
-%USERPROFILE%\.youtube-transcript-api\venv\Scripts\python.exe scripts\fetch_english_transcript.py VIDEO_ID --ai-model gpt-4o-mini
+```powershell
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py "https://www.youtube.com/watch?v=VIDEO_ID"
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py VIDEO_ID --format json --output transcript.json
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py VIDEO_ID --format srt --output transcript.srt
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\python.exe" scripts\fetch_english_transcript.py VIDEO_ID --ai-model gpt-4o-mini
 ```
 
 Equivalent direct command:
 
-```bash
-%USERPROFILE%\.youtube-transcript-api\bin\youtube-transcript-english.cmd VIDEO_ID --format text
+```powershell
+& "$env:USERPROFILE\.youtube-transcript-api\bin\youtube-transcript-english.cmd" VIDEO_ID --format text
 ```
 
 Use the upstream CLI when exact upstream behavior is needed:
 
-```bash
-%USERPROFILE%\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe VIDEO_ID --languages en --format json
-%USERPROFILE%\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe --list-transcripts VIDEO_ID
+```powershell
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe" VIDEO_ID --languages en --format json
+& "$env:USERPROFILE\.youtube-transcript-api\venv\Scripts\youtube_transcript_api.exe" --list-transcripts VIDEO_ID
 ```
 
 ## English Output Policy

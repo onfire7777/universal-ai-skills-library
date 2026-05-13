@@ -148,8 +148,8 @@ If the CLI can do the work without a long-running service, do not add or start a
 Shared durable memory should still work when MCP bridges are disabled. The
 portable baseline is:
 
-- save: `powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Save-UniversalAIMemory.ps1 -Source "<client>" -Note "<memory>"`
-- search: `powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Search-UniversalAIMemory.ps1 -Query "<query>"`
+- save: `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Save-UniversalAIMemory.ps1" -Source "<client>" -Note "<memory>"`
+- search: `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Search-UniversalAIMemory.ps1" -Query "<query>"`
 
 Those wrappers write to the shared Universal AI Stack memory folder, mine the
 note into MemPalace, and mirror it into GBrain when available. Do not use

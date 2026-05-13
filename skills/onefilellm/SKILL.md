@@ -31,9 +31,9 @@ python scripts/run_onefilellm.py --help-topic examples
 
 Equivalent direct commands:
 
-```bash
-%USERPROFILE%\.onefilellm\venv\Scripts\onefilellm.exe --help
-%USERPROFILE%\.onefilellm\bin\onefilellm.cmd --help-topic crawling
+```powershell
+& "$env:USERPROFILE\.onefilellm\venv\Scripts\onefilellm.exe" --help
+& "$env:USERPROFILE\.onefilellm\bin\onefilellm.cmd" --help-topic crawling
 ```
 
 ## References

@@ -15,8 +15,8 @@ Use Lightpanda as the default AI-controlled browser for web retrieval and automa
 - WebSocket endpoint: `ws://127.0.0.1:9222/`
 - MCP command: `%USERPROFILE%\.lightpanda-ai\lightpanda-mcp.cmd`
 - Fetch command: `%USERPROFILE%\.lightpanda-ai\lightpanda-fetch.cmd`
-- Start service: `powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.lightpanda-ai\lightpanda-serve.ps1`
-- Stop service: `powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.lightpanda-ai\lightpanda-stop.ps1`
+- Start service: `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.lightpanda-ai\lightpanda-serve.ps1"`
+- Stop service: `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.lightpanda-ai\lightpanda-stop.ps1"`
 
 This is an AI-only browser runtime. It does not change the operating system default browser.
 
@@ -25,7 +25,7 @@ This is an AI-only browser runtime. It does not change the operating system defa
 1. Prefer Lightpanda for AI browsing, scraping, markdown extraction, semantic tree extraction, JavaScript-rendered content, link discovery, and form workflows.
 2. Prefer the MCP interface for agent workflows when a Lightpanda MCP server is available.
 3. Prefer the CLI fetch wrapper for one-off URL extraction:
-   `%USERPROFILE%\.lightpanda-ai\lightpanda-fetch.cmd --dump markdown https://example.com`
+   `& "$env:USERPROFILE\.lightpanda-ai\lightpanda-fetch.cmd" --dump markdown https://example.com`
 4. Prefer the CDP service for Playwright or Puppeteer automation. Connect to `http://127.0.0.1:9222` with `connectOverCDP` or to `ws://127.0.0.1:9222/` when a WebSocket endpoint is required.
 5. Use a full browser such as Chrome, Chromium, Playwright-managed browsers, or the host browser when the task requires screenshots, visual inspection, pixel/layout validation, browser extensions, WebGL/canvas fidelity, downloads, DevTools performance traces, or broad cross-browser compatibility.
 6. Respect explicit user or system instructions that require a specific browser tool, local in-app browser, screenshot workflow, or official connector.

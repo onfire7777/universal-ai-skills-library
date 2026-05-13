@@ -137,7 +137,7 @@ fetch and CDP startup against `http://127.0.0.1:9222`, while keeping persistent
 bridge tasks disabled for the low-resource profile. Use:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1" -Deep -StartLightpanda
 ```
 
 ### External Tool Adapters
