@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-setup.source-repos.v1",
-  "updated": "2026-05-12",
+  "updated": "2026-05-13",
   "purpose": "Portable inventory of source repositories and runtime roots used by the Universal AI Skills Library installer. Paths are templates and must be resolved by install scripts.",
   "canonical": {
     "universalAiSkillsLibrary": {

@@ -33,6 +33,14 @@ $required = @(
   'ai-setup\runtime\env\.env.template',
   'ai-setup\scripts\install-universal-ai-stack.ps1',
   'ai-setup\scripts\validate-universal-ai-stack.ps1',
+  'ai-setup\scripts\public-release-audit.ps1',
+  'install.ps1',
+  'install.sh',
+  'LICENSE',
+  'SECURITY.md',
+  'CONTRIBUTING.md',
+  'docs\QUICKSTART.md',
+  'docs\PUBLIC_RELEASE_CHECKLIST.md',
   'docs\UNIVERSAL_AI_SETUP.md',
   'docs\AI_REPO_TOOLS_SUMMARY.md'
 )

@@ -15,14 +15,22 @@ import os
 import sys
 import subprocess
 import argparse
+from pathlib import Path
+
+
+DEFAULT_SKILLS_DIR = (
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or str(Path(__file__).resolve().parents[2])
+)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Pre-flight check for Ultimate Skill Creator")
     parser.add_argument(
         "--skills-dir",
-        default=os.environ.get("SKILL_ROUTER_SKILLS_DIR", os.environ.get("MANUS_SKILLS_DIR", "/home/ubuntu/skills")),
-        help="Base directory where skills are installed (default: /home/ubuntu/skills)"
+        default=DEFAULT_SKILLS_DIR,
+        help="Base directory where skills are installed"
     )
     args = parser.parse_args()
 

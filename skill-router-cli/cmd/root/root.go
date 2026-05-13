@@ -36,24 +36,19 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/web"
 )
 
-const Version = "2.2.2"
+const Version = "2.2.3"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
 	Short: "Universal AI skills and tooling router",
-	Long: `skill-router - The universal CLI for managing AI skills, optional MCP bridges,
-multi-model auditing, oracle queries, file organization, model selection,
-platform API integrations, CLI generation, database management, email,
-Hugging Face, Google Workspace, automation, and local AI setup.
+	Long: `skill-router - The universal CLI for loading AI skills on demand,
+syncing compact agent adapters, validating the skill corpus, and managing the
+optional local Universal AI Stack.
 
-Consolidates 1,807 repo skills, indexed local external skills, 4 optional MCP bridges,
-6 MCP connectors (Supabase, HuggingFace, Make, Gmail, SkillSeekers, MemPalace),
-multi-model code auditor, multi-model oracle, file organizer,
-model selector, music prompter, chat summarizer, skill debugger,
-context anchoring, internet skill finder, GitHub gem seeker,
-GStack engineering workflow adapters, GBrain knowledge brain integration,
-SimilarWeb analytics, persistent computing, CLI Printing Press,
-and platform-specific adapters into one context-efficient tool.
+The router keeps 1,807 canonical skills in one repository and loads a single
+matching skill only when a real user prompt needs it. It can also index local
+external skill roots read-only, validate manifests, sync wrapper instructions,
+check optional MCP bridges, and expose local AI stack health.
 
 Compatibility: the legacy manus executable can still call the same router.`,
 	Version: Version,
@@ -68,10 +63,10 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  skill       Load one skill on demand: skill-router skill <name>")
 		fmt.Println("  skills      Manage canonical and local external AI skills on demand")
 		fmt.Println("  mcp         Control MCP bridge infrastructure (start, stop, status, logs)")
-		fmt.Println("  audit       Run multi-model security/code audits (6 frontier models)")
+		fmt.Println("  audit       Run security and code audit workflows")
 		fmt.Println("  oracle      Query multiple AI models and get merged answers")
 		fmt.Println("  print       Generate production CLIs from API specs (Printing Press)")
-		fmt.Println("  api         Interact with the Manus API adapter (tasks, projects, webhooks)")
+		fmt.Println("  api         Interact with compatibility API adapters")
 		fmt.Println()
 		fmt.Println("AI & Research:")
 		fmt.Println("  models      Select and manage AI model preferences")

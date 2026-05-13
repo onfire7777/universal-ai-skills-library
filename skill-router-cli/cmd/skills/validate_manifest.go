@@ -198,6 +198,13 @@ func listSkillScripts(skillDir string) ([]string, error) {
 			return err
 		}
 		if entry.IsDir() {
+			if entry.Name() == "__pycache__" || entry.Name() == ".git" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		name := entry.Name()
+		if strings.HasSuffix(name, ".pyc") || strings.HasSuffix(name, ".pyo") {
 			return nil
 		}
 		rel, err := filepath.Rel(skillDir, path)

@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a new capability or adapter
+title: "[feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What should the router or stack make easier?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the smallest clean change.
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - skill-router CLI
+        - skill corpus
+        - Universal AI Stack
+        - agent adapter
+        - documentation
+        - other
+    validations:
+      required: true

@@ -38,12 +38,12 @@ from pathlib import Path
 SKILLS_DIR = Path(
     os.environ.get("SKILL_ROUTER_SKILLS_DIR")
     or os.environ.get("MANUS_SKILLS_DIR")
-    or "/home/ubuntu/skills"
+    or Path(__file__).resolve().parents[2]
 )
 CACHE_DIR = Path(
     os.environ.get("SKILL_ROUTER_SYNC_CACHE")
     or os.environ.get("MANUS_SKILL_SYNC_CACHE")
-    or "/home/ubuntu/.skill-sync-cache"
+    or (Path.home() / ".skill-sync-cache")
 )
 STATE_FILE = CACHE_DIR / "sync_state.json"
 DEFAULT_REPO = "onfire7777/universal-ai-skills-library"

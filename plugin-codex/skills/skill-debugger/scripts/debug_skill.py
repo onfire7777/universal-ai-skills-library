@@ -28,7 +28,11 @@ from pathlib import Path
 
 # ─── Constants ───────────────────────────────────────────────────────────────
 
-SKILLS_DIR = Path("/home/ubuntu/skills")
+SKILLS_DIR = Path(
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or Path(__file__).resolve().parents[2]
+)
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 

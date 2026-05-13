@@ -13,6 +13,7 @@ Skills are created at /home/ubuntu/skills/<skill-name>/
 """
 
 import sys
+import os
 from pathlib import Path
 
 
@@ -192,7 +193,11 @@ def title_case_skill_name(skill_name):
     return ' '.join(word.capitalize() for word in skill_name.split('-'))
 
 
-SKILLS_BASE_PATH = "/home/ubuntu/skills"
+SKILLS_BASE_PATH = Path(
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or Path(__file__).resolve().parents[2]
+)
 
 
 def init_skill(skill_name):
@@ -206,7 +211,7 @@ def init_skill(skill_name):
         Path to created skill directory, or None if error
     """
     # Determine skill directory path
-    skill_dir = Path(SKILLS_BASE_PATH) / skill_name
+    skill_dir = SKILLS_BASE_PATH / skill_name
 
     # Check if directory already exists
     if skill_dir.exists():

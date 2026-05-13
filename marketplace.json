@@ -8,8 +8,8 @@
     {
       "name": "universal-ai-skills",
       "source": "./plugin",
-      "description": "Universal CLI-first skill router: auto-route real user prompts, load 1,807 canonical skills plus indexed local external skills on demand, audits, oracle, CLI generation, and optional MCP bridge management.",
-      "version": "2.2.2",
+      "description": "CLI-first universal AI skill router and local AI stack adapter for loading 1,807 skills on demand across Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and other agents.",
+      "version": "2.2.3",
       "author": {
         "name": "onfire7777"
       }

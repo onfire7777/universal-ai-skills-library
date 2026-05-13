@@ -50,6 +50,11 @@ HEADERS_TEMPLATE = {
     "Connect-Protocol-Version": "1",
 }
 MAX_SKILLS_PER_PROJECT = 500
+DEFAULT_SKILLS_DIR = (
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+)
 
 
 def grpc_call(method, data, token):
@@ -326,7 +331,7 @@ def main():
     parser = argparse.ArgumentParser(description="Deploy skills to Manus projects via API")
     parser.add_argument("--token", required=True, help="JWT session token")
     parser.add_argument("--project-uid", help="Target project UID")
-    parser.add_argument("--skills-dir", default="/home/ubuntu/skills", help="Source skills directory")
+    parser.add_argument("--skills-dir", default=DEFAULT_SKILLS_DIR, help="Source skills directory")
     parser.add_argument("--zip-dir", default="/tmp/skill_zips", help="Directory for zip files")
     parser.add_argument("--rate-limit", type=float, default=0.15, help="Delay between API calls")
     parser.add_argument("--max-retries", type=int, default=3, help="Max retries on 429")

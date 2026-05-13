@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-stack.model-registry.v1",
-  "updated": "2026-05-12",
+  "updated": "2026-05-13",
   "purpose": "Portable canonical model registry for local AI tools, agents, automations, and fallback routing.",
   "credentialPolicy": {
     "sourceOfTruth": "{{USERPROFILE}}\\.universal-ai-stack\\secrets\\.env",

@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate router and public release checks
+    runs-on: windows-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: skill-router-cli/go.mod
+
+      - name: Go tests
+        working-directory: skill-router-cli
+        run: go test ./...
+
+      - name: Build skill-router
+        working-directory: skill-router-cli
+        run: go build -o ../skill-router.exe .
+
+      - name: Validate Universal AI Stack templates
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-universal-ai-stack.ps1
+
+      - name: Public release audit
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\public-release-audit.ps1 -SkipGoTests

@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-setup.curated-skills.v1",
-  "updated": "2026-05-12",
+  "updated": "2026-05-13",
   "purpose": "Curated always-known skills and wrappers for the Universal AI setup. This file is an index only; full skill bodies stay in the canonical skills corpus and are loaded on demand.",
   "canonicalCorpus": "{{REPO_ROOT}}\\skills",
   "wrapperSkills": [

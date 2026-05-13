@@ -24,7 +24,11 @@ import sys
 import time
 from pathlib import Path
 
-SKILLS_DIR = Path("/home/ubuntu/skills")
+SKILLS_DIR = Path(
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or Path(__file__).resolve().parents[2]
+)
 INDEX_PATH = Path("/tmp/skill_finder_index.json")
 INDEX_MAX_AGE = 3600  # Rebuild index if older than 1 hour
 REQUIRED_INDEX_FIELDS = ("name", "dir_name", "description", "body_keywords", "has_scripts", "has_references", "path")
