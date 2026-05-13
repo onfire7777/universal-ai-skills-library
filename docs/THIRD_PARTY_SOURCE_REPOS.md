@@ -5,6 +5,10 @@ copying them into every AI client. Keep one upstream checkout, index its skills
 read-only, and install only the compact `universal-ai-skills` wrapper into local
 agent roots.
 
+For the shared config map that connects these third-party repos to AI clients,
+memory, embeddings, Context Mode, Lightpanda, Hermes, and Paperclip, see
+`UNIVERSAL_AI_CONNECTION_CONFIGS.md`.
+
 ## GStack
 
 - Upstream: <https://github.com/garrytan/gstack>

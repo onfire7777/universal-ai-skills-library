@@ -139,7 +139,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\ai-setup\scripts\validate-
 powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIStack.ps1"
 ```
 
-See `docs/UNIVERSAL_AI_SETUP.md` for the model registry, failover policy, Hermes/Paperclip integration, and security contract.
+See `docs/UNIVERSAL_AI_SETUP.md` for the model registry, failover policy,
+Hermes/Paperclip integration, and security contract. See
+`docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md` for the exact config files that connect
+each AI client, router, memory system, embedding service, and optional tool
+runtime into one universal stack.
 
 ## Core Skill Groups
 

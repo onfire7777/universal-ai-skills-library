@@ -25,6 +25,12 @@ Paperclip uses `plugin/paperclip/AGENTS.md` plus a wrapper skill installed by `s
 The router never calls a separate model API and does not require router-specific API keys.
 Use `skill-router route --explain "<user prompt>"` to inspect top candidates, evidence gates, and ambiguity behavior.
 
+For the Universal AI Stack configs that connect local clients, model routing,
+shared memory, embeddings, Context Mode, Lightpanda, Hermes, and Paperclip, see
+`../docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md`. The plugin stays an adapter and
+index surface; the repo-owned config map is the authority for local runtime
+connections.
+
 Compatibility:
 
 ```bash

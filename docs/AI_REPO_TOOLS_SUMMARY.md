@@ -87,6 +87,9 @@ Repo-owned files include:
 
 This makes the setup cloneable and reinstallable as a repository. Machine-local secrets, logs, state, OAuth sessions, and downloaded GGUF files remain outside the repo.
 `Test-UniversalAIStack.ps1` reports startup entries, real visible shell wrappers, and duplicate service workers so architecture drift is caught without mistaking the current diagnostic shell for a runaway command window.
+`UNIVERSAL_AI_CONNECTION_CONFIGS.md` is the authoritative map for the
+configs that connect each AI client, router, memory store, embedding service,
+Context Mode, Lightpanda, Hermes, and Paperclip into the shared stack.
 
 Current model policy:
 

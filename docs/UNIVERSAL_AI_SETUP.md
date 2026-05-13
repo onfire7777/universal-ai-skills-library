@@ -2,6 +2,10 @@
 
 The Universal AI Skills Library is the source repo for both the skill corpus and the portable local AI stack configuration. A clean clone should be able to recreate the stack without depending on private files under `%USERPROFILE%`.
 
+For the per-file connection map across clients, model routing, memory,
+embeddings, Context Mode, and Lightpanda, see
+`UNIVERSAL_AI_CONNECTION_CONFIGS.md`.
+
 ## Source Of Truth
 
 - Skill corpus: `skills/`

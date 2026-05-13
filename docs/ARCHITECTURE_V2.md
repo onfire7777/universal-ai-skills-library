@@ -63,6 +63,10 @@ universal-ai-skills-library/
 | Local tool dir | `%USERPROFILE%\.universal-ai\tools` | `%USERPROFILE%\.manus\tools` may be a compatibility junction |
 
 Detailed compatibility rules live in `docs/UNIVERSAL_COMPATIBILITY.md`.
+The repo-owned config connection map lives in
+`docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md`; use it when auditing which files
+connect local AI clients, routing, memory, embeddings, Context Mode,
+Lightpanda, Hermes, and Paperclip.
 
 ## Done Criteria
 
