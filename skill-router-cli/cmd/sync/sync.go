@@ -252,6 +252,8 @@ Wrapper skill root: %s
 Router command: skill-router
 Absolute fallback: %s
 
+## Universal AI Stack Adapter
+
 Paperclip-specific operating rule:
 
 - Keep Paperclip's native company skills for Paperclip board, issue, API, and heartbeat workflows. The universal router adds cross-platform skill selection; it does not replace Paperclip's own execution contract.
@@ -264,6 +266,12 @@ Paperclip-specific operating rule:
 - Load exactly one needed skill with skill-router skill <name>. Search first with skill-router skill search <query> when the name is unknown.
 - Do not copy or paste the 1,807-skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
 - MCP bridges are optional. Use the CLI for skill loading and use MCP only for persistent endpoint workflows such as durable memory, context routing, skill generation services, or browser/CDP automation.
+
+## Universal AI Skill Corpus Access
+
+- Paperclip has access to the full centralized skill corpus through skill-router only.
+- Keep Paperclip's local skill root to compact wrappers plus native Paperclip company skills. Do not copy or install those full skill bodies into Paperclip's local root.
+- Automatic routing flow: run skill-router preflight for real user/task prompts, reject weak or generic matches, then load exactly one needed skill with skill-router skill <name>.
 `, repoDir, platform.PaperclipSkillsDir(), routerPath)
 }
 
