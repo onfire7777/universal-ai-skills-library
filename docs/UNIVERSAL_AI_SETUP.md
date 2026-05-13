@@ -152,6 +152,8 @@ Paperclip:
   in instructions. The sync step registers it in Codex config and refreshes
   Codex hooks from the installed Context Mode template, including PreToolUse,
   PostToolUse, SessionStart, PreCompact, UserPromptSubmit, and Stop.
+- The Codex hook sync strips unsupported regex look-around from the upstream
+  Context Mode PreToolUse matcher so Codex Desktop can parse the hook config.
 - Lightpanda is the on-demand headless browser runtime. The clean default keeps
   persistent Lightpanda bridge services disabled, but the wrappers under
   `%USERPROFILE%\.lightpanda-ai` must be able to fetch pages and start CDP

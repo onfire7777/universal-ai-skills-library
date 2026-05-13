@@ -118,10 +118,12 @@ protection. GBrain can mirror explicit saved memories for structured lookup.
 
 Context Mode is verified as an actual MCP/context tool, not only an instruction
 block. The Universal AI Stack sync registers it in Codex MCP config and refreshes
-Codex hook wiring from the installed Context Mode template. Lightpanda is
-verified through its intended on-demand paths: one-shot markdown fetch and CDP
-startup against `http://127.0.0.1:9222`, while keeping persistent bridge tasks
-disabled for the low-resource profile. Use:
+Codex hook wiring from the installed Context Mode template. The sync removes the
+template's unsupported regex look-around branch before writing Codex Desktop
+hooks, because the Desktop matcher parser rejects look-ahead/look-behind.
+Lightpanda is verified through its intended on-demand paths: one-shot markdown
+fetch and CDP startup against `http://127.0.0.1:9222`, while keeping persistent
+bridge tasks disabled for the low-resource profile. Use:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda

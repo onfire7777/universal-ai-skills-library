@@ -179,6 +179,17 @@ function Ensure-CodexContextModeHooks {
   }
 
   $templateJson = Get-Content -LiteralPath $template -Raw | ConvertFrom-Json
+  foreach ($entry in @($templateJson.hooks.PreToolUse)) {
+    if ($entry.PSObject.Properties.Name -contains 'matcher') {
+      # Codex Desktop's hook matcher engine does not support regex look-around.
+      # The upstream Context Mode template currently includes mcp__(?!.*context-mode)
+      # to catch non-Context-Mode MCP calls. Remove only that unsupported catch-all
+      # branch; the explicit Context Mode tool names and normal shell/file hooks stay.
+      $entry.matcher = $entry.matcher `
+        -replace '\|mcp__\(\?!\.\*context-mode\)', '' `
+        -replace 'mcp__\(\?!\.\*context-mode\)\|?', ''
+    }
+  }
   $existingJson = [pscustomobject]@{ hooks = [pscustomobject]@{} }
   if (Test-Path -LiteralPath $Path) {
     try {
