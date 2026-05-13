@@ -27,11 +27,17 @@ function Ensure-InstructionFile {
   param([string]$Path, [string]$Title)
   $marker = '## Universal AI Stack Adapter'
   $corpusMarker = '## Universal AI Skill Corpus Access'
+  $memoryMarker = '## Universal Shared Memory'
   $stackRoot = Join-Path $HomeDir '.universal-ai-stack'
   $skillSource = Join-Path $HomeDir 'universal-ai-skills-library'
   $skillCorpus = Join-Path $skillSource 'skills'
   $secretEnv = Join-Path $stackRoot 'secrets\.env'
   $healthScript = Join-Path $stackRoot 'scripts\Test-UniversalAIStack.ps1'
+  $saveMemoryScript = Join-Path $stackRoot 'scripts\Save-UniversalAIMemory.ps1'
+  $searchMemoryScript = Join-Path $stackRoot 'scripts\Search-UniversalAIMemory.ps1'
+  $mempalaceRoot = Join-Path $HomeDir '.mempalace\palace'
+  $gbrainRoot = Join-Path $HomeDir '.gbrain'
+  $lightpandaFetch = Join-Path $HomeDir '.lightpanda-ai\lightpanda-fetch.cmd'
   $block = @"
 
 $marker
@@ -52,23 +58,43 @@ $corpusMarker
 - Keep this AI's local skill root to compact wrapper/adapters and native client-specific skills. Do not install, download, paste, or duplicate the full skill corpus into this root.
 - Automatic routing flow: run ``skill-router preflight --json "<latest user prompt>"`` for real user prompts, reject weak/generic matches, then load exactly one needed skill with ``skill-router skill <name>``.
 "@
+  $memoryBlock = @"
+
+$memoryMarker
+- Durable cross-AI memory is MemPalace at ``$mempalaceRoot``. This is the shared memory store for Codex, Claude, Cursor, Hermes, Paperclip, Kimi, Aion, OpenCode, Gemini, Qwen, Roo, Windsurf, and related local agents.
+- Before answering from prior decisions, project history, people/preferences, or past setup state, search shared memory with ``powershell -NoProfile -ExecutionPolicy Bypass -File $searchMemoryScript -Query "<query>"`` or, when MCP tools are available, call ``mempalace_status`` then ``mempalace_search``.
+- Save durable memories only when the user explicitly asks to remember/save something, or when a stable project decision/setup fact has been confirmed. Use ``powershell -NoProfile -ExecutionPolicy Bypass -File $saveMemoryScript -Source "$Title" -Note "<memory>"``.
+- Never store secrets, API keys, tokens, passwords, private keys, raw logs, temporary scratch notes, or unverified guesses in MemPalace.
+- Context Mode is scratch/context-window protection, not durable memory. Do not store long-term facts in Context Mode when MemPalace is available.
+- GBrain state lives at ``$gbrainRoot`` and may mirror explicit saved memories for structured knowledge lookup. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots.
+- Lightpanda is the shared headless browser/fetch runtime. Use ``$lightpandaFetch`` or ``skill-router skill lightpanda-browser`` for browser retrieval; do not treat browser snapshots as memory unless a distilled fact is explicitly saved through MemPalace.
+- Persistent MCP bridge services remain disabled by default for low resource use. Direct CLI wrappers are the universal baseline; enable MCP only for clients that need live tool endpoints.
+"@
 
   $existing = Read-Text -Path $Path
+  $changed = $false
   if ($existing.Contains($marker)) {
-    if ($existing.Contains($corpusMarker)) {
-      return [ordered]@{ path = $Path; changed = $false; marker = $true; corpusMarker = $true }
+    $content = $existing.TrimEnd()
+    if (!$content.Contains($corpusMarker)) {
+      $content += "`r`n" + $corpusBlock
+      $changed = $true
     }
-    $content = $existing.TrimEnd() + "`r`n" + $corpusBlock + "`r`n"
-    Write-Utf8NoBom -Path $Path -Content $content
-    return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true }
+    if (!$content.Contains($memoryMarker)) {
+      $content += "`r`n" + $memoryBlock
+      $changed = $true
+    }
+    if ($changed) {
+      Write-Utf8NoBom -Path $Path -Content ($content.TrimEnd() + "`r`n")
+    }
+    return [ordered]@{ path = $Path; changed = $changed; marker = $true; corpusMarker = $true; memoryMarker = $true }
   }
   if ([string]::IsNullOrWhiteSpace($existing)) {
-    $content = "# $Title`r`n$block`r`n"
+    $content = "# $Title`r`n$block`r`n$memoryBlock`r`n"
   } else {
-    $content = $existing.TrimEnd() + "`r`n" + $block + "`r`n"
+    $content = $existing.TrimEnd() + "`r`n" + $block + "`r`n" + $memoryBlock + "`r`n"
   }
   Write-Utf8NoBom -Path $Path -Content $content
-  return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true }
+  return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true; memoryMarker = $true }
 }
 
 function Ensure-SkillWrapper {

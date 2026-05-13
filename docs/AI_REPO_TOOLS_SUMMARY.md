@@ -109,6 +109,12 @@ Current local bridge roles:
 - Lightpanda: headless browser/CDP automation
 
 The router itself does not require MCP. Normal skill selection and skill loading work through the CLI.
+For durable memory, the universal baseline is direct CLI access to one shared
+MemPalace palace at `C:\Users\burni\.mempalace\palace`. Client adapters should
+use `Search-UniversalAIMemory.ps1` before answering from prior decisions and
+`Save-UniversalAIMemory.ps1` only for explicit durable memories or confirmed
+project facts. Context Mode is not long-term memory; it is scratch/context
+protection. GBrain can mirror explicit saved memories for structured lookup.
 
 ### External Tool Adapters
 

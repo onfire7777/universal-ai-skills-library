@@ -5,7 +5,7 @@
   "bridges": [
     {
       "id": "mempalace",
-      "purpose": "Durable memory and prior-decision lookup.",
+      "purpose": "Durable shared memory and prior-decision lookup. Direct CLI wrappers are the universal baseline; MCP is optional for live tool endpoints.",
       "expectedPort": 8876,
       "enabled": false
     },
@@ -33,6 +33,8 @@
     "Do not copy the full skills corpus into always-loaded instructions.",
     "Do not run MCP bridges for simple one-shot CLI work.",
     "Default install keeps persistent MCP bridge scheduled tasks disabled; enable only for explicit endpoint workflows.",
-    "Keep secrets in the central Universal AI Stack env, not in MCP manifests."
+    "Keep secrets in the central Universal AI Stack env, not in MCP manifests.",
+    "Use Save-UniversalAIMemory.ps1 and Search-UniversalAIMemory.ps1 for cross-client memory when MCP is not active.",
+    "Context Mode is scratch/context continuity only; do not store durable facts there when MemPalace is available."
   ]
 }

@@ -162,6 +162,7 @@ if (Test-Path -LiteralPath $PaperclipConfig) {
   $paperclip.telemetry.enabled = $false
   $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
   [System.IO.File]::WriteAllText($PaperclipConfig, ($paperclip | ConvertTo-Json -Depth 30), $utf8NoBom)
+  Remove-Item -LiteralPath $backup -Force -ErrorAction SilentlyContinue
 }
 
 if (Test-Path -LiteralPath $KimiConfig) {
@@ -177,6 +178,7 @@ if (Test-Path -LiteralPath $KimiConfig) {
     Copy-Item -LiteralPath $KimiConfig -Destination $backup -Force
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($KimiConfig, $scrubbed, $utf8NoBom)
+    Remove-Item -LiteralPath $backup -Force -ErrorAction SilentlyContinue
   }
 }
 
