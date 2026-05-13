@@ -13,8 +13,11 @@ with another user.
 - `install.ps1`
 - `install.sh`
 - `docs/QUICKSTART.md`
+- `docs/README.md`
 - `docs/UNIVERSAL_AI_SETUP.md`
 - `docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md`
+- `docs/DESIGN_AND_MESSAGING.md`
+- `docs/assets/universal-ai-skills-hero.svg`
 - `ai-setup/scripts/public-release-audit.ps1`
 
 ## Required Properties
@@ -48,13 +51,13 @@ Pop-Location
 Recommended description:
 
 ```text
-CLI-first universal AI skill router and local AI stack adapter for loading 1,807 skills on demand across Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and other agents.
+Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,807 skills on demand without duplicating the corpus.
 ```
 
 Recommended topics:
 
 ```text
-ai, agents, skills, cli, mcp, codex, claude, cursor, hermes, paperclip, automation, local-ai
+ai, agents, skills, skill-router, cli, mcp, codex, claude, cursor, hermes, paperclip, automation, local-ai, agent-skills
 ```
 
 ## Security Review

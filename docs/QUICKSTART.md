@@ -1,6 +1,9 @@
 # Quickstart
 
 This guide gets a new user from a clean clone to a working router-first setup.
+The default install is intentionally lightweight: it builds `skill-router`,
+keeps the 1,807-skill corpus in the repository, and installs compact adapters
+instead of copying every skill into every AI client.
 
 ## Requirements
 
@@ -70,6 +73,14 @@ skill-router skills validate-manifest
 skill-router doctor
 ```
 
+Expected model:
+
+- use `skill-router skill search <query>` to discover skills
+- use `skill-router skill <name>` to load one skill
+- use `skill-router preflight --json "<latest user prompt>"` from AI adapters
+  before deciding whether a skill should load automatically
+- keep full skill bodies out of always-loaded instructions
+
 ## Agent Adapter Rule
 
 Add compact instructions to each AI client instead of copying the full corpus:
@@ -102,6 +113,13 @@ auto-coding
 
 Local Qwen fallback and local embeddings are lazy. They do not load the heavy
 llama.cpp backend until a request actually needs them.
+
+This runtime is optional. If you only need the public skill router, use the
+router-only install:
+
+```powershell
+.\install.ps1 -SkipStackInstall
+```
 
 ## Validate
 

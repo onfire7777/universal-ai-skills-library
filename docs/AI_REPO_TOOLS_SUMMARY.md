@@ -4,7 +4,7 @@
 
 The Universal AI Skills Library is complete as a working local cross-agent skill stack. The current router release is `skill-router` v2.2.3, with `manus.exe` kept only as a legacy alias. The canonical repo contains 1,807 indexed skills, a validated manifest, compact wrapper skills synced into local AI clients, and adapter docs for Codex, Claude, Hermes, Paperclip, OpenSkills-style roots, and other local AI surfaces.
 
-The architecture is intentionally CLI-first. AI clients should not preload or copy the full skill corpus into every prompt. They should keep one compact wrapper/instruction surface and call the router only when a real user prompt needs a skill.
+The architecture is intentionally router-first and CLI-driven. AI clients should not preload or copy the full skill corpus into every prompt. They should keep one compact wrapper/instruction surface and call the router only when a real user prompt needs a skill.
 
 ## What It Is Supposed To Do
 
