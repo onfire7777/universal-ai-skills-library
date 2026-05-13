@@ -6,9 +6,7 @@
     "gpt-5.5",
     "kimi-k2.6-thinking",
     "claude-opus-4.7",
-    "qwen3-coder-30b-a3b-q4",
-    "qwen3-coder-next-q5",
-    "qwen2.5-coder-32b-q4"
+    "qwen3-coder-30b-a3b-q4"
   ],
   "httpRouter": {
     "listenHost": "127.0.0.1",
