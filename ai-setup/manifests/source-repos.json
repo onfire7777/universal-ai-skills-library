@@ -16,7 +16,7 @@
     "secretsEnv": "{{USERPROFILE}}\\.universal-ai-stack\\secrets\\.env",
     "localAiRuntime": "{{USERPROFILE}}\\.local-ai",
     "defaultQwenModelRoot": "D:\\AI\\models\\qwen3-coder-30b-a3b",
-    "defaultQwenProxyRoot": "D:\\AI\\local-qwen-fallback"
+    "defaultQwenProxyRoot": "{{USERPROFILE}}\\.universal-ai-stack\\bin"
   },
   "managedClientRoots": [
     {

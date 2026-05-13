@@ -2,7 +2,7 @@ param(
   [string]$TargetRoot = (Join-Path $env:USERPROFILE '.universal-ai-stack'),
   [string]$QwenModelPath = 'D:\AI\models\qwen3-coder-30b-a3b\Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf',
   [string]$QwenEmbeddingModelPath = 'D:\AI\models\qwen3-embedding-0.6b\Qwen3-Embedding-0.6B-Q8_0.gguf',
-  [string]$QwenProxyPath = 'D:\AI\local-qwen-fallback\local_qwen_proxy.py',
+  [string]$QwenProxyPath = '',
   [string]$LlamaCppRoot = (Join-Path $env:USERPROFILE '.local-ai\runtimes\llama.cpp-cuda\b9128-cuda12.4'),
   [string]$HermesPythonw = (Join-Path $env:USERPROFILE '.hermes\hermes-agent\venv\Scripts\pythonw.exe'),
   [string]$KimiApiKey = '',
@@ -93,6 +93,9 @@ function Replace-Placeholders {
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir '..\..'))
+if (!$QwenProxyPath) {
+  $QwenProxyPath = Join-Path $TargetRoot 'bin\local_qwen_proxy.py'
+}
 $RuntimeSource = Join-Path $RepoRoot 'ai-setup\runtime'
 if (!(Test-Path -LiteralPath $RuntimeSource)) {
   throw "Runtime template folder not found: $RuntimeSource"
