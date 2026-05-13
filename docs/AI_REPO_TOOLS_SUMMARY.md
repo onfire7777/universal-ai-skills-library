@@ -96,7 +96,7 @@ Current model policy:
 - Primary host-session model: `gpt-5.5`, `xhigh`, fast tier, via OpenAI/Codex CLI or browser/session auth.
 - API fallback: `kimi-k2.6-thinking`, OpenAI-compatible Moonshot API, normalized to `temperature=1` and `top_p=0.95`.
 - Claude fallback: `claude-opus-4.7`, max reasoning, host CLI/session auth when supported.
-- Local final fallback: `qwen3-coder-30b-a3b-q4`, `Q4_K_M`, 16k context, llama.cpp CUDA, batch `384`, ubatch `192`, threads `6`, parallel `1`, q4 KV cache, 10-minute idle timeout.
+- Local final fallback: `qwen3-coder-30b-a3b-q4`, `Q4_K_M`, 16k context, llama.cpp CUDA, `--n-gpu-layers 99`, batch `384`, ubatch `192`, threads `6`, parallel `1`, q4 KV cache, 10-minute idle timeout.
 - Local shared-memory embedding: `qwen3-embedding-0.6b-q8`, `Q8_0`, 1024 dimensions, OpenAI-compatible endpoint `http://127.0.0.1:18084/v1`, used by GBrain semantic search and shared-memory mirror lookup.
 - The default stack intentionally registers no other local model aliases. Older Qwen3-Next and Qwen2.5-Coder records were removed so missing/heavy models cannot be selected accidentally.
 

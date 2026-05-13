@@ -97,6 +97,7 @@ HTTP-routeable models:
 - `kimi-k2.6-thinking` is the primary paid API fallback.
 - `qwen3-coder-30b-a3b-q4` is the local final generative fallback.
 - `qwen3-embedding-0.6b-q8` is the local embedding model for GBrain and shared memory search.
+- The local llama.cpp profiles use `--n-gpu-layers 99`, 16k context for coding, 8k server context for embeddings, and one local parallel slot to keep Windows responsive.
 
 Paperclip and Hermes should use `auto-coding` through `http://127.0.0.1:18100/v1` when they need a generic OpenAI-compatible endpoint.
 
