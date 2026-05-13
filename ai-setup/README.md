@@ -41,8 +41,12 @@ HTTP/API fallback order:
 1. `kimi-k2.6-thinking`
 2. `qwen3-coder-30b-a3b-q4`
 
-Only configured local model:
+Only configured local generative model:
 
 1. `qwen3-coder-30b-a3b-q4`
 
-Local default is Qwen3-Coder-30B-A3B-Instruct `Q4_K_M` at 16k context. Heavier local model records are intentionally not registered in the default stack so Hermes/Paperclip cannot route to stale or missing endpoints.
+Local shared-memory embedding model:
+
+1. `qwen3-embedding-0.6b-q8`
+
+Local coding default is Qwen3-Coder-30B-A3B-Instruct `Q4_K_M` at 16k context. The local embedding default is Qwen3-Embedding-0.6B `Q8_0` at `http://127.0.0.1:18084/v1` with 1024 dimensions for GBrain. Heavier local model records are intentionally not registered in the default stack so Hermes/Paperclip cannot route to stale or missing endpoints or start redundant model servers.

@@ -94,6 +94,7 @@ Current model policy:
 - API fallback: `kimi-k2.6-thinking`, OpenAI-compatible Moonshot API, normalized to `temperature=1` and `top_p=0.95`.
 - Claude fallback: `claude-opus-4.7`, max reasoning, host CLI/session auth when supported.
 - Local final fallback: `qwen3-coder-30b-a3b-q4`, `Q4_K_M`, 16k context, llama.cpp CUDA, batch `384`, ubatch `192`, threads `6`, parallel `1`, q4 KV cache, 10-minute idle timeout.
+- Local shared-memory embedding: `qwen3-embedding-0.6b-q8`, `Q8_0`, 1024 dimensions, OpenAI-compatible endpoint `http://127.0.0.1:18084/v1`, used by GBrain semantic search and shared-memory mirror lookup.
 - The default stack intentionally registers no other local model aliases. Older Qwen3-Next and Qwen2.5-Coder records were removed so missing/heavy models cannot be selected accidentally.
 
 ### Optional MCP Bridge Infrastructure
@@ -115,15 +116,19 @@ MemPalace palace at `%USERPROFILE%\.mempalace\palace`. Client adapters should
 use `Search-UniversalAIMemory.ps1` before answering from prior decisions and
 `Save-UniversalAIMemory.ps1` only for explicit durable memories or confirmed
 project facts. Context Mode is not long-term memory; it is scratch/context
-protection. GBrain can mirror explicit saved memories for structured lookup.
-The search wrapper uses GBrain keyword fallback when phrase search misses an
-imported shared-memory page.
+protection. GBrain mirrors explicit saved memories for structured lookup and
+embeds them with the local Qwen embedding service rather than a paid OpenAI
+embedding key. The search wrapper uses GBrain keyword fallback when phrase
+search misses an imported shared-memory page.
 
 Context Mode is verified as an actual MCP/context tool, not only an instruction
 block. The Universal AI Stack sync registers it in Codex MCP config and refreshes
 Codex hook wiring from the installed Context Mode template. The sync removes the
 template's unsupported regex look-around branch before writing Codex Desktop
-hooks, because the Desktop matcher parser rejects look-ahead/look-behind.
+hooks, because the Desktop matcher parser rejects look-ahead/look-behind. The
+sync also enforces `30` second timeouts on all Context Mode Codex lifecycle
+hooks, and `Test-UniversalAIContextTools.ps1` verifies the full hook set,
+matcher safety, and timeout guard.
 Lightpanda is verified through its intended on-demand paths: one-shot markdown
 fetch and CDP startup against `http://127.0.0.1:9222`, while keeping persistent
 bridge tasks disabled for the low-resource profile. Use:
@@ -159,7 +164,7 @@ Incorrect behavior that has been fixed:
 - Hermes Agent itself reports an upstream update is available, but its source checkout is dirty. Updating it should be done in a separate controlled pass to avoid overwriting or mixing local edits.
 - Some optional API-backed tools report missing keys in the current process, such as OpenRouter, OpenAI, Manus, Exa, Tavily, Firecrawl, or similar optional providers. These do not block local skill routing.
 - MCP bridges are available, but they are optional. The clean default is CLI-first routing and skill loading.
-- Downloaded local model files are not committed to the repo. The installer expects the Qwen3-Coder GGUF path to be supplied or to exist at the documented default.
+- Downloaded local model files are not committed to the repo. The installer expects the Qwen3-Coder GGUF and Qwen3-Embedding GGUF paths to be supplied or to exist at the documented defaults.
 
 ## Bottom Line
 

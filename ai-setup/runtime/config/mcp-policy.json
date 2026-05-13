@@ -35,6 +35,7 @@
     "Default install keeps persistent MCP bridge scheduled tasks disabled; enable only for explicit endpoint workflows.",
     "Keep secrets in the central Universal AI Stack env, not in MCP manifests.",
     "Use Save-UniversalAIMemory.ps1 and Search-UniversalAIMemory.ps1 for cross-client memory when MCP is not active.",
+    "MemPalace is authoritative durable memory; GBrain is the structured searchable mirror and should use the local qwen3-embedding-0.6b service for vectors.",
     "Context Mode is scratch/context continuity only; do not store durable facts there when MemPalace is available."
   ]
 }

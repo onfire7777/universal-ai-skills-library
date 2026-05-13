@@ -30,9 +30,12 @@ gbrain sync --repo <brain-repo>
 gbrain jobs smoke
 ```
 
-Use keyword search without API keys. Vector embeddings require
-`OPENAI_API_KEY`. Anthropic query expansion and durable subagent workers require
-the relevant provider key only for those optional features.
+Use keyword search without API keys. In the Universal AI Stack, text vector
+search uses the local Qwen embedding service through
+`llama-server:qwen3-embedding-0.6b` at `http://127.0.0.1:18084/v1` with 1024
+dimensions, so GBrain text embeddings do not require an OpenAI key. Anthropic
+query expansion and durable subagent workers require the relevant provider key
+only for those optional features.
 
 ## Load GBrain Skills On Demand
 

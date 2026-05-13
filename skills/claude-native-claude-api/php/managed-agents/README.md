@@ -370,9 +370,9 @@ $client->beta->vaults->credentials->update(
     vaultID: $vault->id,
     auth: [
         'type' => 'mcp_oauth',
-        'access_token' => 'xoxp-new-...',
+        'access_token' => 'SLACK_USER_TOKEN_PLACEHOLDER',
         'expires_at' => '2026-05-15T00:00:00Z',
-        'refresh' => ['refresh_token' => 'xoxe-1-new-...'],
+        'refresh' => ['refresh_token' => 'SLACK_REFRESH_TOKEN_PLACEHOLDER'],
     ],
 );
 

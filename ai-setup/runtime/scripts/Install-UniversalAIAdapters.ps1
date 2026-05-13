@@ -66,7 +66,7 @@ $memoryMarker
 - Save durable memories only when the user explicitly asks to remember/save something, or when a stable project decision/setup fact has been confirmed. Use ``powershell -NoProfile -ExecutionPolicy Bypass -File $saveMemoryScript -Source "$Title" -Note "<memory>"``.
 - Never store secrets, API keys, tokens, passwords, private keys, raw logs, temporary scratch notes, or unverified guesses in MemPalace.
 - Context Mode is scratch/context-window protection, not durable memory. Do not store long-term facts in Context Mode when MemPalace is available.
-- GBrain state lives at ``$gbrainRoot`` and may mirror explicit saved memories for structured knowledge lookup. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots.
+- GBrain state lives at ``$gbrainRoot`` and mirrors explicit saved memories for structured local lookup. Save-UniversalAIMemory imports and embeds saved notes in GBrain using the local ``qwen3-embedding-0.6b`` service at ``http://127.0.0.1:18084/v1`` with 1024 dimensions; MemPalace remains the authoritative durable memory store. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots.
 - Lightpanda is the shared headless browser/fetch runtime. Use ``$lightpandaFetch`` or ``skill-router skill lightpanda-browser`` for browser retrieval; do not treat browser snapshots as memory unless a distilled fact is explicitly saved through MemPalace.
 - Persistent MCP bridge services remain disabled by default for low resource use. Direct CLI wrappers are the universal baseline; enable MCP only for clients that need live tool endpoints.
 "@
@@ -75,6 +75,12 @@ $memoryMarker
   $changed = $false
   if ($existing.Contains($marker)) {
     $content = $existing.TrimEnd()
+    $legacyGBrainLine = "- GBrain state lives at ``$gbrainRoot`` and may mirror explicit saved memories for structured knowledge lookup. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots."
+    $currentGBrainLine = "- GBrain state lives at ``$gbrainRoot`` and mirrors explicit saved memories for structured local lookup. Save-UniversalAIMemory imports and embeds saved notes in GBrain using the local ``qwen3-embedding-0.6b`` service at ``http://127.0.0.1:18084/v1`` with 1024 dimensions; MemPalace remains the authoritative durable memory store. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots."
+    if ($content.Contains($legacyGBrainLine)) {
+      $content = $content.Replace($legacyGBrainLine, $currentGBrainLine)
+      $changed = $true
+    }
     if (!$content.Contains($corpusMarker)) {
       $content += "`r`n" + $corpusBlock
       $changed = $true

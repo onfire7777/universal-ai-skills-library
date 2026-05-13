@@ -73,7 +73,8 @@ function Get-StackServiceWorkers {
     @{ id = 'universal-router'; pattern = 'universal_ai_router\.py' }
     @{ id = 'hermes-gateway'; pattern = 'hermes_cli\.main gateway run' }
     @{ id = 'paperclip'; pattern = 'start-paperclip-with-hermes\.py' }
-    @{ id = 'qwen3-coder-30b-a3b'; pattern = 'local_qwen_proxy\.py' }
+    @{ id = 'qwen3-coder-30b-a3b'; pattern = 'local_qwen_proxy\.py.*--name qwen3-coder-30b-a3b' }
+    @{ id = 'gbrain-embeddings'; pattern = 'local_qwen_proxy\.py.*--name qwen3-embedding-0\.6b' }
   )
 
   $processes = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue
@@ -133,6 +134,7 @@ $result = [ordered]@{
     hermesGateway = Test-Url 'http://127.0.0.1:8642/health'
     paperclip = Test-Url 'http://127.0.0.1:3100/api/health'
     qwen3Proxy = Test-Url 'http://127.0.0.1:18080/health'
+    gbrainEmbeddings = Test-Url 'http://127.0.0.1:18084/health'
   }
   backgroundPolicy = @{
     legacyMcpTasksDisabled = @(

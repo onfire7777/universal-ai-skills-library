@@ -13,7 +13,9 @@
     "auto-coding": "Route through the best available HTTP-capable coding model with failover.",
     "primary-coding": "gpt-5.5",
     "primary-api": "kimi-k2.6-thinking",
-    "local-coding": "qwen3-coder-30b-a3b-q4"
+    "local-coding": "qwen3-coder-30b-a3b-q4",
+    "local-embedding": "qwen3-embedding-0.6b-q8",
+    "shared-memory-embedding": "qwen3-embedding-0.6b-q8"
   },
   "models": [
     {
@@ -113,6 +115,37 @@
         }
       },
       "notes": "Installed local coding fallback for Hermes/Paperclip. Lazy proxy stays light; llama.cpp backend loads only after cloud-routeable providers fail or when explicitly selected."
+    },
+    {
+      "id": "qwen3-embedding-0.6b-q8",
+      "displayName": "Qwen3-Embedding-0.6B Q8_0",
+      "provider": "local-llama-cpp",
+      "routeKind": "openai-compatible-http",
+      "enabled": true,
+      "priority": 5,
+      "model": "qwen3-embedding-0.6b",
+      "baseUrl": "http://127.0.0.1:18084/v1",
+      "healthUrl": "http://127.0.0.1:18084/health",
+      "contextLength": 32768,
+      "embeddingDimensions": 1024,
+      "gpu": "RTX 4090 class, 24GB VRAM",
+      "launchMode": "lazy",
+      "modelPath": "{{QWEN3_EMBEDDING_0_6B_Q8_GGUF}}",
+      "llamaServer": "{{LLAMA_SERVER_EXE}}",
+      "quant": "Q8_0",
+      "profile": {
+        "ctxSize": 8192,
+        "nGpuLayers": 999,
+        "pooling": "last",
+        "embeddingOnly": true,
+        "flashAttention": true,
+        "batchSize": 512,
+        "ubatchSize": 256,
+        "threads": 4,
+        "parallel": 1,
+        "idleTimeoutSeconds": 600
+      },
+      "notes": "Local shared-memory embedding model for GBrain semantic/vector search. The proxy stays light and starts llama.cpp only on embedding requests."
     }
   ]
 }

@@ -190,6 +190,15 @@ function Ensure-CodexContextModeHooks {
         -replace 'mcp__\(\?!\.\*context-mode\)\|?', ''
     }
   }
+  foreach ($event in $templateJson.hooks.PSObject.Properties.Name) {
+    foreach ($entry in @($templateJson.hooks.$event)) {
+      foreach ($hook in @($entry.hooks)) {
+        if ($hook.command -match 'context-mode hook codex') {
+          Ensure-ObjectProperty -Object $hook -Name 'timeout' -Value 30
+        }
+      }
+    }
+  }
   $existingJson = [pscustomobject]@{ hooks = [pscustomobject]@{} }
   if (Test-Path -LiteralPath $Path) {
     try {

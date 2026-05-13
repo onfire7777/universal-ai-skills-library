@@ -33,6 +33,7 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Treat legacy skill names as aliases. Do not duplicate a skill directory when one canonical skill already contains the full implementation.
 - Local Claude, Codex, Manus-compatible, and other AI skill roots are searched read-only by the router; promote external skills into `skills/` only after audit and dedupe.
 - Third-party source repos such as gstack (`%USERPROFILE%\.gstack\gstack`) and GBrain (`%USERPROFILE%\gbrain`) are indexed read-only. Load namespaced gstack skills such as `gstack-review`, `gstack-qa`, or `gstack-cso` on demand instead of copying them into every AI root.
+- Universal shared memory uses MemPalace as the authoritative durable store and GBrain as the structured searchable mirror. Use `%USERPROFILE%\.universal-ai-stack\scripts\Search-UniversalAIMemory.ps1` for lookup and `%USERPROFILE%\.universal-ai-stack\scripts\Save-UniversalAIMemory.ps1` for confirmed durable saves. Saved notes are imported into GBrain and embedded with the local `qwen3-embedding-0.6b` service at `http://127.0.0.1:18084/v1`.
 - Prefer CLI calls for skill access and deterministic local workflows.
 - Run MCP bridges only for persistent endpoint services that cannot be replaced by direct CLI calls.
 - Treat AI platform compatibility as adapter-based:
