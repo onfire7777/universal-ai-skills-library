@@ -100,6 +100,19 @@ $codexHooksText = ''
 if (Test-Path -LiteralPath $codexHooks) {
   $codexHooksText = [System.IO.File]::ReadAllText($codexHooks)
 }
+$codexHookMatchers = @()
+if ($codexHooksText) {
+  try {
+    $codexHooksJson = $codexHooksText | ConvertFrom-Json
+    foreach ($event in $codexHooksJson.hooks.PSObject.Properties.Name) {
+      foreach ($entry in @($codexHooksJson.hooks.$event)) {
+        if ($entry.PSObject.Properties.Name -contains 'matcher' -and $entry.matcher) {
+          $codexHookMatchers += [string]$entry.matcher
+        }
+      }
+    }
+  } catch {}
+}
 
 $contextDoctor = $null
 if ($Deep -and $contextMode) {
@@ -147,6 +160,7 @@ $result = [ordered]@{
     version = $contextVersion
     codexMcpRegistered = [bool]($codexConfigText -match '(?m)^\[mcp_servers\."context-mode"\]')
     codexHooksConfigured = [bool]($codexHooksText -match 'context-mode hook codex pretooluse') -and [bool]($codexHooksText -match 'context-mode hook codex posttooluse')
+    codexHookMatchersNoLookaround = -not [bool]($codexHookMatchers -match '\(\?<?[!=]')
     doctor = $contextDoctor
   }
   lightpanda = [ordered]@{
@@ -165,6 +179,7 @@ $failures = New-Object System.Collections.Generic.List[string]
 if (!$result.contextMode.commandPresent) { $failures.Add('contextMode.commandPresent') | Out-Null }
 if (!$result.contextMode.codexMcpRegistered) { $failures.Add('contextMode.codexMcpRegistered') | Out-Null }
 if (!$result.contextMode.codexHooksConfigured) { $failures.Add('contextMode.codexHooksConfigured') | Out-Null }
+if (!$result.contextMode.codexHookMatchersNoLookaround) { $failures.Add('contextMode.codexHookMatchersNoLookaround') | Out-Null }
 if ($Deep -and (!$result.contextMode.doctor -or !$result.contextMode.doctor.ok)) { $failures.Add('contextMode.doctor') | Out-Null }
 if (!$result.lightpanda.rootPresent) { $failures.Add('lightpanda.rootPresent') | Out-Null }
 if (!$result.lightpanda.fetchWrapperPresent) { $failures.Add('lightpanda.fetchWrapperPresent') | Out-Null }
