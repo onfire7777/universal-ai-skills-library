@@ -113,36 +113,6 @@
         }
       },
       "notes": "Installed local coding fallback for Hermes/Paperclip. Lazy proxy stays light; llama.cpp backend loads only after cloud-routeable providers fail or when explicitly selected."
-    },
-    {
-      "id": "qwen3-coder-next-q5",
-      "displayName": "Qwen3-Coder-Next Q5_K_M",
-      "provider": "local-llama-cpp",
-      "routeKind": "openai-compatible-http",
-      "enabled": false,
-      "priority": 5,
-      "model": "qwen3-coder-next-q5",
-      "baseUrl": "http://127.0.0.1:18084/v1",
-      "healthUrl": "http://127.0.0.1:18084/health",
-      "contextLength": 131072,
-      "gpu": "RTX 4090 class, 24GB VRAM",
-      "launchMode": "manual",
-      "notes": "Disabled by default: stronger but too memory-heavy for clean 24GB VRAM multitasking unless explicitly requested."
-    },
-    {
-      "id": "qwen2.5-coder-32b-q4",
-      "displayName": "Qwen2.5-Coder-32B-Instruct Q4_K_M",
-      "provider": "local-llama-cpp",
-      "routeKind": "openai-compatible-http",
-      "enabled": false,
-      "priority": 6,
-      "model": "qwen2.5-coder-32b-q4",
-      "baseUrl": "http://127.0.0.1:18081/v1",
-      "healthUrl": "http://127.0.0.1:18081/health",
-      "contextLength": 65536,
-      "gpu": "RTX 4090 class, 24GB VRAM",
-      "launchMode": "manual",
-      "notes": "Disabled until the GGUF is actually installed. Keep as optional local fallback, not an automatic missing-file service."
     }
   ]
 }
