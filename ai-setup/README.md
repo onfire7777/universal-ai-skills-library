@@ -1,6 +1,10 @@
 # Universal AI Setup
 
-This folder makes the local Universal AI Stack reproducible from the repository.
+This folder makes the optional local Universal AI Stack reproducible from the
+repository. It is the runtime side of the router-first system: the skill corpus
+stays centralized, while model routing, Hermes/Paperclip integration, memory,
+embeddings, Context Mode, Lightpanda, and health checks are installed from
+portable templates.
 
 It is intentionally split into:
 

@@ -1,7 +1,15 @@
 # Universal AI Skills Plugin
 
 This plugin is the compact adapter surface for the Universal AI Skills Router.
-It does not embed the 1,807-skill corpus into always-loaded context.
+It gives AI clients access to the shared 1,807-skill corpus without embedding
+that corpus into always-loaded context or copying it into every client root.
+
+The intended flow is:
+
+1. search or preflight-route the user request with `skill-router`
+2. sanity-check that the selected skill matches the core task
+3. load exactly one skill when needed
+4. continue with no skill when the route is weak, generic, or ambiguous
 
 Use:
 

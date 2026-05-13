@@ -39,8 +39,11 @@ $required = @(
   'LICENSE',
   'SECURITY.md',
   'CONTRIBUTING.md',
+  'docs\README.md',
   'docs\QUICKSTART.md',
   'docs\PUBLIC_RELEASE_CHECKLIST.md',
+  'docs\DESIGN_AND_MESSAGING.md',
+  'docs\assets\universal-ai-skills-hero.svg',
   'docs\UNIVERSAL_AI_SETUP.md',
   'docs\AI_REPO_TOOLS_SUMMARY.md'
 )

@@ -8,7 +8,7 @@
     {
       "name": "universal-ai-skills",
       "source": "./plugin",
-      "description": "CLI-first universal AI skill router and local AI stack adapter for loading 1,807 skills on demand across Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and other agents.",
+      "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,807 skills on demand without duplicating the corpus.",
       "version": "2.2.3",
       "author": {
         "name": "onfire7777"

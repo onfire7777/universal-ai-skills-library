@@ -1,23 +1,51 @@
 # Universal AI Skills Library
 
-Universal AI Skills Library is a CLI-first skill router and local AI stack
-adapter for agentic coding, research, automation, and long-running AI
-workflows.
+<p align="center">
+  <img src="docs/assets/universal-ai-skills-hero.svg" alt="Universal AI Skills Library hero showing skill-router connecting multiple AI agents to one shared corpus">
+</p>
 
-It keeps a large skill corpus available without injecting thousands of files
-into every agent context. Agents run a lightweight preflight, load exactly one
-skill when it clearly matches the user request, and otherwise continue normally.
+<p align="center">
+  <strong>One shared skill corpus. One router. Every AI agent.</strong>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0f172a"></a>
+  <img alt="Skills: 1,807" src="https://img.shields.io/badge/skills-1,807-2563eb">
+  <img alt="Router-first" src="https://img.shields.io/badge/architecture-router--first-0891b2">
+  <img alt="Public safe" src="https://img.shields.io/badge/release-public--safe-059669">
+</p>
+
+Universal AI Skills Library is a router-first skill system for local and CLI AI
+tools. It lets Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, Kimi, Qwen,
+Gemini, OpenHands, and other agents search, preflight-route, and load 1,807
+skills on demand from one shared corpus without copying thousands of files into
+every client.
+
+The result is a clean universal skills layer for coding, research, automation,
+agentic workflows, memory-aware local AI stacks, and long-running development
+sessions. The full corpus stays in `skills/`; each AI client gets compact
+instructions or a tiny wrapper that calls `skill-router` only when a real user
+prompt needs a matching skill.
+
+## Why It Exists
+
+| Problem | This repo's answer |
+| --- | --- |
+| Every AI client wants skills in a different place. | Use compact adapters that all point back to one canonical router and corpus. |
+| Large skill libraries can bloat context. | Run deterministic preflight and load exactly one relevant skill when needed. |
+| Local AI stacks drift across Hermes, Paperclip, Codex, Claude, and IDE tools. | Keep portable model, memory, routing, and adapter config in repo-owned templates. |
+| Public repos can accidentally leak machine state or secrets. | Ship public-safe defaults, ignored local state, validation scripts, and a release audit. |
 
 ## What It Provides
 
 - 1,807 canonical skills in `skills/`
-- `skill-router`, a Go CLI for searching, routing, validating, and loading skills
+- `skill-router`, a Go CLI for search, preflight routing, validation, and skill loading
 - compact adapters for Codex, Claude, Cursor, Gemini, OpenCode, Hermes Agent,
   Paperclip, Kiro, Qwen, Kimi, OpenHands, Cline, Continue, and similar clients
 - optional Universal AI Stack runtime for model routing, health checks,
   Hermes/Paperclip integration, shared memory, local embeddings, and guarded
   local Qwen fallback
-- optional MCP bridge scripts for workflows that need persistent endpoints
+- optional MCP bridge scripts for workflows that truly need persistent endpoints
 - public-safe install, validation, and release-audit scripts
 
 The normal architecture is router-first. Do not copy the full skill corpus into
@@ -223,6 +251,7 @@ Pop-Location
 
 ## Documentation
 
+- [Documentation Hub](docs/README.md)
 - [Quickstart](docs/QUICKSTART.md)
 - [Universal AI Setup](docs/UNIVERSAL_AI_SETUP.md)
 - [Universal AI Connection Configs](docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md)
@@ -230,6 +259,7 @@ Pop-Location
 - [Compatibility](docs/UNIVERSAL_COMPATIBILITY.md)
 - [Install Modes](docs/INSTALL_MODES.md)
 - [Agent Support Matrix](docs/AGENT_SUPPORT_MATRIX.md)
+- [Design and Messaging](docs/DESIGN_AND_MESSAGING.md)
 - [Third-Party Source Repos](docs/THIRD_PARTY_SOURCE_REPOS.md)
 - [Public Release Checklist](docs/PUBLIC_RELEASE_CHECKLIST.md)
 

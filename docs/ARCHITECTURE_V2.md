@@ -1,8 +1,14 @@
 # Universal AI Skills Router Architecture
 
+Universal AI Skills Library is organized as a ports-and-adapters system. The
+core owns skill discovery, routing, validation, and on-demand loading. Client
+adapters keep Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, Kimi, Qwen,
+and related tools connected without turning each client into a separate copy of
+the full skill corpus.
+
 ## Decision
 
-Use a universal, CLI-first router as the stable core for the user's AI skill ecosystem.
+Use a universal, router-first CLI as the stable core for the user's AI skill ecosystem.
 
 Primary names:
 
@@ -21,7 +27,10 @@ Compatibility names remain only where they identify a real adapter or preserve i
 
 ## Rationale
 
-The previous layout worked technically but mixed a universal router with Manus-branded names. That violated separation of concerns: the universal core and platform adapters were coupled in naming, docs, plugin metadata, and local instructions.
+The previous layout worked technically but mixed a universal router with
+Manus-branded names. That violated separation of concerns: the universal core
+and platform adapters were coupled in naming, docs, plugin metadata, and local
+instructions.
 
 The revised design follows ports and adapters:
 

@@ -1,0 +1,99 @@
+<svg width="1600" height="840" viewBox="0 0 1600 840" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Universal AI Skills Library hero</title>
+  <desc id="desc">A modern abstract network showing one central skill router connecting many AI agents to one shared skill corpus.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="840" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111F"/>
+      <stop offset="0.52" stop-color="#101827"/>
+      <stop offset="1" stop-color="#07131A"/>
+    </linearGradient>
+    <linearGradient id="card" x1="290" y1="125" x2="1310" y2="725" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#162033" stop-opacity="0.94"/>
+      <stop offset="1" stop-color="#0D151F" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="428" y1="168" x2="1120" y2="642" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6EE7F9"/>
+      <stop offset="0.48" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#34D399"/>
+    </linearGradient>
+    <linearGradient id="soft" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#22D3EE" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#A78BFA" stop-opacity="0.18"/>
+    </linearGradient>
+    <filter id="shadow" x="200" y="40" width="1200" height="780" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="38" stdDeviation="42" flood-color="#000814" flood-opacity="0.46"/>
+    </filter>
+    <filter id="glow" x="-80" y="-80" width="1760" height="1000" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="46"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="840" fill="url(#bg)"/>
+  <g filter="url(#glow)" opacity="0.7">
+    <circle cx="435" cy="200" r="150" fill="#0EA5E9" opacity="0.25"/>
+    <circle cx="1192" cy="642" r="190" fill="#10B981" opacity="0.18"/>
+    <circle cx="1080" cy="176" r="150" fill="#8B5CF6" opacity="0.2"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="248" y="92" width="1104" height="656" rx="44" fill="url(#card)" stroke="#263449"/>
+    <rect x="280" y="126" width="1040" height="588" rx="28" fill="#0B1220" fill-opacity="0.52" stroke="#1E293B"/>
+  </g>
+
+  <g opacity="0.78">
+    <path d="M516 405C616 308 743 292 800 420C857 548 990 532 1084 434" stroke="url(#accent)" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M514 494C660 554 760 526 800 420C840 314 948 286 1088 344" stroke="url(#accent)" stroke-width="2.4" stroke-opacity="0.54" stroke-linecap="round"/>
+    <path d="M622 254C730 280 768 346 800 420C832 494 898 604 1034 618" stroke="url(#accent)" stroke-width="2.4" stroke-opacity="0.48" stroke-linecap="round"/>
+  </g>
+
+  <g>
+    <rect x="670" y="290" width="260" height="260" rx="54" fill="#0F172A" stroke="url(#accent)" stroke-width="3"/>
+    <rect x="704" y="324" width="192" height="192" rx="42" fill="url(#soft)" stroke="#334155"/>
+    <path d="M770 420H830M800 390V450" stroke="#E0F2FE" stroke-width="10" stroke-linecap="round"/>
+    <text x="800" y="593" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#F8FAFC">skill-router</text>
+    <text x="800" y="625" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#94A3B8">one preflight, one skill, clean context</text>
+  </g>
+
+  <g font-family="Inter, Segoe UI, Arial, sans-serif">
+    <g transform="translate(372 196)">
+      <rect width="208" height="86" rx="22" fill="#111827" stroke="#263449"/>
+      <text x="26" y="35" font-size="18" font-weight="700" fill="#F8FAFC">Codex</text>
+      <text x="26" y="61" font-size="14" fill="#94A3B8">local adapter</text>
+    </g>
+    <g transform="translate(1020 174)">
+      <rect width="226" height="86" rx="22" fill="#111827" stroke="#263449"/>
+      <text x="26" y="35" font-size="18" font-weight="700" fill="#F8FAFC">Claude</text>
+      <text x="26" y="61" font-size="14" fill="#94A3B8">wrapper skill</text>
+    </g>
+    <g transform="translate(338 528)">
+      <rect width="230" height="86" rx="22" fill="#111827" stroke="#263449"/>
+      <text x="26" y="35" font-size="18" font-weight="700" fill="#F8FAFC">Hermes</text>
+      <text x="26" y="61" font-size="14" fill="#94A3B8">agent runtime</text>
+    </g>
+    <g transform="translate(1040 540)">
+      <rect width="242" height="86" rx="22" fill="#111827" stroke="#263449"/>
+      <text x="26" y="35" font-size="18" font-weight="700" fill="#F8FAFC">Paperclip</text>
+      <text x="26" y="61" font-size="14" fill="#94A3B8">company skills</text>
+    </g>
+    <g transform="translate(442 360)">
+      <rect width="164" height="74" rx="20" fill="#0E1726" stroke="#263449"/>
+      <text x="24" y="31" font-size="16" font-weight="700" fill="#E2E8F0">Cursor</text>
+      <text x="24" y="55" font-size="13" fill="#94A3B8">rules</text>
+    </g>
+    <g transform="translate(996 378)">
+      <rect width="170" height="74" rx="20" fill="#0E1726" stroke="#263449"/>
+      <text x="24" y="31" font-size="16" font-weight="700" fill="#E2E8F0">OpenCode</text>
+      <text x="24" y="55" font-size="13" fill="#94A3B8">skills</text>
+    </g>
+  </g>
+
+  <g font-family="Inter, Segoe UI, Arial, sans-serif">
+    <text x="358" y="156" font-size="17" fill="#38BDF8" font-weight="700" letter-spacing="0.08em">UNIVERSAL AI SKILLS</text>
+    <text x="358" y="680" font-size="18" fill="#CBD5E1">1,807 canonical skills stay in one corpus and load only when routed.</text>
+    <g transform="translate(930 662)">
+      <rect width="270" height="38" rx="19" fill="#0F172A" stroke="#334155"/>
+      <circle cx="25" cy="19" r="7" fill="#34D399"/>
+      <text x="46" y="25" font-size="14" fill="#D1FAE5">router-first, public-safe, low-context</text>
+    </g>
+  </g>
+</svg>
