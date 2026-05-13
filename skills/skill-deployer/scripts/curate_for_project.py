@@ -35,6 +35,12 @@ except ImportError:
         sys.exit(1)
     from openai import OpenAI
 
+DEFAULT_SKILLS_DIR = (
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+)
+
 
 def build_catalog(skills_dir):
     """Build a skill catalog from the skills directory."""
@@ -202,7 +208,7 @@ def resolve_names(names, catalog):
 def main():
     parser = argparse.ArgumentParser(description="Curate skills for Manus projects")
     parser.add_argument("--projects", required=True, help="Projects JSON file")
-    parser.add_argument("--skills-dir", default="/home/ubuntu/skills", help="Skills directory")
+    parser.add_argument("--skills-dir", default=DEFAULT_SKILLS_DIR, help="Skills directory")
     parser.add_argument("--catalog", help="Pre-built catalog file (skip directory scan)")
     parser.add_argument("--output", default="deployment_plan.json", help="Output plan file")
     parser.add_argument("--universal-count", type=int, default=55, help="Number of universal skills")

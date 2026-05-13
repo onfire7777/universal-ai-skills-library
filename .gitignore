@@ -30,7 +30,34 @@ node_modules/
 # Environment
 .env
 .env.local
+*.env
+secrets/
 *.log
+logs/
+state/
+reports/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+
+# Local runtime/install targets
+.universal-ai-stack/
+.local-ai/
+models/
+*.gguf
+*.safetensors
+*.bin
+
+# OAuth/session/browser artifacts
+auth.json
+oauth_creds.json
+cookies.json
+Cookies
+Local State
+Session Storage/
+IndexedDB/
 
 # Virtual environments
 venv/

@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-stack.integrations.v1",
-  "updated": "2026-05-12",
+  "updated": "2026-05-13",
   "paths": {
     "root": "{{USERPROFILE}}\\.universal-ai-stack",
     "repoRoot": "{{REPO_ROOT}}",

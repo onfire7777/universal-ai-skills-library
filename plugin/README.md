@@ -1,6 +1,7 @@
 # Universal AI Skills Plugin
 
-This plugin is an index and rule surface for the Universal AI Skills Router. It does not embed the 1,807-skill corpus into always-loaded context.
+This plugin is the compact adapter surface for the Universal AI Skills Router.
+It does not embed the 1,807-skill corpus into always-loaded context.
 
 Use:
 

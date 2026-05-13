@@ -15,10 +15,15 @@ Skills are expected at /home/ubuntu/skills/<skill-name>/
 
 import sys
 import re
+import os
 import yaml
 from pathlib import Path
 
-SKILLS_BASE_PATH = Path("/home/ubuntu/skills")
+SKILLS_BASE_PATH = Path(
+    os.environ.get("SKILL_ROUTER_SKILLS_DIR")
+    or os.environ.get("MANUS_SKILLS_DIR")
+    or Path(__file__).resolve().parents[2]
+)
 
 
 def resolve_skill_path(skill_path_or_name):
