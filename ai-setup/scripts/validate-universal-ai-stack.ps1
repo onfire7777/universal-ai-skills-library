@@ -115,6 +115,10 @@ if ($CheckInstalled) {
   foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json', 'bin\universal_ai_router.py', 'scripts\Test-UniversalAIStack.ps1') {
     if (!(Test-Path -LiteralPath (Join-Path $InstalledRoot $rel))) { Add-Failure "Installed stack missing $rel" }
   }
+  foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json') {
+    $path = Join-Path $InstalledRoot $rel
+    if (Test-Path -LiteralPath $path) { [void](Read-Json $path) }
+  }
   $secretPath = Join-Path $InstalledRoot 'secrets\.env'
   if (!(Test-Path -LiteralPath $secretPath)) {
     Add-Warning "Installed secrets file missing: $secretPath"

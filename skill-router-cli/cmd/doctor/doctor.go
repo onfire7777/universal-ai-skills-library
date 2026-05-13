@@ -127,7 +127,7 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 		})
 		optional("Optional MCP Connector CLI", func() (string, error) {
 			if !mcpcli.Available() {
-				return "", mcpcli.MissingError()
+				return fmt.Sprintf("not installed; optional (%s)", mcpcli.MissingError().Error()), nil
 			}
 			return "available", nil
 		})
@@ -189,14 +189,15 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			type bridgeInfo struct {
 				name         string
 				port         int
+				taskName     string
 				optional     bool
 				requiresPath string
 			}
 			mcpBridges := []bridgeInfo{
-				{name: "skill-seekers", port: 8875},
-				{name: "mempalace", port: 8876},
-				{name: "context-mode", port: 8877},
-				{name: "lightpanda", port: 8878, optional: true, requiresPath: `\\.\pipe\dockerDesktopLinuxEngine`},
+				{name: "skill-seekers", port: 8875, taskName: "UniversalAI-SkillSeekersMcp"},
+				{name: "mempalace", port: 8876, taskName: "UniversalAI-MemPalaceMcp"},
+				{name: "context-mode", port: 8877, taskName: "UniversalAI-ContextModeMcp"},
+				{name: "lightpanda", port: 8878, taskName: "UniversalAI-LightpandaMcp", optional: true, requiresPath: `\\.\pipe\dockerDesktopLinuxEngine`},
 			}
 			for _, b := range mcpBridges {
 				bCopy := b
@@ -204,6 +205,9 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 					out, _ := runner.RunCommandCapture("powershell", "-NoProfile", "-Command",
 						fmt.Sprintf(`try{$c=New-Object Net.Sockets.TcpClient;$c.Connect('127.0.0.1',%d);$c.Close();'UP'}catch{'DOWN'}`, bCopy.port))
 					if strings.TrimSpace(out) != "UP" {
+						if taskDisabled(bCopy.taskName) {
+							return fmt.Sprintf("disabled by low-resource policy; port %d down", bCopy.port), nil
+						}
 						if bCopy.optional && bCopy.requiresPath != "" && !pathExists(bCopy.requiresPath) {
 							return fmt.Sprintf("skipped; optional dependency unavailable: %s", bCopy.requiresPath), nil
 						}
@@ -229,6 +233,9 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 					if contains(out, "Ready") {
 						return "Ready", nil
 					}
+					if contains(out, "Disabled") {
+						return "Disabled", nil
+					}
 					return "Unknown state", nil
 				})
 			}
@@ -241,19 +248,19 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			if os.Getenv("OPENROUTER_API_KEY") != "" {
 				return "set", nil
 			}
-			return "", fmt.Errorf("not set")
+			return "not set; intentionally disabled in Universal AI Stack policy", nil
 		})
 		optional("OPENAI_API_KEY", func() (string, error) {
 			if os.Getenv("OPENAI_API_KEY") != "" {
 				return "set", nil
 			}
-			return "", fmt.Errorf("not set")
+			return "not set; prefer OpenAI CLI/session auth", nil
 		})
 		optional("MANUS_API_KEY", func() (string, error) {
 			if os.Getenv("MANUS_API_KEY") != "" {
 				return "set", nil
 			}
-			return "", fmt.Errorf("not set")
+			return "not set; optional", nil
 		})
 
 		fmt.Println()
@@ -311,6 +318,17 @@ func pathExists(path string) bool {
 	}
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+func taskDisabled(taskName string) bool {
+	if taskName == "" || runtime.GOOS != "windows" {
+		return false
+	}
+	out, err := runner.RunCommandCapture("schtasks", "/query", "/tn", taskName, "/fo", "list")
+	if err != nil {
+		return false
+	}
+	return contains(out, "Disabled")
 }
 
 func contains(s, substr string) bool {

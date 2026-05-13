@@ -54,17 +54,39 @@ function Protect-SecretsDir {
   }
 }
 
+function ConvertTo-JsonStringFragment {
+  param([string]$Value)
+  $json = $Value | ConvertTo-Json -Compress
+  if ($json.Length -ge 2 -and $json[0] -eq '"' -and $json[$json.Length - 1] -eq '"') {
+    return $json.Substring(1, $json.Length - 2)
+  }
+  return $json
+}
+
 function Replace-Placeholders {
-  param([string]$Text)
-  return $Text.
-    Replace('{{USERPROFILE}}', $env:USERPROFILE).
-    Replace('{{REPO_ROOT}}', $RepoRoot).
-    Replace('{{STARTUP_FOLDER}}', [Environment]::GetFolderPath('Startup')).
-    Replace('{{HERMES_PYTHONW}}', $HermesPythonw).
-    Replace('{{QWEN_PROXY_PY}}', $QwenProxyPath).
-    Replace('{{QWEN3_CODER_30B_A3B_Q4_GGUF}}', $QwenModelPath).
-    Replace('{{LLAMA_CPP_ROOT}}', $LlamaCppRoot).
-    Replace('{{LLAMA_SERVER_EXE}}', (Join-Path $LlamaCppRoot 'llama-server.exe'))
+  param(
+    [string]$Text,
+    [switch]$JsonEscaped
+  )
+
+  $replacements = [ordered]@{
+    USERPROFILE = $env:USERPROFILE
+    REPO_ROOT = $RepoRoot
+    STARTUP_FOLDER = [Environment]::GetFolderPath('Startup')
+    HERMES_PYTHONW = $HermesPythonw
+    QWEN_PROXY_PY = $QwenProxyPath
+    QWEN3_CODER_30B_A3B_Q4_GGUF = $QwenModelPath
+    LLAMA_CPP_ROOT = $LlamaCppRoot
+    LLAMA_SERVER_EXE = (Join-Path $LlamaCppRoot 'llama-server.exe')
+  }
+
+  $expanded = $Text
+  foreach ($key in $replacements.Keys) {
+    $value = [string]$replacements[$key]
+    if ($JsonEscaped) { $value = ConvertTo-JsonStringFragment -Value $value }
+    $expanded = $expanded.Replace("{{$key}}", $value)
+  }
+  return $expanded
 }
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -93,7 +115,7 @@ Get-ChildItem -LiteralPath $TargetRoot -Recurse -File |
   Where-Object { $expandExtensions -contains $_.Extension -or $_.Name -eq '.env.template' } |
   ForEach-Object {
     $text = [System.IO.File]::ReadAllText($_.FullName)
-    $expanded = Replace-Placeholders -Text $text
+    $expanded = Replace-Placeholders -Text $text -JsonEscaped:($_.Extension -eq '.json')
     if ($expanded -ne $text) {
       Write-Utf8NoBom -Path $_.FullName -Content $expanded
     }

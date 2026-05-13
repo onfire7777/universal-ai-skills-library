@@ -43,6 +43,20 @@ function Test-ListeningPort {
   return [bool]$listener
 }
 
+function Test-JsonFile {
+  param([string]$Path)
+
+  if (!(Test-Path -LiteralPath $Path)) {
+    return [ordered]@{ ok = $false; error = 'missing' }
+  }
+  try {
+    [void](Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json)
+    return [ordered]@{ ok = $true }
+  } catch {
+    return [ordered]@{ ok = $false; error = $_.Exception.Message }
+  }
+}
+
 $envValues = Read-EnvFile -Path $SecretsEnv
 $authHeaders = @{}
 if ($envValues['UNIVERSAL_AI_STACK_API_KEY']) {
@@ -70,6 +84,11 @@ $result = [ordered]@{
     routingPolicy = Test-Path -LiteralPath (Join-Path $Root 'config\routing-policy.json')
     integrations = Test-Path -LiteralPath (Join-Path $Root 'config\integrations.json')
     secretsEnv = Test-Path -LiteralPath $SecretsEnv
+  }
+  configJson = @{
+    modelRegistry = Test-JsonFile (Join-Path $Root 'config\model-registry.json')
+    routingPolicy = Test-JsonFile (Join-Path $Root 'config\routing-policy.json')
+    integrations = Test-JsonFile (Join-Path $Root 'config\integrations.json')
   }
   endpoints = @{
     universalRouterHealth = Test-Url 'http://127.0.0.1:18100/health'

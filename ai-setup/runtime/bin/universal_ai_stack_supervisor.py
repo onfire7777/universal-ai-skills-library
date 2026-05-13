@@ -99,6 +99,17 @@ def start_service(service: dict[str, Any], env: dict[str, str]) -> None:
     )
 
 
+def wait_for_health(url: str | None, timeout_seconds: float = 45.0, interval_seconds: float = 2.0) -> bool:
+    if not url:
+        return True
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        if healthy(url):
+            return True
+        time.sleep(interval_seconds)
+    return healthy(url)
+
+
 def write_state(results: list[dict[str, Any]]) -> None:
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     payload = {"time": int(time.time()), "results": results}
@@ -115,8 +126,7 @@ def check_once() -> list[dict[str, Any]]:
         is_healthy = healthy(health_url) if health_url else False
         if not is_healthy:
             start_service(service, env)
-            time.sleep(2)
-            is_healthy = healthy(health_url) if health_url else True
+            is_healthy = wait_for_health(health_url)
         results.append({"id": service_id, "healthy": is_healthy, "healthUrl": health_url})
     write_state(results)
     return results
