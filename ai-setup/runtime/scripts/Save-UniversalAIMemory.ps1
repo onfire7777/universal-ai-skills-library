@@ -5,6 +5,7 @@ param(
   [string]$Wing = 'universal_ai_shared',
   [string[]]$Tags = @('universal-ai-memory'),
   [switch]$SkipGBrain,
+  [switch]$SkipGBrainEmbed,
   [switch]$JsonOnly
 )
 
@@ -78,11 +79,24 @@ if (!$SkipGBrain -and $GBrain) {
   $ErrorActionPreference = 'Continue'
   $gbrainOutput = & $GBrain import $noteDir --no-embed 2>&1
   $gbrainExitCode = $LASTEXITCODE
+  $gbrainEmbedOutput = @()
+  $gbrainEmbedExitCode = $null
+  if ($gbrainExitCode -eq 0 -and !$SkipGBrainEmbed) {
+    $gbrainEmbedOutput = & $GBrain embed --stale 2>&1
+    $gbrainEmbedExitCode = $LASTEXITCODE
+  }
   $ErrorActionPreference = $oldErrorActionPreference
   $gbrainResult.ok = ($gbrainExitCode -eq 0)
   $gbrainResult.exitCode = $gbrainExitCode
   $gbrainResult.importedDirectory = $noteDir
   $gbrainResult.summary = (($gbrainOutput | Select-Object -First 12) -join "`n")
+  $gbrainResult.embedAttempted = ($gbrainExitCode -eq 0 -and !$SkipGBrainEmbed)
+  if ($gbrainEmbedExitCode -ne $null) {
+    $gbrainResult.embedOk = ($gbrainEmbedExitCode -eq 0)
+    $gbrainResult.embedExitCode = $gbrainEmbedExitCode
+    $gbrainResult.embedSummary = (($gbrainEmbedOutput | Select-Object -First 12) -join "`n")
+    $gbrainResult.ok = ($gbrainResult.ok -and $gbrainResult.embedOk)
+  }
 } elseif ($SkipGBrain) {
   $gbrainResult.skipped = $true
 } else {
@@ -107,4 +121,5 @@ if ($JsonOnly) {
   "File: $notePath"
   "MemPalace: $($mempalaceResult.ok)"
   "GBrain: $($gbrainResult.ok)"
+  if ($gbrainResult.Contains('embedOk')) { "GBrainEmbed: $($gbrainResult.embedOk)" }
 }

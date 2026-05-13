@@ -473,10 +473,10 @@ _, err = client.Beta.Vaults.Credentials.Update(ctx, credential.ID, anthropic.Bet
     Auth: anthropic.BetaVaultCredentialUpdateParamsAuthUnion{
         OfMCPOAuth: &anthropic.BetaManagedAgentsMCPOAuthUpdateParams{
             Type:        anthropic.BetaManagedAgentsMCPOAuthUpdateParamsTypeMCPOAuth,
-            AccessToken: anthropic.String("xoxp-new-..."),
+            AccessToken: anthropic.String("SLACK_USER_TOKEN_PLACEHOLDER"),
             ExpiresAt:   anthropic.Time(time.Date(2026, time.May, 15, 0, 0, 0, 0, time.UTC)),
             Refresh: anthropic.BetaManagedAgentsMCPOAuthRefreshUpdateParams{
-                RefreshToken: anthropic.String("xoxe-1-new-..."),
+                RefreshToken: anthropic.String("SLACK_REFRESH_TOKEN_PLACEHOLDER"),
             },
         },
     },

@@ -101,17 +101,39 @@ if (Test-Path -LiteralPath $codexHooks) {
   $codexHooksText = [System.IO.File]::ReadAllText($codexHooks)
 }
 $codexHookMatchers = @()
+$expectedCodexHookEvents = @('PreToolUse', 'PostToolUse', 'SessionStart', 'UserPromptSubmit', 'Stop', 'PreCompact')
+$codexHookEventsPresent = @{}
+$codexContextHookTimeoutsOk = $true
 if ($codexHooksText) {
   try {
     $codexHooksJson = $codexHooksText | ConvertFrom-Json
+    foreach ($expectedEvent in $expectedCodexHookEvents) {
+      $codexHookEventsPresent[$expectedEvent] = $false
+    }
     foreach ($event in $codexHooksJson.hooks.PSObject.Properties.Name) {
       foreach ($entry in @($codexHooksJson.hooks.$event)) {
         if ($entry.PSObject.Properties.Name -contains 'matcher' -and $entry.matcher) {
           $codexHookMatchers += [string]$entry.matcher
         }
+        foreach ($hook in @($entry.hooks)) {
+          if ($hook.command -match 'context-mode hook codex') {
+            if ($codexHookEventsPresent.ContainsKey($event)) {
+              $codexHookEventsPresent[$event] = $true
+            }
+            if (!($hook.PSObject.Properties.Name -contains 'timeout') -or [int]$hook.timeout -ne 30) {
+              $codexContextHookTimeoutsOk = $false
+            }
+          }
+        }
       }
     }
   } catch {}
+}
+$codexAllLifecycleHooksConfigured = $true
+foreach ($expectedEvent in $expectedCodexHookEvents) {
+  if (!$codexHookEventsPresent.ContainsKey($expectedEvent) -or !$codexHookEventsPresent[$expectedEvent]) {
+    $codexAllLifecycleHooksConfigured = $false
+  }
 }
 
 $contextDoctor = $null
@@ -160,6 +182,8 @@ $result = [ordered]@{
     version = $contextVersion
     codexMcpRegistered = [bool]($codexConfigText -match '(?m)^\[mcp_servers\."context-mode"\]')
     codexHooksConfigured = [bool]($codexHooksText -match 'context-mode hook codex pretooluse') -and [bool]($codexHooksText -match 'context-mode hook codex posttooluse')
+    codexAllLifecycleHooksConfigured = $codexAllLifecycleHooksConfigured
+    codexContextHookTimeouts30 = $codexContextHookTimeoutsOk
     codexHookMatchersNoLookaround = -not [bool]($codexHookMatchers -match '\(\?<?[!=]')
     doctor = $contextDoctor
   }
@@ -179,6 +203,8 @@ $failures = New-Object System.Collections.Generic.List[string]
 if (!$result.contextMode.commandPresent) { $failures.Add('contextMode.commandPresent') | Out-Null }
 if (!$result.contextMode.codexMcpRegistered) { $failures.Add('contextMode.codexMcpRegistered') | Out-Null }
 if (!$result.contextMode.codexHooksConfigured) { $failures.Add('contextMode.codexHooksConfigured') | Out-Null }
+if (!$result.contextMode.codexAllLifecycleHooksConfigured) { $failures.Add('contextMode.codexAllLifecycleHooksConfigured') | Out-Null }
+if (!$result.contextMode.codexContextHookTimeouts30) { $failures.Add('contextMode.codexContextHookTimeouts30') | Out-Null }
 if (!$result.contextMode.codexHookMatchersNoLookaround) { $failures.Add('contextMode.codexHookMatchersNoLookaround') | Out-Null }
 if ($Deep -and (!$result.contextMode.doctor -or !$result.contextMode.doctor.ok)) { $failures.Add('contextMode.doctor') | Out-Null }
 if (!$result.lightpanda.rootPresent) { $failures.Add('lightpanda.rootPresent') | Out-Null }

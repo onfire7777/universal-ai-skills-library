@@ -3,7 +3,9 @@ $ErrorActionPreference = "Stop"
 $name = "lightpanda-ai-browser"
 $image = "lightpanda/browser:nightly"
 
-docker pull $image | Out-Null
+if (!(docker image inspect $image 2>$null)) {
+  docker pull $image | Out-Null
+}
 
 $existing = docker ps -a --filter "name=^/$name$" --format "{{.Names}}"
 if ($existing -eq $name) {
@@ -20,4 +22,15 @@ if ($existing -eq $name) {
     $image /bin/lightpanda serve --host 0.0.0.0 --advertise-host 127.0.0.1 --port 9222 --log-level info --obey-robots | Out-Null
 }
 
-Invoke-RestMethod -Uri "http://127.0.0.1:9222/json/version" -TimeoutSec 10 | ConvertTo-Json -Depth 4
+$lastError = $null
+for ($i = 0; $i -lt 20; $i++) {
+  try {
+    Invoke-RestMethod -Uri "http://127.0.0.1:9222/json/version" -TimeoutSec 5 | ConvertTo-Json -Depth 4
+    exit 0
+  } catch {
+    $lastError = $_
+    Start-Sleep -Milliseconds 750
+  }
+}
+
+throw $lastError

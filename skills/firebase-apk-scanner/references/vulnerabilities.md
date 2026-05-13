@@ -19,7 +19,7 @@ Firebase Console → Authentication → Sign-in method → Email/Password: Enabl
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"email":"attacker@evil.com","password":"Password123!","returnSecureToken":true}' \
-  "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=GOOGLE_API_KEY_EXAMPLE_REDACTED"
 ```
 
 **Successful Attack Response:**
@@ -593,7 +593,7 @@ exports.processPayment = functions.https.onCall(async (data, context) => {
 
 **Exploitation:**
 ```bash
-curl -H "x-goog-api-key: AIzaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" \
+curl -H "x-goog-api-key: GOOGLE_API_KEY_EXAMPLE_REDACTED" \
   "https://firebaseremoteconfig.googleapis.com/v1/projects/PROJECT-ID/remoteConfig"
 ```
 
@@ -739,7 +739,7 @@ Raw DEX strings               → strings command output
 **API Key Format:**
 ```
 AIza[A-Za-z0-9_-]{35}
-Example: AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q
+Example: GOOGLE_API_KEY_EXAMPLE_REDACTED
 ```
 
 **What Attackers Can Do With API Key:**

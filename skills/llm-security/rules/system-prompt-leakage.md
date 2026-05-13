@@ -21,8 +21,8 @@ System prompt leakage occurs when the instructions used to configure an LLM are 
 # NEVER DO THIS
 system_prompt = """You are a helpful assistant for ACME Corp.
 
-Database credentials: postgresql://admin:SuperSecret123@db.internal.acme.com/prod
-API Key: sk-proj-abc123secretkey456xyz
+Database credentials: postgresql://example-user:example-password@db.internal.example/prod
+API Key: OPENAI_API_KEY_EXAMPLE_REDACTED
 Internal endpoints: https://internal-api.acme.com/v1/
 
 When users ask about orders, query the database directly.

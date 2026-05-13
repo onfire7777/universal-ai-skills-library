@@ -69,7 +69,20 @@ Local final fallback:
 - KV cache: `q4_0` / `q4_0`
 - Idle timeout: `600` seconds
 
-Only configured local model:
+Local shared-memory embedding model:
+
+- `qwen3-embedding-0.6b-q8`
+- Runtime: llama.cpp / llama-server through the hidden lazy local proxy
+- Model file: `Qwen3-Embedding-0.6B-Q8_0.gguf`
+- Base URL: `http://127.0.0.1:18084/v1`
+- Health URL: `http://127.0.0.1:18084/health`
+- Dimensions: `1024`
+- Server context: `8,192`
+- Pooling: `last`
+- Purpose: GBrain semantic/vector search and shared-memory mirror lookup
+- API cost: none; this replaces paid OpenAI embeddings for GBrain text vectors
+
+Only configured local generative model:
 
 - `qwen3-coder-30b-a3b-q4`
 
@@ -145,9 +158,11 @@ Paperclip:
   `Search-UniversalAIMemory.ps1` for lookup and `Save-UniversalAIMemory.ps1`
   for explicit durable saves. These wrappers are the cross-client baseline for
   Hermes, Paperclip, Codex, Claude, Cursor, Kimi, Aion, OpenCode, and related
-  clients. The lookup wrapper queries MemPalace first, then GBrain. If GBrain's
-  phrase search returns no result for a multi-word query, the wrapper falls back
-  to meaningful individual terms so imported shared-memory pages are still
+  clients. The save wrapper writes the note to MemPalace, imports the same note
+  into GBrain, and runs `gbrain embed --stale` so the mirror remains searchable.
+  The lookup wrapper queries MemPalace first, then GBrain. If GBrain's phrase
+  search returns no result for a multi-word query, the wrapper falls back to
+  meaningful individual terms so imported shared-memory pages are still
   discoverable.
 - Context Mode remains scratch/context-window infrastructure. It must not be
   used as the durable memory source when MemPalace is available.
@@ -157,13 +172,20 @@ Paperclip:
   PostToolUse, SessionStart, PreCompact, UserPromptSubmit, and Stop.
 - The Codex hook sync strips unsupported regex look-around from the upstream
   Context Mode PreToolUse matcher so Codex Desktop can parse the hook config.
+- Context Mode Codex lifecycle hooks are written with a `30` second timeout.
+  `Test-UniversalAIContextTools.ps1` fails if any lifecycle hook is missing,
+  has unsupported matcher look-around, or loses that timeout.
 - Lightpanda is the on-demand headless browser runtime. The clean default keeps
   persistent Lightpanda bridge services disabled, but the wrappers under
   `C:\Users\burni\.lightpanda-ai` must be able to fetch pages and start CDP
   when Docker Desktop's Linux engine is running.
 - GBrain is a structured knowledge mirror and query surface. It can receive
   explicit saved memory notes, but it does not replace MemPalace as the shared
-  memory source.
+  memory source. Its default text embedding provider is the local
+  `llama-server:qwen3-embedding-0.6b` endpoint at
+  `http://127.0.0.1:18084/v1` with 1024 dimensions. Do not reintroduce
+  `text-embedding-3-large` or 1536-dimensional GBrain text embeddings unless
+  the brain database is intentionally rebuilt for that provider.
 
 ## Validation
 
@@ -182,6 +204,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-
 powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda
 skill-router skills validate-manifest
 skill-router doctor
+gbrain stats
+mempalace status
 ```
 
 `skill-router doctor` may warn that optional persistent MCP bridge ports are down. That is normal for the low-resource profile unless the active task needs those endpoints.

@@ -38,6 +38,12 @@ GBrain is a persistent local knowledge system. It should be called through its
 CLI for brain state operations and through `skill-router skill <name>` for
 skillpack instructions.
 
+The Universal AI Stack uses GBrain as the structured searchable mirror for
+explicit shared-memory notes. MemPalace remains the authoritative durable memory
+store. GBrain vectors use the local `qwen3-embedding-0.6b` llama.cpp service at
+`http://127.0.0.1:18084/v1` with 1024 dimensions, so text embedding does not
+require an OpenAI API key.
+
 ## Verification
 
 ```powershell
@@ -49,8 +55,10 @@ skill-router gbrain status
 gbrain --version
 ```
 
-Warnings for missing optional API keys are acceptable when vector embeddings or
-provider-backed query expansion are not configured.
+Warnings for missing optional API keys are acceptable for provider-backed query
+expansion, subagent workers, or other paid optional features. They are not
+expected for the local GBrain text embedding path when the Qwen embedding
+service is healthy.
 
 The `bun.cmd` and `gbrain.cmd` shims are thin delegates, not duplicate installs.
 They exist because long-running AI desktop clients can inherit an older PATH

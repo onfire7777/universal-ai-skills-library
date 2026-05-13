@@ -48,7 +48,7 @@ $curated = Read-Json (Join-Path $RepoRoot 'ai-setup\manifests\curated-skills.jso
 if ($modelRegistry) {
   $models = @($modelRegistry.models)
   $ids = @($models | ForEach-Object { $_.id })
-  foreach ($id in 'gpt-5.5', 'kimi-k2.6-thinking', 'claude-opus-4.7', 'qwen3-coder-30b-a3b-q4') {
+  foreach ($id in 'gpt-5.5', 'kimi-k2.6-thinking', 'claude-opus-4.7', 'qwen3-coder-30b-a3b-q4', 'qwen3-embedding-0.6b-q8') {
     if ($ids -notcontains $id) { Add-Failure "Model registry missing $id" }
   }
   $qwen = $models | Where-Object { $_.id -eq 'qwen3-coder-30b-a3b-q4' } | Select-Object -First 1
@@ -65,6 +65,14 @@ if ($modelRegistry) {
   if ($kimi) {
     if ($kimi.providerRequestDefaults.temperature -ne 1) { Add-Failure 'Kimi temperature default must be 1.' }
     if ($kimi.providerRequestDefaults.top_p -ne 0.95) { Add-Failure 'Kimi top_p default must be 0.95.' }
+  }
+  $embedding = $models | Where-Object { $_.id -eq 'qwen3-embedding-0.6b-q8' } | Select-Object -First 1
+  if (!$embedding) {
+    Add-Failure 'Missing qwen3-embedding-0.6b-q8 local embedding model.'
+  } else {
+    if ([int]$embedding.embeddingDimensions -ne 1024) { Add-Failure "GBrain embedding dimensions should be 1024, got $($embedding.embeddingDimensions)" }
+    if ($embedding.routeKind -ne 'openai-compatible-http') { Add-Failure "GBrain embedding routeKind should be openai-compatible-http, got $($embedding.routeKind)" }
+    if ($embedding.profile.embeddingOnly -ne $true) { Add-Failure 'GBrain embedding profile must be embeddingOnly.' }
   }
   foreach ($disabled in 'qwen3-coder-next-q5', 'qwen2.5-coder-32b-q4') {
     $m = $models | Where-Object { $_.id -eq $disabled } | Select-Object -First 1
@@ -85,7 +93,7 @@ if ($routingPolicy) {
 
 if ($integrations) {
   $services = @($integrations.services)
-  foreach ($svc in 'universal-router', 'hermes-gateway', 'paperclip', 'qwen3-coder-30b-a3b') {
+  foreach ($svc in 'universal-router', 'hermes-gateway', 'paperclip', 'qwen3-coder-30b-a3b', 'gbrain-embeddings') {
     if (@($services | Where-Object { $_.id -eq $svc }).Count -eq 0) { Add-Failure "Integration service missing: $svc" }
   }
 }

@@ -1,6 +1,7 @@
 param(
   [string]$TargetRoot = (Join-Path $env:USERPROFILE '.universal-ai-stack'),
   [string]$QwenModelPath = 'D:\AI\models\qwen3-coder-30b-a3b\Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf',
+  [string]$QwenEmbeddingModelPath = 'D:\AI\models\qwen3-embedding-0.6b\Qwen3-Embedding-0.6B-Q8_0.gguf',
   [string]$QwenProxyPath = 'D:\AI\local-qwen-fallback\local_qwen_proxy.py',
   [string]$LlamaCppRoot = (Join-Path $env:USERPROFILE '.local-ai\runtimes\llama.cpp-cuda\b9128-cuda12.4'),
   [string]$HermesPythonw = (Join-Path $env:USERPROFILE '.hermes\hermes-agent\venv\Scripts\pythonw.exe'),
@@ -76,6 +77,7 @@ function Replace-Placeholders {
     HERMES_PYTHONW = $HermesPythonw
     QWEN_PROXY_PY = $QwenProxyPath
     QWEN3_CODER_30B_A3B_Q4_GGUF = $QwenModelPath
+    QWEN3_EMBEDDING_0_6B_Q8_GGUF = $QwenEmbeddingModelPath
     LLAMA_CPP_ROOT = $LlamaCppRoot
     LLAMA_SERVER_EXE = (Join-Path $LlamaCppRoot 'llama-server.exe')
   }

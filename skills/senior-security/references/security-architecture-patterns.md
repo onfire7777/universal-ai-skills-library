@@ -579,7 +579,7 @@ def admin_panel():
 
 ```python
 # BAD: Hardcoded credentials
-DATABASE_URL = "postgresql://admin:SuperSecret123@localhost/db"
+DATABASE_URL = "postgresql://example-user:example-password@localhost/db"
 API_KEY = "sk-1234567890abcdef"
 
 # GOOD: Environment variables + secret management

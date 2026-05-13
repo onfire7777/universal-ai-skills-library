@@ -373,10 +373,10 @@ client.beta().vaults().credentials().update(credential.id(),
         .vaultId(vault.id())
         .auth(BetaManagedAgentsMcpOAuthUpdateParams.builder()
             .type(BetaManagedAgentsMcpOAuthUpdateParams.Type.MCP_OAUTH)
-            .accessToken("xoxp-new-...")
+            .accessToken("SLACK_USER_TOKEN_PLACEHOLDER")
             .expiresAt(OffsetDateTime.parse("2026-05-15T00:00:00Z"))
             .refresh(BetaManagedAgentsMcpOAuthRefreshUpdateParams.builder()
-                .refreshToken("xoxe-1-new-...")
+                .refreshToken("SLACK_REFRESH_TOKEN_PLACEHOLDER")
                 .build())
             .build())
         .build());
