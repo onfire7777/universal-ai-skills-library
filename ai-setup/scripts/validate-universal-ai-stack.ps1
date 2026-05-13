@@ -68,7 +68,7 @@ if ($modelRegistry) {
   }
   foreach ($disabled in 'qwen3-coder-next-q5', 'qwen2.5-coder-32b-q4') {
     $m = $models | Where-Object { $_.id -eq $disabled } | Select-Object -First 1
-    if ($m -and [bool]$m.enabled) { Add-Failure "$disabled should be disabled by default." }
+    if ($m) { Add-Failure "$disabled should not be registered in the default stack." }
   }
 }
 
@@ -77,6 +77,10 @@ if ($routingPolicy) {
   if ($routingPolicy.httpRouter.skipHostSessionProviders -ne $true) { Add-Failure 'HTTP router must skip host-session providers.' }
   if ($routingPolicy.costPolicy.localModelsOnlyAfterCloudFailure -ne $true) { Add-Failure 'Local models should be final fallback, not default cloud replacement.' }
   if ([int]$routingPolicy.supervisor.checkIntervalSeconds -lt 600) { Add-Failure 'Supervisor cadence must be at least 600 seconds for low-resource profile.' }
+  if ([int]$routingPolicy.retry.globalTimeoutSeconds -gt 300) { Add-Failure 'Router global timeout should stay <= 300 seconds.' }
+  if ($routingPolicy.retry.circuitBreaker.enabled -ne $true) { Add-Failure 'Router circuit breaker must be enabled.' }
+  if ([int]$routingPolicy.agentSafety.maxConcurrentLocalAgents -ne 1) { Add-Failure 'Agent safety must limit local agents to one by default.' }
+  if ($routingPolicy.agentSafety.stopOnRepeatedError -ne $true) { Add-Failure 'Agent safety must stop on repeated errors.' }
 }
 
 if ($integrations) {

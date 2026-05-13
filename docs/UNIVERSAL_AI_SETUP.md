@@ -69,12 +69,11 @@ Local final fallback:
 - KV cache: `q4_0` / `q4_0`
 - Idle timeout: `600` seconds
 
-Disabled/manual local records:
+Only configured local model:
 
-- `qwen3-coder-next-q5`
-- `qwen2.5-coder-32b-q4`
+- `qwen3-coder-30b-a3b-q4`
 
-These are not automatic services because they are heavier or may not be installed. They stay documented so the fallback order is explicit without creating broken endpoints.
+Heavier or older local models are not registered in the default stack. Keeping only the installed Qwen3-Coder-30B-A3B profile prevents stale aliases from triggering broken endpoints or accidental multi-model VRAM pressure.
 
 ## Routing Policy
 
@@ -90,10 +89,16 @@ The failover order remains:
 2. `kimi-k2.6-thinking`
 3. `claude-opus-4.7`
 4. `qwen3-coder-30b-a3b-q4`
-5. `qwen3-coder-next-q5`
-6. `qwen2.5-coder-32b-q4`
 
 The local HTTP router can only expose OpenAI-compatible HTTP providers. It therefore exposes `auto-coding`, `primary-api`, `local-coding`, `qwen3-coder-30b-a3b-q4`, and `kimi-k2.6-thinking`. Host-session providers such as GPT and Claude remain available through native clients and are intentionally not converted into a generic local API.
+
+Safety defaults:
+
+- One attempt per provider and a 240-second global router deadline.
+- Provider circuit breaker opens for 10 minutes after repeated failures.
+- One local model agent by default; local Qwen runs through a lazy proxy and keeps llama.cpp unloaded until needed.
+- Supervisor cadence is 600 seconds and startup is hidden.
+- Long autonomous loops require explicit confirmation at the client layer.
 
 ## Cross-Agent Skill Access
 
@@ -117,6 +122,8 @@ Hermes:
 - Fallback provider: Universal AI Stack router
 - Compression model: `kimi-k2.6-thinking`
 - Max iterations: `30`
+- Gateway task timeout: `900` seconds
+- Repeated tool failures hard-stop instead of looping
 - Cron tick: `600` seconds
 - Discord free response: enabled when configured
 
