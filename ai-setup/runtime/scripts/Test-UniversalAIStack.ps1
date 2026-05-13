@@ -57,6 +57,40 @@ function Test-JsonFile {
   }
 }
 
+function Redact-CommandLine {
+  param([string]$CommandLine)
+
+  if (!$CommandLine) { return '' }
+  return $CommandLine `
+    -replace 'sk-proj-[A-Za-z0-9_-]+', '[REDACTED_OPENAI_KEY]' `
+    -replace 'sk-[A-Za-z0-9_-]{20,}', '[REDACTED_API_KEY]' `
+    -replace '[A-Za-z0-9_-]{24,}\.[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{24,}', '[REDACTED_TOKEN]'
+}
+
+function Get-StackServiceWorkers {
+  $services = @(
+    @{ id = 'universal-supervisor'; pattern = 'universal_ai_stack_supervisor\.py' }
+    @{ id = 'universal-router'; pattern = 'universal_ai_router\.py' }
+    @{ id = 'hermes-gateway'; pattern = 'hermes_cli\.main gateway run' }
+    @{ id = 'paperclip'; pattern = 'start-paperclip-with-hermes\.py' }
+    @{ id = 'qwen3-coder-30b-a3b'; pattern = 'local_qwen_proxy\.py' }
+  )
+
+  $processes = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue
+  foreach ($service in $services) {
+    $matches = @($processes | Where-Object {
+        $_.Name -notmatch '^pythonw\.exe$' -and
+        $_.CommandLine -match $service.pattern
+      } | Select-Object ProcessId,ParentProcessId,Name,@{n = 'CommandLine'; e = { Redact-CommandLine $_.CommandLine } })
+    [ordered]@{
+      id = $service.id
+      workerCount = $matches.Count
+      duplicateWorkers = $matches.Count -gt 1
+      workers = $matches
+    }
+  }
+}
+
 $envValues = Read-EnvFile -Path $SecretsEnv
 $authHeaders = @{}
 if ($envValues['UNIVERSAL_AI_STACK_API_KEY']) {
@@ -72,9 +106,12 @@ $visibleShells = Get-CimInstance Win32_Process |
     $_.Name -match '^(cmd|powershell|pwsh|bash)\.exe$' -and
     $_.CommandLine -match 'hermes|paperclip|qwen|llama|kimi|universal-ai-stack|OpenClaw' -and
     $_.ProcessId -ne $PID -and
-    $_.CommandLine -notmatch 'Test-UniversalAIStack|Test-UniversalAIAdapters|Get-CimInstance|Codex'
+    $_.CommandLine -notmatch 'Test-UniversalAIStack|Test-UniversalAIAdapters|Test-UniversalAIContextTools|validate-universal-ai-stack|Sanitize-UniversalAISecrets|Search-UniversalAIMemory|Save-UniversalAIMemory|Sync-UniversalAIStack|Configure-HermesUniversalAI|Install-UniversalAIAdapters|Install-UniversalAIStackStartup|skill-router (doctor|mcp status|skills validate-manifest)|Get-CimInstance|Get-NetTCPConnection|Get-ChildItem|netstat|Select-String|\.local-ai\\runtimes|Codex'
   } |
-  Select-Object ProcessId,Name,CommandLine
+  Select-Object ProcessId,Name,@{n = 'CommandLine'; e = { Redact-CommandLine $_.CommandLine } }
+
+$serviceWorkers = @(Get-StackServiceWorkers)
+$duplicateServiceWorkers = @($serviceWorkers | Where-Object { $_.duplicateWorkers })
 
 $result = [ordered]@{
   time = (Get-Date).ToString('o')
@@ -120,6 +157,11 @@ $result = [ordered]@{
   }
   startup = $startup
   visibleShells = $visibleShells
+  processPolicy = @{
+    stackServiceWorkers = $serviceWorkers
+    duplicateServiceWorkers = $duplicateServiceWorkers
+    duplicateServiceWorkersClean = $duplicateServiceWorkers.Count -eq 0
+  }
   secrets = @{
     kimiPresent = [bool]$envValues['KIMI_API_KEY']
     universalApiKeyPresent = [bool]$envValues['UNIVERSAL_AI_STACK_API_KEY']

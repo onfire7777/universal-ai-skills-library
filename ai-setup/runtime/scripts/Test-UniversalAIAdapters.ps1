@@ -59,9 +59,26 @@ if (Test-Path -LiteralPath $AdapterConfig) {
   }
 }
 
+$manifestPath = Join-Path (Split-Path -Parent $CanonicalSkillsRoot) 'manifest.json'
 $canonicalSkillCount = 0
+$physicalTopLevelSkillFileCount = 0
+$nestedSkillFiles = @()
 if (Test-Path -LiteralPath $CanonicalSkillsRoot) {
-  $canonicalSkillCount = @(Get-ChildItem -LiteralPath $CanonicalSkillsRoot -Recurse -Filter 'SKILL.md' -File -ErrorAction SilentlyContinue).Count
+  $physicalTopLevelSkillFileCount = @(Get-ChildItem -LiteralPath $CanonicalSkillsRoot -Directory -ErrorAction SilentlyContinue |
+    Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md') }).Count
+  $nestedSkillFiles = @(Get-ChildItem -LiteralPath $CanonicalSkillsRoot -Recurse -Filter 'SKILL.md' -File -ErrorAction SilentlyContinue |
+    Where-Object { ($_.FullName.Substring($CanonicalSkillsRoot.Length).TrimStart('\') -split '[\\/]').Count -ne 2 } |
+    ForEach-Object { $_.FullName.Substring($CanonicalSkillsRoot.Length).TrimStart('\') })
+}
+if (Test-Path -LiteralPath $manifestPath) {
+  try {
+    $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $canonicalSkillCount = [int]$manifest.total_skills
+  } catch {
+    $canonicalSkillCount = $physicalTopLevelSkillFileCount
+  }
+} else {
+  $canonicalSkillCount = $physicalTopLevelSkillFileCount
 }
 
 $secrets = Read-EnvFile -Path (Join-Path $Root 'secrets\.env')
@@ -97,7 +114,10 @@ $result = [ordered]@{
   canonicalSkills = [ordered]@{
     root = $CanonicalSkillsRoot
     present = (Test-Path -LiteralPath $CanonicalSkillsRoot)
+    manifest = $manifestPath
     count = $canonicalSkillCount
+    physicalTopLevelSkillFiles = $physicalTopLevelSkillFileCount
+    nestedSkillFilesIgnored = $nestedSkillFiles
     countOk = ($canonicalSkillCount -ge 1800)
     hermesExternalSource = $hermesConfig.Contains('universal-ai-skills-library\skills') -or $hermesConfig.Contains('universal-ai-skills-library/skills')
   }
