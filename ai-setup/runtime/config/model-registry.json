@@ -84,7 +84,7 @@
       "quant": "Q4_K_M",
       "profile": {
         "ctxSize": 16384,
-        "nGpuLayers": 999,
+        "nGpuLayers": 99,
         "flashAttention": true,
         "batchSize": 384,
         "ubatchSize": 192,
@@ -135,7 +135,7 @@
       "quant": "Q8_0",
       "profile": {
         "ctxSize": 8192,
-        "nGpuLayers": 999,
+        "nGpuLayers": 99,
         "pooling": "last",
         "embeddingOnly": true,
         "flashAttention": true,

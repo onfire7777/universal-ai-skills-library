@@ -65,6 +65,7 @@ Local final fallback:
 - Runtime: llama.cpp / llama-server
 - Model file: `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`
 - Context: `16,384`
+- GPU layers: `99`
 - Batch: `384`
 - UBatch: `192`
 - Threads: `6`
@@ -82,6 +83,7 @@ Local shared-memory embedding model:
 - Health URL: `http://127.0.0.1:18084/health`
 - Dimensions: `1024`
 - Server context: `8,192`
+- GPU layers: `99`
 - Pooling: `last`
 - Purpose: GBrain semantic/vector search and shared-memory mirror lookup
 - API cost: none; this replaces paid OpenAI embeddings for GBrain text vectors

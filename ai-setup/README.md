@@ -53,4 +53,4 @@ Local shared-memory embedding model:
 
 1. `qwen3-embedding-0.6b-q8`
 
-Local coding default is Qwen3-Coder-30B-A3B-Instruct `Q4_K_M` at 16k context. The local embedding default is Qwen3-Embedding-0.6B `Q8_0` at `http://127.0.0.1:18084/v1` with 1024 dimensions for GBrain. Heavier local model records are intentionally not registered in the default stack so Hermes/Paperclip cannot route to stale or missing endpoints or start redundant model servers.
+Local coding default is Qwen3-Coder-30B-A3B-Instruct `Q4_K_M` at 16k context with `--n-gpu-layers 99`, flash attention on, batch `384`, ubatch `192`, 6 threads, parallel `1`, and q4 KV cache. The local embedding default is Qwen3-Embedding-0.6B `Q8_0` at `http://127.0.0.1:18084/v1` with 1024 dimensions for GBrain. Heavier local model records are intentionally not registered in the default stack so Hermes/Paperclip cannot route to stale or missing endpoints or start redundant model servers.
