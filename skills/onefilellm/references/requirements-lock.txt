@@ -42,7 +42,7 @@ pandocfilters==1.5.1
 platformdirs==4.9.6
 propcache==0.4.1
 Pygments==2.20.0
-pypdf==6.4.1
+pypdf==6.10.2
 pyperclip==1.8.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
