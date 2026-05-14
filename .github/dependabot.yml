@@ -1,0 +1,47 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  - package-ecosystem: "gomod"
+    directories:
+      - "/skill-router-cli"
+      - "/skills/printing-press-golden"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "go"
+
+  - package-ecosystem: "pip"
+    directories:
+      - "/skills/*"
+      - "/skills/*/scripts"
+      - "/skills/*/scripts/tests"
+    schedule:
+      interval: "weekly"
+    exclude-paths:
+      - "references/**"
+      - "vendor/**"
+    labels:
+      - "dependencies"
+      - "python"
+
+  - package-ecosystem: "npm"
+    directories:
+      - "/skills/*"
+      - "/skills/*/scripts"
+    schedule:
+      interval: "weekly"
+    exclude-paths:
+      - "references/**"
+      - "vendor/**"
+      - "scripts/vendor/**"
+    labels:
+      - "dependencies"
+      - "javascript"

@@ -69,6 +69,16 @@ func RepoDir() string {
 	if d := os.Getenv("MANUS_REPO_DIR"); d != "" {
 		return d
 	}
+	if cwd, err := os.Getwd(); err == nil {
+		if repo := findRepoDirUpwards(cwd); repo != "" {
+			return repo
+		}
+	}
+	if exe, err := os.Executable(); err == nil {
+		if repo := findRepoDirUpwards(filepath.Dir(exe)); repo != "" {
+			return repo
+		}
+	}
 	home := HomeDir()
 	// Check standard locations in order of preference
 	candidates := []string{
@@ -87,12 +97,39 @@ func RepoDir() string {
 		}
 	}
 	for _, c := range candidates {
-		if _, err := os.Stat(filepath.Join(c, ".git")); err == nil {
+		if isRepoDir(c) {
 			return c
 		}
 	}
 	// Default to the neutral universal repo name.
 	return filepath.Join(home, "universal-ai-skills-library")
+}
+
+func findRepoDirUpwards(start string) string {
+	dir, err := filepath.Abs(start)
+	if err != nil {
+		return ""
+	}
+	for {
+		if isRepoDir(dir) {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return ""
+		}
+		dir = parent
+	}
+}
+
+func isRepoDir(dir string) bool {
+	if _, err := os.Stat(filepath.Join(dir, "manifest.json")); err != nil {
+		return false
+	}
+	if info, err := os.Stat(filepath.Join(dir, "skills")); err != nil || !info.IsDir() {
+		return false
+	}
+	return true
 }
 
 // PrintingPressDir returns the printing-press output directory.

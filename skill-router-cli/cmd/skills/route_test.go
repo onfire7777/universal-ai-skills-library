@@ -82,6 +82,7 @@ func TestRouterMaintenancePromptPrefersMetaSkill(t *testing.T) {
 }
 
 func TestUniversalAISetupPromptPrefersSetupOverGithub(t *testing.T) {
+	configurePreflightTest(t)
 	prompt := "please make sure the universal AI tools is cleanly and universally installed not redundant and clean everything's updated on the GitHub and in all the different AI services that I have on my computer that I use"
 	preflight, err := buildRoutePreflight(prompt, routeOptions{})
 	if err != nil {
@@ -96,6 +97,7 @@ func TestUniversalAISetupPromptPrefersSetupOverGithub(t *testing.T) {
 }
 
 func TestNamedAISoftwareStatusPromptPrefersSetupOverAppUpgrade(t *testing.T) {
+	configurePreflightTest(t)
 	prompt := "did you update hermes open ai claude aion open code kimi and all the different ai softwares with a clean install of the latest version"
 	preflight, err := buildRoutePreflight(prompt, routeOptions{})
 	if err != nil {
