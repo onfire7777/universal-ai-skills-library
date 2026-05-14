@@ -34,9 +34,10 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/sync"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/update"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/web"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/xcli"
 )
 
-const Version = "2.2.4"
+const Version = "2.2.5"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -45,7 +46,7 @@ var rootCmd = &cobra.Command{
 syncing compact agent adapters, validating the skill corpus, and managing the
 optional local Universal AI Stack.
 
-The router keeps 1,808 canonical skills in one repository and loads a single
+The router keeps 1,809 canonical skills in one repository and loads a single
 matching skill only when a real user prompt needs it. It can also index local
 external skill roots read-only, validate manifests, sync wrapper instructions,
 check optional MCP bridges, and expose local AI stack health.
@@ -75,6 +76,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  web         Website analytics via SimilarWeb")
 		fmt.Println("  gstack      GStack engineering workflows and browser/PDF tools")
 		fmt.Println("  gbrain      GBrain personal knowledge brain CLI adapter")
+		fmt.Println("  xcli        sferik/x-cli source checkout and X API CLI adapter")
 		fmt.Println()
 		fmt.Println("Productivity:")
 		fmt.Println("  files       Organize, deduplicate, rename, and clean up files")
@@ -126,6 +128,7 @@ func init() {
 	rootCmd.AddCommand(web.Cmd)
 	rootCmd.AddCommand(gstack.Cmd)
 	rootCmd.AddCommand(gbrain.Cmd)
+	rootCmd.AddCommand(xcli.Cmd)
 
 	// Productivity
 	rootCmd.AddCommand(files.Cmd)

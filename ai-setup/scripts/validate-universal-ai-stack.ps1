@@ -143,7 +143,7 @@ if ($integrations) {
 if ($sourceIntegrations) {
   $sources = @($sourceIntegrations.sources)
   $sourceIds = @($sources | ForEach-Object { $_.id })
-  foreach ($id in 'lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli') {
+  foreach ($id in 'lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli') {
     if ($sourceIds -notcontains $id) { Add-Failure "Source integration missing: $id" }
   }
   foreach ($id in 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli') {
@@ -161,6 +161,10 @@ if ($sourceIntegrations) {
   if ($gskills -and $gskills.installMode -ne 'external-readonly-index') {
     Add-Failure 'GSkills/GStack source integration must remain external-readonly-index.'
   }
+  $xCli = $sources | Where-Object { $_.id -eq 'x-cli' } | Select-Object -First 1
+  if ($xCli -and $xCli.defaultState -ne 'no-background-process') {
+    Add-Failure 'x-cli source integration must remain CLI-only with no background process.'
+  }
   $webSearch = $sources | Where-Object { $_.id -eq 'web-search' } | Select-Object -First 1
   if ($webSearch -and $webSearch.installMode -ne 'host-owned-no-local-service') {
     Add-Failure 'Web search source integration must stay host-owned and no-local-service by default.'
@@ -172,7 +176,7 @@ if ($sourceRepos) {
     Add-Failure 'source-repos.json missing canonical universalAiSkillsLibrary record.'
   }
   $externalSourceIds = @($sourceRepos.optionalExternalSources | ForEach-Object { $_.id })
-  foreach ($id in 'gstack', 'gbrain', 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli', 'web-search') {
+  foreach ($id in 'gstack', 'gbrain', 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli', 'x-cli', 'web-search') {
     if ($externalSourceIds -notcontains $id) { Add-Failure "source-repos.json missing optional external source: $id" }
   }
 }

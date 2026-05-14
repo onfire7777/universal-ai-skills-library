@@ -20,8 +20,8 @@ memory system, embedding service, Context Mode, Lightpanda, and NotebookLM, see
 `../docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md`.
 
 The source-integration layer is also repo-owned and public-safe. It records
-Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, host-native web search,
-GBrain, and GSkills/GStack as shared integrations in
+Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli,
+host-native web search, GBrain, and GSkills/GStack as shared integrations in
 `runtime/config/source-integrations.json`.
 Those entries are pointers, policies, and wrapper paths; they do not vendor
 private machine state, upstream source checkouts, browser sessions, or full

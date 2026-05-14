@@ -14,6 +14,7 @@ Every AI client should see the same capability layer:
 - context-window protection through Context Mode
 - browser retrieval through Lightpanda
 - NotebookLM research through `nlm`
+- X API workflows through `x-cli`
 - fresh web search through the host AI when available
 - external GSkills/GStack skills through read-only routing
 
@@ -29,6 +30,7 @@ downloaded tools, logs, local model files, and generated state.
 | Context Mode | Codex hook sync policy and validation | npm package and local Codex config | CLI/hooks enabled; bridge disabled |
 | MemPalace | shared memory wrapper instructions | memory database and optional MCP command | CLI baseline; bridge disabled |
 | NotebookLM MCP CLI | source policy, canonical router skill, validation pointers | PyPI/uv tool install, Google auth session, generated notebook artifacts | CLI baseline; MCP disabled unless explicitly needed |
+| x-cli | source policy, canonical router skill, validation pointers | Rust source checkout, built `x` executable, user-owned `.xrc` OAuth profile | CLI baseline; no background service |
 | Web search | host-native policy and fallback notes | host AI web/search tool or optional provider keys | no local search proxy, no committed key |
 | GBrain | source/state pointers, embedding model policy | upstream checkout and local brain state | searchable mirror, not authoritative memory |
 | GSkills/GStack | read-only external source policy | upstream checkout | namespaced on-demand skills |
@@ -79,6 +81,8 @@ adapter instructions. It does not publish or commit the user's machine state.
 - Keep NotebookLM auth, browser profiles, and generated artifacts in the user's
   local NotebookLM/Google account state; the repo only stores the router skill
   and source pointer.
+- Keep x-cli auth in `%USERPROFILE%\.xrc` or an explicitly selected profile
+  file; the repo stores only the router skill and source pointer.
 - Keep Context Mode and Lightpanda as wrappers or host tools, not vendored repo
   copies.
 - Keep web search host-native by default. Do not commit web-search provider keys
@@ -98,8 +102,10 @@ Each AI client receives compact instructions that say:
 6. Use Lightpanda for controlled page fetch/extraction and CDP workflows.
 7. Use `skill-router skill notebooklm-mcp-cli` before NotebookLM notebook,
    source, query, Studio artifact, or NotebookLM MCP work.
-8. Use host-native web search for fresh search when available.
-9. Load GBrain and GSkills/GStack skills through `skill-router`, not by copying
+8. Use `skill-router skill x-cli` before X API account, post, search, stream,
+   list, direct message, or social graph work.
+9. Use host-native web search for fresh search when available.
+10. Load GBrain and GSkills/GStack skills through `skill-router`, not by copying
    their source trees into the client.
 
 ## Validation
@@ -123,7 +129,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal
 Expected clean state:
 
 - `source-integrations.json` includes Lightpanda, Context Mode, MemPalace,
-  NotebookLM MCP CLI, web search, GBrain, and GSkills/GStack.
+  NotebookLM MCP CLI, x-cli, web search, GBrain, and GSkills/GStack.
 - Every supported AI adapter has compact universal skill, memory, context, and
   source-integration instructions.
 - Persistent MCP bridge ports may be down in the low-resource profile.

@@ -61,6 +61,22 @@
       "notes": "Requires user-owned Google NotebookLM authentication through nlm login. Do not commit cookies, browser profiles, generated artifacts, or account state."
     },
     {
+      "id": "x-cli",
+      "label": "x-cli",
+      "kind": "social-api-cli",
+      "purpose": "Shared command-line client for X API workflows: account authorization, timelines, posts, replies, search, streaming, direct messages, follows, mutes, blocks, lists, trends, and places.",
+      "installMode": "shared-source-build-cli",
+      "sourceRoot": "{{USERPROFILE}}\\.x-cli\\x-cli",
+      "cli": "{{USERPROFILE}}\\.local\\bin\\x.exe",
+      "alias": "{{USERPROFILE}}\\.local\\bin\\x-cli.exe",
+      "configFile": "{{USERPROFILE}}\\.xrc",
+      "legacyConfigFallback": "{{USERPROFILE}}\\.trc",
+      "skill": "x-cli",
+      "defaultState": "no-background-process",
+      "validation": "x version; x --help; skill-router xcli status",
+      "notes": "Requires user-owned X API/OAuth authorization stored in ~/.xrc. Do not commit ~/.xrc, ~/.trc, tokens, secrets, direct messages, or private account output. Set X_STREAM_MAX_EVENTS for bounded stream automation."
+    },
+    {
       "id": "web-search",
       "label": "Web search",
       "kind": "host-native-source",

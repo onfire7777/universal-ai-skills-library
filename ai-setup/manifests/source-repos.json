@@ -128,6 +128,18 @@
       "loadPolicy": "shared-uv-tool-cli-optional-mcp"
     },
     {
+      "id": "x-cli",
+      "pathTemplate": "{{USERPROFILE}}\\.x-cli\\x-cli",
+      "repoRemote": "https://github.com/sferik/x-cli.git",
+      "package": "x",
+      "commands": [
+        "x",
+        "x-cli"
+      ],
+      "configFile": "{{USERPROFILE}}\\.xrc",
+      "loadPolicy": "shared-source-build-cli-no-background-service"
+    },
+    {
       "id": "web-search",
       "pathTemplate": "host-native",
       "loadPolicy": "host-owned-no-local-service"

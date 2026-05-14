@@ -11,9 +11,9 @@ the local Universal AI Stack.
 | --- | --- |
 | [Quickstart](QUICKSTART.md) | Install from a clean clone and run the first router commands. |
 | [Install Modes](INSTALL_MODES.md) | Choose router-only, stack-enabled, startup, or validation-focused installs. |
-| [Universal AI Setup](UNIVERSAL_AI_SETUP.md) | Understand model routing, local Qwen fallback, embeddings, Hermes, Paperclip, memory, Context Mode, Lightpanda, NotebookLM MCP CLI, web search, GBrain, and GSkills/GStack. |
+| [Universal AI Setup](UNIVERSAL_AI_SETUP.md) | Understand model routing, local Qwen fallback, embeddings, Hermes, Paperclip, memory, Context Mode, Lightpanda, NotebookLM MCP CLI, x-cli, web search, GBrain, and GSkills/GStack. |
 | [Universal AI Connection Configs](UNIVERSAL_AI_CONNECTION_CONFIGS.md) | See the exact repo-owned and machine-generated files that connect each AI client. |
-| [Source Integrations](SOURCE_INTEGRATIONS.md) | Understand the public-safe source layer for Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, web search, GBrain, and GSkills/GStack. |
+| [Source Integrations](SOURCE_INTEGRATIONS.md) | Understand the public-safe source layer for Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli, web search, GBrain, and GSkills/GStack. |
 
 ## Architecture And Compatibility
 

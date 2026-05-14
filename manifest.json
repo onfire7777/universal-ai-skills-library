@@ -1,7 +1,7 @@
 {
-  "version": "2.2.4",
+  "version": "2.2.5",
   "generated": "2026-05-14",
-  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,808-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,809-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
   "core_skills": [
     {
@@ -8813,6 +8813,25 @@
       "scripts": []
     },
     {
+      "name": "notebooklm-mcp-cli",
+      "directory": "skills/notebooklm-mcp-cli",
+      "description": "Use when working with Google NotebookLM through jacob-bd/notebooklm-mcp-cli: listing or creating notebooks, adding sources, querying notebooks, generating audio or studio artifacts, revising slides, downloading artifacts, sharing notebooks, syncing Drive sources, running cross-notebook queries, configuring the NotebookLM MCP server, or diagnosing NotebookLM CLI authentication. Prefer this over generic Google or MCP skills when the task is specifically about NotebookLM.",
+      "aliases": [
+        "notebooklm",
+        "notebook lm",
+        "nlm",
+        "notebooklm cli",
+        "notebooklm mcp",
+        "notebooklm-mcp",
+        "notebooklm-mcp-cli",
+        "google notebooklm",
+        "notebooklm podcast",
+        "notebooklm audio overview"
+      ],
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
       "name": "npm-automation",
       "directory": "skills/npm-automation",
       "description": "Automate NPM tasks via Rube MCP (Composio). Always search tools first for current schemas.",
@@ -8882,25 +8901,6 @@
       "name": "one-pager-prd",
       "directory": "skills/one-pager-prd",
       "description": "Use when proposing new features/products, documenting product requirements, creating concise specs for stakeholder alignment, pitching initiatives, scoping projects before detailed design, capturing user stories and success metrics, or when user mentions one-pager, PRD, product spec, feature proposal, product requirements, or brief.",
-      "has_scripts": false,
-      "scripts": []
-    },
-    {
-      "name": "notebooklm-mcp-cli",
-      "directory": "skills/notebooklm-mcp-cli",
-      "description": "Use when working with Google NotebookLM through jacob-bd/notebooklm-mcp-cli: listing or creating notebooks, adding sources, querying notebooks, generating audio or studio artifacts, revising slides, downloading artifacts, sharing notebooks, syncing Drive sources, running cross-notebook queries, configuring the NotebookLM MCP server, or diagnosing NotebookLM CLI authentication. Prefer this over generic Google or MCP skills when the task is specifically about NotebookLM.",
-      "aliases": [
-        "notebooklm",
-        "notebook lm",
-        "nlm",
-        "notebooklm cli",
-        "notebooklm mcp",
-        "notebooklm-mcp",
-        "notebooklm-mcp-cli",
-        "google notebooklm",
-        "notebooklm podcast",
-        "notebooklm audio overview"
-      ],
       "has_scripts": false,
       "scripts": []
     },
@@ -13688,6 +13688,24 @@
       "scripts": []
     },
     {
+      "name": "x-cli",
+      "directory": "skills/x-cli",
+      "description": "Use when working with sferik/x-cli or the X API from the command line: authorizing X accounts, listing accounts, posting or replying, reading timelines, searching posts or users, streaming X events, managing follows, mutes, blocks, lists, direct messages, trends, places, or diagnosing the local `x` CLI install. Do not use for generic algebra variable \"x\" or unrelated command-line work.",
+      "aliases": [
+        "sferik-x-cli",
+        "sferik x-cli",
+        "x api cli",
+        "x command line",
+        "twitter cli",
+        "twitter command line",
+        "xrc",
+        ".xrc",
+        "x-api"
+      ],
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
       "name": "xero-automation",
       "directory": "skills/xero-automation",
       "description": "Xero Automation: manage invoices, contacts, payments, bank transactions, and accounts in Xero for cloud-based bookkeeping",
@@ -13966,8 +13984,8 @@
       "scripts": []
     }
   ],
-  "total_skills": 1808,
-  "alias_count": 1865,
+  "total_skills": 1809,
+  "alias_count": 1874,
   "routing": {
     "primary_access": "skill-router skill <name>",
     "legacy_access": "manus skill <name>",
