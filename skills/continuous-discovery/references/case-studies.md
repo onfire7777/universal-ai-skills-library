@@ -10,7 +10,7 @@ Four realistic scenarios showing how product teams apply continuous discovery ha
 
 **Company:** Mid-stage B2B SaaS company (200 employees) building a project management tool for marketing teams. 15,000 paying customers, $20M ARR.
 
-**Team:** Product trio -- Priya (PM), Jake (designer), and Lena (engineer). They've been a team for 4 months.
+**Team:** Product trio -- Priya (PM), Ari (designer), and Lena (engineer). They've been a team for 4 months.
 
 **Assigned outcome:** Increase 90-day retention for new accounts from 62% to 75%.
 

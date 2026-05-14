@@ -5623,12 +5623,6 @@
   },
   {
     "category": "Image Compression",
-    "name": "SvgOMG",
-    "url": "https://jakearchibald.github.io/svgomg/",
-    "description": "Online SVG optimizer with a lot of settings and possibility to cut and paste svg code directly in it."
-  },
-  {
-    "category": "Image Compression",
     "name": "CompressJPEG",
     "url": "https://compressjpeg.com/",
     "description": "Compress JPEG images with size even greater than 5MB"

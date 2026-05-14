@@ -139,9 +139,16 @@ $secretPatterns = [ordered]@{
   ProviderAssignment = '(?m)^(OPENAI_API_KEY|ANTHROPIC_API_KEY|CLAUDE_API_KEY|OPENROUTER_API_KEY|KIMI_API_KEY)[ \t]*=[ \t]*[^\r\n#]{20,}'
 }
 $privacyPatterns = [ordered]@{}
-$privateProjectRepoPattern = [regex]::Escape(('jakes' + '-ai-va'))
-$privateProjectNamePattern = [regex]::Escape(('Jake' + "'" + 's AI VA'))
-$privacyPatterns.PrivateProjectBrand = "(?i)$privateProjectRepoPattern|$privateProjectNamePattern"
+if ($env:UNIVERSAL_AI_PRIVATE_TERMS) {
+  $escapedTerms = @(
+    $env:UNIVERSAL_AI_PRIVATE_TERMS -split '[,;]' |
+      Where-Object { $_.Trim() } |
+      ForEach-Object { [regex]::Escape($_.Trim()) }
+  )
+  if ($escapedTerms.Count -gt 0) {
+    $privacyPatterns.PrivateTerms = '(?i)' + ($escapedTerms -join '|')
+  }
+}
 if ($env:USERNAME) {
   $currentUser = [regex]::Escape($env:USERNAME)
   $privacyPatterns.CurrentWindowsUserPath = ('C:' + '\\Users\\' + $currentUser + '(?=\\|/|`|''|"|\s|$)')

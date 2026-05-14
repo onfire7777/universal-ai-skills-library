@@ -580,12 +580,12 @@ def admin_panel():
 ```python
 # BAD: Hardcoded credentials
 DATABASE_URL = "postgresql://example-user:example-password@localhost/db"
-API_KEY = "sk-1234567890abcdef"
+API_KEY = "<api-key>"
 
 # GOOD: Environment variables + secret management
 import os
 DATABASE_URL = os.environ['DATABASE_URL']
-API_KEY = vault_client.get_secret('api/keys')['api_key']
+api_key = vault_client.get_secret('api/keys')['api_key']
 ```
 
 ### Anti-Pattern: Verbose Error Messages

@@ -245,7 +245,7 @@ sfx = normalize_for_category(sfx_raw, "sfx")
 
 ```python
 # WRONG: Hardcoded keys and paths
-API_KEY = "sk-abc123secretkey"
+API_KEY = "<api-key>"
 OUTPUT_DIR = "/Users/john/projects/game/audio/"
 
 # RIGHT: Environment variables and configurable paths

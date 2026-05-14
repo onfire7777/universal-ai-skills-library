@@ -465,8 +465,8 @@ Audit any sprint plan:
 
 This skill is based on the Design Sprint process developed at Google Ventures. For the complete methodology, exercises, and case studies:
 
-- [*"Sprint: How to Solve Big Problems and Test New Ideas in Just Five Days"*](https://www.amazon.com/Sprint-Solve-Problems-Test-Ideas/dp/150112174X?tag=wondelai00-20) by Jake Knapp, John Zeratsky, Braden Kowitz
+- [*"Sprint: How to Solve Big Problems and Test New Ideas in Just Five Days"*](https://www.amazon.com/Sprint-Solve-Problems-Test-Ideas/dp/150112174X?tag=wondelai00-20) by the Design Sprint authors
 
 ## About the Author
 
-**Jake Knapp** created the Design Sprint process while at Google, where he ran sprints on products like Gmail, Chrome, and Google X. As a design partner at Google Ventures (now GV), he refined the process by running over 100 sprints with startups in the GV portfolio. The Design Sprint is now used by teams at Google, Slack, Airbnb, LEGO, and thousands of companies worldwide. Jake is also the author of *Make Time*, a framework for focus and energy.
+The Design Sprint process was created and refined through product work at Google and GV, including sprints for major products and startup portfolio teams. The framework is now used by teams at Google, Slack, Airbnb, LEGO, and thousands of companies worldwide.
