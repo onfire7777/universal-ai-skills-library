@@ -20,7 +20,7 @@ client("s3", aws_secret_access_key="jWnyxxxxxxxxxxxxxxxxX7ZQxxxxxxxxxxxxxxxx")
 
 s3 = boto3.resource(
     "s3",
-    aws_access_key_id="AKIAxxxxxxxxxxxxxxxx",
+    aws_access_key_id="<aws-access-key-id>",
     aws_secret_access_key="jWnyxxxxxxxxxxxxxxxxX7ZQxxxxxxxxxxxxxxxx",
     region_name="us-east-1",
 )
