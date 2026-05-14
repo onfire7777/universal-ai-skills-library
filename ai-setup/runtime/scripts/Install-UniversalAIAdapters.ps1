@@ -77,6 +77,7 @@ $sourceMarker
 - Source integrations are shared pointers and wrappers, not copied upstream repos. The portable registry is ``$stackRoot\config\source-integrations.json``.
 - Lightpanda is the shared headless browser/fetch runtime for page retrieval, extraction, JavaScript loading, and CDP automation. Use native web search when the host provides it; use Lightpanda for controlled page fetch/extraction after search.
 - Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys.
+- NotebookLM MCP CLI is installed as a shared uv-tool source at ``$HomeDir\.notebooklm-mcp-cli\notebooklm-mcp-cli``. Use ``nlm`` first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register ``notebooklm-mcp`` only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned ``nlm login``.
 - GSkills/GStack live as read-only external skill sources under ``$HomeDir\.gstack\gstack``. Load namespaced skills such as ``gstack-review``, ``gstack-qa``, ``gstack-cso``, and ``gstack-browse`` through ``skill-router`` on demand.
 - GBrain source and state stay in ``$HomeDir\gbrain`` and ``$HomeDir\.gbrain``. Do not vendor GBrain skills or GStack skills into this AI root.
 "@
@@ -85,10 +86,30 @@ $sourceMarker
   $changed = $false
   if ($existing.Contains($marker)) {
     $content = $existing.TrimEnd()
+    $contentWithNotebookSeparator = [regex]::Replace($content, 'source registry\.(?=##|#|</)', "source registry.`r`n`r`n")
+    if ($contentWithNotebookSeparator -ne $content) {
+      $content = $contentWithNotebookSeparator
+      $changed = $true
+    }
+    $legacyNotebookPattern = "(?m)\r?\n?## NotebookLM MCP CLI Source Rule\r?\n(?:- [^\r\n]*(?:\r?\n|$))+"
+    if ([regex]::IsMatch($content, $legacyNotebookPattern)) {
+      $content = [regex]::Replace($content, $legacyNotebookPattern, "`r`n")
+      $changed = $true
+    }
     $legacyGBrainLine = "- GBrain state lives at ``$gbrainRoot`` and may mirror explicit saved memories for structured knowledge lookup. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots."
     $currentGBrainLine = "- GBrain state lives at ``$gbrainRoot`` and mirrors explicit saved memories for structured local lookup. Save-UniversalAIMemory imports and embeds saved notes in GBrain using the local ``qwen3-embedding-0.6b`` service at ``http://127.0.0.1:18084/v1`` with 1024 dimensions; MemPalace remains the authoritative durable memory store. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots."
+    $webSearchLine = "- Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys."
+    $notebookLine = "- NotebookLM MCP CLI is installed as a shared uv-tool source at ``$HomeDir\.notebooklm-mcp-cli\notebooklm-mcp-cli``. Use ``nlm`` first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register ``notebooklm-mcp`` only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned ``nlm login``."
     if ($content.Contains($legacyGBrainLine)) {
       $content = $content.Replace($legacyGBrainLine, $currentGBrainLine)
+      $changed = $true
+    }
+    if ($content.Contains($sourceMarker) -and !$content.Contains('NotebookLM MCP CLI')) {
+      if ($content.Contains($webSearchLine)) {
+        $content = $content.Replace($webSearchLine, "$webSearchLine`r`n$notebookLine")
+      } else {
+        $content += "`r`n$notebookLine"
+      }
       $changed = $true
     }
     if (!$content.Contains($corpusMarker)) {

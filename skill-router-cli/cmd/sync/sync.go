@@ -272,7 +272,38 @@ Paperclip-specific operating rule:
 - Paperclip has access to the full centralized skill corpus through skill-router only.
 - Keep Paperclip's local skill root to compact wrappers plus native Paperclip company skills. Do not copy or install those full skill bodies into Paperclip's local root.
 - Automatic routing flow: run skill-router preflight for real user/task prompts, reject weak or generic matches, then load exactly one needed skill with skill-router skill <name>.
-`, repoDir, platform.PaperclipSkillsDir(), routerPath)
+
+## Universal Shared Memory
+
+- Durable cross-AI memory is MemPalace at %s. This is the shared memory store for Codex, Claude, Cursor, Hermes, Paperclip, Kimi, Aion, OpenCode, Gemini, Qwen, Roo, Windsurf, and related local agents.
+- Before answering from prior decisions, project history, people/preferences, or past setup state, search shared memory with powershell -NoProfile -ExecutionPolicy Bypass -File %s -Query "<query>" or, when MCP tools are available, call mempalace_status then mempalace_search.
+- Save durable memories only when the user explicitly asks to remember/save something, or when a stable project decision/setup fact has been confirmed. Use powershell -NoProfile -ExecutionPolicy Bypass -File %s -Source "paperclip Universal AI Adapter" -Note "<memory>".
+- Never store secrets, API keys, tokens, passwords, private keys, raw logs, temporary scratch notes, or unverified guesses in MemPalace.
+- Context Mode is scratch/context-window protection, not durable memory. Do not store long-term facts in Context Mode when MemPalace is available.
+- GBrain state lives at %s and mirrors explicit saved memories for structured local lookup. Save-UniversalAIMemory imports and embeds saved notes in GBrain using the local qwen3-embedding-0.6b service at http://127.0.0.1:18084/v1 with 1024 dimensions; MemPalace remains the authoritative durable memory store. Use gbrain search / gbrain query for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots.
+- Lightpanda is the shared headless browser/fetch runtime. Use %s or skill-router skill lightpanda-browser for browser retrieval; do not treat browser snapshots as memory unless a distilled fact is explicitly saved through MemPalace.
+- Persistent MCP bridge services remain disabled by default for low resource use. Direct CLI wrappers are the universal baseline; enable MCP only for clients that need live tool endpoints.
+
+## Universal Source Integrations
+
+- Source integrations are shared pointers and wrappers, not copied upstream repos. The portable registry is %s.
+- Lightpanda is the shared headless browser/fetch runtime for page retrieval, extraction, JavaScript loading, and CDP automation. Use native web search when the host provides it; use Lightpanda for controlled page fetch/extraction after search.
+- Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys.
+- NotebookLM MCP CLI is installed as a shared uv-tool source at %s. Use nlm first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register notebooklm-mcp only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned nlm login.
+- GSkills/GStack live as read-only external skill sources under %s. Load namespaced skills such as gstack-review, gstack-qa, gstack-cso, and gstack-browse through skill-router on demand.
+- GBrain source and state stay in %s and %s. Do not vendor GBrain skills or GStack skills into this AI root.
+`, repoDir, platform.PaperclipSkillsDir(), routerPath,
+		filepath.Join(platform.HomeDir(), ".mempalace", "palace"),
+		filepath.Join(platform.HomeDir(), ".universal-ai-stack", "scripts", "Search-UniversalAIMemory.ps1"),
+		filepath.Join(platform.HomeDir(), ".universal-ai-stack", "scripts", "Save-UniversalAIMemory.ps1"),
+		filepath.Join(platform.HomeDir(), ".gbrain"),
+		filepath.Join(platform.HomeDir(), ".lightpanda-ai", "lightpanda-fetch.cmd"),
+		filepath.Join(platform.HomeDir(), ".universal-ai-stack", "config", "source-integrations.json"),
+		filepath.Join(platform.HomeDir(), ".notebooklm-mcp-cli", "notebooklm-mcp-cli"),
+		filepath.Join(platform.HomeDir(), ".gstack", "gstack"),
+		filepath.Join(platform.HomeDir(), "gbrain"),
+		filepath.Join(platform.HomeDir(), ".gbrain"),
+	)
 }
 
 func skipGenericInstalledSync(id string) bool {

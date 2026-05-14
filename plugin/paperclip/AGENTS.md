@@ -13,5 +13,5 @@ Paperclip-specific operating rule:
 - If `decision=ambiguous` or `host_ai_review.required` is true, choose only from the listed candidates when one is clearly right; otherwise continue with no universal skill.
 - Load exactly one needed skill with `skill-router skill <name>`. Search first with `skill-router skill search <query>` when the name is unknown.
 - Do not copy or paste the 1,808-skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
-- Use the shared source registry at `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json` for Lightpanda, Context Mode, MemPalace, host-native web search, GBrain, and GSkills/GStack. These are shared pointers/wrappers, not Paperclip-local vendored installs.
+- Use the shared source registry at `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json` for Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, host-native web search, GBrain, and GSkills/GStack. These are shared pointers/wrappers, not Paperclip-local vendored installs.
 - MCP bridges are optional. Use the CLI for skill loading and use MCP only for persistent endpoint workflows such as durable memory, context routing, skill generation services, or browser/CDP automation.

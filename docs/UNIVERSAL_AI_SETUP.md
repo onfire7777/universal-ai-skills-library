@@ -179,9 +179,10 @@ Paperclip:
   `ai-setup/runtime/config/source-integrations.json` and installed to
   `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`. This is
   a public-safe registry of pointers and policies for Lightpanda, Context Mode,
-  MemPalace, host-native web search, GBrain, and GSkills/GStack. It does not
-  vendor private source checkouts, browser sessions, secrets, or full external
-  skill trees into the repo.
+  MemPalace, NotebookLM MCP CLI, host-native web search, GBrain, and
+  GSkills/GStack. It does not vendor private source checkouts, browser
+  sessions, secrets, OAuth/cookie state, generated NotebookLM artifacts, or full
+  external skill trees into the repo.
 - Shared memory is centralized through MemPalace, with helper wrappers in
   `%USERPROFILE%\.universal-ai-stack\scripts`:
   `Search-UniversalAIMemory.ps1` for lookup and `Save-UniversalAIMemory.ps1`

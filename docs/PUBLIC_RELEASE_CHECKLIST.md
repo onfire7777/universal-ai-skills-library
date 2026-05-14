@@ -32,8 +32,9 @@ with another user.
 - local model fallback is lazy and resource-guarded
 - MCP bridges remain optional
 - source integrations are pointer-based and public-safe
-- Lightpanda, Context Mode, MemPalace, web search, GBrain, and GSkills/GStack
-  are documented and validated without vendoring private state
+- Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, web search, GBrain,
+  and GSkills/GStack are documented and validated without vendoring private
+  state
 - command names prefer `skill-router`; `manus` is compatibility-only
 - docs describe the actual scripts and runtime paths
 - manifest validates against `skills/`
