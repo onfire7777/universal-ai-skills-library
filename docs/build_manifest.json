@@ -1,14 +1,14 @@
 {
   "schema": "universal-ai-skills-build-manifest/v2",
-  "generated_at": "2026-05-12T00:00:00.000Z",
+  "generated_at": "2026-05-14T00:00:00.000Z",
   "source_of_truth": "%USERPROFILE%\\universal-ai-skills-library\\skills",
   "router_source": "%USERPROFILE%\\universal-ai-skills-library\\skill-router-cli",
   "primary_binary": "skill-router",
   "legacy_binary_alias": "manus",
-  "skill_count": 1807,
-  "directories_total": 1807,
+  "skill_count": 1808,
+  "directories_total": 1808,
   "missing_skill_md": [],
-  "alias_count": 1855,
+  "alias_count": 1865,
   "merged_legacy_directories": [
     {
       "legacy_directory": "anthropic_administrator-automation",
@@ -9067,6 +9067,25 @@
       "name": "one-pager-prd",
       "directory": "skills/one-pager-prd",
       "description": "Use when proposing new features/products, documenting product requirements, creating concise specs for stakeholder alignment, pitching initiatives, scoping projects before detailed design, capturing user stories and success metrics, or when user mentions one-pager, PRD, product spec, feature proposal, product requirements, or brief.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "notebooklm-mcp-cli",
+      "directory": "skills/notebooklm-mcp-cli",
+      "description": "Use when working with Google NotebookLM through jacob-bd/notebooklm-mcp-cli: listing or creating notebooks, adding sources, querying notebooks, generating audio or studio artifacts, revising slides, downloading artifacts, sharing notebooks, syncing Drive sources, running cross-notebook queries, configuring the NotebookLM MCP server, or diagnosing NotebookLM CLI authentication. Prefer this over generic Google or MCP skills when the task is specifically about NotebookLM.",
+      "aliases": [
+        "notebooklm",
+        "notebook lm",
+        "nlm",
+        "notebooklm cli",
+        "notebooklm mcp",
+        "notebooklm-mcp",
+        "notebooklm-mcp-cli",
+        "google notebooklm",
+        "notebooklm podcast",
+        "notebooklm audio overview"
+      ],
       "has_scripts": false,
       "scripts": []
     },

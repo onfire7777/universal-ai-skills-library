@@ -8,8 +8,8 @@
     {
       "name": "universal-ai-skills",
       "source": "./plugin",
-      "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,807 skills on demand without duplicating the corpus.",
-      "version": "2.2.3",
+      "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,808 skills on demand without duplicating the corpus.",
+      "version": "2.2.4",
       "author": {
         "name": "onfire7777"
       }

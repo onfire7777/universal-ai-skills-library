@@ -16,7 +16,7 @@ Do not make each AI client an independent install. Each client should point back
 | `ai-setup/runtime/bin/local_qwen_proxy.py` | Repo-owned lazy llama.cpp proxy with RAM/VRAM guards, request-size guard, hidden backend startup, idle shutdown, and below-normal process priority. | Local Qwen coding fallback and GBrain embedding proxy. |
 | `ai-setup/runtime/config/routing-policy.json` | Failover, timeouts, retry limits, circuit breaker, agent safety limits, supervisor cadence, and cost policy. | Universal router, Hermes fallback behavior, Paperclip model selection, local-model startup policy. |
 | `ai-setup/runtime/config/integrations.json` | Service inventory and launch commands. Defines the universal router, Hermes gateway, Paperclip, local Qwen coding proxy, and GBrain embedding proxy. | Startup supervisor, health checks, Windows login item, local HTTP services. |
-| `ai-setup/runtime/config/source-integrations.json` | Portable source registry for Lightpanda, Context Mode, MemPalace, host-native web search, GBrain, and GSkills/GStack. | All AI adapters through compact instructions; installed stack under `%USERPROFILE%\.universal-ai-stack\config`. |
+| `ai-setup/runtime/config/source-integrations.json` | Portable source registry for Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, host-native web search, GBrain, and GSkills/GStack. | All AI adapters through compact instructions; installed stack under `%USERPROFILE%\.universal-ai-stack\config`. |
 | `ai-setup/runtime/config/mcp-policy.json` | Low-resource MCP policy. Keeps persistent bridges disabled unless an endpoint workflow needs them. | MemPalace, Context Mode, Skill Seekers, Lightpanda. |
 | `ai-setup/runtime/env/.env.template` | Secret names and non-secret defaults. | Central install env under `%USERPROFILE%\.universal-ai-stack\secrets\.env`. |
 | `ai-setup/runtime/scripts/Install-UniversalAIAdapters.ps1` | Installs compact universal instructions and wrapper skills into supported AI roots. | Codex, Claude, Cursor, Kimi, Hermes, Paperclip, Aion, OpenCode, Continue, Kiro, Gemini, Qwen, Roo, Windsurf, Aider, OpenHands, OpenClaw, Manus-compatible roots. |
@@ -37,7 +37,7 @@ These are generated or updated by the installer/sync scripts. They should not be
 | `%USERPROFILE%\.universal-ai-stack\secrets\.env` | Central secret store. | Never print or commit. Compatibility copies may be written only where a tool requires a local env key. |
 | `%USERPROFILE%\.universal-ai-stack\logs\` | Runtime logs. | Logs should redact secrets and rotate. |
 | `%USERPROFILE%\.universal-ai-stack\state\` | Generated health and runtime state. | Useful for diagnostics, not portable source. |
-| `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json` | Installed source registry. | Shared source policies for Lightpanda, Context Mode, MemPalace, web search, GBrain, and GSkills/GStack. |
+| `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json` | Installed source registry. | Shared source policies for Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, web search, GBrain, and GSkills/GStack. |
 | `%USERPROFILE%\.hermes\config.yaml` | Hermes agent config. | Points Hermes at GPT-5.5 host auth plus universal router fallback and shared safety limits. |
 | `%USERPROFILE%\.hermes\.env` | Hermes environment. | Contains Discord and gateway compatibility values. Real secrets stay out of git. |
 | `%USERPROFILE%\.paperclip\instances\default\config.json` | Paperclip model config. | Uses OpenAI-compatible endpoint `http://127.0.0.1:18100/v1` with model `auto-coding`. |
@@ -112,7 +112,7 @@ Paperclip and Hermes should use `auto-coding` through `http://127.0.0.1:18100/v1
 
 ## Non-Redundancy Rules
 
-- Keep the full 1,807-skill corpus only under `skills/`.
+- Keep the full 1,808-skill corpus only under `skills/`.
 - Keep compact wrapper skills in AI roots.
 - Keep one local generative model registered by default: `qwen3-coder-30b-a3b-q4`.
 - Keep one local embedding model registered by default: `qwen3-embedding-0.6b-q8`.
@@ -147,7 +147,7 @@ mempalace status
 
 Expected clean state:
 
-- Router manifest validates with 1,807 canonical skills and no duplicates.
+- Router manifest validates with 1,808 canonical skills and no duplicates.
 - All supported adapter roots contain compact universal policy.
 - Hermes gateway, Paperclip, universal router, Qwen coding proxy, and GBrain embedding proxy have one worker each.
 - Context Mode hooks parse without unsupported regex look-around.

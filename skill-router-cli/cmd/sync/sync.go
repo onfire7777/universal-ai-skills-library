@@ -264,7 +264,7 @@ Paperclip-specific operating rule:
 - If preflight returns decision=route, sanity-check that the selected skill clearly matches the core task object and action. If it only matched generic words such as issue, problem, fix, install, setup, local, AI, agent, or skill, continue with no universal skill.
 - If decision=ambiguous or host_ai_review.required is true, choose only from the listed candidates when one is clearly right; otherwise continue with no universal skill.
 - Load exactly one needed skill with skill-router skill <name>. Search first with skill-router skill search <query> when the name is unknown.
-- Do not copy or paste the 1,807-skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
+- Do not copy or paste the 1,808-skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
 - MCP bridges are optional. Use the CLI for skill loading and use MCP only for persistent endpoint workflows such as durable memory, context routing, skill generation services, or browser/CDP automation.
 
 ## Universal AI Skill Corpus Access

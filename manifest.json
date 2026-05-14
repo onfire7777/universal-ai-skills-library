@@ -1,7 +1,7 @@
 {
-  "version": "2.2.3",
-  "generated": "2026-05-13",
-  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,807-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+  "version": "2.2.4",
+  "generated": "2026-05-14",
+  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,808-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
   "core_skills": [
     {
@@ -8886,6 +8886,25 @@
       "scripts": []
     },
     {
+      "name": "notebooklm-mcp-cli",
+      "directory": "skills/notebooklm-mcp-cli",
+      "description": "Use when working with Google NotebookLM through jacob-bd/notebooklm-mcp-cli: listing or creating notebooks, adding sources, querying notebooks, generating audio or studio artifacts, revising slides, downloading artifacts, sharing notebooks, syncing Drive sources, running cross-notebook queries, configuring the NotebookLM MCP server, or diagnosing NotebookLM CLI authentication. Prefer this over generic Google or MCP skills when the task is specifically about NotebookLM.",
+      "aliases": [
+        "notebooklm",
+        "notebook lm",
+        "nlm",
+        "notebooklm cli",
+        "notebooklm mcp",
+        "notebooklm-mcp",
+        "notebooklm-mcp-cli",
+        "google notebooklm",
+        "notebooklm podcast",
+        "notebooklm audio overview"
+      ],
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
       "name": "onedesk-automation",
       "directory": "skills/onedesk-automation",
       "description": "Automate Onedesk tasks via Rube MCP (Composio). Always search tools first for current schemas.",
@@ -13947,8 +13966,8 @@
       "scripts": []
     }
   ],
-  "total_skills": 1807,
-  "alias_count": 1855,
+  "total_skills": 1808,
+  "alias_count": 1865,
   "routing": {
     "primary_access": "skill-router skill <name>",
     "legacy_access": "manus skill <name>",

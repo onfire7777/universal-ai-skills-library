@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-setup.source-repos.v1",
-  "updated": "2026-05-13",
+  "updated": "2026-05-14",
   "purpose": "Portable inventory of source repositories and runtime roots used by the Universal AI Skills Library installer. Paths are templates and must be resolved by install scripts.",
   "canonical": {
     "universalAiSkillsLibrary": {
@@ -115,6 +115,17 @@
       "id": "lightpanda",
       "pathTemplate": "{{USERPROFILE}}\\.lightpanda-ai",
       "loadPolicy": "on-demand-wrapper"
+    },
+    {
+      "id": "notebooklm-mcp-cli",
+      "pathTemplate": "{{USERPROFILE}}\\.notebooklm-mcp-cli\\notebooklm-mcp-cli",
+      "repoRemote": "https://github.com/jacob-bd/notebooklm-mcp-cli.git",
+      "package": "notebooklm-mcp-cli",
+      "commands": [
+        "nlm",
+        "notebooklm-mcp"
+      ],
+      "loadPolicy": "shared-uv-tool-cli-optional-mcp"
     },
     {
       "id": "web-search",

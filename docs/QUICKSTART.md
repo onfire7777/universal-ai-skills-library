@@ -2,7 +2,7 @@
 
 This guide gets a new user from a clean clone to a working router-first setup.
 The default install is intentionally lightweight: it builds `skill-router`,
-keeps the 1,807-skill corpus in the repository, and installs compact adapters
+keeps the 1,808-skill corpus in the repository, and installs compact adapters
 instead of copying every skill into every AI client.
 
 ## Requirements

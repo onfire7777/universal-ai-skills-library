@@ -57,7 +57,7 @@ Pop-Location
 Recommended description:
 
 ```text
-Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,807 skills on demand without duplicating the corpus.
+Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,808 skills on demand without duplicating the corpus.
 ```
 
 Recommended topics:

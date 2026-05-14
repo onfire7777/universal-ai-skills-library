@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-stack.source-integrations.v1",
-  "updated": "2026-05-13",
+  "updated": "2026-05-14",
   "policy": "Source integrations are shared pointers and wrappers. Do not vendor upstream source trees or duplicate full skill bodies into AI client roots.",
   "sources": [
     {
@@ -45,6 +45,20 @@
       "defaultState": "mcp-bridge-disabled-cli-enabled",
       "validation": "Test-UniversalAIAdapters.ps1",
       "notes": "Never store secrets, raw logs, temporary scratch notes, or unverified guesses in durable memory."
+    },
+    {
+      "id": "notebooklm-mcp-cli",
+      "label": "NotebookLM CLI and MCP",
+      "kind": "notebook-research-cli",
+      "purpose": "Programmatic access to Google NotebookLM notebooks through the nlm CLI, with an optional stdio MCP server for clients that require a live endpoint.",
+      "installMode": "shared-uv-tool-cli-optional-mcp",
+      "sourceRoot": "{{USERPROFILE}}\\.notebooklm-mcp-cli\\notebooklm-mcp-cli",
+      "cli": "{{USERPROFILE}}\\.local\\bin\\nlm.exe",
+      "mcpCommand": "{{USERPROFILE}}\\.local\\bin\\notebooklm-mcp.exe",
+      "skill": "notebooklm-mcp-cli",
+      "defaultState": "mcp-bridge-disabled-cli-enabled",
+      "validation": "nlm --version; notebooklm-mcp --help; nlm doctor",
+      "notes": "Requires user-owned Google NotebookLM authentication through nlm login. Do not commit cookies, browser profiles, generated artifacts, or account state."
     },
     {
       "id": "web-search",

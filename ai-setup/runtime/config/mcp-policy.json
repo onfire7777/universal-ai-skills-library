@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-stack.mcp-policy.v1",
-  "updated": "2026-05-12",
+  "updated": "2026-05-14",
   "policy": "CLI-first; MCP only for persistent endpoint workflows.",
   "bridges": [
     {
@@ -33,6 +33,7 @@
     "Do not copy the full skills corpus into always-loaded instructions.",
     "Do not run MCP bridges for simple one-shot CLI work.",
     "Default install keeps persistent MCP bridge scheduled tasks disabled; enable only for explicit endpoint workflows.",
+    "Use nlm for NotebookLM work by default; register notebooklm-mcp only as an optional stdio MCP server for clients that need NotebookLM tools.",
     "Keep secrets in the central Universal AI Stack env, not in MCP manifests.",
     "Use Save-UniversalAIMemory.ps1 and Search-UniversalAIMemory.ps1 for cross-client memory when MCP is not active.",
     "MemPalace is authoritative durable memory; GBrain is the structured searchable mirror and should use the local qwen3-embedding-0.6b service for vectors.",

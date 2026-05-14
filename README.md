@@ -10,14 +10,14 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0f172a"></a>
-  <img alt="Skills: 1,807" src="https://img.shields.io/badge/skills-1,807-2563eb">
+  <img alt="Skills: 1,808" src="https://img.shields.io/badge/skills-1,808-2563eb">
   <img alt="Router-first" src="https://img.shields.io/badge/architecture-router--first-0891b2">
   <img alt="Public safe" src="https://img.shields.io/badge/release-public--safe-059669">
 </p>
 
 Universal AI Skills Library is a router-first skill system for local and CLI AI
 tools. It lets Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, Kimi, Qwen,
-Gemini, OpenHands, and other agents search, preflight-route, and load 1,807
+Gemini, OpenHands, and other agents search, preflight-route, and load 1,808
 skills on demand from one shared corpus without copying thousands of files into
 every client.
 
@@ -38,7 +38,7 @@ prompt needs a matching skill.
 
 ## What It Provides
 
-- 1,807 canonical skills in `skills/`
+- 1,808 canonical skills in `skills/`
 - `skill-router`, a Go CLI for search, preflight routing, validation, and skill loading
 - compact adapters for Codex, Claude, Cursor, Gemini, OpenCode, Hermes Agent,
   Paperclip, Kiro, Qwen, Kimi, OpenHands, Cline, Continue, and similar clients
@@ -177,8 +177,9 @@ It provides:
 - local Qwen embedding service for GBrain memory search
 - Hermes Agent and Paperclip configuration helpers
 - shared memory helpers for MemPalace plus GBrain mirror lookup
-- source integration policy for Lightpanda, Context Mode, MemPalace, web
-  search, GBrain, and GSkills/GStack without vendoring those tools into the repo
+- source integration policy for Lightpanda, Context Mode, MemPalace,
+  NotebookLM MCP CLI, web search, GBrain, and GSkills/GStack without vendoring
+  those tools into the repo
 - health-check and adapter-validation scripts
 
 The default local coding fallback is:
