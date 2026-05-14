@@ -45,7 +45,7 @@ $required = @(
   'docs\PUBLIC_RELEASE_CHECKLIST.md',
   'docs\DESIGN_AND_MESSAGING.md',
   'docs\SOURCE_INTEGRATIONS.md',
-  'docs\assets\universal-ai-skills-hero.svg',
+  'docs\assets\universal-ai-skills-hero.png',
   'docs\UNIVERSAL_AI_SETUP.md',
   'docs\AI_REPO_TOOLS_SUMMARY.md'
 )

@@ -46,7 +46,7 @@ $requiredFiles = @(
   'docs\QUICKSTART.md',
   'docs\PUBLIC_RELEASE_CHECKLIST.md',
   'docs\DESIGN_AND_MESSAGING.md',
-  'docs\assets\universal-ai-skills-hero.svg',
+  'docs\assets\universal-ai-skills-hero.png',
   'docs\UNIVERSAL_AI_SETUP.md',
   'docs\UNIVERSAL_AI_CONNECTION_CONFIGS.md',
   'ai-setup\README.md',
@@ -115,6 +115,16 @@ $skipDirs = @(
   '\__pycache__\',
   '\plugin-codex\skills\'
 )
+$binaryExtensions = @(
+  '.avif',
+  '.gif',
+  '.ico',
+  '.jpeg',
+  '.jpg',
+  '.pdf',
+  '.png',
+  '.webp'
+)
 $secretPatterns = [ordered]@{
   OpenAIProject = 'sk-proj-[A-Za-z0-9_-]{20,}'
   GenericProviderKey = 'sk-[A-Za-z0-9_]{30,}'
@@ -140,7 +150,7 @@ $scanFiles = Get-ChildItem -LiteralPath $RepoRoot -Recurse -File -Force |
     foreach ($skip in $skipDirs) {
       if ($path -match [regex]::Escape($skip)) { $keep = $false; break }
     }
-    $keep -and $_.Length -lt 5MB
+    $keep -and $_.Length -lt 5MB -and ($binaryExtensions -notcontains $_.Extension.ToLowerInvariant())
   }
 
 foreach ($file in $scanFiles) {
