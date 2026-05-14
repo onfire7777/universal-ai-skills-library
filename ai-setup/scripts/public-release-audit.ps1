@@ -32,6 +32,11 @@ function Get-RelativePath {
   return $full
 }
 
+function Test-AllowedSecretMatch {
+  param([string]$MatchText)
+  return $MatchText -match 'your-api-key|your_api_key|example|fake|placeholder|sk-\.\.\.|<[^>]+>|os\.environ|getenv|process\.env|\$env:'
+}
+
 $requiredFiles = @(
   'README.md',
   'LICENSE',
@@ -163,9 +168,11 @@ foreach ($file in $scanFiles) {
   }
   if ($rel -eq 'docs\build_manifest.json' -or $rel -eq 'manifest.json') { continue }
   foreach ($name in $secretPatterns.Keys) {
-    if ($text -match $secretPatterns[$name]) {
-      if ($text -match 'your-api-key|your_api_key|example|fake|placeholder|sk-\.\.\.') { continue }
+    $matches = [regex]::Matches($text, $secretPatterns[$name])
+    foreach ($match in $matches) {
+      if (Test-AllowedSecretMatch -MatchText $match.Value) { continue }
       Add-Failure "Potential secret pattern $name in $rel"
+      break
     }
   }
 }
