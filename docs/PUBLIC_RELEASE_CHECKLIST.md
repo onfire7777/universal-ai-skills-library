@@ -18,7 +18,7 @@ with another user.
 - `docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md`
 - `docs/SOURCE_INTEGRATIONS.md`
 - `docs/DESIGN_AND_MESSAGING.md`
-- `docs/assets/universal-ai-skills-hero.svg`
+- `docs/assets/universal-ai-skills-hero.png`
 - `ai-setup/runtime/config/source-integrations.json`
 - `ai-setup/scripts/public-release-audit.ps1`
 

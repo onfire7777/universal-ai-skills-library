@@ -47,21 +47,23 @@ spam, token/key-looking text, and dense skill tables in the README hero.
 Primary asset:
 
 ```text
-docs/assets/universal-ai-skills-hero.svg
+docs/assets/universal-ai-skills-hero.png
 ```
 
-The SVG is repo-native, deterministic, public-safe, and does not depend on a
-binary generated image file. It should stay text-light and brand-forward:
+The PNG is the reviewed public README hero. Keep it public-safe, readable at
+README width, and aligned with the actual architecture:
 
 - center: `skill-router`
-- orbiting nodes: major clients such as Codex, Claude, Hermes, Paperclip,
-  Cursor, and OpenCode
-- footer concept: 1,807 skills loaded on demand from one shared corpus
+- agent adapters: Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, Kimi,
+  Gemini, and Qwen
+- corpus: 1,807 canonical skills loaded on demand from one shared source
+- source layer: Lightpanda, Context Mode, MemPalace, Web Search
+- memory and index layer: GBrain and GSkills
 
 ## GPT Image 2 / Raster Preview Prompt
 
-Use this prompt when creating an optional raster social preview in an image
-model. Do not commit the generated image until it has been reviewed for text
+Use this prompt when refreshing the raster hero or creating a matching social
+preview. Do not commit a generated image until it has been reviewed for text
 accuracy, licensing, visual artifacts, and secret-like strings.
 
 ```text
@@ -69,7 +71,7 @@ Create a modern, sleek, minimal GitHub repository social-preview image for "Univ
 
 Concept: one central AI skill router connects many AI agents to one shared skill corpus. Show a clean dark interface-inspired composition with a central node labeled "skill-router", surrounding nodes labeled Codex, Claude, Cursor, Hermes, Paperclip, and OpenCode, and a subtle line "1,807 skills loaded on demand".
 
-Visual style: premium developer tooling, dark neutral background, refined cyan/blue/green accents, precise spacing, soft depth, no busy code screenshots, no fake secrets, no API keys, no logos from third-party brands, no mascot, no cartoon style.
+Visual style: premium developer tooling, dark neutral background, refined cyan/blue/green accents, precise spacing, soft depth, no busy code screenshots, no fake secrets, no API keys, no mascot, no cartoon style.
 
 Composition: 16:9, strong center focus, ample margins, readable type, abstract routing lines, polished SaaS/devtool aesthetic, suitable as a GitHub social preview and README hero.
 ```

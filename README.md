@@ -1,7 +1,7 @@
 # Universal AI Skills Library
 
 <p align="center">
-  <img src="docs/assets/universal-ai-skills-hero.svg" alt="Universal AI Skills Library hero showing skill-router connecting multiple AI agents to one shared corpus">
+  <img src="docs/assets/universal-ai-skills-hero.png" alt="Universal AI Skills Library hero showing skill-router connecting AI agents, shared skills, memory, and source integrations">
 </p>
 
 <p align="center">
