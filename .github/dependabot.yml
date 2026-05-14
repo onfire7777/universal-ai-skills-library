@@ -2,6 +2,7 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
+    open-pull-requests-limit: 0
     schedule:
       interval: "weekly"
     labels:
@@ -12,6 +13,7 @@ updates:
     directories:
       - "/skill-router-cli"
       - "/skills/printing-press-golden"
+    open-pull-requests-limit: 0
     schedule:
       interval: "weekly"
     labels:
@@ -23,6 +25,7 @@ updates:
       - "/skills/*"
       - "/skills/*/scripts"
       - "/skills/*/scripts/tests"
+    open-pull-requests-limit: 0
     schedule:
       interval: "weekly"
     exclude-paths:
@@ -36,6 +39,7 @@ updates:
     directories:
       - "/skills/*"
       - "/skills/*/scripts"
+    open-pull-requests-limit: 0
     schedule:
       interval: "weekly"
     exclude-paths:
