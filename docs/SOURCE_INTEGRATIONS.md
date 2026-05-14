@@ -16,6 +16,7 @@ Every AI client should see the same capability layer:
 - NotebookLM research through `nlm`
 - X API workflows through `x-cli`
 - Instagram one-turn and TUI workflows through `instagram-cli`
+- LLM-ready web crawling and extraction through `crwl` / Crawl4AI
 - fresh web search through the host AI when available
 - external GSkills/GStack skills through read-only routing
 
@@ -33,6 +34,7 @@ downloaded tools, logs, local model files, and generated state.
 | NotebookLM MCP CLI | source policy, canonical router skill, validation pointers | PyPI/uv tool install, Google auth session, generated notebook artifacts | CLI baseline; MCP disabled unless explicitly needed |
 | x-cli | source policy, canonical router skill, validation pointers | Rust source checkout, built `x` executable, user-owned `.xrc` OAuth profile | CLI baseline; no background service |
 | Instagram CLI | source policy, canonical router skill, validation pointers | Node source checkout, global `instagram-cli` link, user-owned `.instagram-cli` auth/config/log state | CLI baseline; no background service |
+| Crawl4AI | source policy, canonical router skill, validation pointers | Python source checkout, dedicated venv, Playwright/Patchright browser assets, user-owned `.crawl4ai` cache/profiles/output | CLI baseline; no background service |
 | Web search | host-native policy and fallback notes | host AI web/search tool or optional provider keys | no local search proxy, no committed key |
 | GBrain | source/state pointers, embedding model policy | upstream checkout and local brain state | searchable mirror, not authoritative memory |
 | GSkills/GStack | read-only external source policy | upstream checkout | namespaced on-demand skills |
@@ -88,6 +90,9 @@ adapter instructions. It does not publish or commit the user's machine state.
 - Keep Instagram CLI auth, config, logs, downloaded media, and private messages
   in `%USERPROFILE%\.instagram-cli`; the repo stores only the router skill and
   source pointer.
+- Keep Crawl4AI runtime state, venv, browser profiles, cookies, crawl cache,
+  screenshots, and extracted private content in `%USERPROFILE%\.crawl4ai`;
+  the repo stores only the router skill and source pointer.
 - Keep Context Mode and Lightpanda as wrappers or host tools, not vendored repo
   copies.
 - Keep web search host-native by default. Do not commit web-search provider keys
@@ -111,8 +116,11 @@ Each AI client receives compact instructions that say:
    list, direct message, or social graph work.
 9. Use `skill-router skill instagram-cli` before Instagram inbox, direct
    message, read, reply, unsend, media download, TUI, or config work.
-10. Use host-native web search for fresh search when available.
-11. Load GBrain and GSkills/GStack skills through `skill-router`, not by copying
+10. Use `skill-router skill crawl4ai` before Crawl4AI install/update/setup,
+   `crwl`, LLM-ready web crawling, Markdown/JSON extraction, bounded deep
+   crawl, profile, or CDP workflows.
+11. Use host-native web search for fresh search when available.
+12. Load GBrain and GSkills/GStack skills through `skill-router`, not by copying
    their source trees into the client.
 
 ## Validation
@@ -136,7 +144,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal
 Expected clean state:
 
 - `source-integrations.json` includes Lightpanda, Context Mode, MemPalace,
-  NotebookLM MCP CLI, x-cli, Instagram CLI, web search, GBrain, and GSkills/GStack.
+  NotebookLM MCP CLI, x-cli, Instagram CLI, Crawl4AI, web search, GBrain, and GSkills/GStack.
 - Every supported AI adapter has compact universal skill, memory, context, and
   source-integration instructions.
 - Persistent MCP bridge ports may be down in the low-resource profile.

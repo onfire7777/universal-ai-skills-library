@@ -1,7 +1,7 @@
 # Universal AI Skills Plugin
 
 This plugin is the compact adapter surface for the Universal AI Skills Router.
-It gives AI clients access to the shared 1,810-skill corpus without embedding
+It gives AI clients access to the shared 1,811-skill corpus without embedding
 that corpus into always-loaded context or copying it into every client root.
 
 The intended flow is:

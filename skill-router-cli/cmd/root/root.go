@@ -11,6 +11,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/chat"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/config"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/context"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/crawl4ai"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/create"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/db"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/debug"
@@ -38,7 +39,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/xcli"
 )
 
-const Version = "2.2.6"
+const Version = "2.2.7"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -47,7 +48,7 @@ var rootCmd = &cobra.Command{
 syncing compact agent adapters, validating the skill corpus, and managing the
 optional local Universal AI Stack.
 
-The router keeps 1,810 canonical skills in one repository and loads a single
+The router keeps 1,811 canonical skills in one repository and loads a single
 matching skill only when a real user prompt needs it. It can also index local
 external skill roots read-only, validate manifests, sync wrapper instructions,
 check optional MCP bridges, and expose local AI stack health.
@@ -79,6 +80,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  gbrain      GBrain personal knowledge brain CLI adapter")
 		fmt.Println("  xcli        sferik/x-cli source checkout and X API CLI adapter")
 		fmt.Println("  instagram   supreme-gg-gg/instagram-cli source checkout and Instagram CLI adapter")
+		fmt.Println("  crawl4ai    unclecode/crawl4ai crawler stack and crwl CLI adapter")
 		fmt.Println()
 		fmt.Println("Productivity:")
 		fmt.Println("  files       Organize, deduplicate, rename, and clean up files")
@@ -132,6 +134,7 @@ func init() {
 	rootCmd.AddCommand(gbrain.Cmd)
 	rootCmd.AddCommand(xcli.Cmd)
 	rootCmd.AddCommand(instagram.Cmd)
+	rootCmd.AddCommand(crawl4ai.Cmd)
 
 	// Productivity
 	rootCmd.AddCommand(files.Cmd)

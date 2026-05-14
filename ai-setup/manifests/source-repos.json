@@ -152,6 +152,21 @@
       "loadPolicy": "shared-source-build-cli-no-background-service"
     },
     {
+      "id": "crawl4ai",
+      "pathTemplate": "{{USERPROFILE}}\\.crawl4ai-source\\crawl4ai",
+      "repoRemote": "https://github.com/unclecode/crawl4ai.git",
+      "package": "crawl4ai",
+      "version": "0.8.6",
+      "commands": [
+        "crwl",
+        "crawl4ai-setup",
+        "crawl4ai-doctor"
+      ],
+      "stateRoot": "{{USERPROFILE}}\\.crawl4ai",
+      "venv": "{{USERPROFILE}}\\.crawl4ai\\venv",
+      "loadPolicy": "shared-source-venv-cli-no-background-service"
+    },
+    {
       "id": "web-search",
       "pathTemplate": "host-native",
       "loadPolicy": "host-owned-no-local-service"

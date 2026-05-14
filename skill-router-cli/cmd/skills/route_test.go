@@ -378,6 +378,30 @@ func TestInstagramCaptionDoesNotRouteToCLIAdapter(t *testing.T) {
 	}
 }
 
+func TestCrawl4AIRoutesOnlyForCrawlerWork(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("use crawl4ai to crawl https://example.com and return markdown", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision != routeDecisionRoute || preflight.Best.name != "crawl4ai" {
+		t.Fatalf("expected crawl4ai route, got decision=%s best=%s reason=%s", preflight.Decision, preflight.Best.name, preflight.Reason)
+	}
+
+	preflight, err = buildRoutePreflight("search the web for today's AI news", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision == routeDecisionRoute && preflight.Best.name == "crawl4ai" {
+		t.Fatalf("generic web search should not route to crawl4ai")
+	}
+	for _, candidate := range routeReviewCandidates(preflight) {
+		if candidate == "crawl4ai" {
+			t.Fatalf("generic web search should not send crawl4ai for host review")
+		}
+	}
+}
+
 func routeReviewCandidates(preflight routePreflight) []string {
 	if preflight.HostReview == nil {
 		return nil

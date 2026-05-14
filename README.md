@@ -10,14 +10,14 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0f172a"></a>
-  <img alt="Skills: 1,810" src="https://img.shields.io/badge/skills-1,810-2563eb">
+  <img alt="Skills: 1,811" src="https://img.shields.io/badge/skills-1,811-2563eb">
   <img alt="Router-first" src="https://img.shields.io/badge/architecture-router--first-0891b2">
   <img alt="Public safe" src="https://img.shields.io/badge/release-public--safe-059669">
 </p>
 
 Universal AI Skills Library is a router-first skill system for local and CLI AI
 tools. It lets Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, Kimi, Qwen,
-Gemini, OpenHands, and other agents search, preflight-route, and load 1,810
+Gemini, OpenHands, and other agents search, preflight-route, and load 1,811
 skills on demand from one shared corpus without copying thousands of files into
 every client.
 
@@ -38,7 +38,7 @@ prompt needs a matching skill.
 
 ## What It Provides
 
-- 1,810 canonical skills in `skills/`
+- 1,811 canonical skills in `skills/`
 - `skill-router`, a Go CLI for search, preflight routing, validation, and skill loading
 - compact adapters for Codex, Claude, Cursor, Gemini, OpenCode, Hermes Agent,
   Paperclip, Kiro, Qwen, Kimi, OpenHands, Cline, Continue, and similar clients
@@ -46,7 +46,7 @@ prompt needs a matching skill.
   Hermes/Paperclip integration, shared memory, local embeddings, and guarded
   local Qwen fallback
 - portable source integration registry for Lightpanda, Context Mode,
-  MemPalace, x-cli for X API workflows, Instagram CLI for Instagram workflows, host-native web search, GBrain, and GSkills/GStack
+  MemPalace, x-cli for X API workflows, Instagram CLI for Instagram workflows, Crawl4AI for LLM-ready web crawling, host-native web search, GBrain, and GSkills/GStack
 - optional MCP bridge scripts for workflows that truly need persistent endpoints
 - public-safe install, validation, and release-audit scripts
 
@@ -178,7 +178,7 @@ It provides:
 - Hermes Agent and Paperclip configuration helpers
 - shared memory helpers for MemPalace plus GBrain mirror lookup
 - source integration policy for Lightpanda, Context Mode, MemPalace,
-  NotebookLM MCP CLI, x-cli, Instagram CLI, web search, GBrain, and GSkills/GStack without vendoring
+  NotebookLM MCP CLI, x-cli, Instagram CLI, Crawl4AI, web search, GBrain, and GSkills/GStack without vendoring
   those tools into the repo
 - health-check and adapter-validation scripts
 

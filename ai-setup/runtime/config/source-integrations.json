@@ -96,6 +96,27 @@
       "notes": "Unofficial Instagram client. Requires user-owned login via instagram-cli auth login. Do not automate login, and do not commit session files, logs, usernames/passwords, 2FA codes, cookies, private direct messages, or downloaded private media. Prefer --output json for agent workflows."
     },
     {
+      "id": "crawl4ai",
+      "label": "Crawl4AI",
+      "kind": "web-crawler-cli",
+      "purpose": "Shared local Crawl4AI stack for LLM-ready web crawling, scraping, Markdown extraction, JSON extraction, bounded deep crawling, browser profiles, CDP control, screenshots/PDF/MHTML export, and Python AsyncWebCrawler workflows.",
+      "installMode": "shared-source-venv-cli",
+      "sourceRoot": "{{USERPROFILE}}\\.crawl4ai-source\\crawl4ai",
+      "stateRoot": "{{USERPROFILE}}\\.crawl4ai",
+      "venv": "{{USERPROFILE}}\\.crawl4ai\\venv",
+      "cli": "{{USERPROFILE}}\\.local\\bin\\crwl.cmd",
+      "setupCommand": "{{USERPROFILE}}\\.local\\bin\\crawl4ai-setup.cmd",
+      "doctorCommand": "{{USERPROFILE}}\\.local\\bin\\crawl4ai-doctor.cmd",
+      "python": "{{USERPROFILE}}\\.crawl4ai\\venv\\Scripts\\python.exe",
+      "package": "crawl4ai",
+      "version": "0.8.6",
+      "upstream": "https://github.com/unclecode/crawl4ai",
+      "skill": "crawl4ai",
+      "defaultState": "no-background-process",
+      "validation": "crwl --help; crawl4ai-doctor; skill-router crawl4ai status",
+      "notes": "Requires Playwright/Patchright browser setup via crawl4ai-setup. Keep ~/.crawl4ai local and do not commit crawl cache, browser profiles, cookies, screenshots, extracted private content, venv files, or provider API keys. Prefer host-native web search for search discovery and Crawl4AI for known URL crawling/extraction."
+    },
+    {
       "id": "web-search",
       "label": "Web search",
       "kind": "host-native-source",
