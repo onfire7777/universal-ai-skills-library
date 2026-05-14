@@ -264,7 +264,7 @@ Paperclip-specific operating rule:
 - If preflight returns decision=route, sanity-check that the selected skill clearly matches the core task object and action. If it only matched generic words such as issue, problem, fix, install, setup, local, AI, agent, or skill, continue with no universal skill.
 - If decision=ambiguous or host_ai_review.required is true, choose only from the listed candidates when one is clearly right; otherwise continue with no universal skill.
 - Load exactly one needed skill with skill-router skill <name>. Search first with skill-router skill search <query> when the name is unknown.
-- Do not copy or paste the 1,809-skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
+- Do not copy or paste the 1,810-skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
 - MCP bridges are optional. Use the CLI for skill loading and use MCP only for persistent endpoint workflows such as durable memory, context routing, skill generation services, or browser/CDP automation.
 
 ## Universal AI Skill Corpus Access
@@ -291,6 +291,7 @@ Paperclip-specific operating rule:
 - Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys.
 - NotebookLM MCP CLI is installed as a shared uv-tool source at %s. Use nlm first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register notebooklm-mcp only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned nlm login.
 - x-cli is installed as a shared Rust CLI source at %s with executables under %s. Use skill-router skill x-cli, x, or skill-router xcli for X API account, post, search, stream, list, direct message, and social graph workflows. Keep %s local and never copy tokens or account data.
+- Instagram CLI is installed as a shared Node CLI source at %s with command %s. Use skill-router skill instagram-cli, instagram-cli, or skill-router instagram for Instagram inbox, direct message, read, reply, unsend, media download, feed, stories, notifications, profile, and config workflows. Keep %s local and never copy session files, logs, private messages, or downloaded private media.
 - GSkills/GStack live as read-only external skill sources under %s. Load namespaced skills such as gstack-review, gstack-qa, gstack-cso, and gstack-browse through skill-router on demand.
 - GBrain source and state stay in %s and %s. Do not vendor GBrain skills or GStack skills into this AI root.
 `, repoDir, platform.PaperclipSkillsDir(), routerPath,
@@ -304,6 +305,9 @@ Paperclip-specific operating rule:
 		filepath.Join(platform.HomeDir(), ".x-cli", "x-cli"),
 		filepath.Join(platform.HomeDir(), ".local", "bin"),
 		filepath.Join(platform.HomeDir(), ".xrc"),
+		filepath.Join(platform.HomeDir(), ".instagram-cli-source", "instagram-cli"),
+		"instagram-cli",
+		filepath.Join(platform.HomeDir(), ".instagram-cli"),
 		filepath.Join(platform.HomeDir(), ".gstack", "gstack"),
 		filepath.Join(platform.HomeDir(), "gbrain"),
 		filepath.Join(platform.HomeDir(), ".gbrain"),

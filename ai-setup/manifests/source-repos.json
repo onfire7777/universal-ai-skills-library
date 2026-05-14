@@ -140,6 +140,18 @@
       "loadPolicy": "shared-source-build-cli-no-background-service"
     },
     {
+      "id": "instagram-cli",
+      "pathTemplate": "{{USERPROFILE}}\\.instagram-cli-source\\instagram-cli",
+      "repoRemote": "https://github.com/supreme-gg-gg/instagram-cli.git",
+      "package": "@i7m/instagram-cli",
+      "version": "2.0.0",
+      "commands": [
+        "instagram-cli"
+      ],
+      "stateRoot": "{{USERPROFILE}}\\.instagram-cli",
+      "loadPolicy": "shared-source-build-cli-no-background-service"
+    },
+    {
       "id": "web-search",
       "pathTemplate": "host-native",
       "loadPolicy": "host-owned-no-local-service"

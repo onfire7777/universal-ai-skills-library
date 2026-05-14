@@ -100,7 +100,7 @@ if (Test-Path -LiteralPath $AdapterConfig) {
       corpusAccessPolicyPresent = $instructionText.Contains('## Universal AI Skill Corpus Access') -or $instructionText.Contains('Do not copy or install those full skill bodies')
       sharedMemoryPolicyPresent = $instructionText.Contains('## Universal Shared Memory') -and $instructionText.Contains('Save-UniversalAIMemory.ps1') -and $instructionText.Contains('Search-UniversalAIMemory.ps1')
       sharedMemoryEmbeddingPolicyPresent = $instructionText.Contains('qwen3-embedding-0.6b') -and $instructionText.Contains('MemPalace remains the authoritative durable memory store')
-      sourceIntegrationsPolicyPresent = $instructionText.Contains('## Universal Source Integrations') -and $instructionText.Contains('source-integrations.json') -and $instructionText.Contains('GSkills/GStack') -and $instructionText.Contains('Web search is host-owned') -and $instructionText.Contains('NotebookLM MCP CLI') -and $instructionText.Contains('x-cli is installed as a shared Rust CLI source')
+      sourceIntegrationsPolicyPresent = $instructionText.Contains('## Universal Source Integrations') -and $instructionText.Contains('source-integrations.json') -and $instructionText.Contains('GSkills/GStack') -and $instructionText.Contains('Web search is host-owned') -and $instructionText.Contains('NotebookLM MCP CLI') -and $instructionText.Contains('x-cli is installed as a shared Rust CLI source') -and $instructionText.Contains('Instagram CLI is installed as a shared Node CLI source')
       skillFile = $skillPath
       skillPresent = (Test-Path -LiteralPath $skillPath)
     }
@@ -114,7 +114,7 @@ if (Test-Path -LiteralPath $SourceIntegrationConfig) {
     $sourceCfg = Get-Content -LiteralPath $SourceIntegrationConfig -Raw | ConvertFrom-Json
     $ids = @($sourceCfg.sources | ForEach-Object { $_.id })
     $sourceIntegrationSummary.sourceIds = $ids
-    $requiredSourceIds = @('lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli')
+    $requiredSourceIds = @('lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli')
     $sourceIntegrationSummary.requiredSourcesPresent = (@($requiredSourceIds | Where-Object { $ids -notcontains $_ }).Count -eq 0)
   } catch {
     $sourceIntegrationSummary.error = $_.Exception.Message

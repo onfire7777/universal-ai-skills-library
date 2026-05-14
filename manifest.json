@@ -1,7 +1,7 @@
 {
-  "version": "2.2.5",
+  "version": "2.2.6",
   "generated": "2026-05-14",
-  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,809-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,810-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
   "core_skills": [
     {
@@ -7156,6 +7156,29 @@
       "scripts": []
     },
     {
+      "name": "instagram-cli",
+      "directory": "skills/instagram-cli",
+      "description": "Use when working with supreme-gg-gg/instagram-cli or Instagram from the terminal: logging in or checking auth, listing or searching inbox threads, sending Instagram direct messages, reading messages, replying, unsending, downloading message media, viewing feed/stories/notifications/profile TUI screens, configuring the Instagram CLI, or diagnosing the local `instagram-cli` install. Prefer this for agent one-turn Instagram workflows that need JSON output. Do not use for generic social-media copywriting or unrelated Instagram marketing strategy.",
+      "aliases": [
+        "instagram cli",
+        "instagram-cli",
+        "instagram-skill",
+        "i7m",
+        "i7m instagram",
+        "@i7m/instagram-cli",
+        "instagram tui",
+        "instagram terminal client",
+        "instagram direct messages",
+        "instagram messages cli",
+        "instagram dm cli",
+        "instagram inbox",
+        "instagram auth",
+        "instagram one-turn commands"
+      ],
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
       "name": "instantly-automation",
       "directory": "skills/instantly-automation",
       "description": "Automate Instantly cold email outreach -- manage campaigns, sending accounts, lead lists, bulk lead imports, and campaign analytics -- using natural language through the Composio MCP integration.",
@@ -13984,8 +14007,8 @@
       "scripts": []
     }
   ],
-  "total_skills": 1809,
-  "alias_count": 1874,
+  "total_skills": 1810,
+  "alias_count": 1886,
   "routing": {
     "primary_access": "skill-router skill <name>",
     "legacy_access": "manus skill <name>",

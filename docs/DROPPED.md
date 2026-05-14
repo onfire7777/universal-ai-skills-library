@@ -1,6 +1,6 @@
 # Dropped Skills
 
-Historical source-normalization ledger retained for provenance. The current source-of-truth corpus is `skills/` and currently contains 1,809 canonical directories with 1,809 top-level `SKILL.md` files. Use `manifest.json`, `docs/build_manifest.json`, and `skill-router skill list` for current inventory.
+Historical source-normalization ledger retained for provenance. The current source-of-truth corpus is `skills/` and currently contains 1,810 canonical directories with 1,810 top-level `SKILL.md` files. Use `manifest.json`, `docs/build_manifest.json`, and `skill-router skill list` for current inventory.
 
 Input: 849 folders
 Final: 773 skills

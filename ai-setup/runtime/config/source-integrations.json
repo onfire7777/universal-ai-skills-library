@@ -77,6 +77,25 @@
       "notes": "Requires user-owned X API/OAuth authorization stored in ~/.xrc. Do not commit ~/.xrc, ~/.trc, tokens, secrets, direct messages, or private account output. Set X_STREAM_MAX_EVENTS for bounded stream automation."
     },
     {
+      "id": "instagram-cli",
+      "label": "Instagram CLI",
+      "kind": "social-api-cli",
+      "purpose": "Shared terminal client for Instagram workflows: auth checks, inbox/thread listing and search, direct messages, replies, unsend, message media downloads, feed/stories/notifications/profile TUI screens, and agent one-turn JSON commands.",
+      "installMode": "shared-source-build-cli",
+      "sourceRoot": "{{USERPROFILE}}\\.instagram-cli-source\\instagram-cli",
+      "cli": "%APPDATA%\\npm\\instagram-cli.cmd",
+      "powershellCommand": "%APPDATA%\\npm\\instagram-cli.ps1",
+      "package": "@i7m/instagram-cli",
+      "version": "2.0.0",
+      "stateRoot": "{{USERPROFILE}}\\.instagram-cli",
+      "configFile": "{{USERPROFILE}}\\.instagram-cli\\config.ts.yaml",
+      "logs": "{{USERPROFILE}}\\.instagram-cli\\logs",
+      "skill": "instagram-cli",
+      "defaultState": "no-background-process",
+      "validation": "instagram-cli --version; instagram-cli --help; skill-router instagram status",
+      "notes": "Unofficial Instagram client. Requires user-owned login via instagram-cli auth login. Do not automate login, and do not commit session files, logs, usernames/passwords, 2FA codes, cookies, private direct messages, or downloaded private media. Prefer --output json for agent workflows."
+    },
+    {
       "id": "web-search",
       "label": "Web search",
       "kind": "host-native-source",

@@ -2,7 +2,7 @@
 
 ## Current Completion State
 
-The Universal AI Skills Library is complete as a working local cross-agent skill stack. The current router release is `skill-router` v2.2.5, with `manus.exe` kept only as a legacy alias. The canonical repo contains 1,809 indexed skills, a validated manifest, compact wrapper skills synced into local AI clients, and adapter docs for Codex, Claude, Hermes, Paperclip, OpenSkills-style roots, and other local AI surfaces.
+The Universal AI Skills Library is complete as a working local cross-agent skill stack. The current router release is `skill-router` v2.2.6, with `manus.exe` kept only as a legacy alias. The canonical repo contains 1,810 indexed skills, a validated manifest, compact wrapper skills synced into local AI clients, and adapter docs for Codex, Claude, Hermes, Paperclip, OpenSkills-style roots, and other local AI surfaces.
 
 The architecture is intentionally router-first and CLI-driven. AI clients should not preload or copy the full skill corpus into every prompt. They should keep one compact wrapper/instruction surface and call the router only when a real user prompt needs a skill.
 
@@ -28,7 +28,7 @@ Repo path: `skills/`
 
 Default Windows clone path: `%USERPROFILE%\universal-ai-skills-library\skills`
 
-This is the source of truth for all canonical skills. Skills stay here and are loaded only when needed. The latest validation reported 18 core skills plus 1,791 library skills, for 1,809 total, with no duplicate names, no duplicate directories, no duplicate `SKILL.md` bodies, no missing `SKILL.md` files, and no manifest drift.
+This is the source of truth for all canonical skills. Skills stay here and are loaded only when needed. The latest validation reported 18 core skills plus 1,792 library skills, for 1,810 total, with no duplicate names, no duplicate directories, no duplicate `SKILL.md` bodies, no missing `SKILL.md` files, and no manifest drift.
 
 ### Router CLI
 
@@ -60,7 +60,7 @@ These files describe how Codex, Claude, and similar clients should use the route
 
 ### Local AI Root Sync
 
-The current sync model installs the compact wrapper into local AI roots and preserves each platform's native/custom skills. It does not full-copy the 1,809-skill corpus.
+The current sync model installs the compact wrapper into local AI roots and preserves each platform's native/custom skills. It does not full-copy the 1,810-skill corpus.
 
 Known supported local roots include Codex, Claude, OpenSkills `.agent`, Manus-compatible roots, Gemini, Cursor, OpenCode, Kiro, Hermes, Paperclip, OpenClaw, Windsurf, Roo, Continue, Kimi, Qwen, and compatible `SKILL.md`-style clients.
 

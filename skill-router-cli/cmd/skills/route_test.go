@@ -344,6 +344,51 @@ func TestPreflightRoutesAcrossCanonicalLibrary(t *testing.T) {
 	}
 }
 
+func TestInstagramCLIRoutesOnlyForToolWork(t *testing.T) {
+	configurePreflightTest(t)
+	cases := []string{
+		"use instagram-cli to search my Instagram inbox for Alice",
+		"check my instagram direct messages with the CLI and output json",
+		"diagnose the local instagram-cli auth status",
+	}
+	for _, prompt := range cases {
+		preflight, err := buildRoutePreflight(prompt, routeOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if preflight.Decision != routeDecisionRoute || preflight.Best.name != "instagram-cli" {
+			t.Fatalf("prompt %q: expected instagram-cli route, got decision=%s best=%s reason=%s", prompt, preflight.Decision, preflight.Best.name, preflight.Reason)
+		}
+	}
+}
+
+func TestInstagramCaptionDoesNotRouteToCLIAdapter(t *testing.T) {
+	configurePreflightTest(t)
+	preflight, err := buildRoutePreflight("write an Instagram caption for this photo", routeOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preflight.Decision == routeDecisionRoute && preflight.Best.name == "instagram-cli" {
+		t.Fatalf("generic Instagram caption writing should not route to instagram-cli")
+	}
+	for _, candidate := range routeReviewCandidates(preflight) {
+		if candidate == "instagram-cli" {
+			t.Fatalf("generic Instagram caption writing should not send instagram-cli for host review")
+		}
+	}
+}
+
+func routeReviewCandidates(preflight routePreflight) []string {
+	if preflight.HostReview == nil {
+		return nil
+	}
+	candidates := make([]string, 0, len(preflight.HostReview.Candidates))
+	for _, candidate := range preflight.HostReview.Candidates {
+		candidates = append(candidates, candidate.Name)
+	}
+	return candidates
+}
+
 func TestGenericFileOrganizationDoesNotRouteToInvoiceOrganizer(t *testing.T) {
 	configurePreflightTest(t)
 	preflight, err := buildRoutePreflight("organize and rename messy files in this folder", routeOptions{})

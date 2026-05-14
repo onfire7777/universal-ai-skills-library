@@ -79,6 +79,7 @@ $sourceMarker
 - Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys.
 - NotebookLM MCP CLI is installed as a shared uv-tool source at ``$HomeDir\.notebooklm-mcp-cli\notebooklm-mcp-cli``. Use ``nlm`` first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register ``notebooklm-mcp`` only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned ``nlm login``.
 - x-cli is installed as a shared Rust CLI source at ``$HomeDir\.x-cli\x-cli`` with executables in ``$HomeDir\.local\bin``. Use ``skill-router skill x-cli``, ``x``, or ``skill-router xcli`` for X API account, post, search, stream, list, direct message, and social graph workflows. Keep ``$HomeDir\.xrc`` local and never copy tokens or account data.
+- Instagram CLI is installed as a shared Node CLI source at ``$HomeDir\.instagram-cli-source\instagram-cli``. Use ``skill-router skill instagram-cli``, ``instagram-cli``, or ``skill-router instagram`` for Instagram inbox, direct message, read, reply, unsend, media download, feed, stories, notifications, profile, and config workflows. Keep ``$HomeDir\.instagram-cli`` local and never copy session files, logs, private messages, or downloaded private media.
 - GSkills/GStack live as read-only external skill sources under ``$HomeDir\.gstack\gstack``. Load namespaced skills such as ``gstack-review``, ``gstack-qa``, ``gstack-cso``, and ``gstack-browse`` through ``skill-router`` on demand.
 - GBrain source and state stay in ``$HomeDir\gbrain`` and ``$HomeDir\.gbrain``. Do not vendor GBrain skills or GStack skills into this AI root.
 "@
@@ -102,6 +103,7 @@ $sourceMarker
     $webSearchLine = "- Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys."
     $notebookLine = "- NotebookLM MCP CLI is installed as a shared uv-tool source at ``$HomeDir\.notebooklm-mcp-cli\notebooklm-mcp-cli``. Use ``nlm`` first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register ``notebooklm-mcp`` only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned ``nlm login``."
     $xCliLine = "- x-cli is installed as a shared Rust CLI source at ``$HomeDir\.x-cli\x-cli`` with executables in ``$HomeDir\.local\bin``. Use ``skill-router skill x-cli``, ``x``, or ``skill-router xcli`` for X API account, post, search, stream, list, direct message, and social graph workflows. Keep ``$HomeDir\.xrc`` local and never copy tokens or account data."
+    $instagramCliLine = "- Instagram CLI is installed as a shared Node CLI source at ``$HomeDir\.instagram-cli-source\instagram-cli``. Use ``skill-router skill instagram-cli``, ``instagram-cli``, or ``skill-router instagram`` for Instagram inbox, direct message, read, reply, unsend, media download, feed, stories, notifications, profile, and config workflows. Keep ``$HomeDir\.instagram-cli`` local and never copy session files, logs, private messages, or downloaded private media."
     if ($content.Contains($legacyGBrainLine)) {
       $content = $content.Replace($legacyGBrainLine, $currentGBrainLine)
       $changed = $true
@@ -119,6 +121,14 @@ $sourceMarker
         $content = $content.Replace($notebookLine, "$notebookLine`r`n$xCliLine")
       } else {
         $content += "`r`n$xCliLine"
+      }
+      $changed = $true
+    }
+    if ($content.Contains($sourceMarker) -and !$content.Contains('Instagram CLI is installed as a shared Node CLI source')) {
+      if ($content.Contains($xCliLine)) {
+        $content = $content.Replace($xCliLine, "$xCliLine`r`n$instagramCliLine")
+      } else {
+        $content += "`r`n$instagramCliLine"
       }
       $changed = $true
     }

@@ -32,7 +32,7 @@ with another user.
 - local model fallback is lazy and resource-guarded
 - MCP bridges remain optional
 - source integrations are pointer-based and public-safe
-- Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli, web search,
+- Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli, Instagram CLI, web search,
   GBrain, and GSkills/GStack are documented and validated without vendoring private
   state
 - command names prefer `skill-router`; `manus` is compatibility-only
@@ -58,7 +58,7 @@ Pop-Location
 Recommended description:
 
 ```text
-Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,809 skills on demand without duplicating the corpus.
+Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,810 skills on demand without duplicating the corpus.
 ```
 
 Recommended topics:

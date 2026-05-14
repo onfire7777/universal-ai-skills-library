@@ -1,7 +1,7 @@
 {
   "name": "universal-ai-skills",
-  "version": "2.2.5",
-  "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,809 skills on demand without duplicating the corpus.",
+  "version": "2.2.6",
+  "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,810 skills on demand without duplicating the corpus.",
   "author": {
     "name": "onfire7777",
     "url": "https://github.com/onfire7777"
@@ -24,7 +24,7 @@
   "interface": {
     "displayName": "Universal AI Skills",
     "shortDescription": "Router-first AI skill system",
-    "longDescription": "Search, preflight-route, and load one relevant skill on demand from a shared 1,809-skill corpus. Skills stay in the repository under skills/ instead of being copied into every AI client or injected into always-loaded context. The legacy `manus` command remains a compatibility alias.",
+    "longDescription": "Search, preflight-route, and load one relevant skill on demand from a shared 1,810-skill corpus. Skills stay in the repository under skills/ instead of being copied into every AI client or injected into always-loaded context. The legacy `manus` command remains a compatibility alias.",
     "developerName": "onfire7777",
     "category": "skills",
     "capabilities": [

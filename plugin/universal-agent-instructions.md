@@ -16,11 +16,11 @@
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
 - Use `skill-router preflight --hook-event UserPromptSubmit --json "<user prompt>"` for automatic hook prechecks. Use `skill-router preflight --json "<user prompt>"` for manual/internal host-AI prechecks. Use `skill-router route "<user prompt>"` only when an explicit routing check should load the winning skill or fail if no confident skill applies.
 - Use `skill-router route --explain "<user prompt>"` to debug unexpected routes; prefer no route over a weak or ambiguous route.
-- The router scores the full 1,809-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.
+- The router scores the full 1,810-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.
 - Do not preload the full skills corpus into context.
 - Treat `skills/` as source data and `skill-router-cli/` as the router source.
-- Source capabilities are shared through the installed source registry at `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`: Lightpanda for controlled fetch/CDP, Context Mode for scratch/context continuity, MemPalace for durable memory, NotebookLM MCP CLI for Google NotebookLM notebook research and optional stdio MCP, x-cli for X API workflows, host-native web search for fresh search, GBrain for structured lookup, and GSkills/GStack for read-only namespaced skills.
-- Keep source integrations pointer-based. Do not vendor Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli, GBrain, or GSkills/GStack source trees into each AI root, and do not add web-search API keys unless the user explicitly configures a provider.
+- Source capabilities are shared through the installed source registry at `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`: Lightpanda for controlled fetch/CDP, Context Mode for scratch/context continuity, MemPalace for durable memory, NotebookLM MCP CLI for Google NotebookLM notebook research and optional stdio MCP, x-cli for X API workflows, Instagram CLI for Instagram workflows, host-native web search for fresh search, GBrain for structured lookup, and GSkills/GStack for read-only namespaced skills.
+- Keep source integrations pointer-based. Do not vendor Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli, Instagram CLI, GBrain, or GSkills/GStack source trees into each AI root, and do not add web-search API keys unless the user explicitly configures a provider.
 - MCP bridges are optional adapters for persistent endpoint workflows only.
 - Legacy compatibility: `manus skill <name>` may be used only when a client has not moved to `skill-router` yet.
 - Universal compatibility is adapter-based:

@@ -10,7 +10,7 @@ This repository is a universal AI skills setup. The default interface is platfor
 - Optional MCP runtime directory: `C:\ProgramData\universal-ai-mcps`
 - Optional MCP scheduled task prefix: `UniversalAI-*`
 - Local tools directory: `%USERPROFILE%\.universal-ai\tools`
-- Current corpus: 1,809 canonical skills, with legacy/display aliases stored in `manifest.json` and `docs/compatibility_aliases.json`
+- Current corpus: 1,810 canonical skills, with legacy/display aliases stored in `manifest.json` and `docs/compatibility_aliases.json`
 - Local external skill roots: searchable and loadable read-only through `skill-router`; not copied into `skills/` unless intentionally promoted.
 
 For the concrete config files that connect clients, model routing, memory,
@@ -113,7 +113,7 @@ it load exactly one skill with `skill-router skill <best.name>`. If the route is
 only a generic modifier match, such as issue/problem/install/setup/local, the
 agent continues with no skill. If the decision is `ambiguous`, the already
 running host AI chooses only from the listed candidates or continues with no
-skill. This same flow applies to all 1,809 canonical skills and indexed external
+skill. This same flow applies to all 1,810 canonical skills and indexed external
 skills; specific alias examples must not be treated as router scope limits.
 
 Automatic skill routing is user-prompt scoped. Tool hooks, session-start hooks,

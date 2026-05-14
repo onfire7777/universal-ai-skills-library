@@ -15,6 +15,7 @@ Every AI client should see the same capability layer:
 - browser retrieval through Lightpanda
 - NotebookLM research through `nlm`
 - X API workflows through `x-cli`
+- Instagram one-turn and TUI workflows through `instagram-cli`
 - fresh web search through the host AI when available
 - external GSkills/GStack skills through read-only routing
 
@@ -31,6 +32,7 @@ downloaded tools, logs, local model files, and generated state.
 | MemPalace | shared memory wrapper instructions | memory database and optional MCP command | CLI baseline; bridge disabled |
 | NotebookLM MCP CLI | source policy, canonical router skill, validation pointers | PyPI/uv tool install, Google auth session, generated notebook artifacts | CLI baseline; MCP disabled unless explicitly needed |
 | x-cli | source policy, canonical router skill, validation pointers | Rust source checkout, built `x` executable, user-owned `.xrc` OAuth profile | CLI baseline; no background service |
+| Instagram CLI | source policy, canonical router skill, validation pointers | Node source checkout, global `instagram-cli` link, user-owned `.instagram-cli` auth/config/log state | CLI baseline; no background service |
 | Web search | host-native policy and fallback notes | host AI web/search tool or optional provider keys | no local search proxy, no committed key |
 | GBrain | source/state pointers, embedding model policy | upstream checkout and local brain state | searchable mirror, not authoritative memory |
 | GSkills/GStack | read-only external source policy | upstream checkout | namespaced on-demand skills |
@@ -83,6 +85,9 @@ adapter instructions. It does not publish or commit the user's machine state.
   and source pointer.
 - Keep x-cli auth in `%USERPROFILE%\.xrc` or an explicitly selected profile
   file; the repo stores only the router skill and source pointer.
+- Keep Instagram CLI auth, config, logs, downloaded media, and private messages
+  in `%USERPROFILE%\.instagram-cli`; the repo stores only the router skill and
+  source pointer.
 - Keep Context Mode and Lightpanda as wrappers or host tools, not vendored repo
   copies.
 - Keep web search host-native by default. Do not commit web-search provider keys
@@ -104,8 +109,10 @@ Each AI client receives compact instructions that say:
    source, query, Studio artifact, or NotebookLM MCP work.
 8. Use `skill-router skill x-cli` before X API account, post, search, stream,
    list, direct message, or social graph work.
-9. Use host-native web search for fresh search when available.
-10. Load GBrain and GSkills/GStack skills through `skill-router`, not by copying
+9. Use `skill-router skill instagram-cli` before Instagram inbox, direct
+   message, read, reply, unsend, media download, TUI, or config work.
+10. Use host-native web search for fresh search when available.
+11. Load GBrain and GSkills/GStack skills through `skill-router`, not by copying
    their source trees into the client.
 
 ## Validation
@@ -129,7 +136,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal
 Expected clean state:
 
 - `source-integrations.json` includes Lightpanda, Context Mode, MemPalace,
-  NotebookLM MCP CLI, x-cli, web search, GBrain, and GSkills/GStack.
+  NotebookLM MCP CLI, x-cli, Instagram CLI, web search, GBrain, and GSkills/GStack.
 - Every supported AI adapter has compact universal skill, memory, context, and
   source-integration instructions.
 - Persistent MCP bridge ports may be down in the low-resource profile.

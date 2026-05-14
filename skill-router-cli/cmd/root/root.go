@@ -23,6 +23,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gws"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/hf"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/infra"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/instagram"
 	makeCmd "github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/make"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/mcp"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/models"
@@ -37,7 +38,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/xcli"
 )
 
-const Version = "2.2.5"
+const Version = "2.2.6"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -46,7 +47,7 @@ var rootCmd = &cobra.Command{
 syncing compact agent adapters, validating the skill corpus, and managing the
 optional local Universal AI Stack.
 
-The router keeps 1,809 canonical skills in one repository and loads a single
+The router keeps 1,810 canonical skills in one repository and loads a single
 matching skill only when a real user prompt needs it. It can also index local
 external skill roots read-only, validate manifests, sync wrapper instructions,
 check optional MCP bridges, and expose local AI stack health.
@@ -77,6 +78,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  gstack      GStack engineering workflows and browser/PDF tools")
 		fmt.Println("  gbrain      GBrain personal knowledge brain CLI adapter")
 		fmt.Println("  xcli        sferik/x-cli source checkout and X API CLI adapter")
+		fmt.Println("  instagram   supreme-gg-gg/instagram-cli source checkout and Instagram CLI adapter")
 		fmt.Println()
 		fmt.Println("Productivity:")
 		fmt.Println("  files       Organize, deduplicate, rename, and clean up files")
@@ -129,6 +131,7 @@ func init() {
 	rootCmd.AddCommand(gstack.Cmd)
 	rootCmd.AddCommand(gbrain.Cmd)
 	rootCmd.AddCommand(xcli.Cmd)
+	rootCmd.AddCommand(instagram.Cmd)
 
 	// Productivity
 	rootCmd.AddCommand(files.Cmd)

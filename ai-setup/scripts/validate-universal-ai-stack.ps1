@@ -143,7 +143,7 @@ if ($integrations) {
 if ($sourceIntegrations) {
   $sources = @($sourceIntegrations.sources)
   $sourceIds = @($sources | ForEach-Object { $_.id })
-  foreach ($id in 'lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli') {
+  foreach ($id in 'lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli') {
     if ($sourceIds -notcontains $id) { Add-Failure "Source integration missing: $id" }
   }
   foreach ($id in 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli') {
@@ -165,6 +165,10 @@ if ($sourceIntegrations) {
   if ($xCli -and $xCli.defaultState -ne 'no-background-process') {
     Add-Failure 'x-cli source integration must remain CLI-only with no background process.'
   }
+  $instagramCli = $sources | Where-Object { $_.id -eq 'instagram-cli' } | Select-Object -First 1
+  if ($instagramCli -and $instagramCli.defaultState -ne 'no-background-process') {
+    Add-Failure 'instagram-cli source integration must remain CLI-only with no background process.'
+  }
   $webSearch = $sources | Where-Object { $_.id -eq 'web-search' } | Select-Object -First 1
   if ($webSearch -and $webSearch.installMode -ne 'host-owned-no-local-service') {
     Add-Failure 'Web search source integration must stay host-owned and no-local-service by default.'
@@ -176,7 +180,7 @@ if ($sourceRepos) {
     Add-Failure 'source-repos.json missing canonical universalAiSkillsLibrary record.'
   }
   $externalSourceIds = @($sourceRepos.optionalExternalSources | ForEach-Object { $_.id })
-  foreach ($id in 'gstack', 'gbrain', 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli', 'x-cli', 'web-search') {
+  foreach ($id in 'gstack', 'gbrain', 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli', 'web-search') {
     if ($externalSourceIds -notcontains $id) { Add-Failure "source-repos.json missing optional external source: $id" }
   }
 }

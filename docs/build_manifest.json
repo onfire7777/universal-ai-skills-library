@@ -5,10 +5,10 @@
   "router_source": "%USERPROFILE%\\universal-ai-skills-library\\skill-router-cli",
   "primary_binary": "skill-router",
   "legacy_binary_alias": "manus",
-  "skill_count": 1809,
-  "directories_total": 1809,
+  "skill_count": 1810,
+  "directories_total": 1810,
   "missing_skill_md": [],
-  "alias_count": 1874,
+  "alias_count": 1886,
   "merged_legacy_directories": [
     {
       "legacy_directory": "anthropic_administrator-automation",
@@ -7228,6 +7228,13 @@
       "name": "instacart-automation",
       "directory": "skills/instacart-automation",
       "description": "Automate Instacart tasks via Rube MCP (Composio). Always search tools first for current schemas.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "instagram-cli",
+      "directory": "skills/instagram-cli",
+      "description": "Use when working with supreme-gg-gg/instagram-cli or Instagram from the terminal: logging in or checking auth, listing or searching inbox threads, sending Instagram direct messages, reading messages, replying, unsending, downloading message media, viewing feed/stories/notifications/profile TUI screens, configuring the Instagram CLI, or diagnosing the local `instagram-cli` install. Prefer this for agent one-turn Instagram workflows that need JSON output. Do not use for generic social-media copywriting or unrelated Instagram marketing strategy.",
       "has_scripts": false,
       "scripts": []
     },
