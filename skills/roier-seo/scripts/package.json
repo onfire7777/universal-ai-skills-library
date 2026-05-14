@@ -10,7 +10,7 @@
     "audit": "node audit.js"
   },
   "dependencies": {
-    "lighthouse": "^12.0.0",
+    "lighthouse": "^13.3.0",
     "chrome-launcher": "^1.1.0"
   }
 }
