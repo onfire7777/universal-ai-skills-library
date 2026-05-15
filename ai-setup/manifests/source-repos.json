@@ -167,6 +167,20 @@
       "loadPolicy": "shared-source-venv-cli-no-background-service"
     },
     {
+      "id": "firecrawl",
+      "pathTemplate": "{{USERPROFILE}}\\.firecrawl-source\\firecrawl",
+      "repoRemote": "https://github.com/firecrawl/firecrawl.git",
+      "package": "firecrawl-cli",
+      "version": "1.17.0",
+      "mcpPackage": "firecrawl-mcp",
+      "mcpVersion": "3.16.0",
+      "commands": [
+        "firecrawl"
+      ],
+      "auth": "FIRECRAWL_API_KEY or firecrawl login",
+      "loadPolicy": "shared-source-npm-cli-optional-mcp-no-background-service"
+    },
+    {
       "id": "web-search",
       "pathTemplate": "host-native",
       "loadPolicy": "host-owned-no-local-service"

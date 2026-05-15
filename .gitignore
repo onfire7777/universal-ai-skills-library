@@ -45,6 +45,7 @@ reports/
 # Local runtime/install targets
 .universal-ai-stack/
 .local-ai/
+.firecrawl/
 models/
 *.gguf
 *.safetensors

@@ -137,7 +137,7 @@ Safety defaults:
 
 ## Cross-Agent Skill Access
 
-Every local AI client gets compact router instructions and, where supported, one wrapper skill. The full 1,811-skill corpus remains in this repo and is loaded on demand:
+Every local AI client gets compact router instructions and, where supported, one wrapper skill. The full 1,812-skill corpus remains in this repo and is loaded on demand:
 
 ```powershell
 skill-router preflight --json "<latest user prompt>"
@@ -179,10 +179,11 @@ Paperclip:
   `ai-setup/runtime/config/source-integrations.json` and installed to
   `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`. This is
   a public-safe registry of pointers and policies for Lightpanda, Context Mode,
-  MemPalace, NotebookLM MCP CLI, x-cli, Instagram CLI, Crawl4AI, host-native web search, GBrain, and
-  GSkills/GStack. It does not vendor private source checkouts, browser
-  sessions, secrets, OAuth/cookie state, generated NotebookLM artifacts, or full
-  external skill trees into the repo.
+  MemPalace, NotebookLM MCP CLI, x-cli, Instagram CLI, Crawl4AI, Firecrawl,
+  host-native web search, GBrain, and GSkills/GStack. It does not vendor private
+  source checkouts, browser sessions, secrets, OAuth/cookie state, generated
+  NotebookLM artifacts, Firecrawl account state, or full external skill trees
+  into the repo.
 - Shared memory is centralized through MemPalace, with helper wrappers in
   `%USERPROFILE%\.universal-ai-stack\scripts`:
   `Search-UniversalAIMemory.ps1` for lookup and `Save-UniversalAIMemory.ps1`

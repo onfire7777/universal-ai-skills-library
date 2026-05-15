@@ -24,7 +24,7 @@ description: Use this whenever the user mentions Universal AI Skills, skill-rout
 - Use `skill-router skill search <query>` before loading when the skill name is unknown.
 - Use `skill-router preflight --hook-event UserPromptSubmit --json "<user prompt>"` for automatic hook prechecks. Use `skill-router preflight --json "<user prompt>"` for manual/internal host-AI prechecks. Use `skill-router route "<user prompt>"` only for explicit routing checks that should load the winning skill or fail when no confident skill applies.
 - Use `skill-router route --explain "<user prompt>"` when a route looks wrong; it prints the top candidates, score, source, evidence gates, and ambiguity behavior.
-- Automatic routing should prefer no route over a weak route. It scores the full 1,811-skill canonical corpus and read-only external skills together, requires exact aliases or strong multi-token evidence, and refuses ambiguous near-ties.
+- Automatic routing should prefer no route over a weak route. It scores the full 1,812-skill canonical corpus and read-only external skills together, requires exact aliases or strong multi-token evidence, and refuses ambiguous near-ties.
 - If a user says "universal AI skills <thing>", do not decide from the native client skill list. Run `skill-router skill search <thing>` or `skill-router skill <thing>` first.
 - Compatibility aliases, such as `card-creator`, resolve through the manifest to their canonical skills. Do not hardcode one skill family as the router's scope.
 - Use `skill-router skills sources` to inspect read-only local external skill roots.

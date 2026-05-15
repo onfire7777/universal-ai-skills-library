@@ -81,6 +81,7 @@ $sourceMarker
 - x-cli is installed as a shared Rust CLI source at ``$HomeDir\.x-cli\x-cli`` with executables in ``$HomeDir\.local\bin``. Use ``skill-router skill x-cli``, ``x``, or ``skill-router xcli`` for X API account, post, search, stream, list, direct message, and social graph workflows. Keep ``$HomeDir\.xrc`` local and never copy tokens or account data.
 - Instagram CLI is installed as a shared Node CLI source at ``$HomeDir\.instagram-cli-source\instagram-cli``. Use ``skill-router skill instagram-cli``, ``instagram-cli``, or ``skill-router instagram`` for Instagram inbox, direct message, read, reply, unsend, media download, feed, stories, notifications, profile, and config workflows. Keep ``$HomeDir\.instagram-cli`` local and never copy session files, logs, private messages, or downloaded private media.
 - Crawl4AI is installed as a shared Python CLI source at ``$HomeDir\.crawl4ai-source\crawl4ai`` with venv and runtime state under ``$HomeDir\.crawl4ai`` and shims in ``$HomeDir\.local\bin``. Use ``skill-router skill crawl4ai``, ``crwl``, or ``skill-router crawl4ai`` for LLM-ready web crawling, Markdown/JSON extraction, bounded deep crawls, profiles, CDP browser control, setup, and doctor workflows. Keep ``$HomeDir\.crawl4ai`` local and never copy crawl caches, browser profiles, cookies, screenshots, or extracted private content.
+- Firecrawl is installed as a shared npm CLI source at ``$HomeDir\.firecrawl-source\firecrawl`` with command ``firecrawl``. Use ``skill-router skill firecrawl``, ``firecrawl``, or ``skill-router firecrawl`` for hosted Firecrawl search, scrape, crawl, map, parse, interact, agent, login, SDK/API, and optional MCP workflows. Keep ``FIRECRAWL_API_KEY``, Firecrawl account state, generated private output, screenshots, cookies, and session data local; do not run ``firecrawl-cli init --all`` in this router-first stack.
 - GSkills/GStack live as read-only external skill sources under ``$HomeDir\.gstack\gstack``. Load namespaced skills such as ``gstack-review``, ``gstack-qa``, ``gstack-cso``, and ``gstack-browse`` through ``skill-router`` on demand.
 - GBrain source and state stay in ``$HomeDir\gbrain`` and ``$HomeDir\.gbrain``. Do not vendor GBrain skills or GStack skills into this AI root.
 "@
@@ -106,6 +107,7 @@ $sourceMarker
     $xCliLine = "- x-cli is installed as a shared Rust CLI source at ``$HomeDir\.x-cli\x-cli`` with executables in ``$HomeDir\.local\bin``. Use ``skill-router skill x-cli``, ``x``, or ``skill-router xcli`` for X API account, post, search, stream, list, direct message, and social graph workflows. Keep ``$HomeDir\.xrc`` local and never copy tokens or account data."
     $instagramCliLine = "- Instagram CLI is installed as a shared Node CLI source at ``$HomeDir\.instagram-cli-source\instagram-cli``. Use ``skill-router skill instagram-cli``, ``instagram-cli``, or ``skill-router instagram`` for Instagram inbox, direct message, read, reply, unsend, media download, feed, stories, notifications, profile, and config workflows. Keep ``$HomeDir\.instagram-cli`` local and never copy session files, logs, private messages, or downloaded private media."
     $crawl4aiLine = "- Crawl4AI is installed as a shared Python CLI source at ``$HomeDir\.crawl4ai-source\crawl4ai`` with venv and runtime state under ``$HomeDir\.crawl4ai`` and shims in ``$HomeDir\.local\bin``. Use ``skill-router skill crawl4ai``, ``crwl``, or ``skill-router crawl4ai`` for LLM-ready web crawling, Markdown/JSON extraction, bounded deep crawls, profiles, CDP browser control, setup, and doctor workflows. Keep ``$HomeDir\.crawl4ai`` local and never copy crawl caches, browser profiles, cookies, screenshots, or extracted private content."
+    $firecrawlLine = "- Firecrawl is installed as a shared npm CLI source at ``$HomeDir\.firecrawl-source\firecrawl`` with command ``firecrawl``. Use ``skill-router skill firecrawl``, ``firecrawl``, or ``skill-router firecrawl`` for hosted Firecrawl search, scrape, crawl, map, parse, interact, agent, login, SDK/API, and optional MCP workflows. Keep ``FIRECRAWL_API_KEY``, Firecrawl account state, generated private output, screenshots, cookies, and session data local; do not run ``firecrawl-cli init --all`` in this router-first stack."
     if ($content.Contains($legacyGBrainLine)) {
       $content = $content.Replace($legacyGBrainLine, $currentGBrainLine)
       $changed = $true
@@ -139,6 +141,14 @@ $sourceMarker
         $content = $content.Replace($instagramCliLine, "$instagramCliLine`r`n$crawl4aiLine")
       } else {
         $content += "`r`n$crawl4aiLine"
+      }
+      $changed = $true
+    }
+    if ($content.Contains($sourceMarker) -and !$content.Contains('Firecrawl is installed as a shared npm CLI source')) {
+      if ($content.Contains($crawl4aiLine)) {
+        $content = $content.Replace($crawl4aiLine, "$crawl4aiLine`r`n$firecrawlLine")
+      } else {
+        $content += "`r`n$firecrawlLine"
       }
       $changed = $true
     }

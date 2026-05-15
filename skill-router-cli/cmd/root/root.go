@@ -18,6 +18,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/doctor"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/files"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/find"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/firecrawl"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gbrain"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gmail"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gstack"
@@ -39,7 +40,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/xcli"
 )
 
-const Version = "2.2.7"
+const Version = "2.2.8"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -48,7 +49,7 @@ var rootCmd = &cobra.Command{
 syncing compact agent adapters, validating the skill corpus, and managing the
 optional local Universal AI Stack.
 
-The router keeps 1,811 canonical skills in one repository and loads a single
+The router keeps 1,812 canonical skills in one repository and loads a single
 matching skill only when a real user prompt needs it. It can also index local
 external skill roots read-only, validate manifests, sync wrapper instructions,
 check optional MCP bridges, and expose local AI stack health.
@@ -135,6 +136,7 @@ func init() {
 	rootCmd.AddCommand(xcli.Cmd)
 	rootCmd.AddCommand(instagram.Cmd)
 	rootCmd.AddCommand(crawl4ai.Cmd)
+	rootCmd.AddCommand(firecrawl.Cmd)
 
 	// Productivity
 	rootCmd.AddCommand(files.Cmd)

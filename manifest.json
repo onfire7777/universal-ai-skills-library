@@ -1,7 +1,7 @@
 {
-  "version": "2.2.7",
-  "generated": "2026-05-14",
-  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,811-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+  "version": "2.2.8",
+  "generated": "2026-05-15",
+  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,812-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
   "core_skills": [
     {
@@ -5072,6 +5072,31 @@
       "name": "fireberry-automation",
       "directory": "skills/fireberry-automation",
       "description": "Automate Fireberry tasks via Rube MCP (Composio). Always search tools first for current schemas.",
+      "has_scripts": false,
+      "scripts": []
+    },
+    {
+      "name": "firecrawl",
+      "directory": "skills/firecrawl",
+      "description": "Use when working with firecrawl/firecrawl or the installed Firecrawl CLI: installing, updating, logging in, checking status, searching the web through Firecrawl, scraping pages, interacting with pages, crawling sites, mapping URLs, parsing files, running Firecrawl agent jobs, using Firecrawl SDK/API examples, or configuring optional firecrawl-mcp for an MCP client. Prefer this for Firecrawl hosted API and CLI workflows. Do not use for generic web search when the host AI has native search, or for local Crawl4AI workflows.",
+      "aliases": [
+        "firecrawl",
+        "firecrawl cli",
+        "firecrawl-cli",
+        "firecrawl mcp",
+        "firecrawl-mcp",
+        "firecrawl search",
+        "firecrawl scrape",
+        "firecrawl crawl",
+        "firecrawl map",
+        "firecrawl interact",
+        "firecrawl agent",
+        "firecrawl parse",
+        "firecrawl login",
+        "firecrawl api",
+        "firecrawl sdk",
+        "firecrawl/firecrawl"
+      ],
       "has_scripts": false,
       "scripts": []
     },
@@ -14031,8 +14056,8 @@
       "scripts": []
     }
   ],
-  "total_skills": 1811,
-  "alias_count": 1901,
+  "total_skills": 1812,
+  "alias_count": 1917,
   "routing": {
     "primary_access": "skill-router skill <name>",
     "legacy_access": "manus skill <name>",

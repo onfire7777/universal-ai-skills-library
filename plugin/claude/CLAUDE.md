@@ -21,4 +21,4 @@ Use `skill-router route --explain "<user prompt>"` to debug unexpected routes. P
 
 Keep context compact. Load only the skill needed for the current task. Use MCP bridges only when a persistent endpoint is required.
 
-The router scores the full 1,811-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.
+The router scores the full 1,812-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.

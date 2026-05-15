@@ -8,7 +8,7 @@ GitHub About, README, plugin manifests, marketplaces, and generated previews.
 Universal AI Skills Library is not a bundle to paste into every agent. It is a
 router-first skill system:
 
-1. Keep one canonical 1,811-skill corpus in `skills/`.
+1. Keep one canonical 1,812-skill corpus in `skills/`.
 2. Give each AI client compact instructions or a wrapper skill.
 3. Run `skill-router preflight` for real user prompts.
 4. Load exactly one matching skill only when the route clearly fits.
@@ -17,7 +17,7 @@ router-first skill system:
 ## Recommended GitHub About
 
 ```text
-Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,811 skills on demand without duplicating the corpus.
+Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,812 skills on demand without duplicating the corpus.
 ```
 
 ## Short Taglines
@@ -56,7 +56,7 @@ README width, and aligned with the actual architecture:
 - center: `skill-router`
 - agent adapters: Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, Kimi,
   Gemini, and Qwen
-- corpus: 1,811 canonical skills loaded on demand from one shared source
+- corpus: 1,812 canonical skills loaded on demand from one shared source
 - source layer: Lightpanda, Context Mode, MemPalace, Web Search
 - memory and index layer: GBrain and GSkills
 
@@ -69,7 +69,7 @@ accuracy, licensing, visual artifacts, and secret-like strings.
 ```text
 Create a modern, sleek, minimal GitHub repository social-preview image for "Universal AI Skills Library".
 
-Concept: one central AI skill router connects many AI agents to one shared skill corpus. Show a clean dark interface-inspired composition with a central node labeled "skill-router", surrounding nodes labeled Codex, Claude, Cursor, Hermes, Paperclip, and OpenCode, and a subtle line "1,811 skills loaded on demand".
+Concept: one central AI skill router connects many AI agents to one shared skill corpus. Show a clean dark interface-inspired composition with a central node labeled "skill-router", surrounding nodes labeled Codex, Claude, Cursor, Hermes, Paperclip, and OpenCode, and a subtle line "1,812 skills loaded on demand".
 
 Visual style: premium developer tooling, dark neutral background, refined cyan/blue/green accents, precise spacing, soft depth, no busy code screenshots, no fake secrets, no API keys, no mascot, no cartoon style.
 

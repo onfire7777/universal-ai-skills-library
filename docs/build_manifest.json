@@ -1,14 +1,14 @@
 {
   "schema": "universal-ai-skills-build-manifest/v2",
-  "generated_at": "2026-05-14T00:00:00.000Z",
+  "generated_at": "2026-05-15T00:00:00.000Z",
   "source_of_truth": "%USERPROFILE%\\universal-ai-skills-library\\skills",
   "router_source": "%USERPROFILE%\\universal-ai-skills-library\\skill-router-cli",
   "primary_binary": "skill-router",
   "legacy_binary_alias": "manus",
-  "skill_count": 1811,
-  "directories_total": 1811,
+  "skill_count": 1812,
+  "directories_total": 1812,
   "missing_skill_md": [],
-  "alias_count": 1901,
+  "alias_count": 1917,
   "merged_legacy_directories": [
     {
       "legacy_directory": "anthropic_administrator-automation",

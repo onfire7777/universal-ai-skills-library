@@ -117,6 +117,26 @@
       "notes": "Requires Playwright/Patchright browser setup via crawl4ai-setup. Keep ~/.crawl4ai local and do not commit crawl cache, browser profiles, cookies, screenshots, extracted private content, venv files, or provider API keys. Prefer host-native web search for search discovery and Crawl4AI for known URL crawling/extraction."
     },
     {
+      "id": "firecrawl",
+      "label": "Firecrawl",
+      "kind": "hosted-web-data-cli",
+      "purpose": "Shared Firecrawl CLI/API integration for hosted web search with content, scraping, page interaction, crawling, URL mapping, file parsing, agent jobs, SDK/API examples, and optional firecrawl-mcp endpoints.",
+      "installMode": "shared-source-npm-cli-optional-mcp",
+      "sourceRoot": "{{USERPROFILE}}\\.firecrawl-source\\firecrawl",
+      "cli": "%APPDATA%\\npm\\firecrawl.cmd",
+      "powershellCommand": "%APPDATA%\\npm\\firecrawl.ps1",
+      "package": "firecrawl-cli",
+      "version": "1.17.0",
+      "mcpPackage": "firecrawl-mcp",
+      "mcpVersion": "3.16.0",
+      "upstream": "https://github.com/firecrawl/firecrawl",
+      "skill": "firecrawl",
+      "defaultState": "no-background-process",
+      "auth": "user-owned FIRECRAWL_API_KEY or firecrawl login",
+      "validation": "firecrawl --version; firecrawl --help; skill-router firecrawl status",
+      "notes": "Requires user-owned Firecrawl authentication before hosted API calls. Keep FIRECRAWL_API_KEY, account state, project .firecrawl caches, logs, generated private scrape/crawl output, screenshots, cookies, and browser/session data local. Do not run firecrawl-cli init --all in this stack; install compact router adapters instead."
+    },
+    {
       "id": "web-search",
       "label": "Web search",
       "kind": "host-native-source",
