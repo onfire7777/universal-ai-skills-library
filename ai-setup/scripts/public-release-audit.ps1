@@ -94,19 +94,21 @@ if (Test-Path -LiteralPath $readme) {
   }
 }
 
-Invoke-Check -Name 'no tracked plugin-codex skill mirror' -Script {
+Invoke-Check -Name 'plugin-codex only tracks compact wrapper skill' -Script {
   if (Get-Command git -ErrorAction SilentlyContinue) {
     Push-Location $RepoRoot
     try {
-      $trackedMirror = @(& git ls-files 'plugin-codex/skills' 2>$null)
-      if ($trackedMirror.Count -gt 0) {
-        throw "plugin-codex/skills has $($trackedMirror.Count) tracked files; it should stay an ignored local junction to skills/."
+      $trackedSkills = @(& git ls-files 'plugin-codex/skills' 2>$null)
+      $allowed = 'plugin-codex/skills/universal-ai-skills/SKILL.md'
+      $unexpected = @($trackedSkills | Where-Object { $_ -ne $allowed })
+      if ($unexpected.Count -gt 0 -or $trackedSkills.Count -gt 1) {
+        throw "plugin-codex/skills must expose only the compact wrapper skill; tracked files: $($trackedSkills -join ', ')"
       }
     } finally {
       Pop-Location
     }
   } else {
-    Add-Warning 'git not found; skipped plugin-codex/skills tracking check.'
+    Add-Warning 'git not found; skipped plugin-codex/skills compact-wrapper check.'
   }
 }
 
