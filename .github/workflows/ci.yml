@@ -12,12 +12,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: skill-router-cli/go.mod
+          cache-dependency-path: skill-router-cli/go.sum
 
       - name: Go tests
         working-directory: skill-router-cli
