@@ -41,6 +41,8 @@ type candidateJSON struct {
 }
 
 const routeHostReviewMinScore = 55
+const routeOutputDescriptionMax = 220
+const routeOutputPromptMax = 240
 
 func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, error) {
 	if opts.enforceHookEvent && !isUserPromptHookEvent(opts.hookEvent) {
@@ -109,8 +111,9 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 			preflight.Reason = fmt.Sprintf("best candidate %s scored %d but was rejected because the prompt asks for uninstall/removal and the skill does not support uninstall work", bestRaw.name, bestRaw.score)
 		} else {
 			preflight.Reason = fmt.Sprintf("best candidate %s scored %d but failed evidence gates", bestRaw.name, bestRaw.score)
-			if bestRaw.score >= routeHostReviewMinScore {
-				preflight.HostReview = buildHostAIReview(topRouteCandidates(rawCandidates, 5), "The deterministic router found only weak evidence. The current host AI may load one listed skill only if the user intent clearly matches its name and description; otherwise continue normally.")
+			reviewCandidates := topReviewRouteCandidates(candidates, 5)
+			if len(reviewCandidates) > 0 {
+				preflight.HostReview = buildHostAIReview(reviewCandidates, "The deterministic router found only weak evidence. The current host AI may load one listed skill only if the user intent clearly matches its name and description; otherwise continue normally.")
 			}
 		}
 	case maintenancePrompt && best.meta:
@@ -119,7 +122,7 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 	case isAmbiguousRoute(best, second):
 		preflight.Decision = routeDecisionAmbiguous
 		preflight.Reason = fmt.Sprintf("top candidates are too close: %s=%d, %s=%d", best.name, best.score, second.name, second.score)
-		preflight.HostReview = buildHostAIReview(topRouteCandidates(candidates, 5), "The deterministic router found an ambiguous route. The current host AI should choose one listed skill only if the prompt clearly requires it; otherwise continue normally without loading a skill.")
+		preflight.HostReview = buildHostAIReview(topEligibleRouteCandidates(candidates, 5), "The deterministic router found an ambiguous route. The current host AI should choose one listed skill only if the prompt clearly requires it; otherwise continue normally without loading a skill.")
 	default:
 		preflight.Decision = routeDecisionRoute
 		preflight.Reason = "deterministic preflight found a confident skill"
@@ -153,6 +156,54 @@ func topRouteCandidates(candidates []routeCandidate, limit int) []routeCandidate
 	return top
 }
 
+func topEligibleRouteCandidates(candidates []routeCandidate, limit int) []routeCandidate {
+	top := []routeCandidate{}
+	for _, candidate := range candidates {
+		if !isEligibleRouteCandidate(candidate) {
+			continue
+		}
+		top = append(top, candidate)
+		if len(top) >= limit {
+			break
+		}
+	}
+	return top
+}
+
+func topReviewRouteCandidates(candidates []routeCandidate, limit int) []routeCandidate {
+	top := []routeCandidate{}
+	for _, candidate := range candidates {
+		if !isReviewableRouteCandidate(candidate) {
+			continue
+		}
+		top = append(top, candidate)
+		if len(top) >= limit {
+			break
+		}
+	}
+	return top
+}
+
+func isReviewableRouteCandidate(candidate routeCandidate) bool {
+	if candidate.score < routeHostReviewMinScore {
+		return false
+	}
+	e := candidate.evidence
+	if e.uninstallIntent && !e.uninstallSupport {
+		return false
+	}
+	if isGenericSingleTokenName(candidate.name) && !hasSpecificEvidenceForGenericName(e) {
+		return false
+	}
+	if e.exactName || e.exactAlias || e.exactSource {
+		return true
+	}
+	if e.nameStrongHits+e.aliasStrongHits >= 1 && len(e.matchedStrongTokens) >= 1 {
+		return true
+	}
+	return e.descriptionStrongHits >= 2 && len(e.matchedStrongTokens) >= 2
+}
+
 func printPreflight(preflight routePreflight, explain bool) {
 	switch preflight.Decision {
 	case routeDecisionRoute:
@@ -176,20 +227,24 @@ func printPreflight(preflight routePreflight, explain bool) {
 
 func printPreflightJSON(preflight routePreflight, explain bool) error {
 	out := struct {
-		Prompt     string          `json:"prompt"`
-		HookEvent  string          `json:"hook_event,omitempty"`
-		Decision   routeDecision   `json:"decision"`
-		Reason     string          `json:"reason"`
-		Best       *candidateJSON  `json:"best,omitempty"`
-		Second     *candidateJSON  `json:"second,omitempty"`
-		HostReview *hostAIReview   `json:"host_ai_review,omitempty"`
-		Top        []candidateJSON `json:"top,omitempty"`
+		Prompt          string          `json:"prompt,omitempty"`
+		PromptChars     int             `json:"prompt_chars,omitempty"`
+		PromptTruncated bool            `json:"prompt_truncated,omitempty"`
+		HookEvent       string          `json:"hook_event,omitempty"`
+		Decision        routeDecision   `json:"decision"`
+		Reason          string          `json:"reason"`
+		Best            *candidateJSON  `json:"best,omitempty"`
+		Second          *candidateJSON  `json:"second,omitempty"`
+		HostReview      *hostAIReview   `json:"host_ai_review,omitempty"`
+		Top             []candidateJSON `json:"top,omitempty"`
 	}{
-		Prompt:     preflight.Prompt,
-		HookEvent:  preflight.HookEvent,
-		Decision:   preflight.Decision,
-		Reason:     preflight.Reason,
-		HostReview: preflight.HostReview,
+		Prompt:          truncate(preflight.Prompt, routeOutputPromptMax),
+		PromptChars:     len(preflight.Prompt),
+		PromptTruncated: len(preflight.Prompt) > routeOutputPromptMax,
+		HookEvent:       preflight.HookEvent,
+		Decision:        preflight.Decision,
+		Reason:          preflight.Reason,
+		HostReview:      preflight.HostReview,
 	}
 	if preflight.Best.name != "" {
 		best := routeCandidateJSON(preflight.Best)
@@ -222,7 +277,7 @@ func routeCandidateJSON(candidate routeCandidate) candidateJSON {
 		Source:      source,
 		Score:       candidate.score,
 		Eligible:    isEligibleRouteCandidate(candidate),
-		Description: strings.TrimSpace(candidate.description),
+		Description: truncate(strings.TrimSpace(candidate.description), routeOutputDescriptionMax),
 	}
 }
 

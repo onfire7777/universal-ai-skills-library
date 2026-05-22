@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -127,6 +126,4 @@ func init() {
 
 	Cmd.AddCommand(skillCmd)
 	Cmd.AddCommand(projectCmd)
-
-	_ = strings.Join // suppress
 }

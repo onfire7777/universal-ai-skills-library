@@ -99,8 +99,8 @@ if (Test-Path -LiteralPath $AdapterConfig) {
       markerPresent = $instructionText.Contains('## Universal AI Stack Adapter')
       corpusAccessPolicyPresent = $instructionText.Contains('## Universal AI Skill Corpus Access') -or $instructionText.Contains('Do not copy or install those full skill bodies')
       sharedMemoryPolicyPresent = $instructionText.Contains('## Universal Shared Memory') -and $instructionText.Contains('Save-UniversalAIMemory.ps1') -and $instructionText.Contains('Search-UniversalAIMemory.ps1')
-      sharedMemoryEmbeddingPolicyPresent = $instructionText.Contains('qwen3-embedding-0.6b') -and $instructionText.Contains('MemPalace remains the authoritative durable memory store')
-      sourceIntegrationsPolicyPresent = $instructionText.Contains('## Universal Source Integrations') -and $instructionText.Contains('source-integrations.json') -and $instructionText.Contains('GSkills/GStack') -and $instructionText.Contains('Web search is host-owned') -and $instructionText.Contains('NotebookLM MCP CLI') -and $instructionText.Contains('x-cli is installed as a shared Rust CLI source') -and $instructionText.Contains('Instagram CLI is installed as a shared Node CLI source') -and $instructionText.Contains('Crawl4AI is installed as a shared Python CLI source') -and $instructionText.Contains('Firecrawl is installed as a shared npm CLI source')
+      sharedMemoryEmbeddingPolicyPresent = $instructionText.Contains('GBrain mirrors saved memories') -and $instructionText.Contains('Context Mode is scratch')
+      sourceIntegrationsPolicyPresent = $instructionText.Contains('## Universal Source Integrations') -and $instructionText.Contains('source-integrations.json') -and $instructionText.Contains('Source integrations are pointers and wrappers')
       skillFile = $skillPath
       skillPresent = (Test-Path -LiteralPath $skillPath)
     }
@@ -114,7 +114,7 @@ if (Test-Path -LiteralPath $SourceIntegrationConfig) {
     $sourceCfg = Get-Content -LiteralPath $SourceIntegrationConfig -Raw | ConvertFrom-Json
     $ids = @($sourceCfg.sources | ForEach-Object { $_.id })
     $sourceIntegrationSummary.sourceIds = $ids
-    $requiredSourceIds = @('lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli', 'crawl4ai')
+    $requiredSourceIds = @('lightpanda', 'context-mode', 'mempalace', 'skill-seekers', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli', 'crawl4ai', 'firecrawl')
     $sourceIntegrationSummary.requiredSourcesPresent = (@($requiredSourceIds | Where-Object { $ids -notcontains $_ }).Count -eq 0)
   } catch {
     $sourceIntegrationSummary.error = $_.Exception.Message
@@ -227,7 +227,7 @@ $result = [ordered]@{
     physicalTopLevelSkillFiles = $physicalTopLevelSkillFileCount
     nestedSkillFilesIgnored = $nestedSkillFiles
     countOk = ($canonicalSkillCount -ge 1800)
-    hermesExternalSource = $hermesConfig.Contains('universal-ai-skills-library\skills') -or $hermesConfig.Contains('universal-ai-skills-library/skills')
+    hermesRouterWrapperOnly = -not ($hermesConfig.Contains('universal-ai-skills-library\skills') -or $hermesConfig.Contains('universal-ai-skills-library/skills'))
   }
   adapterConfigPresent = (Test-Path -LiteralPath $AdapterConfig)
   sourceIntegrations = $sourceIntegrationSummary
@@ -255,8 +255,8 @@ $result = [ordered]@{
     hermesPrimaryLocalOrCodex = [bool]($hermesConfig -match '(?s)model:\s*(?:.|\n)*provider:\s*(universal-router|openai-codex)')
     hermesReasoningXhigh = [bool]($hermesConfig -match 'reasoning_effort:\s*xhigh')
     hermesUniversalRouterProvider = [bool]($hermesConfig -match '(?s)providers:\s*(?:.|\n)*universal-router:\s*(?:.|\n)*base_url:\s*http://127\.0\.0\.1:18100/v1')
-    hermesFallbackUniversalRouter = [bool]($hermesConfig -match '(?s)fallback_providers:\s*-\s*provider:\s*universal-router\s*model:\s*auto-coding')
-    hermesAuxCompressionUniversalLongContext = [bool]($hermesConfig -match '(?s)compression:\s*(?:.|\n)*provider:\s*universal-router\s*model:\s*(kimi-k2\.6-thinking|auto-coding)(?:.|\n)*context_length:\s*(262144|[6-9][4-9][0-9]{3,})')
+    hermesFallbackUniversalRouter = [bool]($hermesConfig -match '(?s)fallback_providers:\s*(?:.|\n)*provider:\s*universal-router\s*model:\s*auto-coding')
+    hermesAuxCompressionUniversalLongContext = [bool]($hermesConfig -match '(?s)auxiliary:\s*(?:.|\n)*compression:\s*(?:.|\n)*provider:\s*universal-router\s*model:\s*(kimi-k2\.6-thinking|auto-coding)(?:.|\n)*context_length:\s*(262144|[1-9]\d{5,})')
     hermesNoAnthropicFallback = -not [bool]($hermesConfig -match '(?s)fallback_providers:\s*(?:.|\n)*provider:\s*anthropic')
     hermesNoRemovedLocalModelAliases = ($removedHermesModelAliases.Count -eq 0)
     hermesToolLoopHardStop = [bool]($hermesConfig -match 'hard_stop_enabled:\s*true')
@@ -299,3 +299,10 @@ New-Item -ItemType Directory -Force -Path $StateDir | Out-Null
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText((Join-Path $StateDir 'last-adapter-test.json'), ($result | ConvertTo-Json -Depth 10), $utf8NoBom)
 $result | ConvertTo-Json -Depth 10
+$hasFailures = (
+  $result.adapterFailures.Count -gt 0 -or
+  $result.sourceIntegrationFailures.Count -gt 0 -or
+  $result.providerConfigFailures.Count -gt 0 -or
+  $result.memoryConfigFailures.Count -gt 0
+)
+if ($hasFailures) { exit 1 }

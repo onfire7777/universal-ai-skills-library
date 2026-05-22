@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -79,7 +78,6 @@ func init() {
 	Cmd.AddCommand(reviewCmd)
 	Cmd.AddCommand(fixCmd)
 	Cmd.AddCommand(auditSkillCmd)
-	_ = strings.Join // suppress
 }
 
 func findDebugScript(script string) string {

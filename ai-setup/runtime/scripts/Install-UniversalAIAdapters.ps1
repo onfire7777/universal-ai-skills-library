@@ -4,10 +4,17 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $HomeDir = $env:USERPROFILE
+$RepoRoot = Join-Path $HomeDir 'universal-ai-skills-library'
+if (!(Test-Path -LiteralPath $RepoRoot) -and $PSScriptRoot) {
+  $candidate = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+  if (Test-Path -LiteralPath (Join-Path $candidate 'manifest.json')) {
+    $RepoRoot = $candidate
+  }
+}
 $Root = Join-Path $HomeDir '.universal-ai-stack'
 $StateDir = Join-Path $Root 'state'
 $ConfigDir = Join-Path $Root 'config'
-$SourceSkill = Join-Path $HomeDir 'universal-ai-skills-library\skills\universal-ai-skills\SKILL.md'
+$SourceSkill = Join-Path $RepoRoot 'skills\universal-ai-skills\SKILL.md'
 $FallbackSkill = Join-Path $HomeDir '.agent\skills\universal-ai-skills\SKILL.md'
 
 function Write-Utf8NoBom {
@@ -23,170 +30,125 @@ function Read-Text {
   return [System.IO.File]::ReadAllText($Path)
 }
 
+function Resolve-TemplatePath {
+  param([string]$Value)
+  if ([string]::IsNullOrWhiteSpace($Value)) { return $Value }
+  $resolved = $Value.Replace('{{USERPROFILE}}', $HomeDir)
+  $resolved = $resolved.Replace('{{REPO_ROOT}}', $RepoRoot)
+  $resolved = $resolved.Replace('%APPDATA%', $env:APPDATA)
+  return $resolved
+}
+
+function Remove-ManagedUniversalBlocks {
+  param([string]$Content)
+  if ([string]::IsNullOrWhiteSpace($Content)) { return '' }
+  $headings = @(
+    'Universal AI Skills Router',
+    'Universal AI Stack Adapter',
+    'Universal AI Skill Corpus Access',
+    'Universal Shared Memory',
+    'Universal Source Integrations',
+    'Universal Source Integration',
+    'Universal Skill Source',
+    'Universal AI Stack Adapter',
+    'GStack/GBrain Source Repo Rule',
+    'everything-claude-code Operating Rule',
+    'design-resources-for-developers Operating Rule',
+    'OpenUI Operating Rule',
+    'LLM Ingestion Operating Rule',
+    'Caveman Default Rule',
+    'MemPalace Operating Rule',
+    'Skill Seekers Operating Rule',
+    'OpenSkills Operating Rule',
+    'Context Mode Operating Rule',
+    'Lightpanda Browser Operating Rule',
+    'Caveman Operating Rule'
+  )
+  $clean = $Content
+  foreach ($heading in $headings) {
+    $escaped = [regex]::Escape($heading)
+    $pattern = "(?ms)(?:\r?\n)?##\s+$escaped\s*\r?\n.*?(?=(?:\r?\n##\s+)|(?:\r?\n#\s+)|(?:\r?\n--- project-doc ---)|\z)"
+    $clean = [regex]::Replace($clean, $pattern, '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+  }
+  return $clean.TrimEnd()
+}
+
 function Ensure-InstructionFile {
   param([string]$Path, [string]$Title)
-  $marker = '## Universal AI Stack Adapter'
-  $corpusMarker = '## Universal AI Skill Corpus Access'
-  $memoryMarker = '## Universal Shared Memory'
-  $sourceMarker = '## Universal Source Integrations'
   $stackRoot = Join-Path $HomeDir '.universal-ai-stack'
   $skillSource = Join-Path $HomeDir 'universal-ai-skills-library'
   $skillCorpus = Join-Path $skillSource 'skills'
-  $secretEnv = Join-Path $stackRoot 'secrets\.env'
   $healthScript = Join-Path $stackRoot 'scripts\Test-UniversalAIStack.ps1'
-  $saveMemoryScript = Join-Path $stackRoot 'scripts\Save-UniversalAIMemory.ps1'
   $searchMemoryScript = Join-Path $stackRoot 'scripts\Search-UniversalAIMemory.ps1'
-  $mempalaceRoot = Join-Path $HomeDir '.mempalace\palace'
-  $gbrainRoot = Join-Path $HomeDir '.gbrain'
-  $lightpandaFetch = Join-Path $HomeDir '.lightpanda-ai\lightpanda-fetch.cmd'
+  $saveMemoryScript = Join-Path $stackRoot 'scripts\Save-UniversalAIMemory.ps1'
+
   $block = @"
 
-$marker
-- Universal AI Stack root: ``$stackRoot``.
-- Universal skill source: ``$skillSource``.
-- Full skill corpus: all canonical skills under ``$skillCorpus`` are available through ``skill-router``. Do not copy or install those full skill bodies into this AI's local root.
-- For every new substantive user prompt, run ``skill-router preflight --json "<latest user prompt>"`` before loading skills. Do not run it for assistant text, tool output, startup hooks, status checks, or background jobs.
-- If the router decision is ``route``, sanity-check that the selected skill matches the user's core task, object, and action, then load only that skill with ``skill-router skill <skill-name>``. Use ``skill-router skill search <query>`` when the skill name is unknown.
-- Keep always-loaded instructions compact. Do not paste or copy the full skills corpus into this agent.
-- Model policy: prefer GPT-5.5 with xhigh reasoning through official CLI/session auth, then Kimi 2.6 Thinking, then Claude Opus 4.7, then local Qwen fallbacks.
-- OpenAI-compatible endpoint: ``http://127.0.0.1:18100/v1`` with local-first model ``local-coding`` or automatic model ``auto-coding`` and ``UNIVERSAL_AI_STACK_API_KEY`` from ``$secretEnv``. Never print or paste secrets.
-- Check stack health with ``skill-router doctor``, ``skill-router mcp status``, and ``powershell -NoProfile -ExecutionPolicy Bypass -File $healthScript``.
+## Universal AI Stack Adapter
+- Canonical source: ``$skillSource``.
+- Router binary: ``skill-router`` (``$HomeDir\go\bin\skill-router.exe``).
+- For substantive user prompts, run ``skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"`` from prompt-submit hooks, or ``skill-router preflight --json "<latest user prompt>"`` when the host AI performs the precheck directly.
+- Run automatic routing only for real user prompts. Do not route from tool output, assistant messages, startup, stop, compaction, status checks, or background jobs.
+- If ``decision`` is ``route``, sanity-check the selected skill against the user's core task, object, and action, then load exactly one skill with ``skill-router skill <name>``.
+- If the match is weak, generic, ambiguous, or only hits words such as "issue", "install", "setup", "local", "AI", or "skill", continue without loading a skill.
+- Search unknown skills with ``skill-router skill search <query> --limit 10``.
+- Health checks: ``skill-router doctor`` and ``powershell -NoProfile -ExecutionPolicy Bypass -File $healthScript``.
 "@
+
   $corpusBlock = @"
 
-$corpusMarker
-- This AI has access to the full centralized skill corpus through ``skill-router`` only: ``$skillCorpus``.
-- Keep this AI's local skill root to compact wrapper/adapters and native client-specific skills. Do not install, download, paste, or duplicate the full skill corpus into this root.
-- Automatic routing flow: run ``skill-router preflight --json "<latest user prompt>"`` for real user prompts, reject weak/generic matches, then load exactly one needed skill with ``skill-router skill <name>``.
+## Universal AI Skill Corpus Access
+- This AI accesses the centralized corpus through ``skill-router`` only: ``$skillCorpus``.
+- Keep this local AI root to compact wrappers and native client-specific skills. Do not install, paste, or duplicate the full corpus here.
 "@
+
   $memoryBlock = @"
 
-$memoryMarker
-- Durable cross-AI memory is MemPalace at ``$mempalaceRoot``. This is the shared memory store for Codex, Claude, Cursor, Hermes, Paperclip, Kimi, Aion, OpenCode, Gemini, Qwen, Roo, Windsurf, and related local agents.
-- Before answering from prior decisions, project history, people/preferences, or past setup state, search shared memory with ``powershell -NoProfile -ExecutionPolicy Bypass -File $searchMemoryScript -Query "<query>"`` or, when MCP tools are available, call ``mempalace_status`` then ``mempalace_search``.
-- Save durable memories only when the user explicitly asks to remember/save something, or when a stable project decision/setup fact has been confirmed. Use ``powershell -NoProfile -ExecutionPolicy Bypass -File $saveMemoryScript -Source "$Title" -Note "<memory>"``.
-- Never store secrets, API keys, tokens, passwords, private keys, raw logs, temporary scratch notes, or unverified guesses in MemPalace.
-- Context Mode is scratch/context-window protection, not durable memory. Do not store long-term facts in Context Mode when MemPalace is available.
-- GBrain state lives at ``$gbrainRoot`` and mirrors explicit saved memories for structured local lookup. Save-UniversalAIMemory imports and embeds saved notes in GBrain using the local ``qwen3-embedding-0.6b`` service at ``http://127.0.0.1:18084/v1`` with 1024 dimensions; MemPalace remains the authoritative durable memory store. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots.
-- Lightpanda is the shared headless browser/fetch runtime. Use ``$lightpandaFetch`` or ``skill-router skill lightpanda-browser`` for browser retrieval; do not treat browser snapshots as memory unless a distilled fact is explicitly saved through MemPalace.
-- Persistent MCP bridge services remain disabled by default for low resource use. Direct CLI wrappers are the universal baseline; enable MCP only for clients that need live tool endpoints.
+## Universal Shared Memory
+- Durable shared memory is MemPalace. Search prior confirmed decisions with ``powershell -NoProfile -ExecutionPolicy Bypass -File $searchMemoryScript -Query "<query>"``.
+- Save durable facts only when the user explicitly asks or after a stable setup decision is confirmed, using ``powershell -NoProfile -ExecutionPolicy Bypass -File $saveMemoryScript -Source "$Title" -Note "<memory>"``.
+- Never store secrets, tokens, passwords, raw logs, temporary scratch notes, or unverified guesses.
+- GBrain mirrors saved memories for structured lookup; Context Mode is scratch/session continuity, not durable memory.
 "@
+
   $sourceBlock = @"
 
-$sourceMarker
-- Source integrations are shared pointers and wrappers, not copied upstream repos. The portable registry is ``$stackRoot\config\source-integrations.json``.
-- Lightpanda is the shared headless browser/fetch runtime for page retrieval, extraction, JavaScript loading, and CDP automation. Use native web search when the host provides it; use Lightpanda for controlled page fetch/extraction after search.
-- Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys.
-- NotebookLM MCP CLI is installed as a shared uv-tool source at ``$HomeDir\.notebooklm-mcp-cli\notebooklm-mcp-cli``. Use ``nlm`` first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register ``notebooklm-mcp`` only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned ``nlm login``.
-- x-cli is installed as a shared Rust CLI source at ``$HomeDir\.x-cli\x-cli`` with executables in ``$HomeDir\.local\bin``. Use ``skill-router skill x-cli``, ``x``, or ``skill-router xcli`` for X API account, post, search, stream, list, direct message, and social graph workflows. Keep ``$HomeDir\.xrc`` local and never copy tokens or account data.
-- Instagram CLI is installed as a shared Node CLI source at ``$HomeDir\.instagram-cli-source\instagram-cli``. Use ``skill-router skill instagram-cli``, ``instagram-cli``, or ``skill-router instagram`` for Instagram inbox, direct message, read, reply, unsend, media download, feed, stories, notifications, profile, and config workflows. Keep ``$HomeDir\.instagram-cli`` local and never copy session files, logs, private messages, or downloaded private media.
-- Crawl4AI is installed as a shared Python CLI source at ``$HomeDir\.crawl4ai-source\crawl4ai`` with venv and runtime state under ``$HomeDir\.crawl4ai`` and shims in ``$HomeDir\.local\bin``. Use ``skill-router skill crawl4ai``, ``crwl``, or ``skill-router crawl4ai`` for LLM-ready web crawling, Markdown/JSON extraction, bounded deep crawls, profiles, CDP browser control, setup, and doctor workflows. Keep ``$HomeDir\.crawl4ai`` local and never copy crawl caches, browser profiles, cookies, screenshots, or extracted private content.
-- Firecrawl is installed as a shared npm CLI source at ``$HomeDir\.firecrawl-source\firecrawl`` with command ``firecrawl``. Use ``skill-router skill firecrawl``, ``firecrawl``, or ``skill-router firecrawl`` for hosted Firecrawl search, scrape, crawl, map, parse, interact, agent, login, SDK/API, and optional MCP workflows. Keep ``FIRECRAWL_API_KEY``, Firecrawl account state, generated private output, screenshots, cookies, and session data local; do not run ``firecrawl-cli init --all`` in this router-first stack.
-- GSkills/GStack live as read-only external skill sources under ``$HomeDir\.gstack\gstack``. Load namespaced skills such as ``gstack-review``, ``gstack-qa``, ``gstack-cso``, and ``gstack-browse`` through ``skill-router`` on demand.
-- GBrain source and state stay in ``$HomeDir\gbrain`` and ``$HomeDir\.gbrain``. Do not vendor GBrain skills or GStack skills into this AI root.
+## Universal Source Integrations
+- Source integrations are pointers and wrappers, not copied upstream repos. Registry: ``$stackRoot\config\source-integrations.json``.
+- Load source-specific capabilities on demand through ``skill-router skill <name>`` or the registered CLI command.
+- Use host-native web search when available; use Lightpanda, Crawl4AI, Firecrawl, NotebookLM, x-cli, Instagram CLI, GBrain, GStack, MemPalace, Skill Seekers, or Context Mode only when the task actually needs that source.
+- Persistent MCP bridges stay optional and disabled by default unless a client specifically needs a live endpoint.
 "@
 
   $existing = Read-Text -Path $Path
-  $changed = $false
-  if ($existing.Contains($marker)) {
-    $content = $existing.TrimEnd()
-    $contentWithNotebookSeparator = [regex]::Replace($content, 'source registry\.(?=##|#|</)', "source registry.`r`n`r`n")
-    if ($contentWithNotebookSeparator -ne $content) {
-      $content = $contentWithNotebookSeparator
-      $changed = $true
-    }
-    $legacyNotebookPattern = "(?m)\r?\n?## NotebookLM MCP CLI Source Rule\r?\n(?:- [^\r\n]*(?:\r?\n|$))+"
-    if ([regex]::IsMatch($content, $legacyNotebookPattern)) {
-      $content = [regex]::Replace($content, $legacyNotebookPattern, "`r`n")
-      $changed = $true
-    }
-    $legacyGBrainLine = "- GBrain state lives at ``$gbrainRoot`` and may mirror explicit saved memories for structured knowledge lookup. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots."
-    $currentGBrainLine = "- GBrain state lives at ``$gbrainRoot`` and mirrors explicit saved memories for structured local lookup. Save-UniversalAIMemory imports and embeds saved notes in GBrain using the local ``qwen3-embedding-0.6b`` service at ``http://127.0.0.1:18084/v1`` with 1024 dimensions; MemPalace remains the authoritative durable memory store. Use ``gbrain search`` / ``gbrain query`` for brain-first retrieval; do not copy GBrain or GStack skill trees into AI roots."
-    $webSearchLine = "- Web search is host-owned and has no default background service. Do not add web-search API keys or scrape search engines by default; use optional provider-specific skills only when the user configures those keys."
-    $notebookLine = "- NotebookLM MCP CLI is installed as a shared uv-tool source at ``$HomeDir\.notebooklm-mcp-cli\notebooklm-mcp-cli``. Use ``nlm`` first for NotebookLM notebooks, sources, queries, Studio artifacts, sharing, downloads, batch work, cross-notebook queries, and diagnostics. Register ``notebooklm-mcp`` only as an optional stdio MCP server when a client specifically needs live NotebookLM tools, and authenticate only through user-owned ``nlm login``."
-    $xCliLine = "- x-cli is installed as a shared Rust CLI source at ``$HomeDir\.x-cli\x-cli`` with executables in ``$HomeDir\.local\bin``. Use ``skill-router skill x-cli``, ``x``, or ``skill-router xcli`` for X API account, post, search, stream, list, direct message, and social graph workflows. Keep ``$HomeDir\.xrc`` local and never copy tokens or account data."
-    $instagramCliLine = "- Instagram CLI is installed as a shared Node CLI source at ``$HomeDir\.instagram-cli-source\instagram-cli``. Use ``skill-router skill instagram-cli``, ``instagram-cli``, or ``skill-router instagram`` for Instagram inbox, direct message, read, reply, unsend, media download, feed, stories, notifications, profile, and config workflows. Keep ``$HomeDir\.instagram-cli`` local and never copy session files, logs, private messages, or downloaded private media."
-    $crawl4aiLine = "- Crawl4AI is installed as a shared Python CLI source at ``$HomeDir\.crawl4ai-source\crawl4ai`` with venv and runtime state under ``$HomeDir\.crawl4ai`` and shims in ``$HomeDir\.local\bin``. Use ``skill-router skill crawl4ai``, ``crwl``, or ``skill-router crawl4ai`` for LLM-ready web crawling, Markdown/JSON extraction, bounded deep crawls, profiles, CDP browser control, setup, and doctor workflows. Keep ``$HomeDir\.crawl4ai`` local and never copy crawl caches, browser profiles, cookies, screenshots, or extracted private content."
-    $firecrawlLine = "- Firecrawl is installed as a shared npm CLI source at ``$HomeDir\.firecrawl-source\firecrawl`` with command ``firecrawl``. Use ``skill-router skill firecrawl``, ``firecrawl``, or ``skill-router firecrawl`` for hosted Firecrawl search, scrape, crawl, map, parse, interact, agent, login, SDK/API, and optional MCP workflows. Keep ``FIRECRAWL_API_KEY``, Firecrawl account state, generated private output, screenshots, cookies, and session data local; do not run ``firecrawl-cli init --all`` in this router-first stack."
-    if ($content.Contains($legacyGBrainLine)) {
-      $content = $content.Replace($legacyGBrainLine, $currentGBrainLine)
-      $changed = $true
-    }
-    if ($content.Contains($sourceMarker) -and !$content.Contains('NotebookLM MCP CLI')) {
-      if ($content.Contains($webSearchLine)) {
-        $content = $content.Replace($webSearchLine, "$webSearchLine`r`n$notebookLine")
-      } else {
-        $content += "`r`n$notebookLine"
-      }
-      $changed = $true
-    }
-    if ($content.Contains($sourceMarker) -and !$content.Contains('x-cli is installed as a shared Rust CLI source')) {
-      if ($content.Contains($notebookLine)) {
-        $content = $content.Replace($notebookLine, "$notebookLine`r`n$xCliLine")
-      } else {
-        $content += "`r`n$xCliLine"
-      }
-      $changed = $true
-    }
-    if ($content.Contains($sourceMarker) -and !$content.Contains('Instagram CLI is installed as a shared Node CLI source')) {
-      if ($content.Contains($xCliLine)) {
-        $content = $content.Replace($xCliLine, "$xCliLine`r`n$instagramCliLine")
-      } else {
-        $content += "`r`n$instagramCliLine"
-      }
-      $changed = $true
-    }
-    if ($content.Contains($sourceMarker) -and !$content.Contains('Crawl4AI is installed as a shared Python CLI source')) {
-      if ($content.Contains($instagramCliLine)) {
-        $content = $content.Replace($instagramCliLine, "$instagramCliLine`r`n$crawl4aiLine")
-      } else {
-        $content += "`r`n$crawl4aiLine"
-      }
-      $changed = $true
-    }
-    if ($content.Contains($sourceMarker) -and !$content.Contains('Firecrawl is installed as a shared npm CLI source')) {
-      if ($content.Contains($crawl4aiLine)) {
-        $content = $content.Replace($crawl4aiLine, "$crawl4aiLine`r`n$firecrawlLine")
-      } else {
-        $content += "`r`n$firecrawlLine"
-      }
-      $changed = $true
-    }
-    if (!$content.Contains($corpusMarker)) {
-      $content += "`r`n" + $corpusBlock
-      $changed = $true
-    }
-    if (!$content.Contains($memoryMarker)) {
-      $content += "`r`n" + $memoryBlock
-      $changed = $true
-    }
-    if (!$content.Contains($sourceMarker)) {
-      $content += "`r`n" + $sourceBlock
-      $changed = $true
-    }
-    if ($changed) {
-      Write-Utf8NoBom -Path $Path -Content ($content.TrimEnd() + "`r`n")
-    }
-    return [ordered]@{ path = $Path; changed = $changed; marker = $true; corpusMarker = $true; memoryMarker = $true; sourceMarker = $true }
-  }
-  if ([string]::IsNullOrWhiteSpace($existing)) {
+  $base = Remove-ManagedUniversalBlocks -Content $existing
+  if ([string]::IsNullOrWhiteSpace($base)) {
     $content = "# $Title`r`n$block`r`n$corpusBlock`r`n$memoryBlock`r`n$sourceBlock`r`n"
   } else {
-    $content = $existing.TrimEnd() + "`r`n" + $block + "`r`n" + $corpusBlock + "`r`n" + $memoryBlock + "`r`n" + $sourceBlock + "`r`n"
+    $content = $base.TrimEnd() + "`r`n" + $block + "`r`n" + $corpusBlock + "`r`n$memoryBlock`r`n$sourceBlock`r`n"
   }
-  Write-Utf8NoBom -Path $Path -Content $content
-  return [ordered]@{ path = $Path; changed = $true; marker = $true; corpusMarker = $true; memoryMarker = $true; sourceMarker = $true }
+  $changed = ($content -ne $existing)
+  if ($changed) {
+    Write-Utf8NoBom -Path $Path -Content $content
+  }
+  return [ordered]@{
+    path = $Path
+    changed = $changed
+    marker = $true
+    corpusMarker = $true
+    memoryMarker = $true
+    sourceMarker = $true
+  }
 }
 
 function Ensure-SkillWrapper {
   param([string]$SkillsRoot)
-  if (!(Test-Path -LiteralPath $SourceSkill)) {
+  $src = $SourceSkill
+  if (!(Test-Path -LiteralPath $src)) {
     if (!(Test-Path -LiteralPath $FallbackSkill)) {
       return [ordered]@{ path = (Join-Path $SkillsRoot 'universal-ai-skills\SKILL.md'); changed = $false; present = $false; error = 'source skill missing' }
     }
     $src = $FallbackSkill
-  } else {
-    $src = $SourceSkill
   }
 
   $destDir = Join-Path $SkillsRoot 'universal-ai-skills'
@@ -200,32 +162,31 @@ function Ensure-SkillWrapper {
   return [ordered]@{ path = $dest; changed = $changed; present = (Test-Path -LiteralPath $dest) }
 }
 
+function Get-ManagedAdapters {
+  $manifest = Join-Path $RepoRoot 'ai-setup\manifests\source-repos.json'
+  if (Test-Path -LiteralPath $manifest) {
+    try {
+      $cfg = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json
+      return @($cfg.managedClientRoots | ForEach-Object {
+        [ordered]@{
+          name = $_.id
+          instructions = Resolve-TemplatePath $_.instructions
+          skills = Resolve-TemplatePath $_.skills
+        }
+      })
+    } catch {}
+  }
+  return @(
+    @{ name = 'codex'; instructions = "$HomeDir\.codex\AGENTS.md"; skills = "$HomeDir\.codex\skills" },
+    @{ name = 'claude'; instructions = "$HomeDir\.claude\CLAUDE.md"; skills = "$HomeDir\.claude\skills" },
+    @{ name = 'hermes'; instructions = "$HomeDir\.hermes\AGENTS.md"; skills = "$HomeDir\.hermes\skills" },
+    @{ name = 'paperclip'; instructions = "$HomeDir\.paperclip\universal-ai-skills\AGENTS.md"; skills = "$HomeDir\.paperclip\skills" }
+  )
+}
+
 New-Item -ItemType Directory -Force -Path $StateDir, $ConfigDir | Out-Null
 
-$adapters = @(
-  @{ name = 'agent'; instructions = "$HomeDir\.agent\AGENTS.md"; skills = "$HomeDir\.agent\skills" },
-  @{ name = 'agents'; instructions = "$HomeDir\.agents\AGENTS.md"; skills = "$HomeDir\.agents\skills" },
-  @{ name = 'codex'; instructions = "$HomeDir\.codex\AGENTS.md"; skills = "$HomeDir\.codex\skills" },
-  @{ name = 'aion-codex-home'; instructions = "$HomeDir\AppData\Roaming\AionUi\codex-home\AGENTS.md"; skills = "$HomeDir\AppData\Roaming\AionUi\codex-home\skills" },
-  @{ name = 'claude'; instructions = "$HomeDir\.claude\CLAUDE.md"; skills = "$HomeDir\.claude\skills" },
-  @{ name = 'cursor'; instructions = "$HomeDir\.cursor\rules\openskills.md"; skills = "$HomeDir\.cursor\skills" },
-  @{ name = 'continue'; instructions = "$HomeDir\.continue\AGENTS.md"; skills = "$HomeDir\.continue\skills" },
-  @{ name = 'gemini'; instructions = "$HomeDir\.gemini\GEMINI.md"; skills = "$HomeDir\.gemini\skills" },
-  @{ name = 'hermes'; instructions = "$HomeDir\.hermes\AGENTS.md"; skills = "$HomeDir\.hermes\skills" },
-  @{ name = 'kimi'; instructions = "$HomeDir\.kimi\AGENTS.md"; skills = "$HomeDir\.kimi\skills" },
-  @{ name = 'kiro'; instructions = "$HomeDir\.kiro\steering\universal-ai-stack.md"; skills = "$HomeDir\.kiro\skills" },
-  @{ name = 'manus'; instructions = "$HomeDir\.manus\AGENTS.md"; skills = "$HomeDir\.manus\skills" },
-  @{ name = 'opencode-home'; instructions = "$HomeDir\.opencode\AGENTS.md"; skills = "$HomeDir\.opencode\skills" },
-  @{ name = 'opencode-config'; instructions = "$HomeDir\.config\opencode\AGENTS.md"; skills = "$HomeDir\.config\opencode\skills" },
-  @{ name = 'openhands'; instructions = "$HomeDir\.openhands\AGENTS.md"; skills = "$HomeDir\.openhands\skills" },
-  @{ name = 'openclaw'; instructions = "$HomeDir\.openclaw\AGENTS.md"; skills = "$HomeDir\.openclaw\skills" },
-  @{ name = 'paperclip'; instructions = "$HomeDir\.paperclip\universal-ai-skills\AGENTS.md"; skills = "$HomeDir\.paperclip\skills" },
-  @{ name = 'qwen'; instructions = "$HomeDir\.qwen\AGENTS.md"; skills = "$HomeDir\.qwen\skills" },
-  @{ name = 'roo'; instructions = "$HomeDir\.roo\AGENTS.md"; skills = "$HomeDir\.roo\skills" },
-  @{ name = 'windsurf'; instructions = "$HomeDir\.windsurf\AGENTS.md"; skills = "$HomeDir\.windsurf\skills" },
-  @{ name = 'aider'; instructions = "$HomeDir\.aider\OPENSKILLS.md"; skills = "$HomeDir\.aider\skills" }
-)
-
+$adapters = @(Get-ManagedAdapters)
 $results = New-Object System.Collections.Generic.List[object]
 foreach ($adapter in $adapters) {
   $instruction = Ensure-InstructionFile -Path $adapter.instructions -Title "$($adapter.name) Universal AI Adapter"
@@ -238,7 +199,7 @@ foreach ($adapter in $adapters) {
 }
 
 $config = [ordered]@{
-  schema = 'universal-ai-stack.agent-adapters.v1'
+  schema = 'universal-ai-stack.agent-adapters.v2'
   updated = (Get-Date).ToString('yyyy-MM-dd')
   sourceSkill = $SourceSkill
   adapters = $adapters
@@ -259,5 +220,7 @@ Write-Utf8NoBom -Path (Join-Path $StateDir 'last-adapter-audit.json') -Content (
 if ($JsonOnly) {
   $report | ConvertTo-Json -Depth 10
 } else {
-  $report | ConvertTo-Json -Depth 10
+  Write-Host "Universal AI adapters installed: $($results.Count)"
+  Write-Host "Changed instruction files: $($report.changedInstructionFiles -join ', ')"
+  Write-Host "Changed skill wrappers: $($report.changedSkillWrappers -join ', ')"
 }

@@ -20,10 +20,31 @@
   },
   "managedClientRoots": [
     {
+      "id": "agent",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.agent\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.agent\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "agents",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.agents\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.agents\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
       "id": "codex",
       "kind": "skill-root",
       "instructions": "{{USERPROFILE}}\\.codex\\AGENTS.md",
       "skills": "{{USERPROFILE}}\\.codex\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "aion-codex-home",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\AppData\\Roaming\\AionUi\\codex-home\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\AppData\\Roaming\\AionUi\\codex-home\\skills",
       "mode": "compact-wrapper"
     },
     {
@@ -41,6 +62,13 @@
       "mode": "compact-wrapper"
     },
     {
+      "id": "continue",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.continue\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.continue\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
       "id": "hermes",
       "kind": "skill-root",
       "instructions": "{{USERPROFILE}}\\.hermes\\AGENTS.md",
@@ -55,10 +83,38 @@
       "mode": "compact-wrapper"
     },
     {
-      "id": "opencode",
+      "id": "manus",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.manus\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.manus\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "opencode-home",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.opencode\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.opencode\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "opencode-config",
       "kind": "skill-root",
       "instructions": "{{USERPROFILE}}\\.config\\opencode\\AGENTS.md",
       "skills": "{{USERPROFILE}}\\.config\\opencode\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "openhands",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.openhands\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.openhands\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "openclaw",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.openclaw\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.openclaw\\skills",
       "mode": "compact-wrapper"
     },
     {
@@ -88,11 +144,33 @@
       "instructions": "{{USERPROFILE}}\\.qwen\\AGENTS.md",
       "skills": "{{USERPROFILE}}\\.qwen\\skills",
       "mode": "compact-wrapper"
+    },
+    {
+      "id": "roo",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.roo\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.roo\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "windsurf",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.windsurf\\AGENTS.md",
+      "skills": "{{USERPROFILE}}\\.windsurf\\skills",
+      "mode": "compact-wrapper"
+    },
+    {
+      "id": "aider",
+      "kind": "skill-root",
+      "instructions": "{{USERPROFILE}}\\.aider\\OPENSKILLS.md",
+      "skills": "{{USERPROFILE}}\\.aider\\skills",
+      "mode": "compact-wrapper"
     }
   ],
   "optionalExternalSources": [
     {
       "id": "gstack",
+      "runtimeIntegrationId": "gskills-gstack",
       "pathTemplate": "{{USERPROFILE}}\\.gstack\\gstack",
       "loadPolicy": "read-only-indexed-through-skill-router"
     },

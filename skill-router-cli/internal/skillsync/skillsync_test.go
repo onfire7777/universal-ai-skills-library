@@ -6,6 +6,25 @@ import (
 	"testing"
 )
 
+func TestPropagateRefusesCanonicalSourceTarget(t *testing.T) {
+	source := t.TempDir()
+	skillDir := filepath.Join(source, "universal-ai-skills")
+	if err := os.MkdirAll(skillDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	sourceFile := filepath.Join(skillDir, "SKILL.md")
+	if err := os.WriteFile(sourceFile, []byte("# Universal AI Skills\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := Propagate(source, []string{source}, false); err == nil {
+		t.Fatal("expected overlapping source and target to be rejected")
+	}
+	if _, err := os.Stat(sourceFile); err != nil {
+		t.Fatalf("source skill was removed after rejected propagation: %v", err)
+	}
+}
+
 func TestPropagateDefaultsToWrapperSkillsOnly(t *testing.T) {
 	src := t.TempDir()
 	dst := t.TempDir()

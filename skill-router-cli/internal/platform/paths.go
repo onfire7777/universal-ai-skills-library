@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -14,6 +15,9 @@ func SkillsDir() string {
 		return d
 	}
 	if d := os.Getenv("MANUS_SKILLS_DIR"); d != "" {
+		return d
+	}
+	if d := configString("skills_dir"); d != "" {
 		return d
 	}
 	home := HomeDir()
@@ -49,6 +53,9 @@ func MCPDir() string {
 	if d := os.Getenv("SKILL_ROUTER_MCP_DIR"); d != "" {
 		return d
 	}
+	if d := configString("mcp_dir"); d != "" {
+		return d
+	}
 	if runtime.GOOS == "windows" {
 		return `C:\ProgramData\universal-ai-mcps`
 	}
@@ -67,6 +74,9 @@ func RepoDir() string {
 		return d
 	}
 	if d := os.Getenv("MANUS_REPO_DIR"); d != "" {
+		return d
+	}
+	if d := configString("repo_dir"); d != "" && isRepoDir(d) {
 		return d
 	}
 	if cwd, err := os.Getwd(); err == nil {
@@ -130,6 +140,22 @@ func isRepoDir(dir string) bool {
 		return false
 	}
 	return true
+}
+
+func configString(key string) string {
+	data, err := os.ReadFile(filepath.Join(ConfigDir(), "config.json"))
+	if err != nil {
+		return ""
+	}
+	var raw map[string]json.RawMessage
+	if json.Unmarshal(data, &raw) != nil {
+		return ""
+	}
+	var value string
+	if field, ok := raw[key]; ok && json.Unmarshal(field, &value) == nil {
+		return value
+	}
+	return ""
 }
 
 // PrintingPressDir returns the printing-press output directory.

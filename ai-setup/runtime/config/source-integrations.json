@@ -47,6 +47,19 @@
       "notes": "Never store secrets, raw logs, temporary scratch notes, or unverified guesses in durable memory."
     },
     {
+      "id": "skill-seekers",
+      "label": "Skill Seekers",
+      "kind": "skill-generation-cli",
+      "purpose": "Shared skill creation, enhancement, packaging, and installation workflows from docs, repositories, PDFs, videos, notebooks, and codebases.",
+      "installMode": "shared-cli-optional-mcp",
+      "localRoot": "{{USERPROFILE}}\\.skill-seekers",
+      "cli": "skill-seekers",
+      "mcpCommand": "%APPDATA%\\npm\\skill-seekers-mcp.cmd",
+      "defaultState": "mcp-bridge-disabled-cli-enabled",
+      "validation": "skill-seekers --help",
+      "notes": "Keep generated skills project-specific unless the user asks for universal promotion. Do not copy generated full skill bodies into every AI root."
+    },
+    {
       "id": "notebooklm-mcp-cli",
       "label": "NotebookLM CLI and MCP",
       "kind": "notebook-research-cli",

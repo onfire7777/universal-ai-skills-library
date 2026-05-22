@@ -143,10 +143,10 @@ if ($integrations) {
 if ($sourceIntegrations) {
   $sources = @($sourceIntegrations.sources)
   $sourceIds = @($sources | ForEach-Object { $_.id })
-  foreach ($id in 'lightpanda', 'context-mode', 'mempalace', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli', 'crawl4ai', 'firecrawl') {
+  foreach ($id in 'lightpanda', 'context-mode', 'mempalace', 'skill-seekers', 'web-search', 'gbrain', 'gskills-gstack', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli', 'crawl4ai', 'firecrawl') {
     if ($sourceIds -notcontains $id) { Add-Failure "Source integration missing: $id" }
   }
-  foreach ($id in 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli') {
+  foreach ($id in 'mempalace', 'skill-seekers', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli') {
     $source = $sources | Where-Object { $_.id -eq $id } | Select-Object -First 1
     if ($source -and $source.defaultState -notmatch 'disabled') {
       Add-Failure "Source integration $id must default persistent bridges off for low-resource installs."
@@ -188,7 +188,7 @@ if ($sourceRepos) {
     Add-Failure 'source-repos.json missing canonical universalAiSkillsLibrary record.'
   }
   $externalSourceIds = @($sourceRepos.optionalExternalSources | ForEach-Object { $_.id })
-  foreach ($id in 'gstack', 'gbrain', 'mempalace', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli', 'crawl4ai', 'firecrawl', 'web-search') {
+  foreach ($id in 'gstack', 'gbrain', 'mempalace', 'skill-seekers', 'context-mode', 'lightpanda', 'notebooklm-mcp-cli', 'x-cli', 'instagram-cli', 'crawl4ai', 'firecrawl', 'web-search') {
     if ($externalSourceIds -notcontains $id) { Add-Failure "source-repos.json missing optional external source: $id" }
   }
 }

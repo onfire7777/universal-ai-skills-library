@@ -29,8 +29,7 @@
     "category": "skills",
     "capabilities": [
       "cli",
-      "skills",
-      "mcp-management"
+      "skills"
     ]
   }
 }

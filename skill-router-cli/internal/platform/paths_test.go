@@ -3,6 +3,7 @@ package platform
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 )
 
@@ -86,5 +87,33 @@ func TestRepoDirFindsCurrentCheckoutFromNestedDirectory(t *testing.T) {
 
 	if got := RepoDir(); got != repo {
 		t.Fatalf("expected RepoDir to find current checkout %q, got %q", repo, got)
+	}
+}
+
+func TestRepoDirUsesSavedConfigWhenValid(t *testing.T) {
+	home := t.TempDir()
+	repo := t.TempDir()
+	if err := os.WriteFile(filepath.Join(repo, "manifest.json"), []byte(`{"core_skills":[],"library_skills":[]}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(repo, "skills"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	configDir := filepath.Join(home, ".skill-router")
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	config := `{"repo_dir":` + strconv.Quote(repo) + `}`
+	if err := os.WriteFile(filepath.Join(configDir, "config.json"), []byte(config), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv("SKILL_ROUTER_REPO_DIR", "")
+	t.Setenv("MANUS_REPO_DIR", "")
+	t.Setenv("SKILL_ROUTER_CONFIG_DIR", configDir)
+	t.Setenv("USERPROFILE", home)
+
+	if got := RepoDir(); got != repo {
+		t.Fatalf("expected RepoDir to use saved config %q, got %q", repo, got)
 	}
 }

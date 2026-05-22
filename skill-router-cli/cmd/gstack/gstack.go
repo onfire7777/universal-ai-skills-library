@@ -159,7 +159,7 @@ func runGitBash(script string) error {
 	}
 	bunPosix := posixPath(filepath.Join(platform.HomeDir(), ".bun", "bin"))
 	scriptPath := filepath.ToSlash(script)
-	command := exec.Command(bash, "-lc", fmt.Sprintf("export PATH=%q:$PATH; cd %q && bash %q", bunPosix, posixPath(gstackDir()), scriptPath))
+	command := exec.Command(bash, "-c", `export PATH="$1:$PATH"; cd "$2" && bash "$3"`, "skill-router-gstack", bunPosix, posixPath(gstackDir()), scriptPath)
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	command.Stdin = os.Stdin

@@ -26,6 +26,7 @@ backup.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
 
 router_base = "http://127.0.0.1:18100/v1"
 canonical_skills_root = str(Path.home() / "universal-ai-skills-library" / "skills")
+wrapper_skills_root = str(Path.home() / ".hermes" / "skills")
 router_provider = {
     "name": "Universal AI Stack Router",
     "base_url": router_base,
@@ -67,7 +68,8 @@ if not isinstance(external_dirs, list):
     external_dirs = []
     skills["external_dirs"] = external_dirs
 external_dirs = [str(p) for p in external_dirs if str(p) != canonical_skills_root]
-external_dirs.insert(0, canonical_skills_root)
+if wrapper_skills_root not in external_dirs:
+    external_dirs.insert(0, wrapper_skills_root)
 skills["external_dirs"] = external_dirs
 
 data["fallback_providers"] = [{
@@ -196,6 +198,7 @@ report = {
     "discordRequireMention": data.get("discord", {}).get("require_mention"),
     "canonicalSkillsRoot": canonical_skills_root,
     "canonicalSkillsRootLinked": canonical_skills_root in data.get("skills", {}).get("external_dirs", []),
+    "wrapperSkillsRootLinked": wrapper_skills_root in data.get("skills", {}).get("external_dirs", []),
 }
 print(json.dumps(report, indent=2))
 '@

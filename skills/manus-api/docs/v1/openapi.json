@@ -360,7 +360,7 @@
 														"file_id": {
 															"type": "string",
 															"description": "ID of a previously uploaded file (via POST /v1/files)"
-														},
+														}
 													},
 													"required": [
 														"filename",

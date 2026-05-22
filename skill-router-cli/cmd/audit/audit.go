@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -105,6 +104,5 @@ func findScript(skill string, parts ...string) string {
 }
 
 func findReference(skill string, parts ...string) string {
-	_ = strings.Join(parts, "/") // suppress unused import
 	return findScript(skill, parts...)
 }

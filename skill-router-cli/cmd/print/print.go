@@ -1,9 +1,6 @@
 package print
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
@@ -268,7 +265,4 @@ func init() {
 	Cmd.AddCommand(workflowCmd)
 	Cmd.AddCommand(rawCmd)
 	Cmd.AddCommand(versionCmd)
-
-	_ = strings.Join // suppress unused import warning
-	_ = fmt.Sprintf
 }

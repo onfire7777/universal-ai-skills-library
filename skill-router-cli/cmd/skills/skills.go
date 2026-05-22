@@ -189,6 +189,13 @@ var searchCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.ToLower(strings.Join(args, " "))
 		refreshExternal, _ := cmd.Flags().GetBool("refresh")
+		limit, _ := cmd.Flags().GetInt("limit")
+		if limit <= 0 {
+			return fmt.Errorf("--limit must be between 1 and 100")
+		}
+		if limit > 100 {
+			limit = 100
+		}
 		manifest, err := loadManifest()
 		if err != nil {
 			return err
@@ -228,10 +235,15 @@ var searchCmd = &cobra.Command{
 			}
 			return results[i].score > results[j].score
 		})
+		shown := 0
 		for _, result := range results {
+			if shown >= limit {
+				break
+			}
 			fmt.Printf("  [%-18s] %-30s %s\n", result.kind, result.name, truncate(result.description, 50))
+			shown++
 		}
-		fmt.Printf("\n%d matches found.\n", len(results))
+		fmt.Printf("\n%d of %d matches shown. Use --limit N to adjust, up to 100.\n", shown, len(results))
 		return nil
 	},
 }
@@ -423,6 +435,7 @@ func init() {
 	listCmd.Flags().Bool("all", true, "Show all skills (default)")
 	listCmd.Flags().Bool("external", false, "Also list unique skills from local external roots")
 	searchCmd.Flags().Bool("refresh", false, "Refresh local external skill index before searching")
+	searchCmd.Flags().Int("limit", 25, "Maximum search results to print, capped at 100")
 	sourcesCmd.Flags().Bool("refresh", false, "Refresh local external skill index after scanning sources")
 	RouteCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
 	AutoCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
@@ -483,6 +496,9 @@ func findSkillMarkdown(name string) (string, error) {
 			}
 		}
 	}
+	if !isSafeSkillLookupName(name) {
+		return "", fmt.Errorf("unsafe skill name %q; use a manifest skill name or alias", name)
+	}
 
 	candidates := []string{
 		filepath.Join(repoSkillsDir(), name, "SKILL.md"),
@@ -524,6 +540,18 @@ func skillMarkdownFromDirectory(directory string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("skill markdown not found for manifest directory %s", directory)
+}
+
+func isSafeSkillLookupName(name string) bool {
+	trimmed := strings.TrimSpace(name)
+	if trimmed == "" || trimmed == "." || trimmed == ".." || filepath.IsAbs(trimmed) {
+		return false
+	}
+	if strings.ContainsAny(trimmed, `/\`) {
+		return false
+	}
+	clean := filepath.Clean(trimmed)
+	return clean == trimmed && !strings.Contains(clean, "..")
 }
 
 func installSkills(target string, fullCopy bool) error {

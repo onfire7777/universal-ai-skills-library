@@ -1,30 +1,11 @@
 # Universal AI Skills Router Rule
 
 - Canonical source: `%USERPROFILE%\universal-ai-skills-library`.
-- For every new substantive user prompt, perform skill selection automatically as an internal preflight. Do not wait for the user to ask for routing.
-- Hook scope is strict: automatic skill selection belongs only to real user prompt submission events, such as Codex/Claude `UserPromptSubmit`. Do not run or load routed skills from tool hooks, session-start hooks, stop hooks, compaction/resume hooks, background jobs, assistant messages, tool outputs, or status checks.
-- Internal preflight protocol:
-  1. Run `skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"` silently when invoked from a hook adapter. If there is no hook adapter and the host AI is doing the precheck internally, `skill-router preflight --json "<latest user prompt>"` is acceptable.
-  2. If `decision` is `route`, perform a compact host-AI sanity check before loading: the selected skill name or description must clearly match the user's core task, object, and action. If it only matches generic modifiers like "issue", "problem", "install", "setup", "local", "AI", or "skill", continue normally with no skill instead of loading a mismatched skill.
-  3. If `decision` is `ambiguous` or `host_ai_review.required` is true, use the current host AI to choose from only the listed candidates, or continue with no skill if none clearly fits.
-  4. If `decision` is `no_route` and no host review is requested, continue normally.
-- Keep preflight internal and quiet. Do not expose chain-of-thought-like notes such as "Need load...", "best route is external", or "skill is not installed"; report only the final selected skill when it materially affects the user's request.
-- Never load a routed skill just because the CLI returned `decision=route` when the current host AI can see the route is irrelevant.
-- On hosts with native skill tools, do not use native `skill_view`/`read skill` for router-selected universal skills. Load routed universal skills with `skill-router skill <name>` so the skill does not need to be installed in that host's local skill registry.
-- The router does not call a separate LLM API and does not need extra API keys.
-- Use `skill-router skill <name>` to load one skill on demand.
-- Use `skill-router skill search <query>` before loading when the skill name is unknown.
-- Use `skill-router preflight --hook-event UserPromptSubmit --json "<user prompt>"` for automatic hook prechecks. Use `skill-router preflight --json "<user prompt>"` for manual/internal host-AI prechecks. Use `skill-router route "<user prompt>"` only when an explicit routing check should load the winning skill or fail if no confident skill applies.
-- Use `skill-router route --explain "<user prompt>"` to debug unexpected routes; prefer no route over a weak or ambiguous route.
-- The router scores the full 1,812-skill corpus. Compatibility aliases such as `card-creator` resolve through the manifest, but no single skill family is the router's scope.
-- Do not preload the full skills corpus into context.
-- Treat `skills/` as source data and `skill-router-cli/` as the router source.
-- Source capabilities are shared through the installed source registry at `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`: Lightpanda for controlled fetch/CDP, Context Mode for scratch/context continuity, MemPalace for durable memory, NotebookLM MCP CLI for Google NotebookLM notebook research and optional stdio MCP, x-cli for X API workflows, Instagram CLI for Instagram workflows, Crawl4AI for local LLM-ready web crawling, Firecrawl for hosted web search/scrape/crawl/map/parse/interact/agent work and optional MCP, host-native web search for fresh search, GBrain for structured lookup, and GSkills/GStack for read-only namespaced skills.
-- Keep source integrations pointer-based. Do not vendor Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli, Instagram CLI, Crawl4AI, Firecrawl, GBrain, or GSkills/GStack source trees into each AI root, and do not add web-search or Firecrawl API keys unless the user explicitly configures a provider.
-- MCP bridges are optional adapters for persistent endpoint workflows only.
-- Legacy compatibility: `manus skill <name>` may be used only when a client has not moved to `skill-router` yet.
-- Universal compatibility is adapter-based:
-  - `skill-root` clients load `SKILL.md` wrappers and call the CLI on demand.
-  - `repo-instruction` clients get compact pointers in `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules`, `.github/copilot-instructions.md`, `.continue/rules`, `.kiro/steering`, `.junie/guidelines.md`, or `CONVENTIONS.md`.
-  - `hosted` clients such as ChatGPT or Claude Cowork use Actions, Apps SDK, MCP, API, or uploaded instructions instead of local full-copy sync.
-- Paperclip local agents use a combined adapter: one wrapper skill at `%USERPROFILE%\.paperclip\skills\universal-ai-skills` plus compact instructions at `%USERPROFILE%\.paperclip\universal-ai-skills\AGENTS.md`. Keep Paperclip-native company skills for board/API work and call `skill-router` only for prompt-scoped universal skill selection.
+- For every substantive user prompt, run `skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"` from prompt-submit hooks, or `skill-router preflight --json "<latest user prompt>"` from the host AI precheck.
+- Run automatic routing only for real user prompts. Never route from tool output, assistant messages, startup, stop, compaction, status checks, or background jobs.
+- If `decision` is `route`, sanity-check that the selected skill clearly matches the user's core task, object, and action. Load exactly one skill with `skill-router skill <name>`.
+- If the match is weak, generic, ambiguous, or only hits words such as "issue", "install", "setup", "local", "AI", or "skill", continue without loading a skill.
+- Search unknown skills with `skill-router skill search <query> --limit 10`.
+- Keep preflight internal and quiet. Do not use host-native skill tools for router-selected universal skills.
+- Do not preload or duplicate the full skills corpus. Source integrations are pointer-based through `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`.
+- MCP bridges are optional and only for clients that require persistent endpoints.

@@ -1,9 +1,6 @@
 package gws
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
@@ -62,7 +59,4 @@ func init() {
 	Cmd.AddCommand(docsCmd)
 	Cmd.AddCommand(sheetsCmd)
 	Cmd.AddCommand(slidesCmd)
-
-	_ = strings.Join // suppress
-	_ = fmt.Sprintf
 }

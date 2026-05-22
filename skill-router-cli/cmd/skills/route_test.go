@@ -1,8 +1,10 @@
 package skills
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -230,6 +232,79 @@ func TestUninstallIntentRejectsInstallOnlySkill(t *testing.T) {
 	})
 	if isEligibleRouteCandidate(installer) {
 		t.Fatalf("expected uninstall intent to reject install-only OpenClaw skill, got score %d evidence %#v", installer.score, installer.evidence)
+	}
+}
+
+func TestPreflightHostReviewExcludesIneligibleGenericCandidates(t *testing.T) {
+	prompt := "please do a full clean uninstall completely without causing any issues or breaking anything of my openclaw local install"
+	installOnly := routeCandidate{
+		name:        "install",
+		description: "Install and configure tools.",
+		score:       routeHostReviewMinScore + 20,
+		evidence: routeEvidence{
+			uninstallIntent:  true,
+			uninstallSupport: false,
+		},
+	}
+	taskSpecific := routeCandidate{
+		name:        "openclaw-cleanup",
+		description: "Cleanly uninstall OpenClaw local installs.",
+		score:       routeHostReviewMinScore + 15,
+		evidence: routeEvidence{
+			nameStrongHits:        1,
+			descriptionStrongHits: 2,
+			matchedStrongTokens:   map[string]bool{"openclaw": true, "uninstall": true},
+		},
+	}
+
+	candidates := topReviewRouteCandidates([]routeCandidate{installOnly, taskSpecific}, 5)
+	if len(candidates) != 1 || candidates[0].name != "openclaw-cleanup" {
+		t.Fatalf("expected only reviewable task-specific candidate, got %#v for %q", candidates, prompt)
+	}
+}
+
+func TestPreflightJSONBoundsPromptAndDescriptions(t *testing.T) {
+	longPrompt := strings.Repeat("prompt ", 1000)
+	preflight := routePreflight{
+		Prompt:   longPrompt,
+		Decision: routeDecisionNoRoute,
+		Reason:   "test",
+		HostReview: buildHostAIReview([]routeCandidate{{
+			name:        "long-description",
+			description: strings.Repeat("description ", 100),
+			score:       routeHostReviewMinScore,
+			evidence: routeEvidence{
+				exactName:           true,
+				exactStrongTokens:   1,
+				matchedStrongTokens: map[string]bool{"description": true},
+			},
+		}}, "review"),
+	}
+	var out bytes.Buffer
+	oldStdout := os.Stdout
+	reader, writer, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.Stdout = writer
+	err = printPreflightJSON(preflight, false)
+	_ = writer.Close()
+	os.Stdout = oldStdout
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := out.ReadFrom(reader); err != nil {
+		t.Fatal(err)
+	}
+	output := out.String()
+	if strings.Contains(output, longPrompt) {
+		t.Fatal("expected JSON output to avoid echoing the full prompt")
+	}
+	if !strings.Contains(output, `"prompt_truncated": true`) {
+		t.Fatalf("expected prompt_truncated marker in output: %s", output)
+	}
+	if strings.Count(output, "description ") > 25 {
+		t.Fatalf("expected candidate description to be bounded, got output length %d", len(output))
 	}
 }
 

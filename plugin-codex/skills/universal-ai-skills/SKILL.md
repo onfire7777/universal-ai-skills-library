@@ -1,6 +1,6 @@
 ---
 name: universal-ai-skills
-description: Compact plugin wrapper for automatic Universal AI Skills routing and on-demand skill loading through skill-router.
+description: Compact Codex plugin wrapper for the Universal AI Skills Router. Use for automatic preflight routing and on-demand skill loading through skill-router.
 ---
 
 # Universal AI Skills Router

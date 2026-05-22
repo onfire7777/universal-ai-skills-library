@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 )
@@ -91,6 +92,9 @@ func copyDir(src, dst string) error {
 	if !info.IsDir() {
 		return fmt.Errorf("source is not a directory")
 	}
+	if pathsOverlap(src, dst) {
+		return fmt.Errorf("refusing to copy %s to overlapping destination %s", src, dst)
+	}
 	if err := os.RemoveAll(dst); err != nil {
 		return err
 	}
@@ -138,4 +142,45 @@ func copyFile(src, dst string, mode os.FileMode) error {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+func pathsOverlap(src, dst string) bool {
+	srcVariants := comparablePathVariants(src)
+	dstVariants := comparablePathVariants(dst)
+	for _, srcPath := range srcVariants {
+		for _, dstPath := range dstVariants {
+			if sameOrNestedPath(srcPath, dstPath) || sameOrNestedPath(dstPath, srcPath) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func comparablePathVariants(path string) []string {
+	variants := []string{}
+	if abs, err := filepath.Abs(path); err == nil {
+		variants = append(variants, filepath.Clean(abs))
+		if resolved, err := filepath.EvalSymlinks(abs); err == nil {
+			variants = append(variants, filepath.Clean(resolved))
+		}
+	}
+	return variants
+}
+
+func sameOrNestedPath(base, target string) bool {
+	if pathEqual(base, target) {
+		return true
+	}
+	rel, err := filepath.Rel(base, target)
+	if err != nil || rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return false
+	}
+	return !filepath.IsAbs(rel)
+}
+
+func pathEqual(left, right string) bool {
+	left = filepath.Clean(left)
+	right = filepath.Clean(right)
+	return left == right || strings.EqualFold(left, right)
 }
