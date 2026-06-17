@@ -44,6 +44,15 @@ Out of scope (later phases): eval harness (Phase 2), re-ranker (Phase 3). The fe
 - **Paths:** `internal/platform/paths.go` → `ConfigDir()` = `~/.skill-router` (override `SKILL_ROUTER_CONFIG_DIR`). Telemetry dir = `ConfigDir()/telemetry/`. Add a `TelemetryDir()` helper next to `ToolsDir()`.
 - **Determinism precedent:** tests use `cmd/skills/testdata/route-fixture/manifest.json`; telemetry tests should write under a temp `SKILL_ROUTER_CONFIG_DIR` (t.TempDir) so they never touch the real home dir.
 - Module is Go-only (`spf13/cobra`, `fatih/color`) — add no new deps.
+
+### REBASE 2026-06-17 — engine seam (Phase 2 landed; hook the engine, not cmd/skills)
+The route core was relocated into `internal/skillservice` (Phase 2). Telemetry must hook the engine so it covers BOTH the CLI and the MCP `serve` surface — one call site, no duplication.
+- **Decision source (NEW):** `internal/skillservice/service.go` → `Route(prompt string, opts RouteOptions) (RouteResult, error)`. `RouteResult{Prompt, Decision("route"|"no_route"|"ambiguous"), Matches []SkillRef (ordered; [0]=best,[1]=second), Selected *SkillRef, Margin int, Threshold int}` (see `internal/skillservice/types.go`). `SkillRef{Name, Path, Source, Description, Score}`.
+- **Hook site (NEW):** call `telemetry.LogDecision(...)` from inside `Route` (or a thin wrapper it funnels through) so CLI (`RoutePromptCLI`/`RunPreflightCLI`) and MCP (`cmd/serve`) both emit. Map `RouteResult` → the decision record (best=Matches[0], second=Matches[1], top=Matches[:5], margin=Margin).
+- **`reranker_used` flag:** the engine has a single reranker slot (`routeReranker`/`identityReranker` in `route_semantic.go`); set `reranker_used` from whether a learned reranker ran (wired in Phase 3.3) — leave the field present now, default false.
+- **Avoid an import cycle:** `internal/skillservice` may import `internal/telemetry` (telemetry is stdlib-only). `telemetry.Enabled()` should read env + the config JSON directly via a small read (like `platform.configString`) OR via `cmd/config`, whichever keeps `internal/skillservice → internal/telemetry` acyclic. Verify with `go build ./...`.
+- **CLI commands stay in `cmd/skills`** (thin cobra wrappers): `skills telemetry` (status/enable/disable/path/tail) and `skills feedback` (+promote). `telemetry.Version` set from `cmd/root` (cmd/root imports cmd/skills, not vice-versa).
+- config `telemetry.enabled` → `cmd/config/config.go`; `platform.TelemetryDir()` → `internal/platform/paths.go`.
 </code_context>
 
 <specifics>

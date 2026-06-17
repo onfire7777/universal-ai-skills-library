@@ -41,6 +41,14 @@ Out of scope: re-ranker (Phase 3). The eval harness must expose a reusable scori
 - **Manifest types:** `manifestSkill{Name, Description, Aliases}`, `skillManifest{CoreSkills, LibrarySkills}`, `externalSkill{Name, Description, SourceID}`.
 - **Command registration:** add `EvalCmd` under the `skills` group in `cmd/skills/skills.go` `init()`, alongside `RouteCmd`/`AutoCmd`/`PreflightCmd`.
 - **Cross-phase:** Phase 1's `skills feedback promote` writes into `cmd/skills/testdata/eval/cases.jsonl` — same schema this phase reads.
+
+### REBASE 2026-06-17 — engine seam (Phase 2 landed; score via the engine)
+The route core is now `internal/skillservice`. The eval harness must score via the engine's entry point, NOT a `cmd/skills` copy.
+- **Scoring entry (NEW):** `internal/skillservice.Route(prompt, RouteOptions) (RouteResult, error)`. For each case, call `Route` against the pinned fixture and read `RouteResult.Matches` (ordered top-N, `[0]`=best) + `RouteResult.Decision` for `no_route` cases. P@1 = Matches[0].Name == expected; MRR over the ordered Matches; Recall@5 over Matches[:5].
+- **Fixture determinism:** the engine tests set `SKILL_ROUTER_REPO_DIR`/`SKILL_ROUTER_SKILLS_DIR` (+ HOME/CONFIG/EXTERNAL roots) to `cmd/skills/testdata/route-fixture` for hermeticity — reuse that env setup so eval runs are deterministic. `--live` skips the override.
+- **Package placement:** `internal/eval` imports `internal/skillservice` (and `internal/platform`). The `skills eval` cobra command is a thin wrapper in `cmd/skills`.
+- **Golden data lives at** `cmd/skills/testdata/eval/{cases.jsonl,thresholds.json,baseline.json}` (shared with Phase 1's `promote` target).
+- The engine exposes `RouteResult` so the harness needs no access to unexported `routeCandidate`/`routeEvidence`; if richer per-candidate data is needed, add a minimal exported accessor on the engine rather than duplicating the scorer.
 </code_context>
 
 <specifics>
