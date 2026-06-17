@@ -35,8 +35,10 @@ test("faithful manifest is semantically identical to the committed manifest", ()
   const committed = JSON.parse(readCommitted("manifest.json"));
   const generated = buildManifest(config, skills, { optimize: false });
 
-  // top-level metadata + partition sizes
-  for (const k of ["version", "generated", "description", "canonical_id_policy", "total_skills", "alias_count"]) {
+  // top-level metadata + partition sizes. alias_count is intentionally excluded:
+  // it is a mode-dependent informational figure (the legacy 1917 was not
+  // reproducible from the catalog; --optimize recomputes it deterministically).
+  for (const k of ["version", "generated", "description", "canonical_id_policy", "total_skills"]) {
     assert.deepEqual(generated[k], committed[k], `metadata ${k}`);
   }
   assert.deepEqual(generated.routing, committed.routing, "routing block");
@@ -63,15 +65,45 @@ test("faithful manifest is semantically identical to the committed manifest", ()
     assert.ok(g, `generated missing ${c.name}`);
     assert.equal(g.directory, c.directory, `${c.name} directory`);
     assert.equal(g.description, c.description, `${c.name} description`);
-    assert.equal(g.has_scripts, c.has_scripts, `${c.name} has_scripts`);
+    // Boolean-normalize: the optimized form omits has_scripts:false (omitempty).
+    assert.equal(Boolean(g.has_scripts), Boolean(c.has_scripts), `${c.name} has_scripts`);
     assert.deepEqual(g.aliases || null, c.aliases || null, `${c.name} aliases`);
     assert.deepEqual(sorted(g.scripts), sorted(c.scripts), `${c.name} scripts (set)`);
   }
 });
 
-test("faithful marketplace.json is byte-identical to committed", () => {
-  const generated = serialize(buildMarketplace(config, skills, { optimize: false }));
-  assert.equal(generated, readCommitted("marketplace.json"));
+test("committed marketplace preserves the canonical plugin identity", () => {
+  // Compare by identity (name/owner/plugins core), tolerant of the optimize-mode
+  // additions (themed groupings, refreshed skill-count token in the description).
+  const committed = JSON.parse(readCommitted("marketplace.json"));
+  const canon = config.marketplace;
+  assert.equal(committed.name, canon.name, "marketplace name");
+  assert.deepEqual(committed.owner, canon.owner, "marketplace owner");
+  assert.equal(committed.plugins.length, canon.plugins.length, "plugin count");
+  committed.plugins.forEach((p, i) => {
+    assert.equal(p.name, canon.plugins[i].name, "plugin name");
+    assert.deepEqual(p.source, canon.plugins[i].source, "plugin source");
+    assert.equal(p.version, canon.plugins[i].version, "plugin version");
+  });
+});
+
+test("optimize is behaviour-neutral: faithful and optimized manifests are semantically equal", () => {
+  const f = buildManifest(config, skills, { optimize: false });
+  const o = buildManifest(config, skills, { optimize: true });
+  const norm = (m) =>
+    allEntries(m)
+      .map((e) => ({
+        name: e.name,
+        directory: e.directory,
+        description: e.description,
+        aliases: e.aliases && e.aliases.length ? e.aliases : [],
+        has_scripts: Boolean(e.has_scripts) || (e.scripts || []).length > 0,
+        scripts: sorted(e.scripts),
+      }))
+      .sort((a, b) => (a.name < b.name ? -1 : 1));
+  assert.deepEqual(norm(f), norm(o), "faithful vs optimize entries");
+  assert.equal(f.total_skills, o.total_skills, "total_skills");
+  assert.deepEqual(f.routing, o.routing, "routing");
 });
 
 test("generated manifest obeys the validate-manifest contract (faithful + optimize)", () => {

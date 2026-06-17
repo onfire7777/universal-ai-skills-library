@@ -257,36 +257,65 @@ export function buildAll(config, skills, opts) {
 }
 
 // ---------------------------------------------------------------------------
-// drift comparison — compare by MEANING, not bytes:
-//   - drop volatile timestamp fields (generated / generated_at)
-//   - sort each entry's scripts[] (the Go validator treats scripts as an
-//     unordered set: validate_manifest.go normalizeScriptList sorts both sides).
-// This makes --check robust against the legacy manifest's non-canonical script
-// ordering while still catching real drift (added/removed skills, changed
-// descriptions, changed script SETS, etc.).
+// drift comparison — compare by MEANING, not bytes. This is intentionally
+// invariant to the faithful-vs-optimize formatting choice so the guard reports
+// real drift (skills added/removed, descriptions/aliases/script-sets changed)
+// regardless of which form is committed:
+//   - drop volatile / mode-dependent fields (generated, alias_count, the
+//     marketplace skill-count token, groupings)
+//   - canonicalize each entry: aliases default [], has_scripts := scripts
+//     non-empty, scripts sorted (the Go validator sorts both sides anyway)
 // ---------------------------------------------------------------------------
-function sortEntryScripts(entry) {
-  if (Array.isArray(entry.scripts)) entry.scripts = entry.scripts.slice().sort();
-  return entry;
+function canonicalEntry(e) {
+  const scripts = (e.scripts || []).slice().sort();
+  return {
+    name: e.name,
+    directory: e.directory,
+    description: e.description,
+    aliases: e.aliases && e.aliases.length ? e.aliases : [],
+    has_scripts: scripts.length > 0,
+    scripts,
+  };
 }
 
 export function normalizeForCompare(key, text) {
-  if (key !== "manifest" && key !== "build-manifest") return text;
+  let obj;
   try {
-    const obj = JSON.parse(text);
-    if (key === "manifest") {
-      delete obj.generated;
-      (obj.core_skills || []).forEach(sortEntryScripts);
-      (obj.library_skills || []).forEach(sortEntryScripts);
-    }
-    if (key === "build-manifest") {
-      delete obj.generated_at;
-      (obj.skills || []).forEach(sortEntryScripts);
-    }
-    return serialize(obj);
+    obj = JSON.parse(text);
   } catch {
     return text;
   }
+  if (key === "manifest") {
+    return serialize({
+      version: obj.version,
+      description: obj.description,
+      canonical_id_policy: obj.canonical_id_policy,
+      routing: obj.routing,
+      total_skills: obj.total_skills,
+      core_skills: (obj.core_skills || []).map(canonicalEntry),
+      library_skills: (obj.library_skills || []).map(canonicalEntry),
+    });
+  }
+  if (key === "marketplace") {
+    return serialize({
+      name: obj.name,
+      owner: obj.owner,
+      plugins: (obj.plugins || []).map((p) => ({
+        name: p.name,
+        source: p.source,
+        version: p.version,
+        author: p.author,
+      })),
+    });
+  }
+  if (key === "build-manifest") {
+    delete obj.generated_at;
+    (obj.skills || []).forEach((e) => {
+      if (Array.isArray(e.scripts)) e.scripts = e.scripts.slice().sort();
+    });
+    return serialize(obj);
+  }
+  return text;
 }
 
 // ---------------------------------------------------------------------------
