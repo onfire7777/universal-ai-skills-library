@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillservice"
 )
 
 type manifestValidation struct {
@@ -66,11 +67,11 @@ func init() {
 }
 
 func validateManifest() (manifestValidation, error) {
-	manifest, err := loadManifest()
+	manifest, err := skillservice.LoadManifest()
 	if err != nil {
 		return manifestValidation{}, err
 	}
-	all := append([]manifestSkill{}, manifest.CoreSkills...)
+	all := append([]skillservice.ManifestSkill{}, manifest.CoreSkills...)
 	all = append(all, manifest.LibrarySkills...)
 	result := manifestValidation{
 		CoreSkills:    len(manifest.CoreSkills),
@@ -133,14 +134,14 @@ func validateManifest() (manifestValidation, error) {
 		result.DuplicateContent = append(result.DuplicateContent, strings.Join(names, ", "))
 	}
 
-	entries, err := os.ReadDir(repoSkillsDir())
+	entries, err := os.ReadDir(skillservice.RepoSkillsDir())
 	if err == nil {
 		for _, entry := range entries {
 			if !entry.IsDir() {
 				continue
 			}
 			rel := filepath.ToSlash(filepath.Join("skills", entry.Name()))
-			if _, err := os.Stat(filepath.Join(repoSkillsDir(), entry.Name(), "SKILL.md")); err == nil && !manifestDirs[rel] {
+			if _, err := os.Stat(filepath.Join(skillservice.RepoSkillsDir(), entry.Name(), "SKILL.md")); err == nil && !manifestDirs[rel] {
 				result.UnindexedTopDirs = append(result.UnindexedTopDirs, rel)
 			}
 		}

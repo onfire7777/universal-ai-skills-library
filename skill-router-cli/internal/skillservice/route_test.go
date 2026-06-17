@@ -1,4 +1,4 @@
-package skills
+package skillservice
 
 import (
 	"bytes"
@@ -10,12 +10,12 @@ import (
 
 func TestRouteScoringPrefersPrintableCardsForCardCreatorPrompt(t *testing.T) {
 	prompt := "use the universal AI skills card creator skill to create a beautiful mothers day card"
-	printable := manifestSkill{
+	printable := ManifestSkill{
 		Name:        "printable-cards",
 		Description: "Create beautiful printable foldable greeting cards as PDFs.",
 		Aliases:     []string{"card-creator", "card creator", "greeting-card-creator"},
 	}
-	router := manifestSkill{
+	router := ManifestSkill{
 		Name:        "universal-ai-skills",
 		Description: "Use this whenever the user mentions Universal AI Skills, skill-router, router, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically.",
 	}
@@ -32,12 +32,12 @@ func TestRouteScoringPrefersPrintableCardsForCardCreatorPrompt(t *testing.T) {
 
 func TestSearchScoringFindsPrintableCardsForMothersDayPrompt(t *testing.T) {
 	query := "mother card creator"
-	printable := manifestSkill{
+	printable := ManifestSkill{
 		Name:        "printable-cards",
 		Description: "Create beautiful printable foldable greeting cards as PDFs.",
 		Aliases:     []string{"card-creator", "card creator", "greeting-card-creator", "mothers day card"},
 	}
-	wrapper := manifestSkill{
+	wrapper := ManifestSkill{
 		Name:        "universal-ai-skills",
 		Description: "Use this whenever the user mentions Universal AI Skills, skill-router, router, card creator, printable cards, greeting cards, Mother's Day cards, birthday cards, or wants the best skill selected automatically.",
 	}
@@ -63,11 +63,11 @@ func TestRouterMaintenancePromptAllowsMetaSkill(t *testing.T) {
 
 func TestRouterMaintenancePromptPrefersMetaSkill(t *testing.T) {
 	prompt := "improve the skill router automatic routing accuracy"
-	meta := manifestRouteCandidate(prompt, manifestSkill{
+	meta := manifestRouteCandidate(prompt, ManifestSkill{
 		Name:        "universal-ai-skills",
 		Description: "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically.",
 	})
-	generic := externalRouteCandidate(prompt, externalSkill{
+	generic := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "improve-skill",
 		Description: "Improve an existing AI skill based on review feedback.",
 		SourceID:    "claude",
@@ -115,7 +115,7 @@ func TestNamedAISoftwareStatusPromptPrefersSetupOverAppUpgrade(t *testing.T) {
 
 func TestGStackPromptRoutesToGStackAdapter(t *testing.T) {
 	prompt := "use gstack review and QA before shipping this branch"
-	gstack := manifestRouteCandidate(prompt, manifestSkill{
+	gstack := manifestRouteCandidate(prompt, ManifestSkill{
 		Name:        "gstack",
 		Description: "Universal adapter for Garry Tan's gstack engineering skill stack. Use when the user asks for gstack, gstack review, gstack QA, gstack shipping, gstack security review, gstack browser/PDF tooling, or gstack integration.",
 		Aliases:     []string{"garrytan-gstack", "gstack-skills"},
@@ -127,7 +127,7 @@ func TestGStackPromptRoutesToGStackAdapter(t *testing.T) {
 
 func TestGBrainPromptRoutesToGBrainAdapter(t *testing.T) {
 	prompt := "set up gbrain local pglite brain and make the brain-first retrieval skills available"
-	gbrain := manifestRouteCandidate(prompt, manifestSkill{
+	gbrain := manifestRouteCandidate(prompt, ManifestSkill{
 		Name:        "gbrain",
 		Description: "Universal adapter for Garry Tan's GBrain personal knowledge brain. Use when the user asks for GBrain, brain-first retrieval, local PGLite brain setup, gbrain query/search/import/sync/embed, GBrain skills, Minions, durable agent jobs, soul-audit, brain maintenance, or integrating GBrain with gstack.",
 		Aliases:     []string{"garrytan-gbrain", "gbrain-skills", "brain-first"},
@@ -139,7 +139,7 @@ func TestGBrainPromptRoutesToGBrainAdapter(t *testing.T) {
 
 func TestNamespacedGStackExternalSkillBeatsGenericReview(t *testing.T) {
 	prompt := "load gstack cso for a security audit"
-	gstackCSO := externalRouteCandidate(prompt, externalSkill{
+	gstackCSO := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "gstack-cso",
 		Description: "Run gstack's security officer workflow for OWASP, STRIDE, and code security audits.",
 		SourceID:    "gstack-gbrain",
@@ -170,7 +170,7 @@ func TestPreflightPrefersExplicitGStackExternalSkill(t *testing.T) {
 func TestReadSkillFrontmatterParsesBlockDescription(t *testing.T) {
 	root := t.TempDir()
 	createExternalTestSkillWithName(t, root, "gstack-cso", "cso", "|\n  Chief Security Officer mode.\n  OWASP and STRIDE security audits.")
-	name, description := readSkillFrontmatter(filepath.Join(root, "gstack-cso", "SKILL.md"))
+	name, description := ReadSkillFrontmatter(filepath.Join(root, "gstack-cso", "SKILL.md"))
 	if name != "cso" {
 		t.Fatalf("expected cso name, got %q", name)
 	}
@@ -181,7 +181,7 @@ func TestReadSkillFrontmatterParsesBlockDescription(t *testing.T) {
 
 func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
 	genericPrompt := "thanks, that makes sense"
-	printable := manifestSkill{
+	printable := ManifestSkill{
 		Name:        "printable-cards",
 		Description: "Create beautiful printable foldable greeting cards as PDFs.",
 		Aliases:     []string{"card-creator", "card creator", "greeting-card-creator"},
@@ -192,7 +192,7 @@ func TestAutomaticRoutingRejectsGenericPrompt(t *testing.T) {
 	}
 
 	issuePrompt := "please solve this issue"
-	toIssues := manifestRouteCandidate(issuePrompt, manifestSkill{
+	toIssues := manifestRouteCandidate(issuePrompt, ManifestSkill{
 		Name:        "to-issues",
 		Description: "Convert notes and TODOs into tracked issues.",
 	})
@@ -214,7 +214,7 @@ func TestRouteStemKeepsIssuesAsStopToken(t *testing.T) {
 
 func TestAutomaticRoutingRejectsOpenClawUninstallAsIssues(t *testing.T) {
 	prompt := "please do a full clean uninstall completely without causing any issues or breaking anything of my openclaw local install"
-	toIssues := manifestRouteCandidate(prompt, manifestSkill{
+	toIssues := manifestRouteCandidate(prompt, ManifestSkill{
 		Name:        "to-issues",
 		Description: "Break a plan, spec, or PRD into independently-grabbable issues on the project issue tracker using tracer-bullet vertical slices. Use when user wants to convert a plan into issues, create implementation tickets, or break down work into issues.",
 	})
@@ -225,7 +225,7 @@ func TestAutomaticRoutingRejectsOpenClawUninstallAsIssues(t *testing.T) {
 
 func TestUninstallIntentRejectsInstallOnlySkill(t *testing.T) {
 	prompt := "please do a clean uninstall of my openclaw local install"
-	installer := externalRouteCandidate(prompt, externalSkill{
+	installer := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "gate-mcp-installer",
 		Description: "One-click installer and configurator for Gate MCP in OpenClaw. Use when the user wants to install mcporter CLI, configure Gate MCP, verify setup, or troubleshoot connectivity issues.",
 		SourceID:    "claude-repos",
@@ -310,7 +310,7 @@ func TestPreflightJSONBoundsPromptAndDescriptions(t *testing.T) {
 
 func TestAutomaticRoutingRejectsBroadAgentKeywordMatch(t *testing.T) {
 	prompt := "i just downloaded hermes agent tell me about what to do first"
-	mail := manifestSkill{
+	mail := ManifestSkill{
 		Name:        "agent-mail-automation",
 		Description: "Automate Agent Mail tasks via Rube MCP (Composio). Always search tools first for current schemas.",
 	}
@@ -322,7 +322,7 @@ func TestAutomaticRoutingRejectsBroadAgentKeywordMatch(t *testing.T) {
 
 func TestExternalHermesAgentBeatsBroadAgentKeywordMatch(t *testing.T) {
 	prompt := "i just downloaded hermes agent tell me about what to do first"
-	hermes := externalSkill{
+	hermes := ExternalSkill{
 		Name:        "hermes-agent",
 		Description: "Configure, extend, or contribute to Hermes Agent.",
 		SourceID:    "hermes",
@@ -335,7 +335,7 @@ func TestExternalHermesAgentBeatsBroadAgentKeywordMatch(t *testing.T) {
 
 func TestAutomaticRoutingRejectsSourceOnlyExternalMatch(t *testing.T) {
 	prompt := "hermes setup"
-	worker := externalRouteCandidate(prompt, externalSkill{
+	worker := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "kanban-worker",
 		Description: "Run a worker in the Hermes automation environment.",
 		SourceID:    "hermes",
@@ -347,7 +347,7 @@ func TestAutomaticRoutingRejectsSourceOnlyExternalMatch(t *testing.T) {
 
 func TestAutomaticRoutingHandlesInflectedDescriptionPhrase(t *testing.T) {
 	prompt := "rename files in this folder"
-	organizer := manifestRouteCandidate(prompt, manifestSkill{
+	organizer := manifestRouteCandidate(prompt, ManifestSkill{
 		Name:        "file-organizer",
 		Description: "Comprehensive file organization suite. Use for cleaning up messy folders, arranging the desktop, finding duplicates, renaming files intelligently, and categorizing files by type or date.",
 	})
@@ -359,12 +359,12 @@ func TestAutomaticRoutingHandlesInflectedDescriptionPhrase(t *testing.T) {
 func TestAutomaticRoutingRejectsAmbiguousNearTie(t *testing.T) {
 	prompt := "debug this failing test"
 	candidates := []routeCandidate{
-		externalRouteCandidate(prompt, externalSkill{
+		externalRouteCandidate(prompt, ExternalSkill{
 			Name:        "test-failing-test",
 			Description: "Diagnose and fix a failing test.",
 			SourceID:    "external",
 		}),
-		externalRouteCandidate(prompt, externalSkill{
+		externalRouteCandidate(prompt, ExternalSkill{
 			Name:        "testing",
 			Description: "General testing workflows for fixing failing tests.",
 			SourceID:    "external",
@@ -499,7 +499,7 @@ func TestGenericFileOrganizationDoesNotRouteToInvoiceOrganizer(t *testing.T) {
 	if preflight.Best.name != "file-organizer" {
 		t.Fatalf("expected generic file cleanup to route to file-organizer, got %s", preflight.Best.name)
 	}
-	invoice := manifestRouteCandidate("organize and rename messy files in this folder", manifestSkill{
+	invoice := manifestRouteCandidate("organize and rename messy files in this folder", ManifestSkill{
 		Name:        "invoice-organizer",
 		Description: "Automatically organizes invoices and receipts for tax preparation by reading messy files, extracting key information, renaming them consistently, and sorting them into logical folders. Turns hours of manual bookkeeping into minutes of automated organization.",
 	})
@@ -510,14 +510,14 @@ func TestGenericFileOrganizationDoesNotRouteToInvoiceOrganizer(t *testing.T) {
 
 func TestCreateIssueDoesNotRideGenericCreateVerb(t *testing.T) {
 	prompt := "create a beautiful mothers day card"
-	createIssue := manifestRouteCandidate(prompt, manifestSkill{
+	createIssue := manifestRouteCandidate(prompt, ManifestSkill{
 		Name:        "create-issue",
 		Description: "Create an issue in GitHub or Jira.",
 	})
 	if isEligibleRouteCandidate(createIssue) {
 		t.Fatalf("generic create verb should not make create-issue eligible, got score %d evidence %#v", createIssue.score, createIssue.evidence)
 	}
-	creatingIssues := externalRouteCandidate(prompt, externalSkill{
+	creatingIssues := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "creating-issues",
 		Description: "Issue creation expertise and convention enforcement. Auto-invokes when creating issues, writing issue descriptions, asking about issue best practices, or needing help with issue titles.",
 		SourceID:    "claude-repos",
@@ -529,7 +529,7 @@ func TestCreateIssueDoesNotRideGenericCreateVerb(t *testing.T) {
 
 func TestGenericFixAndRunVerbsDoNotRouteWithoutDomainEvidence(t *testing.T) {
 	prompt := "please fix the hermes heartbeat run state issue"
-	fix := externalRouteCandidate(prompt, externalSkill{
+	fix := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "fix",
 		Description: "Fix failing or flaky Playwright tests.",
 		SourceID:    "claude-repos",
@@ -537,7 +537,7 @@ func TestGenericFixAndRunVerbsDoNotRouteWithoutDomainEvidence(t *testing.T) {
 	if isEligibleRouteCandidate(fix) || fix.score >= automaticRouteMinScore {
 		t.Fatalf("generic fix verb should not route to Playwright fix skill, got score %d evidence %#v", fix.score, fix.evidence)
 	}
-	run := externalRouteCandidate(prompt, externalSkill{
+	run := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "run",
 		Description: "One-shot lifecycle command that chains init, baseline, spawn, eval, and merge.",
 		SourceID:    "claude-repos",
@@ -549,7 +549,7 @@ func TestGenericFixAndRunVerbsDoNotRouteWithoutDomainEvidence(t *testing.T) {
 
 func TestDescriptionPhraseNeedsMultipleDomainTokens(t *testing.T) {
 	prompt := "please fix the hermes heartbeat run state issue"
-	transformers := externalRouteCandidate(prompt, externalSkill{
+	transformers := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "transformers-js",
 		Description: "Use Transformers.js to run state-of-the-art machine learning models directly in JavaScript/TypeScript.",
 		SourceID:    "codex-cache",
@@ -561,7 +561,7 @@ func TestDescriptionPhraseNeedsMultipleDomainTokens(t *testing.T) {
 
 func TestFixSkillStillRoutesWithSpecificTestEvidence(t *testing.T) {
 	prompt := "fix the flaky Playwright test that fails in CI"
-	fix := externalRouteCandidate(prompt, externalSkill{
+	fix := externalRouteCandidate(prompt, ExternalSkill{
 		Name:        "fix",
 		Description: "Fix failing or flaky Playwright tests.",
 		SourceID:    "claude-repos",
@@ -683,11 +683,11 @@ func TestPreflightProvidesHostReviewForAmbiguousRoute(t *testing.T) {
 // without tripping routing CI.
 func configurePreflightTest(t *testing.T) {
 	t.Helper()
-	fixture, err := filepath.Abs(filepath.Join("testdata", "route-fixture"))
+	fixture, err := filepath.Abs(filepath.Join("..", "..", "cmd", "skills", "testdata", "route-fixture"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Full hermetic isolation. externalSkillRoots() derives every installed-skill
+	// Full hermetic isolation. ExternalSkillRoots() derives every installed-skill
 	// root from HomeDir(), which on Unix resolves to $HOME (USERPROFILE is honored
 	// only on Windows). Without redirecting HOME the router scans the real
 	// ~/.agent, ~/.claude, ... skill roots, so routing depended on whatever the

@@ -1,25 +1,25 @@
-package skills
+package skillservice
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"os"
 	"sort"
 	"strings"
-
-	"github.com/spf13/cobra"
 )
 
-// semanticEmbeddingDims is the width of the built-in offline embedder. A
+// SemanticEmbeddingDims is the width of the built-in offline embedder. A
 // precomputed vector store must be generated with the same width so the prompt
 // vector and the stored skill vectors are comparable.
-const semanticEmbeddingDims = 256
+const SemanticEmbeddingDims = 256
+
+// semanticEmbeddingDims is the engine-internal alias for SemanticEmbeddingDims.
+const semanticEmbeddingDims = SemanticEmbeddingDims
 
 // Phase 1 semantic routing layer.
 //
 // This file adds an OPTIONAL semantic-recall stage on top of the deterministic
-// lexical scorer in route_scorer.go. It is strictly additive: when no embedder
+// lexical scorer in scorer.go. It is strictly additive: when no embedder
 // is configured (the default), the engine is disabled and routing falls back to
 // the exact lexical behavior the rest of the package already implements.
 //
@@ -268,7 +268,7 @@ func marshalSemanticVectorStore(store semanticVectorStore) ([]byte, error) {
 // via Reciprocal Rank Fusion, applies the re-ranker, then enforces the exact-win
 // guardrail. It only re-orders candidates — it never mutates their lexical scores
 // or the confidence/ambiguity thresholds — so the downstream decision logic in
-// route_preflight.go is unchanged.
+// preflight.go is unchanged.
 type semanticRouteEngine struct {
 	embedder routeEmbedder
 	store    semanticVectorStore
@@ -423,7 +423,7 @@ func applySemanticRouting(candidates []routeCandidate, prompt string) []routeCan
 // + library + external overlay) as bare candidates carrying name and description,
 // which is all the embedder needs.
 func collectSemanticCorpus() ([]routeCandidate, error) {
-	manifest, err := loadManifest()
+	manifest, err := LoadManifest()
 	if err != nil {
 		return nil, err
 	}
@@ -431,7 +431,7 @@ func collectSemanticCorpus() ([]routeCandidate, error) {
 	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
 		candidates = append(candidates, routeCandidate{name: s.Name, description: s.Description})
 	}
-	external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
+	external, err := FindExternalSkills(CanonicalSkillKeys(manifest), false)
 	if err != nil {
 		return nil, err
 	}
@@ -441,44 +441,20 @@ func collectSemanticCorpus() ([]routeCandidate, error) {
 	return candidates, nil
 }
 
-// VectorsCmd materializes the offline int8 vector store used by the optional
-// semantic routing path. It is fully offline and deterministic.
-var VectorsCmd = &cobra.Command{
-	Use:   "vectors",
-	Short: "Generate the offline int8 semantic vector store for SKILL_ROUTER_VECTORS",
-	Long: `Embed every routable skill (manifest core + library + external overlay) with the
-built-in offline embedder, quantize each vector to int8, and write a JSON store.
-
-Point the router at the file to enable the precomputed semantic path:
-
-  skill-router skills vectors --out vectors.json
-  SKILL_ROUTER_SEMANTIC=1 SKILL_ROUTER_VECTORS=vectors.json skill-router skills preflight "<prompt>"
-
-This contacts no network and loads no model weights; the exact lexical behavior
-is unchanged unless SKILL_ROUTER_SEMANTIC=1 is set.`,
-	RunE: func(cmd *cobra.Command, _ []string) error {
-		out, _ := cmd.Flags().GetString("out")
-		out = strings.TrimSpace(out)
-		if out == "" {
-			out = strings.TrimSpace(os.Getenv("SKILL_ROUTER_VECTORS"))
-		}
-		if out == "" {
-			return fmt.Errorf("no output path: pass --out <file> or set SKILL_ROUTER_VECTORS")
-		}
-		dims, _ := cmd.Flags().GetInt("dims")
-		corpus, err := collectSemanticCorpus()
-		if err != nil {
-			return err
-		}
-		store := buildSemanticVectorStore(corpus, newHashingEmbedder(dims))
-		data, err := marshalSemanticVectorStore(store)
-		if err != nil {
-			return err
-		}
-		if err := os.WriteFile(out, data, 0o644); err != nil {
-			return err
-		}
-		fmt.Printf("Wrote %d skill vectors (%d dims) to %s\n", len(store), dims, out)
-		return nil
-	},
+// BuildVectorStore embeds every routable skill (manifest core + library +
+// external overlay) with the built-in offline embedder, quantizes each vector to
+// int8, and returns the serialized JSON store plus the number of skills covered.
+// It contacts no network and loads no model weights, so it backs the CLI's
+// `skills vectors` command as a thin shim over the engine.
+func BuildVectorStore(dims int) ([]byte, int, error) {
+	corpus, err := collectSemanticCorpus()
+	if err != nil {
+		return nil, 0, err
+	}
+	store := buildSemanticVectorStore(corpus, newHashingEmbedder(dims))
+	data, err := marshalSemanticVectorStore(store)
+	if err != nil {
+		return nil, 0, err
+	}
+	return data, len(store), nil
 }

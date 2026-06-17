@@ -1,10 +1,20 @@
-package skills
+package skillservice
 
 import (
 	"encoding/json"
 	"fmt"
 	"strings"
 )
+
+// routeOptions is the engine-internal routing configuration. The CLI parses its
+// flags (routeOptionsFromCommand) and maps them onto RouteOptions; the engine
+// translates RouteOptions into this internal struct before running the pipeline.
+type routeOptions struct {
+	optional         bool
+	explain          bool
+	hookEvent        string
+	enforceHookEvent bool
+}
 
 type routeDecision string
 
@@ -53,7 +63,7 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 			Reason:    fmt.Sprintf("automatic routing is disabled for hook event %q; it only runs for user prompt submission events", strings.TrimSpace(opts.hookEvent)),
 		}, nil
 	}
-	manifest, err := loadManifest()
+	manifest, err := LoadManifest()
 	if err != nil {
 		return routePreflight{}, err
 	}
@@ -73,7 +83,7 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 		}
 		candidates = append(candidates, next)
 	}
-	external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
+	external, err := FindExternalSkills(CanonicalSkillKeys(manifest), false)
 	if err != nil {
 		return routePreflight{}, err
 	}
@@ -221,7 +231,7 @@ func printPreflight(preflight routePreflight, explain bool) {
 	if preflight.HostReview != nil && preflight.HostReview.Required {
 		fmt.Println("Host AI review:", preflight.HostReview.Instruction)
 		for _, candidate := range preflight.HostReview.Candidates {
-			fmt.Printf("  - %s (%s, score %d): %s\n", candidate.Name, candidate.Source, candidate.Score, truncate(candidate.Description, 120))
+			fmt.Printf("  - %s (%s, score %d): %s\n", candidate.Name, candidate.Source, candidate.Score, Truncate(candidate.Description, 120))
 		}
 	}
 	if explain {
@@ -242,7 +252,7 @@ func printPreflightJSON(preflight routePreflight, explain bool) error {
 		HostReview      *hostAIReview   `json:"host_ai_review,omitempty"`
 		Top             []candidateJSON `json:"top,omitempty"`
 	}{
-		Prompt:          truncate(preflight.Prompt, routeOutputPromptMax),
+		Prompt:          Truncate(preflight.Prompt, routeOutputPromptMax),
 		PromptChars:     len(preflight.Prompt),
 		PromptTruncated: len(preflight.Prompt) > routeOutputPromptMax,
 		HookEvent:       preflight.HookEvent,
@@ -281,7 +291,7 @@ func routeCandidateJSON(candidate routeCandidate) candidateJSON {
 		Source:      source,
 		Score:       candidate.score,
 		Eligible:    isEligibleRouteCandidate(candidate),
-		Description: truncate(strings.TrimSpace(candidate.description), routeOutputDescriptionMax),
+		Description: Truncate(strings.TrimSpace(candidate.description), routeOutputDescriptionMax),
 	}
 }
 
