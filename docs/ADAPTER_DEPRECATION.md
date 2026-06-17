@@ -32,18 +32,17 @@ registry directly.
 
 ### Option B — `skill-router serve` MCP Server
 
-Connect the router as an MCP server so the host agent can call routing tools
-natively:
+Connect the router as a stdio JSON-RPC MCP server so the host agent can call
+routing tools natively:
 
 ```
-skill-router serve                 # stdio MCP server (default)
-skill-router serve --http :8765    # HTTP/SSE MCP server
+skill-router serve
 ```
 
 Then register the server in the agent's MCP configuration (e.g.,
 `~/.claude/settings.json`, `~/.codex/config.json`, etc.) under the
-`mcpServers` key. The MCP tools exposed are: `route`, `search_skills`,
-`load_skill`, and `compose`.
+`mcpServers` key with the command `skill-router serve`. The MCP tools exposed
+are: `route`, `search_skills`, `load_skill`, and `compose`.
 
 ## Invariants That Are Unchanged
 
