@@ -15,7 +15,7 @@ Build a measurable improvement loop on top of the Phase 2 lexical routing servic
 - Decimal phases (2.1): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Telemetry & Feedback Capture** - Opt-in, local-only JSONL capture of route decisions plus a feedback/promote path into the labeled set
-- [ ] **Phase 2: Eval Harness & Gate** - Score routing on P@1/MRR/Recall@5 over a golden dataset; gate on absolute floors + no-regression; CLI report
+- [x] **Phase 2: Eval Harness & Gate** - Score routing on P@1/MRR/Recall@5 over a golden dataset; gate on absolute floors + no-regression; CLI report
 - [ ] **Phase 3: Re-ranker Training Pipeline** - Pure-Go linear re-ranker over lexical features, eval-gated, hybrid and off by default
 
 ## Phase Details
@@ -49,7 +49,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: TBD (set during planning)
+- [x] 02-01: internal/eval (dataset/metrics/gate/runner) + golden data + skills eval report
 
 ### Phase 3: Re-ranker Training Pipeline
 **Goal**: Train a deterministic, pure-Go linear re-ranker over existing `routeEvidence` features from labeled data, integrate it as a gated hybrid top-N reorder (off by default with silent fallback), and only allow promotion when it beats the eval baseline.
@@ -74,5 +74,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Telemetry & Feedback Capture | 2/2 | Complete | 2026-06-17 |
-| 2. Eval Harness & Gate | 0/1 | Not started | - |
+| 2. Eval Harness & Gate | 1/1 | Complete | 2026-06-17 |
 | 3. Re-ranker Training Pipeline | 0/1 | Not started | - |

@@ -16,16 +16,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** Make the lexical skill router measurable and self-improving — locally, with eval metrics gating every change.
-**Current focus:** Phase 2 — Eval Harness & Gate
+**Current focus:** Phase 3 — Re-ranker Training Pipeline
 
 ## Current Position
 
-Phase: 2 of 3 (Eval Harness & Gate)
+Phase: 3 of 3 (Re-ranker Training Pipeline)
 Plan: 0 of TBD in current phase
-Status: Ready to execute (engine seam ready)
-Last activity: 2026-06-17 — Phase 2 engine (internal/skillservice + compose + MCP serve + adapter deprecation) landed; Phase 3.1 telemetry shipped & verified (11455af)
+Status: Executing final sub-phase
+Last activity: 2026-06-17 — Phase 3.2 eval harness + gate shipped & verified (545445a)
 
-Progress: [███░░░░░░░] 33% (Phase 1/3.1 complete; engine prerequisite complete)
+Progress: [███████░░░] 66% (3.1 telemetry + 3.2 eval complete; engine complete)
 
 ## Performance Metrics
 
