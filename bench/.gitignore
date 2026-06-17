@@ -1,0 +1,4 @@
+# Build/runtime artifacts — only results/*.json snapshots are committed.
+__pycache__/
+*.pyc
+skill-router-bench
