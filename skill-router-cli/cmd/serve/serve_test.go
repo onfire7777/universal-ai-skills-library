@@ -109,6 +109,29 @@ func TestToolsCallRoute(t *testing.T) {
 	}
 }
 
+func TestToolsCallComposePipeline(t *testing.T) {
+	msgs := run(t,
+		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}`,
+		`{"jsonrpc":"2.0","id":11,"method":"tools/call","params":{"name":"compose","arguments":{"prompt":"crawl a website with crawl4ai, then summarize this chat session","pipeline":true}}}`,
+	)
+	last := msgs[len(msgs)-1]
+	res := last["result"].(map[string]any)
+	text := res["content"].([]any)[0].(map[string]any)["text"].(string)
+	var plan map[string]any
+	if err := json.Unmarshal([]byte(text), &plan); err != nil {
+		t.Fatalf("compose pipeline result not JSON: %v\n%q", err, text)
+	}
+	// A pipeline plan (ComposePlanResult) carries multiStep + steps; the flat
+	// working-set Compose result does not.
+	if _, ok := plan["multiStep"]; !ok {
+		t.Fatalf("pipeline mode should return a ComposePlanResult with multiStep, got: %q", text)
+	}
+	steps, ok := plan["steps"].([]any)
+	if !ok || len(steps) != 2 {
+		t.Fatalf("expected a 2-step pipeline plan, got: %q", text)
+	}
+}
+
 func TestUnknownMethodReturnsError(t *testing.T) {
 	msgs := run(t,
 		`{"jsonrpc":"2.0","id":3,"method":"does/not/exist"}`,

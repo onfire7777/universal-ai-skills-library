@@ -438,6 +438,11 @@ func init() {
 	composeCmd.Flags().Int("min-score", 75, "Minimum route score to include")
 	composeCmd.Flags().Bool("full", false, "Emit concatenated SKILL.md bodies as one bundle")
 	composeCmd.Flags().Bool("json", false, "Emit JSON")
+	composeCmd.Flags().Bool("pipeline", false, "Plan a multi-step capability DAG (segments the prompt; plan §3.6) instead of a flat working set")
+	composeCmd.Flags().Int("max-steps", 8, "Pipeline mode: max sub-tasks (context-budget guardrail)")
+	composeCmd.Flags().Int("budget", 6000, "Pipeline mode: token ceiling for lazily inlined bodies")
+	composeCmd.Flags().Bool("load", false, "Pipeline mode: inline bodies within budget (default: pointers only)")
+	composeCmd.Flags().Bool("allow-external", false, "Pipeline mode: inline third-party external skill bodies")
 
 	Cmd.AddCommand(readCmd)
 	Cmd.AddCommand(loadSkillCmd)
