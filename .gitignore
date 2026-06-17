@@ -71,3 +71,6 @@ IndexedDB/
 # Virtual environments
 venv/
 .venv/
+
+# Routing-eval generated artifacts (reproducible via tests/routing-eval/seed_corpus.py)
+tests/routing-eval/cases.corpus.jsonl

@@ -1,0 +1,16 @@
+{
+  "abstention_accuracy": 1.0,
+  "cases_file": "tests/routing-eval/cases.jsonl",
+  "decision_distribution": {
+    "ambiguous": 8,
+    "no_route": 15,
+    "route": 32
+  },
+  "mrr": 0.6193,
+  "n_cases": 55,
+  "n_negative": 8,
+  "n_positive": 47,
+  "p_at_1": 0.5319,
+  "recall_at_5": 0.6879,
+  "routed_to_expected_rate": 0.4894
+}

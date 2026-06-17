@@ -20,7 +20,8 @@ skills themselves + the registry that indexes them).
 | **Registry / manifest** | `manifest.json` (root) | JSON | **Single** index of the corpus consumed by the router (name, directory, description, aliases, scripts). | B4 |
 | **Packaging / setup** | `plugin/`, `plugin-codex/`, `ai-setup/`, `infrastructure/` | mixed | Distribution & install (`plugin*`); Python AI stack & agent setup (`ai-setup`); infra (`infrastructure`). | B5 / B6 |
 | **Docs** | `docs/` | md + `build_manifest.json` | Architecture & build metadata. | B5 |
-| **Tests** | `tests/`, `skill-router-cli/**/*_test.go` | Go / scripts | Characterization + unit. | B7 |
+| **Tests** | `tests/`, `skill-router-cli/**/*_test.go` | Go / scripts | Characterization + unit + routing-eval (`tests/routing-eval/`). | B7 |
+| **Frontmatter schema** | `schemas/skill.schema.json` | JSON Schema | Build-time `SKILL.md` frontmatter contract; validated `--warn` by `scripts/registry/validate-schema.mjs`. Additive, runtime-neutral. | Phase 0 |
 
 **Boundary rule (the whole point of the refactor):** the router **knows nothing about
 being co-located** with the corpus. It locates the corpus + registry through
@@ -35,6 +36,7 @@ Canonical tree: `universal-ai-skills-library/` (the second autofix clone is **ab
 ```
 universal-ai-skills-library/
 ├── manifest.json          # REGISTRY — single source of truth (v2.2.8; 1812 skills, 1917 aliases)
+├── schemas/               # SKILL.md frontmatter contract (skill.schema.json) — Phase 0
 ├── skill-router-cli/      # ROUTER (Go module)
 │   ├── cmd/               # cobra subcommands
 │   └── internal/          # platform, runner, skillsync, mcpcli
@@ -43,7 +45,7 @@ universal-ai-skills-library/
 ├── ai-setup/              # installer / agent setup
 ├── infrastructure/        # infra
 ├── docs/                  # docs + build_manifest.json
-└── tests/                 # cross-cutting tests
+└── tests/                 # cross-cutting tests (characterization/ + routing-eval/)
 ```
 
 > **LAYOUT DECISION (final):** Keep this current top-level layout. A `packages/` workspace

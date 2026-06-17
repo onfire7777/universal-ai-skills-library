@@ -10,6 +10,7 @@ and the Goal 2/3 consolidation.
 | Path | Purpose |
 |------|---------|
 | `characterization/` | Behavioural baseline pinning router + registry + legacy `manus` alias **before** the refactor, so regressions are caught. See its [README](characterization/README.md). |
+| `routing-eval/` | Labeled routing eval set + harness reporting **P@1 / MRR / Recall@5** over the live corpus, with a committed baseline and a no-regression CI gate. Phase 0 of `docs/ARCHITECTURE_IMPROVEMENT_PLAN.md`. See its [README](routing-eval/README.md). |
 | `fixtures/skills-lib/` | A **frozen** miniature skills library (manifest + `skills/`) the characterization tests run against, instead of the live `skills/` tree. Shared with `skill-router-cli`'s Go routing tests. |
 
 ## Running
