@@ -91,10 +91,14 @@ func init() {
 }
 
 func findScript(skill string, parts ...string) string {
-	paths := []string{
-		filepath.Join(append([]string{platform.SkillsDir(), skill}, parts...)...),
+	// Installed dir + source corpus via the config/env driven resolver, plus the
+	// legacy layout where the skill sits directly under the repo root. The added
+	// source-corpus candidate only widens resolution (never removes a prior one),
+	// and aligns audit with the other command packages.
+	paths := append(
+		platform.SkillAssetCandidates(skill, parts...),
 		filepath.Join(append([]string{platform.RepoDir(), skill}, parts...)...),
-	}
+	)
 	for _, p := range paths {
 		if _, err := os.Stat(p); err == nil {
 			return p

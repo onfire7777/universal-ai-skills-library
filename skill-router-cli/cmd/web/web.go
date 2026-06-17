@@ -2,8 +2,6 @@ package web
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -91,15 +89,9 @@ func runWebScript(script string, args ...string) error {
 	return runner.RunPython(scriptPath, args...)
 }
 
+// findWebScript locates a similarweb-analytics helper script through the
+// config/env driven corpus resolver. Resolution order is unchanged: installed
+// skills dir, then source corpus.
 func findWebScript(script string) string {
-	paths := []string{
-		filepath.Join(platform.SkillsDir(), "similarweb-analytics", "scripts", script),
-		filepath.Join(platform.RepoDir(), "skills", "similarweb-analytics", "scripts", script),
-	}
-	for _, p := range paths {
-		if _, err := os.Stat(p); err == nil {
-			return p
-		}
-	}
-	return ""
+	return platform.ResolveSkillAsset("similarweb-analytics", "scripts", script)
 }

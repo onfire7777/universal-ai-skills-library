@@ -187,15 +187,9 @@ func runFileScriptArgs(script string, args ...string) error {
 	return runner.RunPython(scriptPath, args...)
 }
 
+// findFileScript locates a file-organizer helper script through the config/env
+// driven corpus resolver. Resolution order is unchanged: installed skills dir,
+// then source corpus.
 func findFileScript(script string) string {
-	paths := []string{
-		filepath.Join(platform.SkillsDir(), "file-organizer", "scripts", script),
-		filepath.Join(platform.RepoDir(), "skills", "file-organizer", "scripts", script),
-	}
-	for _, p := range paths {
-		if _, err := os.Stat(p); err == nil {
-			return p
-		}
-	}
-	return ""
+	return platform.ResolveSkillAsset("file-organizer", "scripts", script)
 }

@@ -55,11 +55,12 @@ func init() {
 }
 
 func findOracleScript() string {
-	paths := []string{
-		filepath.Join(platform.SkillsDir(), "multi-model-oracle", "scripts", "oracle.py"),
-		filepath.Join(platform.RepoDir(), "skills", "multi-model-oracle", "scripts", "oracle.py"),
+	// Installed dir + source corpus via the config/env driven resolver, plus the
+	// legacy layout where the skill sits directly under the repo root.
+	paths := append(
+		platform.SkillAssetCandidates("multi-model-oracle", "scripts", "oracle.py"),
 		filepath.Join(platform.RepoDir(), "multi-model-oracle", "scripts", "oracle.py"),
-	}
+	)
 	for _, p := range paths {
 		if _, err := os.Stat(p); err == nil {
 			return p

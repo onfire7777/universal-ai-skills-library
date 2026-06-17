@@ -2,8 +2,6 @@ package chat
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -75,15 +73,9 @@ func init() {
 	Cmd.AddCommand(contextCmd)
 }
 
+// findChatScript locates a chat-summarizer helper script through the config/env
+// driven corpus resolver, so the router is not tied to a repo-relative skills
+// layout. Resolution order is unchanged: installed skills dir, then source corpus.
 func findChatScript(script string) string {
-	paths := []string{
-		filepath.Join(platform.SkillsDir(), "chat-summarizer", "scripts", script),
-		filepath.Join(platform.RepoDir(), "skills", "chat-summarizer", "scripts", script),
-	}
-	for _, p := range paths {
-		if _, err := os.Stat(p); err == nil {
-			return p
-		}
-	}
-	return ""
+	return platform.ResolveSkillAsset("chat-summarizer", "scripts", script)
 }

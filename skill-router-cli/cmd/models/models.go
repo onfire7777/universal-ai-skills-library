@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -84,27 +83,9 @@ func init() {
 }
 
 func findModelScript(name string) string {
-	paths := []string{
-		filepath.Join(platform.SkillsDir(), "model-selector", "scripts", name),
-		filepath.Join(platform.RepoDir(), "skills", "model-selector", "scripts", name),
-	}
-	for _, p := range paths {
-		if _, err := os.Stat(p); err == nil {
-			return p
-		}
-	}
-	return ""
+	return platform.ResolveSkillAsset("model-selector", "scripts", name)
 }
 
 func findModelRef(name string) string {
-	paths := []string{
-		filepath.Join(platform.SkillsDir(), "model-selector", "references", name),
-		filepath.Join(platform.RepoDir(), "skills", "model-selector", "references", name),
-	}
-	for _, p := range paths {
-		if _, err := os.Stat(p); err == nil {
-			return p
-		}
-	}
-	return ""
+	return platform.ResolveSkillAsset("model-selector", "references", name)
 }

@@ -586,7 +586,7 @@ func countInstallableSkills(srcRoot string, fullCopy bool) (int, error) {
 }
 
 func loadManifest() (skillManifest, error) {
-	data, err := os.ReadFile(filepath.Join(platform.RepoDir(), "manifest.json"))
+	data, err := os.ReadFile(platform.ManifestPath())
 	if err != nil {
 		return skillManifest{}, fmt.Errorf("manifest not found: %w", err)
 	}
@@ -597,17 +597,20 @@ func loadManifest() (skillManifest, error) {
 	return manifest, nil
 }
 
+// repoSkillsDir returns the source skills corpus directory. It now delegates to
+// the config/env driven resolver (default RepoDir()/skills), so the router is no
+// longer hard-wired to a repo-relative skills/ layout.
 func repoSkillsDir() string {
-	return filepath.Join(platform.RepoDir(), "skills")
+	return platform.SkillSourceDir()
 }
 
 func skillScriptPath(skill string, elems ...string) string {
-	parts := append([]string{skill}, elems...)
-	candidates := []string{
-		filepath.Join(append([]string{platform.SkillsDir()}, parts...)...),
-		filepath.Join(append([]string{repoSkillsDir()}, parts...)...),
-		filepath.Join(append([]string{platform.RepoDir()}, parts...)...),
-	}
+	// Installed dir + source corpus via the shared resolver, plus the legacy
+	// layout where the skill sits directly under the repo root.
+	candidates := append(
+		platform.SkillAssetCandidates(skill, elems...),
+		filepath.Join(append([]string{platform.RepoDir(), skill}, elems...)...),
+	)
 	for _, candidate := range candidates {
 		if _, err := os.Stat(candidate); err == nil {
 			return candidate

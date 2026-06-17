@@ -3,7 +3,6 @@ package music
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -43,11 +42,8 @@ var referenceCmd = &cobra.Command{
 	Use:   "reference",
 	Short: "Show the full music prompt crafting reference guide",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		refPath := filepath.Join(platform.SkillsDir(), "music-prompter", "references", "prompt_guide.md")
-		if _, err := os.Stat(refPath); err != nil {
-			refPath = filepath.Join(platform.RepoDir(), "skills", "music-prompter", "references", "prompt_guide.md")
-		}
-		if _, err := os.Stat(refPath); err != nil {
+		refPath := platform.ResolveSkillAsset("music-prompter", "references", "prompt_guide.md")
+		if refPath == "" {
 			// Inline fallback
 			fmt.Println("Music Prompt Crafting Framework")
 			fmt.Println("================================")
