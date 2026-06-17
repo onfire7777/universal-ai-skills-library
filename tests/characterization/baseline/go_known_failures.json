@@ -1,0 +1,5 @@
+{
+  "_comment": "Allowed pre-existing skill-router-cli `go test ./...` failures. The Go-baseline test asserts the CURRENT failing set is a SUBSET of this list, so the refactor may FIX failures (list shrinks) but never ADD one. This list is now EMPTY: the 4 failures present at pre-refactor HEAD were all fixed by Builder 2 (commits 41f72c2 fixture-pinned routing, 1e7b30e Windows traversal on all platforms, 53b009f RepoDir symlink-safe). With an empty baseline this gate requires `go test ./...` to stay fully green. If a failure is ever knowingly accepted again, add its `<package> :: <Test>` id here with a note.",
+  "captured_at_commit": "post Builder-2 router fixes (go test ./... green)",
+  "known_failures": []
+}

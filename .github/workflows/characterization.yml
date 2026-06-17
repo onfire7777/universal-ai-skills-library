@@ -1,0 +1,59 @@
+name: Characterization
+
+# Cross-cutting behavioural baseline for the skill-router + registry.
+# Runs on Linux (fast, no PowerShell) and is complementary to ci.yml, which
+# remains the Windows gate for the pwsh release-audit steps (see
+# .github/workflows/README.md). This workflow stays green despite the small set
+# of pre-existing Go failures: the Python suite gates on *no NEW* Go failures
+# (subset of tests/characterization/baseline/go_known_failures.json) rather than
+# requiring a fully-green Go suite pre-refactor.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  characterize:
+    name: Router + registry characterization
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          # 'stable' decouples CI from the router module's location so this
+          # keeps working if the router is reorganised. The module's own
+          # go.mod still pins the language version at build time.
+          go-version: stable
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Locate + build skill-router (once)
+        run: |
+          set -euo pipefail
+          MOD_FILE=$(find . -name go.mod -path '*skill-router*' -not -path '*/node_modules/*' | head -1)
+          if [ -z "$MOD_FILE" ]; then echo "::error::skill-router go.mod not found"; exit 1; fi
+          MOD_DIR=$(dirname "$MOD_FILE")
+          echo "Building router from $MOD_DIR"
+          (cd "$MOD_DIR" && GOFLAGS=-mod=mod go build -o "$GITHUB_WORKSPACE/skill-router" .)
+          echo "SKILL_ROUTER_BIN=$GITHUB_WORKSPACE/skill-router" >> "$GITHUB_ENV"
+
+      - name: Lint test sources (compile check)
+        run: python3 -m compileall -q tests/characterization
+
+      - name: Go vet (informational)
+        continue-on-error: true
+        run: |
+          MOD_DIR=$(dirname "$(find . -name go.mod -path '*skill-router*' | head -1)")
+          (cd "$MOD_DIR" && GOFLAGS=-mod=mod go vet ./...)
+
+      - name: Run characterization suite
+        run: python3 -m unittest discover -s tests/characterization -p 'test_*.py' -v

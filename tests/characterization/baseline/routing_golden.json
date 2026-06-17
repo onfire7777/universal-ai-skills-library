@@ -1,0 +1,54 @@
+{
+  "_comment": "Pinned router outcomes against tests/fixtures/skills-lib. Tests assert decision + best_name + best_source; best_score is diagnostic only.",
+  "fixture": "skill-router-cli/cmd/skills/testdata/route-fixture",
+  "entries": [
+    {
+      "id": "card-creator-mothers-day",
+      "prompt": "use the universal AI skills card creator skill to create a beautiful mothers day card",
+      "decision": "route",
+      "best_name": "printable-cards",
+      "best_source": "canonical",
+      "best_score": 407
+    },
+    {
+      "id": "chat-summarizer-handoff",
+      "prompt": "summarize this chat session into a handoff document",
+      "decision": "route",
+      "best_name": "chat-summarizer",
+      "best_source": "canonical",
+      "best_score": 212
+    },
+    {
+      "id": "router-maintenance-meta",
+      "prompt": "improve the skill router automatic routing accuracy",
+      "decision": "route",
+      "best_name": "universal-ai-skills",
+      "best_source": "canonical",
+      "best_score": 235
+    },
+    {
+      "id": "python-testing-patterns",
+      "prompt": "write pytest fixtures and mocking tests for a python module",
+      "decision": "route",
+      "best_name": "python-testing-patterns",
+      "best_source": "canonical",
+      "best_score": 131
+    },
+    {
+      "id": "universal-ai-setup",
+      "prompt": "please make sure the universal AI tools is cleanly and universally installed not redundant and clean everything updated on GitHub and in all the different AI services on my computer",
+      "decision": "route",
+      "best_name": "universal-ai-setup",
+      "best_source": "canonical",
+      "best_score": 245
+    },
+    {
+      "id": "generic-no-route",
+      "prompt": "what is the capital of France",
+      "decision": "no_route",
+      "best_name": null,
+      "best_source": null,
+      "best_score": null
+    }
+  ]
+}
