@@ -58,6 +58,13 @@ jobs:
       - name: Run characterization suite
         run: python3 -m unittest discover -s tests/characterization -p 'test_*.py' -v
 
+      - name: Routing eval — baseline metrics gate (no regression)
+        # Phase 0 of docs/ARCHITECTURE_IMPROVEMENT_PLAN.md (§3.5/§9.3): routing
+        # changes are gated by metrics, not vibes. Reuses the router built above
+        # (SKILL_ROUTER_BIN) and the isolated-but-live-corpus eval; fails only if
+        # P@1 / MRR / Recall@5 / abstention REGRESS vs the committed baseline.
+        run: python3 tests/routing-eval/run_eval.py --check
+
   registry-drift:
     name: Registry single-source drift guard
     runs-on: ubuntu-latest
@@ -78,3 +85,9 @@ jobs:
 
       - name: Registry generator unit tests
         run: node --test scripts/registry/lib/frontmatter.test.mjs scripts/registry/generate-registry.test.mjs
+
+      - name: SKILL.md frontmatter schema (warn — Phase 0 backfill tracker)
+        # Phase 0 (§3.2/§9.1): validate every SKILL.md against schemas/skill.schema.json.
+        # Runs in --warn mode (exit 0) during incremental backfill; prints per-field
+        # coverage so the backfill gap is visible. Flips to --error in a later phase.
+        run: node scripts/registry/validate-schema.mjs
