@@ -1,0 +1,57 @@
+# gitleaks configuration for the Universal AI Skills Library.
+#
+# Extends gitleaks' default ruleset and allowlists the 45 KNOWN-ILLUSTRATIVE
+# findings catalogued in Scout 1's secret audit (no real secrets; report:
+# scout1-secret-audit.md). The intent (Security-Audit directive): future REAL
+# leaks anywhere in the corpus fail CI, while these teaching/example/vendored-doc
+# values do not. Every allowlisted path below is documentation, a security-skill
+# detection pattern, a vendored third-party API reference, or an internal
+# version-hash map — never an application credential.
+#
+# Maintenance: when adding a new path here, note WHY it is a non-secret. Prefer
+# the narrowest scope (single file) unless the whole directory is vendored docs.
+
+title = "universal-ai-skills-library gitleaks policy"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known illustrative / example / vendored-doc secrets (Scout 1 audit, all non-real)."
+# Matched against file paths (Go regexp, unanchored). Grouped by reason.
+paths = [
+  # --- Figma fileKeys in a how-to doc (document ids, not auth credentials) ---
+  '''skills/figma-implement-design/SKILL\.md''',
+
+  # --- API/protocol documentation with placeholder Authorization headers & sample tokens ---
+  '''skills/api-design/SKILL\.md''',
+  '''skills/manus-api/docs/.*\.mdx''',                                  # manus API v2 docs (curl Bearer examples)
+  '''skills/high-perf-browser/references/real-time-communication\.md''',# RFC 6455 "the sample nonce" WebSocket key
+  '''skills/typescript-unit-testing/references/mocking/factories\.md''',
+  '''skills/typescript-unit-testing/references/nestjs/guards\.md''',
+
+  # --- Vendored third-party Neon REST API reference docs (published example keys) ---
+  '''skills/using-neon/references/neon-rest-api/.*\.md''',
+
+  # --- Security-skill content: detection regexes, vulnerability examples, teaching payloads ---
+  '''skills/senior-security/scripts/secret_scanner\.py''',              # BEGIN PRIVATE KEY are scanner regex patterns
+  '''skills/code-security/AGENTS\.md''',
+  '''skills/code-security/rules/kubernetes\.md''',
+  '''skills/code-security/rules/secrets\.md''',
+  '''skills/llm-security/AGENTS\.md''',
+  '''skills/llm-security/rules/sensitive-disclosure\.md''',
+  '''skills/firebase-apk-scanner/references/vulnerabilities\.md''',
+  '''skills/probe/references/nuclei-templates\.md''',                   # jwt.io alg:none sample token
+  '''skills/sentinel/references/vulnerability-patterns\.md''',
+  '''skills/tone/references/anti-patterns\.md''',
+
+  # --- Internal skill version-fingerprint map (high-entropy hashes, not credentials) ---
+  '''skills/\.skill_versions\.json''',
+]
+
+# Belt-and-suspenders: pin the canonical public example values regardless of path,
+# so these specific RFC/jwt.io samples never trip a future moved/copied doc.
+regexes = [
+  '''dGhlIHNhbXBsZSBub25jZQ==''',                                       # RFC 6455 Sec-WebSocket-Key sample ("the sample nonce")
+  '''eyJhbGciOiJ[Ah]b25lI''',                                          # jwt.io alg:none example token prefix
+]
