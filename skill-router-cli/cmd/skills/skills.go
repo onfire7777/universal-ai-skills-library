@@ -145,9 +145,10 @@ var listCmd = &cobra.Command{
 }
 
 var searchCmd = &cobra.Command{
-	Use:   "search <query>",
-	Short: "Search skills by name or description",
-	Args:  cobra.MinimumNArgs(1),
+	Use:     "search <query>",
+	Aliases: []string{"search_skills"},
+	Short:   "Search skills by name or description",
+	Args:    cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.ToLower(strings.Join(args, " "))
 		refreshExternal, _ := cmd.Flags().GetBool("refresh")
@@ -383,6 +384,14 @@ var summarizeCmd = &cobra.Command{
 	},
 }
 
+var loadSkillCmd = &cobra.Command{
+	Use:     "load_skill <name>",
+	Aliases: []string{"load"},
+	Short:   "Print a single skill's SKILL.md (alias of `skill <name>`)",
+	Args:    cobra.ExactArgs(1),
+	RunE:    func(cmd *cobra.Command, args []string) error { return printSkill(args[0]) },
+}
+
 // VectorsCmd materializes the offline int8 vector store used by the optional
 // semantic routing path. It is a thin shim over skillservice.BuildVectorStore,
 // which is fully offline and deterministic.
@@ -456,6 +465,7 @@ func init() {
 	Cmd.AddCommand(debugCmd)
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(searchCmd)
+	Cmd.AddCommand(loadSkillCmd)
 	Cmd.AddCommand(RouteCmd)
 	Cmd.AddCommand(AutoCmd)
 	Cmd.AddCommand(PreflightCmd)
