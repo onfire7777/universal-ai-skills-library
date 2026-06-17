@@ -258,6 +258,67 @@ func TestBuildCompositionIsDeterministic(t *testing.T) {
 	}
 }
 
+// TestComposeCuratedMultiStepSetResolvesEndToEnd is the Phase 4 program success
+// metric (docs/ARCHITECTURE_IMPROVEMENT_PLAN.md §4): a curated multi-step set must
+// resolve end-to-end. Each case exercises a distinct connector form and asserts the
+// full ordered skill sequence plus a fully-linked linear DAG against the pinned
+// fixture manifest (hermetic — insulated from library churn).
+func TestComposeCuratedMultiStepSetResolvesEndToEnd(t *testing.T) {
+	configurePreflightTest(t)
+	cases := []struct {
+		name   string
+		prompt string
+		want   []string
+	}{
+		{
+			name:   "comma-then connectors",
+			prompt: "convert a github repo into one llm ready xml context file, then write pytest fixtures and mocking tests for a python module, then organize and rename messy files in this folder",
+			want:   []string{"onefilellm", "python-testing-patterns", "file-organizer"},
+		},
+		{
+			name:   "ascii arrow connectors",
+			prompt: "review this code for SQL injection and authentication security -> create an architecture decision record for choosing postgres",
+			want:   []string{"sql-injection-testing", "architecture-decision-records"},
+		},
+		{
+			name:   "semicolon plus then connectors",
+			prompt: "train a Hugging Face transformer model on a text dataset; then organize and rename messy files in this folder",
+			want:   []string{"transformers", "file-organizer"},
+		},
+		{
+			name:   "numbered list connectors",
+			prompt: "1. convert a github repo into one llm ready xml context file\n2. review this code for SQL injection and authentication security",
+			want:   []string{"onefilellm", "sql-injection-testing"},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			comp, err := buildComposition(tc.prompt, defaultComposeOptions())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(comp.Steps) != len(tc.want) {
+				t.Fatalf("expected %d steps, got %d: %#v", len(tc.want), len(comp.Steps), comp.Steps)
+			}
+			for i, want := range tc.want {
+				s := comp.Steps[i]
+				if s.Decision != routeDecisionRoute || s.Skill != want {
+					t.Fatalf("step %d: expected %q route, got decision=%s skill=%q (text %q)", i, want, s.Decision, s.Skill, s.Text)
+				}
+			}
+			// Every sub-task must be linked into a single linear pipeline.
+			if len(comp.Edges) != len(tc.want)-1 {
+				t.Fatalf("expected %d edges for %d steps, got %#v", len(tc.want)-1, len(tc.want), comp.Edges)
+			}
+			for i, e := range comp.Edges {
+				if e.From != i || e.To != i+1 {
+					t.Fatalf("edge %d not contiguous: %#v", i, e)
+				}
+			}
+		})
+	}
+}
+
 func TestBuildCompositionSingleStepIsNotMultiStep(t *testing.T) {
 	configurePreflightTest(t)
 	comp, err := buildComposition("organize and rename messy files in this folder", defaultComposeOptions())
