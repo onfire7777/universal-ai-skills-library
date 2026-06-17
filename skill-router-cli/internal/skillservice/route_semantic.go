@@ -13,6 +13,15 @@ import (
 // vector and the stored skill vectors are comparable.
 const semanticEmbeddingDims = 256
 
+// Lane caps for RRF fusion. The lexical lane stays short (a precision signal);
+// the semantic lane is the recall driver. Capping both — instead of fusing the
+// whole corpus in each lane — is what surfaces semantically-relevant,
+// lexically-weak skills without drowning them in lexical noise.
+const (
+	routeLexLaneCap = 5
+	routeSemLaneCap = 25
+)
+
 // DefaultEmbeddingDims is the public width of the built-in offline embedder,
 // exposed so the CLI vectors command can default its --dims flag to the same
 // value the runtime engine uses.
@@ -320,13 +329,26 @@ func (e *semanticRouteEngine) fuse(prompt string, candidates []routeCandidate) [
 		return cosines[semOrder[a]] > cosines[semOrder[b]]
 	})
 
-	lexNames := make([]string, len(candidates))
-	for i, c := range candidates {
-		lexNames[i] = c.name
+	// Cap each lane before fusing. The lexical lane is a short *precision* signal
+	// (only candidates with a positive lexical score); ranking the score==0 tail
+	// would feed RRF arbitrary positions and bury semantic-only matches. The
+	// semantic lane is capped to its top-K (the long tail is irrelevant). This is
+	// what lets a semantically-relevant, lexically-weak skill surface — and is
+	// measured to lift Recall@5 well past an uncapped full-corpus fusion.
+	lexNames := make([]string, 0, routeLexLaneCap)
+	for _, c := range candidates {
+		if c.score <= 0 || len(lexNames) >= routeLexLaneCap {
+			break // candidates arrive in lexical-score order
+		}
+		lexNames = append(lexNames, c.name)
 	}
-	semNames := make([]string, len(candidates))
-	for i, idx := range semOrder {
-		semNames[i] = candidates[idx].name
+	semCap := routeSemLaneCap
+	if semCap > len(semOrder) {
+		semCap = len(semOrder)
+	}
+	semNames := make([]string, 0, semCap)
+	for _, idx := range semOrder[:semCap] {
+		semNames = append(semNames, candidates[idx].name)
 	}
 	rrf := reciprocalRankFusion([][]string{lexNames, semNames}, e.rrfKOrDefault())
 
@@ -366,8 +388,11 @@ func (e *semanticRouteEngine) fuse(prompt string, candidates []routeCandidate) [
 		if rest[a].score != rest[b].score {
 			return rest[a].score > rest[b].score
 		}
-		if rest[a].lexScore != rest[b].lexScore {
-			return rest[a].lexScore > rest[b].lexScore
+		// Tie-break toward the semantic lane (higher cosine): equal-RRF ties are
+		// where a lexical distractor would otherwise edge out the more relevant
+		// semantic match. Exact-name precision is already handled by pinning above.
+		if rest[a].cosine != rest[b].cosine {
+			return rest[a].cosine > rest[b].cosine
 		}
 		return rest[a].candidate.name < rest[b].candidate.name
 	})
@@ -389,7 +414,11 @@ func isGuardrailPinned(c routeCandidate) bool {
 }
 
 func semanticCandidateText(c routeCandidate) string {
-	return strings.TrimSpace(c.name + " " + c.description)
+	// De-hyphenate the kebab id so its tokens read as words to the embedder
+	// (e.g. "python-testing-patterns" → "python testing patterns"); measurably
+	// improves recall for a real word-piece model vs. embedding the raw slug.
+	name := strings.ReplaceAll(c.name, "-", " ")
+	return strings.TrimSpace(name + " " + c.description)
 }
 
 // ---- Default engine / integration ----
@@ -397,7 +426,9 @@ func semanticCandidateText(c routeCandidate) string {
 // defaultSemanticEngine is disabled unless explicitly opted into, preserving the
 // offline hard floor and the exact lexical routing behavior by default.
 //
-//   - SKILL_ROUTER_SEMANTIC=1   enable the built-in offline hashing embedder
+//   - SKILL_ROUTER_SEMANTIC=1   enable semantic routing
+//   - SKILL_ROUTER_EMBEDDER=ollama  use the local Ollama model (real recall);
+//     default is the built-in offline hashing embedder
 //   - SKILL_ROUTER_VECTORS=path optional precomputed int8 vector store (JSON)
 var defaultSemanticEngine = newDefaultSemanticRouteEngine()
 
@@ -406,7 +437,7 @@ func newDefaultSemanticRouteEngine() *semanticRouteEngine {
 	if os.Getenv("SKILL_ROUTER_SEMANTIC") != "1" {
 		return engine // embedder stays nil → disabled → lexical fallback
 	}
-	engine.embedder = newHashingEmbedder(semanticEmbeddingDims)
+	engine.embedder = selectEmbedder(semanticEmbeddingDims)
 	if path := strings.TrimSpace(os.Getenv("SKILL_ROUTER_VECTORS")); path != "" {
 		if store, err := loadSemanticVectorStore(path); err == nil {
 			engine.store = store

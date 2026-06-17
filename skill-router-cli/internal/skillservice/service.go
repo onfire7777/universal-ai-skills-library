@@ -345,7 +345,10 @@ func BuildVectorStoreJSON(dims int) ([]byte, int, error) {
 	if err != nil {
 		return nil, 0, err
 	}
-	store := buildSemanticVectorStore(corpus, newHashingEmbedder(dims))
+	// Build with the SAME embedder the runtime engine selects (hashing by
+	// default; the local Ollama model when SKILL_ROUTER_EMBEDDER=ollama), so the
+	// store and query vectors are produced by one model at one width.
+	store := buildSemanticVectorStore(corpus, selectEmbedder(dims))
 	data, err := marshalSemanticVectorStore(store)
 	if err != nil {
 		return nil, 0, err
