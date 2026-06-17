@@ -165,7 +165,13 @@ func isUnsafeManifestDir(dir string) bool {
 	if strings.TrimSpace(dir) == "" {
 		return true
 	}
-	clean := filepath.Clean(dir)
+	// Manifest directories are cross-platform JSON data. Normalize backslashes to
+	// forward slashes first so a Windows-style traversal ("..\x") is rejected on
+	// Unix too, where filepath would otherwise treat the backslash as a literal
+	// filename character and let the traversal through. Non-traversal backslash
+	// paths ("skills\alpha") normalize to a safe relative path and stay allowed.
+	normalized := strings.ReplaceAll(dir, "\\", "/")
+	clean := filepath.Clean(normalized)
 	if filepath.IsAbs(clean) || clean == ".." || strings.HasPrefix(clean, ".."+string(os.PathSeparator)) {
 		return true
 	}
