@@ -27,6 +27,7 @@ $required = @(
   'ai-setup\runtime\bin\universal_ai_router.py',
   'ai-setup\runtime\bin\universal_ai_stack_supervisor.py',
   'ai-setup\runtime\bin\local_qwen_proxy.py',
+  'ai-setup\runtime\bin\_universal_ai_common.py',
   'ai-setup\runtime\config\model-registry.json',
   'ai-setup\runtime\config\routing-policy.json',
   'ai-setup\runtime\config\integrations.json',
@@ -222,7 +223,7 @@ foreach ($file in $scanFiles) {
 }
 
 if ($CheckInstalled) {
-  foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json', 'config\source-integrations.json', 'bin\universal_ai_router.py', 'scripts\Test-UniversalAIStack.ps1') {
+  foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json', 'config\source-integrations.json', 'bin\universal_ai_router.py', 'bin\_universal_ai_common.py', 'scripts\Test-UniversalAIStack.ps1') {
     if (!(Test-Path -LiteralPath (Join-Path $InstalledRoot $rel))) { Add-Failure "Installed stack missing $rel" }
   }
   foreach ($rel in 'config\model-registry.json', 'config\routing-policy.json', 'config\integrations.json', 'config\source-integrations.json') {
