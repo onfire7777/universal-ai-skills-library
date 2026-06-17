@@ -48,12 +48,14 @@ func Search(query string) (SearchResult, error) {
 	scored := []scoredRef{}
 	for _, s := range manifest.CoreSkills {
 		if score := scoreManifestSkill(query, s); score > 0 || MatchesSkill(s, query) {
-			scored = append(scored, scoredRef{ref: SkillRef{Name: s.Name, Source: "core", Description: s.Description, Score: score}, score: score})
+			path, _ := skillMarkdownFromDirectory(s.Directory)
+			scored = append(scored, scoredRef{ref: SkillRef{Name: s.Name, Source: "core", Description: s.Description, Path: path, Score: score}, score: score})
 		}
 	}
 	for _, s := range manifest.LibrarySkills {
 		if score := scoreManifestSkill(query, s); score > 0 || MatchesSkill(s, query) {
-			scored = append(scored, scoredRef{ref: SkillRef{Name: s.Name, Source: "library", Description: s.Description, Score: score}, score: score})
+			path, _ := skillMarkdownFromDirectory(s.Directory)
+			scored = append(scored, scoredRef{ref: SkillRef{Name: s.Name, Source: "library", Description: s.Description, Path: path, Score: score}, score: score})
 		}
 	}
 	external, err := FindExternalSkills(CanonicalSkillKeys(manifest), false)
@@ -186,7 +188,9 @@ func routeResultFromPreflight(preflight routePreflight, opts RouteOptions) Route
 
 func routeCandidateRef(c routeCandidate) SkillRef {
 	source := "library"
-	if c.external {
+	if c.core {
+		source = "core"
+	} else if c.external {
 		source = "ext:" + c.sourceID
 	}
 	return SkillRef{

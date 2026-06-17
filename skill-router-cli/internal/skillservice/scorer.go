@@ -20,6 +20,7 @@ type routeCandidate struct {
 	sourceID    string
 	score       int
 	external    bool
+	core        bool // true for manifest CoreSkills; false for LibrarySkills and external
 	meta        bool
 	evidence    routeEvidence
 }
@@ -59,11 +60,16 @@ type fieldMatch struct {
 }
 
 func manifestRouteCandidate(prompt string, s ManifestSkill) routeCandidate {
+	return manifestRouteCandidateCore(prompt, s, false)
+}
+
+func manifestRouteCandidateCore(prompt string, s ManifestSkill, core bool) routeCandidate {
 	evidence := scoreRouteFields(prompt, s.Name, s.Aliases, s.Description, "")
 	return routeCandidate{
 		name:        s.Name,
 		description: s.Description,
 		score:       evidenceScore(evidence),
+		core:        core,
 		meta:        isMetaRoutingSkill(s.Name),
 		evidence:    evidence,
 	}
