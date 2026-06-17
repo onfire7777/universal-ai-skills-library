@@ -1,0 +1,57 @@
+{
+  "label": "before",
+  "timestamp": "2026-06-17T03:54:44.712186+00:00",
+  "git_head": "eec826d",
+  "host": {
+    "go": "go version go1.26.3 darwin/arm64",
+    "uname": "Darwin arm64"
+  },
+  "latency_ms": {
+    "router_init_version": {
+      "median": 8.17,
+      "min": 7.88
+    },
+    "manifest_load_list": {
+      "median": 15.78,
+      "min": 14.34
+    },
+    "route_decision_preflight": {
+      "median": 167.88,
+      "min": 135.16
+    },
+    "manifest_load_overhead": 7.61,
+    "routing_overhead": 159.71,
+    "_method": "wall-clock subprocess, median of 15 runs (3 warmup)",
+    "_prompt": "organize and rename messy files in this folder"
+  },
+  "manifest_parse_go": {
+    "alloc_bytes_parse": 1303742,
+    "core_skills": 18,
+    "file_bytes": 747223,
+    "iterations": 60,
+    "library_skills": 1794,
+    "parse_ms_median": 4.778,
+    "parse_ms_min": 4.356,
+    "total_skills": 1812
+  },
+  "size_bytes": {
+    "router_binary": 10463042,
+    "manifest_json": 747223,
+    "build_manifest_json": 749988,
+    "repo_total": 195407872,
+    "git": 59072512,
+    "skills_dir": 132001792,
+    "repo_excl_git": 136335360
+  },
+  "footprint": {
+    "file_bytes_total": 116028856,
+    "json_count": 1171,
+    "json_bytes": 3716400,
+    "font_count": 216,
+    "font_bytes": 21648416,
+    "skills_count": 1812
+  },
+  "memory": {
+    "max_rss_preflight": 21790720
+  }
+}
