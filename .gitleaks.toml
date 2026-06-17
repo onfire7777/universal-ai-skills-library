@@ -25,13 +25,18 @@ paths = [
 
   # --- API/protocol documentation with placeholder Authorization headers & sample tokens ---
   '''skills/api-design/SKILL\.md''',
-  '''skills/manus-api/docs/.*\.mdx''',                                  # manus API v2 docs (curl Bearer examples)
+  # manus API v2 docs: placeholder curl `Authorization: Bearer` examples (exact files, not a glob)
+  '''skills/manus-api/docs/v2/task-lifecycle\.mdx''',
+  '''skills/manus-api/docs/v2/website\.mdx''',
+  '''skills/manus-api/docs/v2/webhooks-security\.mdx''',
   '''skills/high-perf-browser/references/real-time-communication\.md''',# RFC 6455 "the sample nonce" WebSocket key
   '''skills/typescript-unit-testing/references/mocking/factories\.md''',
   '''skills/typescript-unit-testing/references/nestjs/guards\.md''',
 
-  # --- Vendored third-party Neon REST API reference docs (published example keys) ---
-  '''skills/using-neon/references/neon-rest-api/.*\.md''',
+  # --- Vendored third-party Neon REST API reference docs (published example keys; exact files) ---
+  '''skills/using-neon/references/neon-rest-api/keys\.md''',
+  '''skills/using-neon/references/neon-rest-api/projects\.md''',
+  '''skills/using-neon/references/neon-rest-api/branches\.md''',
 
   # --- Security-skill content: detection regexes, vulnerability examples, teaching payloads ---
   '''skills/senior-security/scripts/secret_scanner\.py''',              # BEGIN PRIVATE KEY are scanner regex patterns
