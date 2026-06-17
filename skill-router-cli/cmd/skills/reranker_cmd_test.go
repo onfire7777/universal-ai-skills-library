@@ -43,7 +43,7 @@ func TestRerankerTrainPromotionGate(t *testing.T) {
 	baselinePath := filepath.Join("testdata", "eval", "baseline.json")
 	promotePath := filepath.Join(t.TempDir(), "model.json") // never touch committed file
 
-	res, err := runRerankerTrain(casesPath, baselinePath, promotePath, reranker.DefaultTrainOptions())
+	res, err := runRerankerTrain(casesPath, baselinePath, promotePath, false, reranker.DefaultTrainOptions())
 	if err != nil {
 		t.Fatalf("train: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestRerankerTrainRefusesBelowMinExamples(t *testing.T) {
 	baselinePath := filepath.Join("testdata", "eval", "baseline.json")
 	promotePath := filepath.Join(dir, "model.json")
 
-	_, err := runRerankerTrain(casesPath, baselinePath, promotePath, reranker.DefaultTrainOptions())
+	_, err := runRerankerTrain(casesPath, baselinePath, promotePath, false, reranker.DefaultTrainOptions())
 	if err == nil {
 		t.Fatalf("expected refusal below min examples")
 	}
@@ -93,6 +93,27 @@ func TestStrictlyBeatsBaseline(t *testing.T) {
 	}
 	if ok, _ := strictlyBeatsBaseline(eval.Metrics{PAt1: 0.95, MRR: 0.8, RecallAt5: 0.9}, base); ok {
 		t.Error("an improvement that also regresses another metric must be refused")
+	}
+}
+
+// TestPromotionReferenceLiveUsesCurrentEngine pins the bug fix: in live mode the
+// gate must be the current engine (`without`), NOT the fixture-era stored
+// baseline (≈1.0) the live corpus can never reach.
+func TestPromotionReferenceLiveUsesCurrentEngine(t *testing.T) {
+	stored := eval.Baseline{PAt1: 1, MRR: 1, RecallAt5: 1}
+	without := eval.Metrics{PAt1: 0.8929, MRR: 0.9213, RecallAt5: 1}
+
+	if ref := promotionReference(false, without, stored); ref != stored {
+		t.Fatalf("fixture mode must gate against the stored baseline, got %+v", ref)
+	}
+	live := promotionReference(true, without, stored)
+	if live.PAt1 != without.PAt1 || live.MRR != without.MRR || live.RecallAt5 != without.RecallAt5 {
+		t.Fatalf("live mode must gate against the current engine %+v, got %+v", without, live)
+	}
+	// And a candidate that strictly improves the live engine must now promote —
+	// which it never could against the unreachable stored 1.0 baseline.
+	if ok, _ := strictlyBeatsBaseline(eval.Metrics{PAt1: 0.95, MRR: 0.95, RecallAt5: 1}, live); !ok {
+		t.Fatal("a candidate beating the live engine must be promotable")
 	}
 }
 

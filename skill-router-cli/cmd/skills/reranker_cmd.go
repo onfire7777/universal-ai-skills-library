@@ -63,7 +63,7 @@ type trainResult struct {
 // model through the real apply path and promotes only when the candidate strictly
 // beats the baseline on every gated metric. The candidate model is written to
 // promotePath only on promotion. Returns a clear error below the min example count.
-func runRerankerTrain(casesPath, baselinePath, promotePath string, opts reranker.TrainOptions) (trainResult, error) {
+func runRerankerTrain(casesPath, baselinePath, promotePath string, liveGate bool, opts reranker.TrainOptions) (trainResult, error) {
 	res := trainResult{PromotePath: promotePath}
 
 	ds, err := eval.LoadCases(casesPath)
@@ -133,15 +133,35 @@ func runRerankerTrain(casesPath, baselinePath, promotePath string, opts reranker
 		RecallAt5: with.Metrics.RecallAt5,
 	}
 
+	// Choose the promotion reference. The committed baseline.json is a fixture-era
+	// reference (≈perfect: 1.0/1.0/1.0) that the full live corpus cannot reach, so
+	// gating --live against it makes the learned re-ranker STRUCTURALLY un-promotable
+	// (Phase-3's data-driven loop would never close). In live mode, gate against the
+	// CURRENT live engine (the model-off `without` run): promote iff the candidate
+	// strictly improves the engine it will actually run in. Fixture mode is unchanged.
+	gateRef := promotionReference(liveGate, without.Metrics, base)
+	res.Baseline = gateRef
+
 	// Eval-gated promotion: promote only when the candidate STRICTLY beats the
-	// baseline on at least one metric and regresses on none (strictly-better).
-	res.Promoted, res.Reason = strictlyBeatsBaseline(with.Metrics, base)
+	// reference on at least one metric and regresses on none (strictly-better).
+	res.Promoted, res.Reason = strictlyBeatsBaseline(with.Metrics, gateRef)
 	if res.Promoted {
 		if err := skillservice.SaveRerankModel(promotePath, model); err != nil {
 			return res, err
 		}
 	}
 	return res, nil
+}
+
+// promotionReference returns the metrics the trained candidate must strictly
+// beat to be promoted. In live mode that is the CURRENT engine (the model-off
+// run) so the gate measures "does the model improve the engine it runs in";
+// otherwise it is the stored fixture baseline (preserving fixture-mode behavior).
+func promotionReference(liveGate bool, without eval.Metrics, stored eval.Baseline) eval.Baseline {
+	if liveGate {
+		return eval.Baseline{PAt1: without.PAt1, MRR: without.MRR, RecallAt5: without.RecallAt5}
+	}
+	return stored
 }
 
 // strictlyBeatsBaseline reports whether metrics improve on the baseline on at
@@ -195,7 +215,7 @@ var rerankerTrainCmd = &cobra.Command{
 			}
 		}
 
-		res, err := runRerankerTrain(casesPath, baselinePath, promotePath, reranker.DefaultTrainOptions())
+		res, err := runRerankerTrain(casesPath, baselinePath, promotePath, live, reranker.DefaultTrainOptions())
 		if err != nil {
 			return err
 		}
