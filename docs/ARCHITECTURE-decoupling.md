@@ -22,35 +22,53 @@ run independently of where the corpus lives.
 
 ## 3. Resolution contract (B2 implements)
 
-The router resolves three things, each via an explicit override chain.
-**Repo-relative `..` walking is a *last-resort fallback only*, never the primary mechanism.**
+Authoritative resolution order (confirmed with B2). Each resolver is an explicit override
+chain; **repo-relative `..` walking is a *last-resort fallback only*, never the primary
+mechanism.** The two NEW resolvers (`SkillSourceDir`, `ManifestPath`) are **additive and
+default to the repo, so runtime behavior is unchanged**; all `MANUS_*` legacy aliases are retained.
 
 ### 3.1 Skills corpus directory — `SkillsDir()`
 1. `SKILL_ROUTER_SKILLS_DIR` (env)
 2. `MANUS_SKILLS_DIR` (env, legacy alias — keep)
-3. `skills_dir` in `~/.skill-router/config.json`
+3. `skills_dir` in config.json
 4. Installed default `~/.agent/skills` (OpenSkills standard)
 
-### 3.2 Registry manifest — `loadManifest()`
-1. `SKILL_ROUTER_REPO_DIR` → `<repo>/manifest.json` (env).
-   *Recommended addition:* an explicit `SKILL_ROUTER_MANIFEST` file override for full decoupling.
-2. `MANUS_REPO_DIR` (env, legacy)
+### 3.2 Library repo root — `RepoDir()`
+1. `SKILL_ROUTER_REPO_DIR` (env)
+2. `MANUS_REPO_DIR` (env, legacy alias — keep)
 3. `repo_dir` in config.json (validated)
-4. Upward search from cwd / exe dir for a **repo marker** = a directory containing **both**
-   `manifest.json` and `skills/` (`isRepoDir`) — *fallback only*.
-5. Standard home locations (`~/universal-ai-skills-library`, …).
+4. Upward search from **cwd** for a **repo marker** = a dir containing **both** `manifest.json`
+   and `skills/` (`isRepoDir`) — *fallback only*
+5. Upward search from the **executable** dir — *fallback only*
+6. Home candidates (`~/universal-ai-skills-library`, `~/manus-skills-library`, `~/repos/…`, `~/Documents/…`)
 
-Loader today: `loadManifest()` → `os.ReadFile(RepoDir()/manifest.json)`.
+### 3.3 Skills corpus source — `SkillSourceDir()` *(NEW, additive)*
+1. `SKILL_ROUTER_SKILLS_SOURCE_DIR` (env)
+2. `skills_source_dir` in config.json
+3. Default `RepoDir()/skills`
 
-### 3.3 External skill roots (overlay)
+### 3.4 Registry manifest path — `ManifestPath()` *(NEW, additive)*
+1. `SKILL_ROUTER_MANIFEST` (env)
+2. `manifest_path` in config.json
+3. Default `RepoDir()/manifest.json`
+
+Loader: `loadManifest()` → `os.ReadFile(ManifestPath())`.
+
+### 3.5 Config dir — `ConfigDir()`
+1. `SKILL_ROUTER_CONFIG_DIR` (env)
+2. Default `~/.skill-router`
+
+### 3.6 External skill roots (overlay)
 - `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` (path list); cache TTL via `SKILL_ROUTER_EXTERNAL_CACHE_TTL_MINUTES`.
 
-### 3.4 Environment-variable surface (authoritative)
+### 3.7 Environment-variable surface (authoritative)
 
 | Variable | Purpose | Status |
 |----------|---------|--------|
 | `SKILL_ROUTER_SKILLS_DIR` | Skills corpus root | primary |
 | `SKILL_ROUTER_REPO_DIR` | Library repo root (holds `manifest.json` + `skills/`) | primary |
+| `SKILL_ROUTER_SKILLS_SOURCE_DIR` | Skills corpus source override (default `RepoDir()/skills`) | primary (additive) |
+| `SKILL_ROUTER_MANIFEST` | Manifest file path override (default `RepoDir()/manifest.json`) | primary (additive) |
 | `SKILL_ROUTER_CONFIG_DIR` | Config dir (default `~/.skill-router`) | primary |
 | `SKILL_ROUTER_MCP_DIR` | MCP bridges data dir | primary |
 | `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` | Extra skill roots overlay | primary |
