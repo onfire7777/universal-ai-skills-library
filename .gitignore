@@ -17,6 +17,11 @@ dist/
 build/
 *.egg
 
+# Lint / type / test tool caches
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
 # Node
 node_modules/
 
