@@ -14,7 +14,7 @@ Build a measurable improvement loop on top of the Phase 2 lexical routing servic
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Telemetry & Feedback Capture** - Opt-in, local-only JSONL capture of route decisions plus a feedback/promote path into the labeled set
+- [x] **Phase 1: Telemetry & Feedback Capture** - Opt-in, local-only JSONL capture of route decisions plus a feedback/promote path into the labeled set
 - [ ] **Phase 2: Eval Harness & Gate** - Score routing on P@1/MRR/Recall@5 over a golden dataset; gate on absolute floors + no-regression; CLI report
 - [ ] **Phase 3: Re-ranker Training Pipeline** - Pure-Go linear re-ranker over lexical features, eval-gated, hybrid and off by default
 
@@ -33,8 +33,8 @@ Build a measurable improvement loop on top of the Phase 2 lexical routing servic
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — telemetry core: internal/telemetry (types, opt-in gate, best-effort LogDecision, HASH_PROMPTS, feedback/promote, no-net), TelemetryDir(), config telemetry.enabled
-- [ ] 01-02-PLAN.md — CLI + wiring: skills telemetry/feedback/promote commands, best-effort LogDecision in route/auto/preflight, disabled stderr notice, version pass-through
+- [x] 01-01-PLAN.md — telemetry core: internal/telemetry (types, opt-in gate, best-effort LogDecision, HASH_PROMPTS, feedback/promote, no-net), TelemetryDir(), config telemetry.enabled
+- [x] 01-02-PLAN.md — CLI + wiring: skills telemetry/feedback/promote commands, best-effort LogDecision at the engine seam (covers CLI + MCP), disabled stderr notice, version pass-through
 
 ### Phase 2: Eval Harness & Gate
 **Goal**: Deterministically score the router on P@1, MRR, and Recall@5 over a committed labeled dataset, gate changes against absolute floors and a stored baseline, and surface results as a CLI report.
@@ -73,6 +73,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Telemetry & Feedback Capture | 0/1 | Not started | - |
+| 1. Telemetry & Feedback Capture | 2/2 | Complete | 2026-06-17 |
 | 2. Eval Harness & Gate | 0/1 | Not started | - |
 | 3. Re-ranker Training Pipeline | 0/1 | Not started | - |

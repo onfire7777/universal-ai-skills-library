@@ -16,16 +16,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** Make the lexical skill router measurable and self-improving — locally, with eval metrics gating every change.
-**Current focus:** Phase 1 — Telemetry & Feedback Capture
+**Current focus:** Phase 2 — Eval Harness & Gate
 
 ## Current Position
 
-Phase: 1 of 3 (Telemetry & Feedback Capture)
+Phase: 2 of 3 (Eval Harness & Gate)
 Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-06-17 — Bootstrapped GSD planning artifacts from approved design spec
+Status: Ready to execute (engine seam ready)
+Last activity: 2026-06-17 — Phase 2 engine (internal/skillservice + compose + MCP serve + adapter deprecation) landed; Phase 3.1 telemetry shipped & verified (11455af)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33% (Phase 1/3.1 complete; engine prerequisite complete)
 
 ## Performance Metrics
 
