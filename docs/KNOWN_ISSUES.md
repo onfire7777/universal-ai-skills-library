@@ -16,10 +16,10 @@ is not a storage cost:
 
 These are intentional and should be preserved.
 
-## Latent bugs (tracked separately, out of refactor-only scope)
+## Resolved bugs
 
-- **`infrastructure/mcp-bridges/bridge_context_mode.ps1`** launches Node via the
-  full path `C:\Program Files\nodejs\node.exe`. Under `mcp-proxy` this path can
-  space-split. A latent fix (8.3 short path `C:\PROGRA~1\nodejs\node.exe`) existed
-  in the now-removed orphan `launch_context_mode.ps1` but was **not** ported
-  (this effort is refactor-only). Track as a separate bug-fix.
+- **`infrastructure/mcp-bridges/bridge_context_mode.ps1`** previously launched
+  Node via the full path `C:\Program Files\nodejs\node.exe`, which could
+  space-split the `-Command` argument under `mcp-proxy`. **Fixed (2026-06-17):**
+  invocation now uses the 8.3 short path `C:\PROGRA~1\nodejs\node.exe` (the fix
+  that had existed in the since-removed orphan `launch_context_mode.ps1`).
