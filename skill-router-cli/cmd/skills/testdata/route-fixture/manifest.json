@@ -1,0 +1,129 @@
+{
+  "version": "fixture-1",
+  "generated": "pinned-test-fixture",
+  "description": "PINNED routing-test fixture corpus. Curated subset of the canonical manifest, used ONLY by router unit tests so routing stays deterministic and DECOUPLED from the live, mutable skills/ tree. Keep small: do not add skills that interfere with reject/ambiguous routing tests.",
+  "core_skills": [
+    {
+      "name": "file-organizer",
+      "directory": "skills/file-organizer",
+      "description": "Comprehensive file organization suite. Use for cleaning up messy folders, arranging the desktop, finding duplicates, renaming files intelligently, and categorizing files by type or date. Includes safety features like dry-run mode and undo capabilities."
+    },
+    {
+      "name": "chat-summarizer",
+      "directory": "skills/chat-summarizer",
+      "description": "Generate a comprehensive, AI-optimized summary of the current AI session. Use when the user asks to summarize this chat, create a session summary, generate a handoff document, capture what was done, or save progress for continuation in a new chat or another AI client."
+    },
+    {
+      "name": "universal-ai-skills",
+      "directory": "skills/universal-ai-skills",
+      "description": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list."
+    },
+    {
+      "name": "universal-ai-config",
+      "directory": "skills/universal-ai-config",
+      "description": "Configure and audit the local universal AI skills setup across Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, Paperclip agents, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, Manus compatibility surfaces, plugin manifests, optional MCP bridges, and global instruction files. Use when the user asks to organize, consolidate, optimize, rename, or repair the cross-AI skill router configuration."
+    }
+  ],
+  "library_skills": [
+    {
+      "name": "universal-ai-setup",
+      "directory": "skills/universal-ai-setup",
+      "description": "Manage this repository as the user's universal AI setup hub for OpenSkills, source repo inventory, bootstrap scripts, skill audits, and cross-agent operating rules."
+    },
+    {
+      "name": "printable-cards",
+      "directory": "skills/printable-cards",
+      "description": "Create beautiful printable foldable greeting cards (birthday, thank you, etc.) as PDFs. Use when the user asks to make, design, or create a printable card, greeting card, birthday card, or foldable card for someone.",
+      "aliases": [
+        "card-creator",
+        "card creator",
+        "greeting-card-creator",
+        "manus-card-creator",
+        "printable card",
+        "printable cards",
+        "foldable card",
+        "foldable greeting card",
+        "mother's day card",
+        "mothers day card",
+        "mother day card",
+        "birthday card"
+      ]
+    },
+    {
+      "name": "python-testing-patterns",
+      "directory": "skills/python-testing-patterns",
+      "description": "Implement comprehensive testing strategies with pytest, fixtures, mocking, and test-driven development. Use when writing Python tests, setting up test suites, or implementing testing best practices."
+    },
+    {
+      "name": "sql-injection-testing",
+      "directory": "skills/sql-injection-testing",
+      "description": "This skill should be used when the user asks to \"test for SQL injection vulnerabilities\", \"perform SQLi attacks\", \"bypass authentication using SQL injection\", \"extract database information through injection\", \"detect SQL injection flaws\", or \"exploit database query vulnerabilities\". It provides comprehensive techniques for identifying, exploiting, and understanding SQL injection attack vectors across different database systems."
+    },
+    {
+      "name": "architecture-decision-records",
+      "directory": "skills/architecture-decision-records",
+      "description": "Write and maintain Architecture Decision Records (ADRs) following best practices for technical decision documentation. Use when documenting significant technical decisions, reviewing past architectural choices, or establishing decision processes."
+    },
+    {
+      "name": "onefilellm",
+      "directory": "skills/onefilellm",
+      "description": "Use when aggregating local files, directories, GitHub repositories/issues/PRs, documentation pages, PDFs, arXiv/DOI/PMID sources, YouTube transcripts, stdin, or clipboard text into a single LLM-ready XML context file using the locally installed jimmc414/onefilellm CLI. Use for context packaging, source bundling, repo-to-text conversion, and multi-source research ingestion.",
+      "aliases": [
+        "one llm",
+        "llm-ready xml",
+        "llm ready xml context",
+        "single llm ready xml",
+        "repo to xml context",
+        "repo to text"
+      ]
+    },
+    {
+      "name": "transformers",
+      "directory": "skills/transformers",
+      "description": "This skill should be used when working with pre-trained transformer models for natural language processing, computer vision, audio, or multimodal tasks. Use for text generation, classification, question answering, translation, summarization, image classification, object detection, speech recognition, and fine-tuning models on custom datasets."
+    },
+    {
+      "name": "instagram-cli",
+      "directory": "skills/instagram-cli",
+      "description": "Use when working with supreme-gg-gg/instagram-cli or Instagram from the terminal: logging in or checking auth, listing or searching inbox threads, sending Instagram direct messages, reading messages, replying, unsending, downloading message media, viewing feed/stories/notifications/profile TUI screens, configuring the Instagram CLI, or diagnosing the local `instagram-cli` install. Prefer this for agent one-turn Instagram workflows that need JSON output. Do not use for generic social-media copywriting or unrelated Instagram marketing strategy.",
+      "aliases": [
+        "instagram cli",
+        "instagram-cli",
+        "instagram-skill",
+        "i7m",
+        "i7m instagram",
+        "@i7m/instagram-cli",
+        "instagram tui",
+        "instagram terminal client",
+        "instagram direct messages",
+        "instagram messages cli",
+        "instagram dm cli",
+        "instagram inbox",
+        "instagram auth",
+        "instagram one-turn commands"
+      ]
+    },
+    {
+      "name": "crawl4ai",
+      "directory": "skills/crawl4ai",
+      "description": "Use when working with unclecode/crawl4ai or the local Crawl4AI stack: installing, updating, setting up, diagnosing, or using the `crwl` CLI for LLM-ready web crawling, scraping, Markdown extraction, JSON extraction, deep crawling, browser profiles, CDP browser control, screenshots/PDF/MHTML export, or Python `AsyncWebCrawler` workflows. Prefer this for deterministic local web-to-Markdown and crawler workflows. Do not use for generic web search when the host AI has native search.",
+      "aliases": [
+        "crawl4ai",
+        "crawl 4 ai",
+        "crwl",
+        "unclecode crawl4ai",
+        "crawl4ai setup",
+        "crawl4ai doctor",
+        "web crawler cli",
+        "llm web crawler",
+        "web to markdown",
+        "llm ready markdown",
+        "deep crawl",
+        "async web crawler",
+        "asyncwebcrawler",
+        "crawl4ai profiles",
+        "crawl4ai cdp"
+      ]
+    }
+  ]
+}

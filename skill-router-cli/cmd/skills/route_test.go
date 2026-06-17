@@ -675,14 +675,31 @@ func TestPreflightProvidesHostReviewForAmbiguousRoute(t *testing.T) {
 	}
 }
 
+// configurePreflightTest points the router at a PINNED FIXTURE corpus instead of
+// the live skills/ tree. Routing is scoring-sensitive across the whole manifest,
+// so reading the mutable 1,800-skill corpus made these tests flaky and coupled
+// the router to library churn. The fixture (testdata/route-fixture) is a small,
+// curated, deterministic manifest, so B3/B4 can regenerate skills/manifest.json
+// without tripping routing CI.
 func configurePreflightTest(t *testing.T) {
 	t.Helper()
-	repoRoot, err := filepath.Abs(filepath.Join("..", "..", ".."))
+	fixture, err := filepath.Abs(filepath.Join("testdata", "route-fixture"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("USERPROFILE", t.TempDir())
-	t.Setenv("SKILL_ROUTER_REPO_DIR", repoRoot)
+	// Full hermetic isolation. externalSkillRoots() derives every installed-skill
+	// root from HomeDir(), which on Unix resolves to $HOME (USERPROFILE is honored
+	// only on Windows). Without redirecting HOME the router scans the real
+	// ~/.agent, ~/.claude, ... skill roots, so routing depended on whatever the
+	// host had installed — the coupling these fixtures remove. Point HOME and the
+	// installed-skills dir at empty temp dirs so only the pinned fixture manifest
+	// drives routing.
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("SKILL_ROUTER_SKILLS_DIR", filepath.Join(home, ".agent", "skills"))
+	t.Setenv("SKILL_ROUTER_EXTERNAL_SKILL_ROOTS", "")
+	t.Setenv("SKILL_ROUTER_REPO_DIR", fixture)
 	t.Setenv("SKILL_ROUTER_CONFIG_DIR", t.TempDir())
 }
 
