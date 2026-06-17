@@ -1,6 +1,8 @@
 // Package registry wires the Go registry builder (internal/registry) into the
-// skill-router CLI as `skill-router registry build`. It is the Go owner of the
-// build step and the eventual replacement for scripts/registry/generate-registry.mjs.
+// skill-router CLI as `skill-router registry build`. It is the sole owner of the
+// registry build step (it replaced the former Node generator
+// scripts/registry/generate-registry.mjs at byte-parity; that tool was removed
+// after the Node→Go cut-over — see docs/MIGRATION_NODE_TO_GO.md).
 package registry
 
 import (
@@ -30,19 +32,17 @@ var Cmd = &cobra.Command{
 	Short: "Build and verify the registry artifacts (the Go owner of the build step)",
 	Long: "registry - generate and verify the canonical registry artifacts from the\n" +
 		"skills/ corpus and scripts/registry/registry.config.json.\n\n" +
-		"This is the Go reimplementation of scripts/registry/generate-registry.mjs.\n" +
-		"It emits the same four artifacts in lockstep:\n" +
+		"This is the sole registry generator (it replaced the former Node\n" +
+		"generate-registry.mjs at byte-parity). It emits four artifacts in lockstep:\n" +
 		"  manifest.json                    (router catalog)\n" +
 		"  marketplace.json                 (Claude plugin marketplace)\n" +
 		"  .agents/plugins/marketplace.json (codex variant)\n" +
-		"  docs/build_manifest.json         (provenance)\n\n" +
-		"Once `registry build --check` and the parity harness (make parity) prove\n" +
-		"byte-identical output, the Node generator can be retired behind this gate.",
+		"  docs/build_manifest.json         (provenance)",
 }
 
 var buildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "Generate/verify the registry artifacts (replaces generate-registry.mjs)",
+	Short: "Generate/verify the registry artifacts (manifest, marketplace, build_manifest)",
 	Long: "Generate or verify the registry artifacts.\n\n" +
 		"Modes (default is --check; the committed artifacts are the --optimize form):\n" +
 		"  --check            regenerate in memory and compare (semantically) against\n" +

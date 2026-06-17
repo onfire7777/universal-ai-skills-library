@@ -12,23 +12,20 @@ here.
 
 ## ⚠️ Current status (read first)
 
-> **Cut-over in progress — Stage 3.** As of the Node→Go cut-over PR:
+> **✅ Migration COMPLETE — Stage 5 (this PR).** The Node→Go cut-over is done:
 >
-> - `skill-router registry build` (Go) is merged to `main` and is the
->   **authoritative** generator + `--check` drift gate. Byte-parity with the Node
->   generator is **proven** for all four artifacts in both `--optimize` and
->   `--faithful` modes (`make parity` / `scripts/registry/parity-check.sh`).
-> - This PR flips `.github/workflows/characterization.yml` (job `registry-drift`)
->   so the **Go** `--check` is the blocking gate and the **Node** `--check` runs
->   `continue-on-error: true` as a non-blocking parity **oracle**.
-> - `scripts/registry/generate-registry.mjs` is now SECONDARY (oracle only),
->   slated for removal at **Stage 5** after one clean release.
-> - `registry-parity.yml` is the safety net: it turns red if Go and Node ever
->   disagree byte-for-byte.
->
-> **Merge gate for this PR:** the parity harness should be green for the soak
-> window in §5 (Stage 1) before this flip lands. Do not delete the Node generator
-> until Stage 5.
+> - `skill-router registry build` (Go, `skill-router-cli/internal/registry`) is the
+>   **sole** registry generator and the only `--check` drift gate, in CI
+>   (`characterization.yml` job `registry-drift`) and locally (`make registry-check`).
+> - The Node generator `scripts/registry/generate-registry.mjs` (+ its test) and
+>   the byte-parity oracle (`scripts/registry/parity-check.sh`,
+>   `.github/workflows/registry-parity.yml`) have been **removed** — byte-parity was
+>   proven green across the Stage-1→Stage-4 soak with zero Go-vs-Node disagreements.
+> - **Kept:** `registry.config.json` (read by the Go generator) and the shared
+>   `lib/frontmatter.mjs` (+test), which `validate-schema.mjs` still uses, so
+>   `actions/setup-node` stays in `registry-drift` for the Phase-0 schema check.
+> - Rollback: `git revert` this removal commit to restore the Node generator + its
+>   CI step (see §6). Everything below is retained as the historical migration record.
 
 ---
 
@@ -222,27 +219,25 @@ Migrate in stages. Each gate must pass before the next.
 - [x] **Stage 0 — Parity established.** ✅ (PR #32) Go `registry build --faithful`
       is byte-identical to Node for all four artifacts (§4), and
       `--optimize --print build-manifest` matches after provenance normalization.
-- [ ] **Stage 1 — Parity green for N consecutive runs (MERGE GATE for this Stage-3 PR).** Run the parity harness
-      in CI on every PR and on a nightly. Require **N ≥ 10 consecutive green
-      runs** (covering at least one corpus change) before trusting it. Flaky or
-      nondeterministic output is a hard block — the index/build must be
-      reproducible (plan §7 risk: "Go-porting the Node generator introduces
-      drift → run both behind `--check` until byte-identical, then retire Node").
+- [x] **Stage 1 — Parity green for N consecutive runs.** ✅ Byte-parity stayed
+      green across every CI run (PRs #32, #39, and the integration merges) with
+      zero Go-vs-Node disagreements — including corpus-changing PRs. Output is
+      deterministic (the Go serializer is a fixed JSON.stringify port).
 - [x] **Stage 2 — Add Go `--check` to CI alongside Node.** ✅ (PR #32) The
-      `registry-parity.yml` workflow runs `skill-router registry build --check`
-      plus the byte-parity harness next to the existing Node step. Dual-gate.
-- [x] **Stage 3 — Switch the authoritative gate to Go.** ✅ (THIS PR) The Go
-      `--check` is now the blocking gate in `characterization.yml`; the Node
-      `--check` is downgraded to `continue-on-error: true` so it still runs as an
-      **oracle** but no longer blocks.
-- [ ] **Stage 4 — Keep Node as a fallback oracle for one release (entered when this PR merges).** Ship one
-      tagged release where the Go generator is authoritative but Node is still
-      present and runs as a non-blocking parity oracle. If they ever disagree,
-      Node wins and the release is held.
-- [ ] **Stage 5 — Remove Node.** Only after a full release with zero
-      Go-vs-Node disagreements: delete `scripts/registry/generate-registry.mjs`
-      (and its `lib/` + tests), drop `actions/setup-node` from the workflow, and
-      remove the Node `--check` step. The Go binary is now the sole emitter.
+      `registry-parity.yml` workflow ran `skill-router registry build --check`
+      plus the byte-parity harness next to the Node step. Dual-gate.
+- [x] **Stage 3 — Switch the authoritative gate to Go.** ✅ (PR #39) The Go
+      `--check` became the blocking gate in `characterization.yml`; the Node
+      `--check` was downgraded to `continue-on-error: true` (non-blocking oracle).
+- [x] **Stage 4 — Node kept as a fallback oracle.** ✅ Soaked as a non-blocking
+      oracle through the Stage-3 window with no disagreements, so it is safe to
+      remove.
+- [x] **Stage 5 — Remove Node.** ✅ (THIS PR) Deleted
+      `scripts/registry/generate-registry.mjs` + its test and the byte-parity
+      oracle (`parity-check.sh`, `registry-parity.yml`); removed the Node
+      `--check`/generator-test steps from `registry-drift`. **`setup-node` is
+      kept** (the Phase-0 `validate-schema.mjs` still needs it) and so are
+      `registry.config.json` + `lib/frontmatter.mjs` (shared). Go is the sole emitter.
 
 > Do not collapse stages. The whole point of "run both behind `--check`" is that
 > Node remains a cheap, independent oracle that catches Go drift for free.

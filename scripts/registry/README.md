@@ -17,6 +17,12 @@ scripts/registry/registry.config.json     ├──▶ marketplace.json         
 Because every artifact is produced from the same scan in one run, they can no
 longer drift from each other or from the `skills/` tree.
 
+> **The generator is the Go command `skill-router registry build`**
+> (`skill-router-cli/internal/registry`). It replaced the former Node generator
+> `generate-registry.mjs` at proven byte-parity; the Node tool was removed at the
+> end of the cut-over (see `docs/MIGRATION_NODE_TO_GO.md`). `registry.config.json`
+> and the shared `lib/frontmatter.mjs` (used by `validate-schema.mjs`) remain.
+
 ## What lives where
 
 - **`skills/<id>/SKILL.md`** — the catalog. A skill's canonical id is its
@@ -34,21 +40,25 @@ longer drift from each other or from the `skills/` tree.
 ## Commands
 
 ```bash
+# From the repo root use the `skill-router` binary, or from skill-router-cli/
+# run `go run . registry build ...`.
+
 # Validate that the committed registries are in sync with skills/ (CI guard).
-# Default checks ALL four artifacts byte-for-byte + the stale-duplicate guard.
-node scripts/registry/generate-registry.mjs --check
+# Default checks ALL four artifacts + the stale-duplicate guard.
+skill-router registry build --check
 
 # Regenerate the registries on disk.
-node scripts/registry/generate-registry.mjs --write
+skill-router registry build --write
 
 # Inspect one artifact without writing.
-node scripts/registry/generate-registry.mjs --print manifest
+skill-router registry build --print manifest
 
-# Characterization: reproduce the legacy manifest/marketplace byte-for-byte.
-node scripts/registry/generate-registry.mjs --check --faithful
+# Reproduce the legacy manifest/marketplace byte-for-byte.
+skill-router registry build --check --faithful
 
-# Tests.
-node --test scripts/registry/lib/frontmatter.test.mjs scripts/registry/generate-registry.test.mjs
+# Tests: the shared frontmatter parser lib (the Go generator is tested under
+# skill-router-cli/internal/registry/).
+node --test scripts/registry/lib/frontmatter.test.mjs
 ```
 
 Optimize is the **default** (the committed registries are the optimized output):

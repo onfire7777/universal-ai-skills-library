@@ -32,5 +32,6 @@ rather than claiming a successful run.
 
 - Once the consolidated package layout is final (Goals 1–3 merged), reconcile
   `ci.yml` and `characterization.yml` (e.g. promote `go test ./...` to a hard
-  Linux gate now that it is green) and wire Builder 4's registry drift-guard
-  (`node scripts/registry/generate-registry.mjs --check`) into CI.
+  Linux gate now that it is green). The registry drift-guard is wired into the
+  `registry-drift` job and is now the Go gate (`skill-router registry build
+  --check`); the legacy Node generator was removed at cut-over Stage 5.

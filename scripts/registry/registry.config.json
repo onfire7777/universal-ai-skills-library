@@ -1,6 +1,6 @@
 {
   "$schema": "./registry.config.schema.json",
-  "$doc": "Single source of truth for the unified skill registry. The skill CATALOG is derived from skills/ on disk; this file holds only the curated, non-derivable metadata. Generated artifacts (manifest.json, marketplace.json, docs/build_manifest.json) are produced by generate-registry.mjs and must never be hand-edited.",
+  "$doc": "Single source of truth for the unified skill registry. The skill CATALOG is derived from skills/ on disk; this file holds only the curated, non-derivable metadata. Generated artifacts (manifest.json, marketplace.json, docs/build_manifest.json) are produced by `skill-router registry build` and must never be hand-edited.",
   "schemaVersion": 1,
   "manifest": {
     "version": "2.2.8",

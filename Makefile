@@ -8,7 +8,7 @@
 ROUTER_DIR := skill-router-cli
 
 .PHONY: help build vet test baseline schema eval eval-check eval-baseline \
-        registry-check registry-write parity dist release-dry install-local
+        registry-check registry-write dist release-dry install-local
 
 help: ## Show available targets
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -43,16 +43,13 @@ eval-check: ## Routing metrics gate — fail if metrics regress vs the committed
 eval-baseline: ## Re-record the routing-eval baseline snapshot (only after an INTENDED change)
 	python3 tests/routing-eval/run_eval.py --baseline
 
-# --- Phase 0 (cont.) — Go owns the build; Node retired behind the parity gate ---
+# --- Registry: Go is the sole owner of the build (Node generator removed) ---
 
 registry-check: ## Verify registry artifacts via the Go owner (skill-router registry build --check)
 	cd $(ROUTER_DIR) && go run . registry build --check
 
 registry-write: ## Regenerate the registry artifacts with the Go owner
 	cd $(ROUTER_DIR) && go run . registry build --write
-
-parity: ## Cut-over gate: prove Go registry build is byte-identical to the Node generator
-	bash scripts/registry/parity-check.sh
 
 # --- Phase 5 (cont.) — binary distribution / packaging ---
 

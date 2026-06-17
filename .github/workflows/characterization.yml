@@ -91,25 +91,20 @@ jobs:
           (cd "$MOD_DIR" && GOFLAGS=-mod=readonly go build -o "$GITHUB_WORKSPACE/skill-router" .)
           echo "SKILL_ROUTER_BIN=$GITHUB_WORKSPACE/skill-router" >> "$GITHUB_ENV"
 
-      - name: Registry artifacts match single source (Go — AUTHORITATIVE)
-        # Cut-over Stage 3 (docs/MIGRATION_NODE_TO_GO.md §5): the Go generator is
-        # now the BLOCKING drift gate. Byte-checks all 4 registries (manifest.json,
-        # marketplace.json, .agents/plugins/marketplace.json, docs/build_manifest.json)
-        # against the single source of truth; exits 1 on drift.
+      - name: Registry artifacts match single source (Go — sole gate)
+        # The Go generator is the SOLE registry build + drift gate. The Node
+        # generator and its byte-parity oracle were removed at Stage 5 of the
+        # cut-over (docs/MIGRATION_NODE_TO_GO.md §5). Byte-checks all 4 registries
+        # (manifest.json, marketplace.json, .agents/plugins/marketplace.json,
+        # docs/build_manifest.json) against the single source of truth; exits 1 on drift.
         run: |
           "$SKILL_ROUTER_BIN" registry build --check
 
-      - name: Registry artifacts match single source (Node — oracle, non-blocking)
-        # Stage 4: the Node generator is retained as an independent parity oracle.
-        # It still runs (so Go-vs-Node drift is visible) but no longer blocks; it is
-        # removed entirely at Stage 5 after one clean release. If it ever disagrees
-        # with Go, the byte-parity oracle in registry-parity.yml turns RED.
-        continue-on-error: true
-        run: node scripts/registry/generate-registry.mjs --check --optimize
-
-      - name: Registry generator unit tests (Node oracle — non-blocking)
-        continue-on-error: true
-        run: node --test scripts/registry/lib/frontmatter.test.mjs scripts/registry/generate-registry.test.mjs
+      - name: Frontmatter parser unit tests
+        # lib/frontmatter.mjs is shared with validate-schema.mjs (both kept). Its
+        # test stays a hard gate even though the Node generator that also used it
+        # is gone.
+        run: node --test scripts/registry/lib/frontmatter.test.mjs
 
       - name: SKILL.md frontmatter schema (warn — Phase 0 backfill tracker)
         # Phase 0 (§3.2/§9.1): validate every SKILL.md against schemas/skill.schema.json.

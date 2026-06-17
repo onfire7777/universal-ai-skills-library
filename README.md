@@ -305,7 +305,7 @@ Behavioural, registry, and secret-scan gates (run in CI; runnable locally):
 python3 -m unittest discover -s tests/characterization -p 'test_*.py'
 
 # registry single-source drift guard (every artifact matches skills/)
-node scripts/registry/generate-registry.mjs --check --optimize
+skill-router registry build --check   # or: cd skill-router-cli && go run . registry build --check
 
 # secret scan (uses the .gitleaks.toml allowlist of known doc examples)
 gitleaks detect --no-git --config .gitleaks.toml
