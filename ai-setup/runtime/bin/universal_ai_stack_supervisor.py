@@ -13,41 +13,22 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+# Shared runtime helpers live beside this script in runtime/bin (a plain scripts
+# directory, not a package). Make that directory importable before importing them
+# so resolution does not depend on the working directory or interpreter flags.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _universal_ai_common import (  # noqa: E402  (path bootstrap must precede import)
+    CONFIG_DIR,
+    ROOT,
+    SECRETS_ENV,
+    load_env,
+    load_json,
+    setup_logging,
+)
+
 
 CREATE_NO_WINDOW = 0x08000000 if os.name == "nt" else 0
-ROOT = Path(os.environ.get("UNIVERSAL_AI_STACK_HOME", Path(__file__).resolve().parents[1]))
-CONFIG_DIR = ROOT / "config"
-LOG_DIR = ROOT / "logs"
 STATE_DIR = ROOT / "state"
-SECRETS_ENV = ROOT / "secrets" / ".env"
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def load_env(path: Path) -> dict[str, str]:
-    env = dict(os.environ)
-    env["UNIVERSAL_AI_STACK_HOME"] = str(ROOT)
-    if path.exists():
-        for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
-            line = raw.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, value = line.split("=", 1)
-            if key.strip():
-                env[key.strip()] = value.strip().strip('"')
-    return env
-
-
-def setup_logging() -> None:
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        filename=str(LOG_DIR / "supervisor.log"),
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
 
 
 def healthy(url: str, timeout: float = 8.0) -> bool:
@@ -118,7 +99,9 @@ def write_state(results: list[dict[str, Any]]) -> None:
 
 def check_once() -> list[dict[str, Any]]:
     integrations = load_json(CONFIG_DIR / "integrations.json")
-    env = load_env(SECRETS_ENV)
+    # Supervisor semantics: inject the stack home and let the dotenv file override
+    # the process environment so spawned services see the configured values.
+    env = load_env(SECRETS_ENV, inject_home=True, override=True)
     results: list[dict[str, Any]] = []
     for service in integrations.get("services", []):
         health_url = service.get("healthUrl")
@@ -133,7 +116,7 @@ def check_once() -> list[dict[str, Any]]:
 
 
 def main() -> int:
-    setup_logging()
+    setup_logging("supervisor.log")
     policy = load_json(CONFIG_DIR / "routing-policy.json")
     interval = int(policy.get("supervisor", {}).get("checkIntervalSeconds", 600))
     once = "--once" in sys.argv

@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import sys
 import threading
 import time
@@ -15,46 +14,23 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
-
-ROOT = Path(os.environ.get("UNIVERSAL_AI_STACK_HOME", Path(__file__).resolve().parents[1]))
-CONFIG_DIR = ROOT / "config"
-LOG_DIR = ROOT / "logs"
-SECRETS_ENV = ROOT / "secrets" / ".env"
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def load_env(path: Path) -> dict[str, str]:
-    env = dict(os.environ)
-    if not path.exists():
-        return env
-    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"')
-        if key and key not in env:
-            env[key] = value
-    return env
+# Shared runtime helpers live beside this script in runtime/bin (a plain scripts
+# directory, not a package). Make that directory importable before importing them
+# so resolution does not depend on the working directory or interpreter flags.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _universal_ai_common import (  # noqa: E402  (path bootstrap must precede import)
+    CONFIG_DIR,
+    SECRETS_ENV,
+    load_env,
+    load_json,
+    setup_logging,
+)
 
 
-def setup_logging() -> None:
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        filename=str(LOG_DIR / "router.log"),
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
-
-
-setup_logging()
+setup_logging("router.log")
 REGISTRY = load_json(CONFIG_DIR / "model-registry.json")
 POLICY = load_json(CONFIG_DIR / "routing-policy.json")
+# Router semantics: the process environment takes precedence over the dotenv file.
 ENV = load_env(SECRETS_ENV)
 CIRCUIT_LOCK = threading.Lock()
 CIRCUIT_STATE: dict[str, dict[str, Any]] = {}
