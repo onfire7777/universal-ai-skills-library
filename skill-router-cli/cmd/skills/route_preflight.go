@@ -88,6 +88,10 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 	sortRouteCandidates(candidates)
 	sortRouteCandidates(rawCandidates)
 
+	// Phase 1 hybrid semantic recall. A no-op (identity) unless semantic routing
+	// is explicitly enabled; the exact name/alias guardrail is enforced inside.
+	candidates = applySemanticRouting(candidates, prompt)
+
 	preflight := routePreflight{
 		Prompt:     prompt,
 		HookEvent:  strings.TrimSpace(opts.hookEvent),
