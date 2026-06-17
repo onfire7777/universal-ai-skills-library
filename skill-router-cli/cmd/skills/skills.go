@@ -26,6 +26,10 @@ type manifestSkill struct {
 	Aliases     []string `json:"aliases,omitempty"`
 	HasScripts  bool     `json:"has_scripts,omitempty"`
 	Scripts     []string `json:"scripts,omitempty"`
+	// Capabilities is the typed capability list from the enriched frontmatter
+	// (§3.2). Additive and optional: absent on the un-backfilled corpus, in which
+	// case composition falls back to deterministic per-step capability inference.
+	Capabilities []string `json:"capabilities,omitempty"`
 }
 
 type skillManifest struct {
@@ -260,11 +264,36 @@ error for generic prompts.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
+		if compose, _ := cmd.Flags().GetBool("compose"); compose {
+			jsonOut, _ := cmd.Flags().GetBool("json")
+			return runCompose(prompt, composeOptionsFromCommand(cmd), jsonOut)
+		}
 		opts, err := routeOptionsFromCommand(cmd, false)
 		if err != nil {
 			return err
 		}
 		return routePromptWithOptions(prompt, opts)
+	},
+}
+
+// ComposeCmd plans a capability-typed DAG for a multi-step prompt. It is the CLI
+// backing for the Phase 4 MCP `compose` tool: deterministic, offline, context-light.
+var ComposeCmd = &cobra.Command{
+	Use:   "compose <prompt>",
+	Short: "Plan a capability-typed skill DAG for a multi-step prompt",
+	Long: `Decompose a multi-step prompt ("scrape -> summarize -> post") into an ordered,
+capability-typed DAG of skills.
+
+Composition is deterministic (same prompt + manifest => same DAG), offline, and
+context-light: each step lists the routed skill and a one-line load command rather
+than the skill body. Bodies load lazily, only with --load, and only within the
+--budget token ceiling. Third-party external skills stay pointer-only unless
+--allow-external is set.`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		prompt := strings.Join(args, " ")
+		jsonOut, _ := cmd.Flags().GetBool("json")
+		return runCompose(prompt, composeOptionsFromCommand(cmd), jsonOut)
 	},
 }
 
@@ -438,6 +467,11 @@ func init() {
 	searchCmd.Flags().Int("limit", 25, "Maximum search results to print, capped at 100")
 	sourcesCmd.Flags().Bool("refresh", false, "Refresh local external skill index after scanning sources")
 	RouteCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
+	RouteCmd.Flags().Bool("compose", false, "Plan a multi-step capability DAG instead of loading a single skill")
+	RouteCmd.Flags().Bool("json", false, "Print structured JSON (composition output)")
+	registerComposeFlags(RouteCmd)
+	registerComposeFlags(ComposeCmd)
+	ComposeCmd.Flags().Bool("json", false, "Print the capability DAG as structured JSON")
 	AutoCmd.Flags().Bool("explain", false, "Print route scoring diagnostics before loading the selected skill")
 	AutoCmd.Flags().String("hook-event", "", "Hook event name; automatic loading no-ops unless this is UserPromptSubmit")
 	PreflightCmd.Flags().Bool("explain", false, "Print route scoring diagnostics")
@@ -456,6 +490,7 @@ func init() {
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(searchCmd)
 	Cmd.AddCommand(RouteCmd)
+	Cmd.AddCommand(ComposeCmd)
 	Cmd.AddCommand(AutoCmd)
 	Cmd.AddCommand(PreflightCmd)
 	Cmd.AddCommand(sourcesCmd)
@@ -705,6 +740,27 @@ func routeOptionsFromCommand(cmd *cobra.Command, optional bool) (routeOptions, e
 		opts.enforceHookEvent = strings.TrimSpace(hookEvent) != ""
 	}
 	return opts, nil
+}
+
+func registerComposeFlags(cmd *cobra.Command) {
+	def := defaultComposeOptions()
+	cmd.Flags().Int("max-steps", def.maxSteps, "Maximum pipeline length (context-budget guardrail)")
+	cmd.Flags().Int("budget", def.budgetTokens, "Estimated token budget for lazily inlined bodies")
+	cmd.Flags().Bool("load", false, "Inline skill bodies within the token budget (default: pointers only)")
+	cmd.Flags().Bool("allow-external", false, "Allow composing third-party external skill bodies")
+}
+
+func composeOptionsFromCommand(cmd *cobra.Command) composeOptions {
+	opts := defaultComposeOptions()
+	if v, err := cmd.Flags().GetInt("max-steps"); err == nil && cmd.Flags().Changed("max-steps") {
+		opts.maxSteps = v
+	}
+	if v, err := cmd.Flags().GetInt("budget"); err == nil && cmd.Flags().Changed("budget") {
+		opts.budgetTokens = v
+	}
+	opts.load, _ = cmd.Flags().GetBool("load")
+	opts.allowExternal, _ = cmd.Flags().GetBool("allow-external")
+	return opts
 }
 
 func isMetaRoutingSkill(name string) bool {
