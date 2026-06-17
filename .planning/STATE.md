@@ -1,12 +1,12 @@
 ---
 gsd_state_version: '1.0'
-status: planning
+status: complete
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 3
   total_plans: 0
   completed_plans: 0
-  percent: 0
+  percent: 100
 ---
 
 # Project State
@@ -16,16 +16,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** Make the lexical skill router measurable and self-improving — locally, with eval metrics gating every change.
-**Current focus:** Phase 3 — Re-ranker Training Pipeline
+**Current focus:** Milestone complete — all 3 phases done
 
 ## Current Position
 
-Phase: 3 of 3 (Re-ranker Training Pipeline)
+Phase: 3 of 3 (COMPLETE)
 Plan: 0 of TBD in current phase
-Status: Executing final sub-phase
-Last activity: 2026-06-17 — Phase 3.2 eval harness + gate shipped & verified (545445a)
+Status: All phases complete — ready for milestone audit
+Last activity: 2026-06-17 — Phase 3.3 re-ranker shipped & verified (46dc55a); milestone code-complete
 
-Progress: [███████░░░] 66% (3.1 telemetry + 3.2 eval complete; engine complete)
+Progress: [██████████] 100% (engine + 3.1 telemetry + 3.2 eval + 3.3 reranker complete)
 
 ## Performance Metrics
 

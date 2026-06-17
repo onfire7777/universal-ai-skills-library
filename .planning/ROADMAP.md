@@ -6,7 +6,7 @@ Build a measurable improvement loop on top of the Phase 2 lexical routing servic
 
 ## Milestones
 
-- 🚧 **v1.0 Routing Feedback Loop** - Phases 1-3 (in progress)
+- ✅ **v1.0 Routing Feedback Loop** - Phases 1-3 (all phases complete 2026-06-17)
 
 ## Phases
 
@@ -16,7 +16,7 @@ Build a measurable improvement loop on top of the Phase 2 lexical routing servic
 
 - [x] **Phase 1: Telemetry & Feedback Capture** - Opt-in, local-only JSONL capture of route decisions plus a feedback/promote path into the labeled set
 - [x] **Phase 2: Eval Harness & Gate** - Score routing on P@1/MRR/Recall@5 over a golden dataset; gate on absolute floors + no-regression; CLI report
-- [ ] **Phase 3: Re-ranker Training Pipeline** - Pure-Go linear re-ranker over lexical features, eval-gated, hybrid and off by default
+- [x] **Phase 3: Re-ranker Training Pipeline** - Pure-Go linear re-ranker over lexical features, eval-gated, hybrid and off by default
 
 ## Phase Details
 
@@ -64,7 +64,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 03-01: TBD (set during planning)
+- [x] 03-01: internal/reranker + engine hook + skills reranker (train/eval/enable/disable/status), eval-gated promotion
 
 ## Progress
 
@@ -75,4 +75,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Telemetry & Feedback Capture | 2/2 | Complete | 2026-06-17 |
 | 2. Eval Harness & Gate | 1/1 | Complete | 2026-06-17 |
-| 3. Re-ranker Training Pipeline | 0/1 | Not started | - |
+| 3. Re-ranker Training Pipeline | 1/1 | Complete | 2026-06-17 |
