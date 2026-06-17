@@ -41,6 +41,14 @@ Out of scope: any non-linear/embedding model; any network. Training uses Phase 1
 - **Eval reuse:** Phase 2's `internal/eval` exposes the scoring/metric entry point; `reranker train`/`eval` call it twice (baseline vs candidate model).
 - **Config:** add `reranker.enabled` in `cmd/config/config.go` following Phase 1's `telemetry.enabled` pattern. Model path under `platform.ConfigDir()` plus committed default in `testdata/reranker/`.
 - **Command registration:** add `RerankerCmd` to the `skills` group in `cmd/skills/skills.go` `init()`.
+
+### REBASE 2026-06-17 — engine seam (Phase 2 landed; drive the EXISTING reranker hook)
+The route core is now `internal/skillservice`, and it ALREADY contains the reranker seam. Do NOT introduce a second, parallel rerank path (master plan §"reranker_used ↔ semantic layer").
+- **Existing hook:** `internal/skillservice/route_semantic.go` → `routeReranker interface { rerank(prompt string, scored []fusedCandidate) []fusedCandidate }`, default `identityReranker{}`, plus `extractRerankFeatures([]fusedCandidate) []rerankFeatures` and `fusedCandidate` (carries lexical score + evidence). The learned model must implement/inform this single hook.
+- **Feature source:** reuse `extractRerankFeatures` and the `routeEvidence` carried inside the engine. If the lexical (non-semantic) main pipeline needs the same hook, generalize the ONE rerank point (post-sort/pre-choose in `buildRoutePreflight`/`Route`) rather than adding a new one. `Rerank` reorders top-N only (default 10); exact name/alias wins stay pinned (`isGuardrailPinned`).
+- **Gating:** used only when `reranker.enabled=true` (config, alongside `telemetry.enabled`) AND a `model.json` loads; missing/invalid model ⇒ identity/lexical fallback (engine default). Set the Phase 3.1 `reranker_used` telemetry flag from this same hook.
+- **Eval-gated promotion:** `skills reranker train` calls the Phase 3.2 `internal/eval` entry twice (with vs without the candidate model) and refuses to promote unless it beats baseline.
+- **Persistence:** committed default `cmd/skills/testdata/reranker/model.json`; user models under `platform.ConfigDir()`. `internal/reranker` imports `internal/skillservice` (features/types) + `internal/eval` (gating); `skills reranker` cobra command is a thin wrapper in `cmd/skills`.
 </code_context>
 
 <specifics>

@@ -13,3 +13,9 @@ func TestDeprecationNoticeMentionsCLI(t *testing.T) {
 		}
 	}
 }
+
+func TestDeprecationNoticePointsToMigrationDoc(t *testing.T) {
+	if !strings.Contains(DeprecationNotice(), "ADAPTER_DEPRECATION.md") {
+		t.Errorf("notice should reference the migration doc: %s", DeprecationNotice())
+	}
+}

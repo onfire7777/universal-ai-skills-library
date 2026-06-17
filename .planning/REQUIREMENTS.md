@@ -1,0 +1,20 @@
+# Requirements: Skill-Router Phase 3 Feedback Loop
+
+Authoritative design spec: `docs/superpowers/specs/2026-06-17-phase-3-feedback-loop-design.md`.
+
+| ID | Requirement | Phase |
+|----|-------------|-------|
+| REQ-01 | Telemetry is opt-in and local-only; disabled by default; no network imports anywhere in the feature; write failures never break routing. | 1 |
+| REQ-02 | Route decisions log to local JSONL when enabled; a `feedback` command labels a decision (`--correct`/`--accept`/`--reject`); `promote` folds labels into the golden eval set. | 1 |
+| REQ-03 | Eval harness computes P@1, MRR, and Recall@5 over a labeled golden dataset, deterministically against the pinned manifest fixture. | 2 |
+| REQ-04 | Eval gate fails (non-zero exit) on absolute-floor breach OR regression vs the stored baseline; supports `--update-baseline`. | 2 |
+| REQ-05 | Pure-Go deterministic re-ranker training over `routeEvidence` features; emits `model.json`; refuses below a minimum example count. | 3 |
+| REQ-06 | Re-ranker integrates as a gated hybrid top-N reorder, off by default, with silent fallback; promotion is eval-gated. | 3 |
+| REQ-07 | CLI metrics report: human table, `--json`, and `--explain`; plus `skills reranker status`. | 2 |
+
+## Constraints (apply to every requirement)
+
+- No remote LLM or data exfiltration; everything runs on-device.
+- No new Go module dependencies (stdlib + existing cobra/color only).
+- Default routing behavior must be unchanged when telemetry and the re-ranker are disabled.
+- New CLI commands nest under the existing `skills` group.

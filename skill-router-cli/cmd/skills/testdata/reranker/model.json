@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "features": [
+    "exact_name",
+    "exact_alias",
+    "exact_source",
+    "name_strong_hits",
+    "name_weak_hits",
+    "alias_strong_hits",
+    "alias_weak_hits",
+    "desc_strong_hits",
+    "desc_weak_hits",
+    "desc_phrase_hit",
+    "embedded_name_phrase_hit",
+    "embedded_alias_phrase_hit",
+    "normalized_lex_score",
+    "is_meta",
+    "is_external",
+    "source_boost",
+    "unmatched_name_penalty",
+    "prompt_strong_token_count"
+  ],
+  "weights": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "bias": 0,
+  "trained_at": "2026-06-17T00:00:00Z",
+  "n_examples": 0,
+  "metrics": {
+    "p_at_1": 1,
+    "mrr": 1,
+    "recall_at_5": 1
+  }
+}

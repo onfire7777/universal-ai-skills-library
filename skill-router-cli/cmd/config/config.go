@@ -15,14 +15,32 @@ import (
 
 // Config represents the Universal AI Skills Router configuration.
 type Config struct {
-	SkillsDir        string   `json:"skills_dir"`
-	RepoDir          string   `json:"repo_dir"`
-	MCPDir           string   `json:"mcp_dir"`
-	AgentRoots       []string `json:"agent_roots"`
-	OpenRouterAPIKey string   `json:"openrouter_api_key,omitempty"`
-	ManusAPIKey      string   `json:"manus_api_key,omitempty"`
-	MCPProxyVersion  string   `json:"mcp_proxy_version"`
-	AutoUpdate       bool     `json:"auto_update"`
+	SkillsDir        string          `json:"skills_dir"`
+	RepoDir          string          `json:"repo_dir"`
+	MCPDir           string          `json:"mcp_dir"`
+	AgentRoots       []string        `json:"agent_roots"`
+	OpenRouterAPIKey string          `json:"openrouter_api_key,omitempty"`
+	ManusAPIKey      string          `json:"manus_api_key,omitempty"`
+	MCPProxyVersion  string          `json:"mcp_proxy_version"`
+	AutoUpdate       bool            `json:"auto_update"`
+	Telemetry        TelemetryConfig `json:"telemetry"`
+	Reranker         RerankerConfig  `json:"reranker"`
+}
+
+// TelemetryConfig holds opt-in routing-telemetry settings. It is read directly
+// (nested "telemetry":{"enabled":...}) by internal/telemetry.Enabled via
+// platform.ConfigNestedBool, so the engine never imports this command package.
+type TelemetryConfig struct {
+	Enabled bool `json:"enabled"`
+}
+
+// RerankerConfig holds the opt-in learned-re-ranker flag. It mirrors the
+// telemetry nested pattern and is read directly (nested
+// "reranker":{"enabled":...}) by the engine via platform.ConfigNestedBool, so the
+// engine never imports this command package. Off by default: when false (or a
+// model fails to load) routing is byte-for-byte unchanged.
+type RerankerConfig struct {
+	Enabled bool `json:"enabled"`
 }
 
 // Cmd is the top-level config command group.
@@ -47,6 +65,8 @@ var showCmd = &cobra.Command{
 		fmt.Printf("  MCP Directory:       %s\n", cfg.MCPDir)
 		fmt.Printf("  MCP Proxy Version:   %s\n", cfg.MCPProxyVersion)
 		fmt.Printf("  Auto-Update:         %v\n", cfg.AutoUpdate)
+		fmt.Printf("  Telemetry:           %v\n", cfg.Telemetry.Enabled)
+		fmt.Printf("  Reranker:            %v\n", cfg.Reranker.Enabled)
 		fmt.Printf("  Platform:            %s/%s\n", runtime.GOOS, runtime.GOARCH)
 		fmt.Println()
 		bold.Println("Agent Roots:")
@@ -100,8 +120,12 @@ var setCmd = &cobra.Command{
 			cfg.ManusAPIKey = value
 		case "auto_update":
 			cfg.AutoUpdate = value == "true"
+		case "telemetry.enabled":
+			cfg.Telemetry.Enabled = value == "true"
+		case "reranker.enabled":
+			cfg.Reranker.Enabled = value == "true"
 		default:
-			return fmt.Errorf("unknown config key: %s\nValid keys: skills_dir, repo_dir, mcp_dir, mcp_proxy_version, openrouter_api_key, manus_api_key, auto_update", key)
+			return fmt.Errorf("unknown config key: %s\nValid keys: skills_dir, repo_dir, mcp_dir, mcp_proxy_version, openrouter_api_key, manus_api_key, auto_update, telemetry.enabled, reranker.enabled", key)
 		}
 		return saveConfig(cfg)
 	},
@@ -137,6 +161,38 @@ func init() {
 
 func configPath() string {
 	return filepath.Join(platform.ConfigDir(), "config.json")
+}
+
+// SetTelemetryEnabled persists the telemetry opt-in flag, loading the current
+// config (or defaults), flipping telemetry.enabled, and saving. It is the
+// shared writer behind `skills telemetry enable`/`disable`, so those CLI
+// wrappers do not have to hand-edit config.json.
+func SetTelemetryEnabled(enabled bool) error {
+	cfg := loadOrDefault()
+	cfg.Telemetry.Enabled = enabled
+	return saveConfig(cfg)
+}
+
+// TelemetryEnabled reports the persisted config flag (env override is applied by
+// internal/telemetry.Enabled, which is the authoritative gate).
+func TelemetryEnabled() bool {
+	return loadOrDefault().Telemetry.Enabled
+}
+
+// SetRerankerEnabled persists the learned-re-ranker opt-in flag. It is the shared
+// writer behind `skills reranker enable`/`disable`, mirroring SetTelemetryEnabled
+// so those wrappers do not hand-edit config.json.
+func SetRerankerEnabled(enabled bool) error {
+	cfg := loadOrDefault()
+	cfg.Reranker.Enabled = enabled
+	return saveConfig(cfg)
+}
+
+// RerankerEnabled reports the persisted reranker config flag (the env override
+// SKILL_ROUTER_RERANKER=1 is applied by the engine's gate, which is
+// authoritative).
+func RerankerEnabled() bool {
+	return loadOrDefault().Reranker.Enabled
 }
 
 func defaultConfig() *Config {

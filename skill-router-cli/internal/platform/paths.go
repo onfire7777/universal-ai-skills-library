@@ -67,6 +67,14 @@ func ToolsDir() string {
 	return filepath.Join(HomeDir(), ".skill-router", "tools")
 }
 
+// TelemetryDir returns the opt-in routing-telemetry directory
+// (ConfigDir()/telemetry). It holds decisions.jsonl and feedback.jsonl. The
+// directory is created lazily by the telemetry package on first write; this
+// helper only resolves the path and never touches the filesystem.
+func TelemetryDir() string {
+	return filepath.Join(ConfigDir(), "telemetry")
+}
+
 // RepoDir returns the skills library repo directory.
 // Checks multiple standard locations.
 func RepoDir() string {
@@ -156,6 +164,40 @@ func configString(key string) string {
 		return value
 	}
 	return ""
+}
+
+// ConfigNestedBool reads a boolean from a nested object in config.json, e.g.
+// ConfigNestedBool("telemetry", "enabled") reads {"telemetry":{"enabled":true}}.
+// It returns (value, true) when the path resolves to a valid bool, otherwise
+// (false, false). It reads the raw JSON directly — like configString — so
+// low-level packages (e.g. internal/telemetry) can consult config without
+// importing the cmd/config command package and risking an import cycle.
+func ConfigNestedBool(parent, key string) (bool, bool) {
+	data, err := os.ReadFile(filepath.Join(ConfigDir(), "config.json"))
+	if err != nil {
+		return false, false
+	}
+	var raw map[string]json.RawMessage
+	if json.Unmarshal(data, &raw) != nil {
+		return false, false
+	}
+	parentField, ok := raw[parent]
+	if !ok {
+		return false, false
+	}
+	var nested map[string]json.RawMessage
+	if json.Unmarshal(parentField, &nested) != nil {
+		return false, false
+	}
+	field, ok := nested[key]
+	if !ok {
+		return false, false
+	}
+	var value bool
+	if json.Unmarshal(field, &value) != nil {
+		return false, false
+	}
+	return value, true
 }
 
 // PrintingPressDir returns the printing-press output directory.

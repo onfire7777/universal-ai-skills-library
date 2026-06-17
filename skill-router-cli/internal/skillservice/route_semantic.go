@@ -8,18 +8,20 @@ import (
 	"strings"
 )
 
-// SemanticEmbeddingDims is the width of the built-in offline embedder. A
+// semanticEmbeddingDims is the width of the built-in offline embedder. A
 // precomputed vector store must be generated with the same width so the prompt
 // vector and the stored skill vectors are comparable.
-const SemanticEmbeddingDims = 256
+const semanticEmbeddingDims = 256
 
-// semanticEmbeddingDims is the engine-internal alias for SemanticEmbeddingDims.
-const semanticEmbeddingDims = SemanticEmbeddingDims
+// DefaultEmbeddingDims is the public width of the built-in offline embedder,
+// exposed so the CLI vectors command can default its --dims flag to the same
+// value the runtime engine uses.
+const DefaultEmbeddingDims = semanticEmbeddingDims
 
 // Phase 1 semantic routing layer.
 //
 // This file adds an OPTIONAL semantic-recall stage on top of the deterministic
-// lexical scorer in scorer.go. It is strictly additive: when no embedder
+// lexical scorer in route_scorer.go. It is strictly additive: when no embedder
 // is configured (the default), the engine is disabled and routing falls back to
 // the exact lexical behavior the rest of the package already implements.
 //
@@ -268,7 +270,7 @@ func marshalSemanticVectorStore(store semanticVectorStore) ([]byte, error) {
 // via Reciprocal Rank Fusion, applies the re-ranker, then enforces the exact-win
 // guardrail. It only re-orders candidates — it never mutates their lexical scores
 // or the confidence/ambiguity thresholds — so the downstream decision logic in
-// preflight.go is unchanged.
+// route_preflight.go is unchanged.
 type semanticRouteEngine struct {
 	embedder routeEmbedder
 	store    semanticVectorStore
@@ -414,8 +416,20 @@ func newDefaultSemanticRouteEngine() *semanticRouteEngine {
 }
 
 // applySemanticRouting re-orders candidates with the default engine. It is a
-// no-op (identity) whenever semantic routing is not enabled.
-func applySemanticRouting(candidates []routeCandidate, prompt string) []routeCandidate {
+// no-op (identity) whenever semantic routing is not enabled. When a learned
+// re-ranker model is supplied AND semantic routing is enabled, the SAME model is
+// installed into the engine's single routeReranker slot so the semantic path and
+// the lexical path share one rerank implementation (no parallel path). A nil
+// model leaves the default identityReranker in place.
+func applySemanticRouting(candidates []routeCandidate, prompt string, model *RerankModel) []routeCandidate {
+	if !defaultSemanticEngine.enabled() {
+		return defaultSemanticEngine.fuse(prompt, candidates)
+	}
+	prev := defaultSemanticEngine.reranker
+	if model.valid() {
+		defaultSemanticEngine.reranker = learnedReranker{model: model}
+		defer func() { defaultSemanticEngine.reranker = prev }()
+	}
 	return defaultSemanticEngine.fuse(prompt, candidates)
 }
 
@@ -423,7 +437,7 @@ func applySemanticRouting(candidates []routeCandidate, prompt string) []routeCan
 // + library + external overlay) as bare candidates carrying name and description,
 // which is all the embedder needs.
 func collectSemanticCorpus() ([]routeCandidate, error) {
-	manifest, err := LoadManifest()
+	manifest, err := loadManifest()
 	if err != nil {
 		return nil, err
 	}
@@ -431,7 +445,7 @@ func collectSemanticCorpus() ([]routeCandidate, error) {
 	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
 		candidates = append(candidates, routeCandidate{name: s.Name, description: s.Description})
 	}
-	external, err := FindExternalSkills(CanonicalSkillKeys(manifest), false)
+	external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
 	if err != nil {
 		return nil, err
 	}
@@ -439,22 +453,4 @@ func collectSemanticCorpus() ([]routeCandidate, error) {
 		candidates = append(candidates, routeCandidate{name: s.Name, description: s.Description, sourceID: s.SourceID, external: true})
 	}
 	return candidates, nil
-}
-
-// BuildVectorStore embeds every routable skill (manifest core + library +
-// external overlay) with the built-in offline embedder, quantizes each vector to
-// int8, and returns the serialized JSON store plus the number of skills covered.
-// It contacts no network and loads no model weights, so it backs the CLI's
-// `skills vectors` command as a thin shim over the engine.
-func BuildVectorStore(dims int) ([]byte, int, error) {
-	corpus, err := collectSemanticCorpus()
-	if err != nil {
-		return nil, 0, err
-	}
-	store := buildSemanticVectorStore(corpus, newHashingEmbedder(dims))
-	data, err := marshalSemanticVectorStore(store)
-	if err != nil {
-		return nil, 0, err
-	}
-	return data, len(store), nil
 }

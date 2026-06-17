@@ -267,7 +267,7 @@ func TestDisabledEngineFallsBackToLexicalOrder(t *testing.T) {
 
 func TestDefaultSemanticRoutingIsNoOpWithoutOptIn(t *testing.T) {
 	in := []routeCandidate{semCand("a-skill", 70, false), semCand("b-skill", 60, false)}
-	out := applySemanticRouting(in, "anything")
+	out := applySemanticRouting(in, "anything", nil)
 	got := names(out)
 	if got[0] != "a-skill" || got[1] != "b-skill" {
 		t.Fatalf("default routing must be a no-op unless explicitly enabled, got %v", got)

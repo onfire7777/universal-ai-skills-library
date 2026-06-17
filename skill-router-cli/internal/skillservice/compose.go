@@ -5,19 +5,24 @@ import (
 	"strings"
 )
 
-// ComposeRequest configures a Compose call.
+// ComposeRequest is the request shape for Compose. When Skills is set, routing
+// is skipped and exactly those skills are loaded in order; otherwise Prompt is
+// routed and the top matches above MinScore are assembled. Full toggles the
+// concatenated SKILL.md bundle.
 type ComposeRequest struct {
-	Prompt   string   // natural-language task; used for routing when Skills is empty
+	Prompt   string   // natural-language task
 	Skills   []string // explicit names; if set, skips routing
-	Top      int      // max skills to include (default 5)
-	MinScore int      // minimum route score to include (default 75)
-	Full     bool     // include concatenated bodies as Bundle
+	Top      int      // default 5
+	MinScore int      // default 75
+	Full     bool     // include concatenated bodies
 }
 
-// ComposeResult is the assembled working set returned by Compose.
+// ComposeResult is the typed output of Compose. Skills is the ordered, deduped
+// working set with per-skill token estimates; Bundle is populated only in Full
+// mode.
 type ComposeResult struct {
 	Prompt        string     `json:"prompt,omitempty"`
-	Skills        []SkillRef `json:"skills"`               // ordered, deduped
+	Skills        []SkillRef `json:"skills"` // ordered, deduped
 	TotalTokenEst int        `json:"totalTokenEst"`
 	Bundle        string     `json:"bundle,omitempty"` // only when Full
 }
@@ -28,9 +33,13 @@ func EstimateTokens(s string) int {
 	return words*4/3 + 1
 }
 
-// Compose assembles a working set of skills for a task. When req.Skills is set
-// the listed skills are loaded directly, skipping routing. Otherwise Route is
-// called and the top-scoring results above the threshold are returned.
+// Compose assembles a working set of skills for a task. In plan mode (default)
+// it returns ordered, deduped references with token estimates; in Full mode it
+// also returns a single concatenated bundle of the SKILL.md bodies. When
+// req.Skills is supplied, routing is skipped and those skills are loaded
+// directly; otherwise the prompt is routed through the shared Route pipeline
+// (semantic layer + guardrail preserved) and the top matches above MinScore are
+// selected.
 func Compose(req ComposeRequest) (ComposeResult, error) {
 	top := req.Top
 	if top <= 0 {
@@ -51,8 +60,6 @@ func Compose(req ComposeRequest) (ComposeResult, error) {
 			refs = append(refs, ld.Ref)
 		}
 	} else {
-		// Route records minScore as Threshold but does not filter Matches by it;
-		// the loop below is the real threshold gate.
 		rr, err := Route(req.Prompt, RouteOptions{MinScore: minScore})
 		if err != nil {
 			return ComposeResult{}, err
@@ -77,6 +84,8 @@ func Compose(req ComposeRequest) (ComposeResult, error) {
 		if err != nil {
 			return ComposeResult{}, fmt.Errorf("compose load %s: %w", r.Name, err)
 		}
+		// D4: preserve route score then replace ref with canonical Load() data
+		// so Path/Source/Description are populated from the actual SKILL.md.
 		score := r.Score
 		r = ld.Ref            // canonical Name/Path/Source/Description from Load()
 		r.Score = score

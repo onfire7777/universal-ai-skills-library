@@ -1,17 +1,9 @@
-// Package skillservice is the shared skill-routing engine. It carries the
-// route/search/load core that the CLI (cmd/skills) and a future thin MCP server
-// (cmd/serve) both call, so every surface routes through identical logic.
-//
-// The public surface is Route, Search, and Load plus the typed structs below.
-// The deterministic lexical scorer, the hybrid semantic-recall layer, and the
-// preflight decision engine are kept unexported inside this package; later
-// phases (telemetry, reranker) hook the route pipeline here so both the CLI and
-// the MCP surface inherit them automatically.
 package skillservice
 
-// SkillRef is the engine's view of one routable skill. Source maps the skill's
-// origin to a stable label: "core" / "library" for canonical manifest skills,
-// or "ext:<sourceID>" for a skill discovered in a read-only external root.
+// SkillRef is a context-light reference to a single skill. It is the common
+// currency of every engine result: route matches, search hits, and the loaded
+// skill's own reference all share this shape so the CLI and MCP surfaces format
+// one type.
 type SkillRef struct {
 	Name        string `json:"name"`
 	Path        string `json:"path"`
@@ -21,35 +13,35 @@ type SkillRef struct {
 	TokenEst    int    `json:"tokenEst,omitempty"`
 }
 
-// RouteOptions configures a single Route call. A zero value routes the prompt
-// with default thresholds and no hook-event gating.
+// RouteOptions tunes a single Route call. The zero value reproduces the default
+// CLI routing behavior (no hook gating, no explain, default threshold).
 type RouteOptions struct {
 	HookEvent string
 	Explain   bool
 	MinScore  int // 0 => default automaticRouteMinScore (75)
 }
 
-// RouteResult is the full outcome of a route decision. Decision, the ordered
-// Matches slice, and Margin are part of the contract later phases depend on
-// (Phase 3 telemetry/reranker): Matches[0] is the best candidate, Matches[1]
-// the runner-up, and Margin is best.Score - second.Score.
+// RouteResult is the typed output of the route pipeline. Decision/Margin and the
+// ordered top-N Matches are the Phase 3 telemetry/reranker seam: every candidate
+// keeps its routeEvidence reachable inside the engine, and the single
+// post-sort/pre-choose hook lives in the pipeline (see Route).
 type RouteResult struct {
 	Prompt    string     `json:"prompt"`
 	Decision  string     `json:"decision"` // "route" | "no_route" | "ambiguous"
 	Matches   []SkillRef `json:"matches"`  // ordered; Matches[0]=best, [1]=second
 	Selected  *SkillRef  `json:"selected,omitempty"`
-	Margin    int        `json:"margin"` // best.Score - second.Score (0 if no second)
+	Margin    int        `json:"margin"`    // best.Score - second.Score (0 if no second)
 	Threshold int        `json:"threshold"`
 }
 
-// SearchResult is the outcome of a name/description search.
+// SearchResult is the typed output of Search.
 type SearchResult struct {
 	Query   string     `json:"query"`
 	Matches []SkillRef `json:"matches"`
 }
 
-// LoadResult carries a resolved skill reference and the raw SKILL.md body.
+// LoadResult is the typed output of Load. Body is the raw SKILL.md content.
 type LoadResult struct {
 	Ref  SkillRef `json:"ref"`
-	Body string   `json:"body"` // raw SKILL.md
+	Body string   `json:"body"`
 }

@@ -13,6 +13,7 @@ import (
 var composeCmd = &cobra.Command{
 	Use:   "compose <prompt>",
 	Short: "Assemble a working set of skills for a task (plan by default, --full for bodies)",
+	// D7: --skills flag makes the positional prompt optional.
 	Args: func(cmd *cobra.Command, args []string) error {
 		skills, _ := cmd.Flags().GetString("skills")
 		if skills != "" {
@@ -28,10 +29,7 @@ var composeCmd = &cobra.Command{
 		jsonOut, _ := cmd.Flags().GetBool("json")
 
 		req := skillservice.ComposeRequest{
-			Prompt:   strings.Join(args, " "),
-			Top:      top,
-			MinScore: minScore,
-			Full:     full,
+			Prompt: strings.Join(args, " "), Top: top, MinScore: minScore, Full: full,
 		}
 		if skillsFlag != "" {
 			req.Skills = strings.Split(skillsFlag, ",")
@@ -47,6 +45,7 @@ var composeCmd = &cobra.Command{
 			enc.SetIndent("", "  ")
 			return enc.Encode(res)
 		}
+		// D6: --full prints the plan list first, then a blank line, then the bundle.
 		if full {
 			fmt.Fprintf(cmd.OutOrStdout(), "Composed %d skills (~%d tokens):\n", len(res.Skills), res.TotalTokenEst)
 			for i, s := range res.Skills {

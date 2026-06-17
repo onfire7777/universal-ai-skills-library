@@ -7,11 +7,6 @@ import (
 	"unicode"
 )
 
-// AutomaticRouteMinScore is the default confidence threshold a candidate must
-// reach to be auto-routed. Exposed so CLI adapters can report it in messages.
-const AutomaticRouteMinScore = 75
-
-const automaticRouteMinScore = AutomaticRouteMinScore
 const automaticRouteMinMargin = 18
 
 type routeCandidate struct {
@@ -20,7 +15,6 @@ type routeCandidate struct {
 	sourceID    string
 	score       int
 	external    bool
-	core        bool // true for manifest CoreSkills; false for LibrarySkills and external
 	meta        bool
 	evidence    routeEvidence
 }
@@ -59,23 +53,18 @@ type fieldMatch struct {
 	matched    map[string]bool
 }
 
-func manifestRouteCandidate(prompt string, s ManifestSkill) routeCandidate {
-	return manifestRouteCandidateCore(prompt, s, false)
-}
-
-func manifestRouteCandidateCore(prompt string, s ManifestSkill, core bool) routeCandidate {
+func manifestRouteCandidate(prompt string, s manifestSkill) routeCandidate {
 	evidence := scoreRouteFields(prompt, s.Name, s.Aliases, s.Description, "")
 	return routeCandidate{
 		name:        s.Name,
 		description: s.Description,
 		score:       evidenceScore(evidence),
-		core:        core,
 		meta:        isMetaRoutingSkill(s.Name),
 		evidence:    evidence,
 	}
 }
 
-func externalRouteCandidate(prompt string, s ExternalSkill) routeCandidate {
+func externalRouteCandidate(prompt string, s externalSkill) routeCandidate {
 	evidence := scoreRouteFields(prompt, s.Name, nil, s.Description, s.SourceID)
 	candidate := routeCandidate{
 		name:        s.Name,
@@ -88,23 +77,12 @@ func externalRouteCandidate(prompt string, s ExternalSkill) routeCandidate {
 	return applyExplicitExternalSourceBoost(prompt, candidate)
 }
 
-func scoreManifestSkill(prompt string, s ManifestSkill) int {
+func scoreManifestSkill(prompt string, s manifestSkill) int {
 	return manifestRouteCandidate(prompt, s).score
 }
 
-func scoreExternalSkill(prompt string, s ExternalSkill) int {
+func scoreExternalSkill(prompt string, s externalSkill) int {
 	return externalRouteCandidate(prompt, s).score
-}
-
-// ScoreManifestSkill exposes the lexical score for one manifest skill so the CLI
-// search command can rank canonical skills with the engine's scorer.
-func ScoreManifestSkill(prompt string, s ManifestSkill) int {
-	return scoreManifestSkill(prompt, s)
-}
-
-// ScoreExternalSkill exposes the lexical score for one external skill.
-func ScoreExternalSkill(prompt string, s ExternalSkill) int {
-	return scoreExternalSkill(prompt, s)
 }
 
 func isConfidentRoute(score int) bool {

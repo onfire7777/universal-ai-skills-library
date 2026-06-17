@@ -23,7 +23,20 @@ var Cmd = &cobra.Command{
 wrapper skills to conservative default agent roots. This keeps local AI clients
 connected to skill-router without copying the full skill corpus into each root.
 
-Use sync matrix for a read-only compatibility view before changing roots.`,
+Physical-copy adapter propagation is deprecated. Prefer agents calling the
+skill-router CLI directly or connecting the skill-router serve MCP server. See
+docs/ADAPTER_DEPRECATION.md.
+
+Use sync --check (or sync matrix) for a read-only adapter-status view before
+changing roots.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		check, _ := cmd.Flags().GetBool("check")
+		jsonOut, _ := cmd.Flags().GetBool("json")
+		if check {
+			return printAdapterStatus(jsonOut)
+		}
+		return cmd.Help()
+	},
 }
 
 var allCmd = &cobra.Command{
@@ -93,6 +106,7 @@ var installedCmd = &cobra.Command{
 This updates detected local clients without copying the full skill corpus and
 skips workspace/source trees that should not be mutated generically.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		emitDeprecationNotice()
 		roots := installedWrapperRoots()
 		counts, err := skillsync.Propagate(skillsync.SourceDir(), roots, false)
 		for _, root := range roots {
@@ -111,6 +125,7 @@ AGENTS.md instruction file under ~/.paperclip/universal-ai-skills. Paperclip
 company agents should point their instructionsFilePath at that AGENTS.md and
 load full skills through skill-router on demand.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		emitDeprecationNotice()
 		skillsDir := platform.PaperclipSkillsDir()
 		instructionsDir := platform.PaperclipInstructionsDir()
 		instructionsFile := platform.PaperclipInstructionsFile()
@@ -199,6 +214,8 @@ This command does not install, copy, link, delete, or modify any files.`,
 }
 
 func init() {
+	Cmd.Flags().Bool("check", false, "Read-only adapter-status report: list each known agent root and whether it currently holds physically-copied wrapper skills (no writes)")
+	Cmd.Flags().Bool("json", false, "Output the --check adapter-status report as JSON")
 	allCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	propagateAllCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	matrixCmd.Flags().Bool("json", false, "Output JSON")
@@ -213,11 +230,97 @@ func init() {
 }
 
 func propagateToRoots(fullCopy bool) error {
+	emitDeprecationNotice()
 	counts, err := skillsync.PropagateToDefaultRoots(fullCopy)
 	for _, root := range platform.AgentRoots() {
 		fmt.Printf("  %-40s [%d skills]\n", root, counts[root])
 	}
 	return err
+}
+
+// emitDeprecationNotice prints the physical-copy adapter deprecation guidance to
+// stderr once per propagation run. It does not change copy behavior.
+func emitDeprecationNotice() {
+	fmt.Fprintln(os.Stderr, skillsync.DeprecationNotice())
+}
+
+// adapterStatusRow is the read-only per-root status emitted by sync --check.
+type adapterStatusRow struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Path          string `json:"path"`
+	Adapter       string `json:"adapter"`
+	DefaultSync   bool   `json:"defaultSync"`
+	Exists        bool   `json:"exists"`
+	WrapperCopied bool   `json:"wrapperCopied"`
+	SkillFiles    int    `json:"skillFiles"`
+	Status        string `json:"status"`
+}
+
+// printAdapterStatus renders a read-only report of every known agent root and
+// whether it currently holds physically-copied wrapper skills. It performs no
+// writes and is the inspection surface for the adapter deprecation. It reuses
+// buildMatrix so classification stays consistent with sync matrix.
+func printAdapterStatus(jsonOut bool) error {
+	rows := []adapterStatusRow{}
+	for _, m := range buildMatrix() {
+		rows = append(rows, adapterStatusRow{
+			ID:            m.ID,
+			Name:          m.Name,
+			Path:          m.Path,
+			Adapter:       m.Adapter,
+			DefaultSync:   m.DefaultSync,
+			Exists:        m.Exists,
+			WrapperCopied: m.Wrapper,
+			SkillFiles:    m.SkillFiles,
+			Status:        adapterStatus(m),
+		})
+	}
+
+	if jsonOut {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(rows)
+	}
+
+	fmt.Fprintln(os.Stderr, skillsync.DeprecationNotice())
+	fmt.Println()
+	fmt.Printf("%-22s %-16s %-7s %-10s %-7s %s\n", "AGENT", "ADAPTER", "SYNC", "COPIED", "SKILLS", "STATUS")
+	for _, row := range rows {
+		sync := "report-only"
+		if row.DefaultSync {
+			sync = "default"
+		}
+		copied := "no"
+		if row.WrapperCopied {
+			copied = "wrapper"
+		} else if row.Adapter != "skill-root" {
+			copied = "n/a"
+		}
+		fmt.Printf("%-22s %-16s %-7s %-10s %-7d %s\n", row.ID, row.Adapter, sync, copied, row.SkillFiles, row.Status)
+	}
+	return nil
+}
+
+// adapterStatus describes, in deprecation terms, whether a root holds
+// physically-copied wrapper skills and what the migration should be.
+func adapterStatus(row matrixRow) string {
+	if row.Adapter != "skill-root" || row.Path == "" {
+		return "no physical copy (" + row.Adapter + "); use CLI/MCP"
+	}
+	if !row.Exists {
+		return "not present; nothing to migrate"
+	}
+	if row.Wrapper {
+		return "wrapper copied (deprecated); migrate to CLI/serve MCP"
+	}
+	if row.SkillFiles > 100 {
+		return "full corpus copied (deprecated); migrate to CLI/serve MCP"
+	}
+	if row.SkillFiles > 0 {
+		return "adapter-specific skills present; not a wrapper copy"
+	}
+	return "empty; no copied skills"
 }
 
 func installedWrapperRoots() []string {

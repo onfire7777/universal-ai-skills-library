@@ -6,16 +6,6 @@ import (
 	"strings"
 )
 
-// routeOptions is the engine-internal routing configuration. The CLI parses its
-// flags (routeOptionsFromCommand) and maps them onto RouteOptions; the engine
-// translates RouteOptions into this internal struct before running the pipeline.
-type routeOptions struct {
-	optional         bool
-	explain          bool
-	hookEvent        string
-	enforceHookEvent bool
-}
-
 type routeDecision string
 
 const (
@@ -23,6 +13,17 @@ const (
 	routeDecisionNoRoute   routeDecision = "no_route"
 	routeDecisionAmbiguous routeDecision = "ambiguous"
 )
+
+// routeOptions is the engine-internal request for the route pipeline. It is the
+// unexported counterpart of the public RouteOptions; the CLI adapter and Route()
+// translate between the two. optional drives the auto-command's quiet no-route
+// behavior; enforceHookEvent gates routing to user-prompt hook events only.
+type routeOptions struct {
+	optional         bool
+	explain          bool
+	hookEvent        string
+	enforceHookEvent bool
+}
 
 type routePreflight struct {
 	Prompt     string
@@ -34,6 +35,11 @@ type routePreflight struct {
 	RawBest    routeCandidate
 	Candidates []routeCandidate
 	HostReview *hostAIReview
+	// RerankerUsed records whether the gated learned re-ranker actually ran and
+	// reordered candidates for this decision. It is the source of the telemetry
+	// reranker_used flag (set in logRouteDecision). False unless reranker.enabled
+	// AND a valid model loaded AND the reorder window had >= 2 candidates.
+	RerankerUsed bool
 }
 
 type hostAIReview struct {
@@ -63,7 +69,7 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 			Reason:    fmt.Sprintf("automatic routing is disabled for hook event %q; it only runs for user prompt submission events", strings.TrimSpace(opts.hookEvent)),
 		}, nil
 	}
-	manifest, err := LoadManifest()
+	manifest, err := loadManifest()
 	if err != nil {
 		return routePreflight{}, err
 	}
@@ -71,9 +77,8 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 	rawCandidates := []routeCandidate{}
 	bestRaw := routeCandidate{}
 	maintenancePrompt := isRouterMaintenancePrompt(prompt)
-	for i, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
-		isCore := i < len(manifest.CoreSkills)
-		next := manifestRouteCandidateCore(prompt, s, isCore)
+	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
+		next := manifestRouteCandidate(prompt, s)
 		next = applyMetaMaintenanceBoost(prompt, next)
 		rawCandidates = append(rawCandidates, next)
 		if next.score > bestRaw.score {
@@ -84,7 +89,7 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 		}
 		candidates = append(candidates, next)
 	}
-	external, err := FindExternalSkills(CanonicalSkillKeys(manifest), false)
+	external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
 	if err != nil {
 		return routePreflight{}, err
 	}
@@ -99,15 +104,26 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 	sortRouteCandidates(candidates)
 	sortRouteCandidates(rawCandidates)
 
-	// Phase 1 hybrid semantic recall. A no-op (identity) unless semantic routing
-	// is explicitly enabled; the exact name/alias guardrail is enforced inside.
-	candidates = applySemanticRouting(candidates, prompt)
+	// Phase 3.3 single rerank hook (post-sort / pre-choose). This is THE one point
+	// the learned re-ranker attaches; it drives both the semantic fusion stage's
+	// routeReranker slot and the plain lexical pipeline through the SAME model and
+	// feature code (route_reranker.go) — no parallel rerank path.
+	//
+	// The model is loaded once and gated: loadEngineRerankModel returns nil unless
+	// reranker.enabled (config/env) AND a valid model.json loads. When nil, both
+	// applySemanticRouting (Phase 1, identity unless SKILL_ROUTER_SEMANTIC=1) and
+	// applyLearnedRerouting are no-ops, so default routing stays byte-for-byte
+	// unchanged. rerankerUsed is true only when the gated reorder actually ran.
+	model := loadEngineRerankModel()
+	candidates = applySemanticRouting(candidates, prompt, model)
+	candidates, rerankerUsed := applyLearnedRerouting(candidates, prompt, model)
 
 	preflight := routePreflight{
-		Prompt:     prompt,
-		HookEvent:  strings.TrimSpace(opts.hookEvent),
-		RawBest:    bestRaw,
-		Candidates: candidates,
+		Prompt:       prompt,
+		HookEvent:    strings.TrimSpace(opts.hookEvent),
+		RawBest:      bestRaw,
+		Candidates:   candidates,
+		RerankerUsed: rerankerUsed,
 	}
 	best, second, ok := chooseRouteCandidate(candidates)
 	if maintenancePrompt {
@@ -143,6 +159,16 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 		preflight.Reason = "deterministic preflight found a confident skill"
 	}
 	_ = opts
+
+	// Phase 3.1 telemetry seam. buildRoutePreflight is the single funnel every
+	// route surface passes through — the public Route(), the CLI route/auto
+	// (RoutePromptCLI) and preflight (RunPreflightCLI), and the MCP server
+	// (cmd/serve → Route). Logging here means ONE decision record per real
+	// routing decision, covering both the CLI and MCP with no duplication. It is
+	// best-effort and fully gated: when telemetry is disabled, nothing is built
+	// or written and routing output stays byte-for-byte identical.
+	logRouteDecision(prompt, preflight)
+
 	return preflight, nil
 }
 
@@ -232,7 +258,7 @@ func printPreflight(preflight routePreflight, explain bool) {
 	if preflight.HostReview != nil && preflight.HostReview.Required {
 		fmt.Println("Host AI review:", preflight.HostReview.Instruction)
 		for _, candidate := range preflight.HostReview.Candidates {
-			fmt.Printf("  - %s (%s, score %d): %s\n", candidate.Name, candidate.Source, candidate.Score, Truncate(candidate.Description, 120))
+			fmt.Printf("  - %s (%s, score %d): %s\n", candidate.Name, candidate.Source, candidate.Score, truncate(candidate.Description, 120))
 		}
 	}
 	if explain {
@@ -253,7 +279,7 @@ func printPreflightJSON(preflight routePreflight, explain bool) error {
 		HostReview      *hostAIReview   `json:"host_ai_review,omitempty"`
 		Top             []candidateJSON `json:"top,omitempty"`
 	}{
-		Prompt:          Truncate(preflight.Prompt, routeOutputPromptMax),
+		Prompt:          truncate(preflight.Prompt, routeOutputPromptMax),
 		PromptChars:     len(preflight.Prompt),
 		PromptTruncated: len(preflight.Prompt) > routeOutputPromptMax,
 		HookEvent:       preflight.HookEvent,
@@ -292,7 +318,7 @@ func routeCandidateJSON(candidate routeCandidate) candidateJSON {
 		Source:      source,
 		Score:       candidate.score,
 		Eligible:    isEligibleRouteCandidate(candidate),
-		Description: Truncate(strings.TrimSpace(candidate.description), routeOutputDescriptionMax),
+		Description: truncate(strings.TrimSpace(candidate.description), routeOutputDescriptionMax),
 	}
 }
 

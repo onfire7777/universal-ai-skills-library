@@ -14,8 +14,10 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 )
 
-// ManifestSkill is one entry in the canonical skills manifest.
-type ManifestSkill struct {
+// manifestSkill / skillManifest mirror the canonical manifest.json shape. These
+// types (and the loaders/discovery below) were relocated verbatim from
+// cmd/skills so the routing core is self-contained inside the engine package.
+type manifestSkill struct {
 	Name        string   `json:"name"`
 	Directory   string   `json:"directory"`
 	Description string   `json:"description"`
@@ -24,20 +26,17 @@ type ManifestSkill struct {
 	Scripts     []string `json:"scripts,omitempty"`
 }
 
-// Manifest is the canonical core + library skill index loaded from manifest.json.
-type Manifest struct {
-	CoreSkills    []ManifestSkill `json:"core_skills"`
-	LibrarySkills []ManifestSkill `json:"library_skills"`
+type skillManifest struct {
+	CoreSkills    []manifestSkill `json:"core_skills"`
+	LibrarySkills []manifestSkill `json:"library_skills"`
 }
 
-// ExternalSkillRoot is one read-only local root scanned for installed skills.
-type ExternalSkillRoot struct {
+type externalSkillRoot struct {
 	ID   string
 	Path string
 }
 
-// ExternalSkill is a skill discovered in a read-only external root.
-type ExternalSkill struct {
+type externalSkill struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	SourceID    string `json:"sourceId"`
@@ -48,31 +47,100 @@ type externalSkillsCache struct {
 	Version        int             `json:"version"`
 	GeneratedUnix  int64           `json:"generatedUnix"`
 	RootsSignature string          `json:"rootsSignature"`
-	Skills         []ExternalSkill `json:"skills"`
+	Skills         []externalSkill `json:"skills"`
 }
 
-// LoadManifest reads and parses the canonical manifest.json.
-func LoadManifest() (Manifest, error) {
+const automaticRouteMinScore = 75
+
+func loadManifest() (skillManifest, error) {
 	data, err := os.ReadFile(platform.ManifestPath())
 	if err != nil {
-		return Manifest{}, fmt.Errorf("manifest not found: %w", err)
+		return skillManifest{}, fmt.Errorf("manifest not found: %w", err)
 	}
-	var manifest Manifest
+	var manifest skillManifest
 	if err := json.Unmarshal(data, &manifest); err != nil {
-		return Manifest{}, err
+		return skillManifest{}, err
 	}
 	return manifest, nil
 }
 
-// RepoSkillsDir returns the source skills corpus directory. It delegates to the
-// config/env driven resolver (default RepoDir()/skills), so the router is not
-// hard-wired to a repo-relative skills/ layout.
-func RepoSkillsDir() string {
+// repoSkillsDir returns the source skills corpus directory. It delegates to the
+// config/env driven resolver (default RepoDir()/skills).
+func repoSkillsDir() string {
 	return platform.SkillSourceDir()
 }
 
-// MatchesSkill reports whether a manifest skill matches a (lowercased) search query.
-func MatchesSkill(s ManifestSkill, query string) bool {
+func findSkillMarkdown(name string) (string, error) {
+	key := strings.ToLower(strings.TrimSpace(name))
+	if key == "" {
+		return "", fmt.Errorf("skill name is required")
+	}
+	if manifest, err := loadManifest(); err == nil {
+		for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
+			if strings.ToLower(s.Name) == key || hasAlias(s, key) {
+				return skillMarkdownFromDirectory(s.Directory)
+			}
+		}
+	}
+	if !isSafeSkillLookupName(name) {
+		return "", fmt.Errorf("unsafe skill name %q; use a manifest skill name or alias", name)
+	}
+
+	candidates := []string{
+		filepath.Join(repoSkillsDir(), name, "SKILL.md"),
+		filepath.Join(platform.SkillsDir(), name, "SKILL.md"),
+		filepath.Join(platform.RepoDir(), name, "SKILL.md"),
+	}
+	if key == "manus-config" {
+		candidates = append([]string{
+			filepath.Join(repoSkillsDir(), "universal-ai-config", "SKILL.md"),
+			filepath.Join(platform.SkillsDir(), "universal-ai-config", "SKILL.md"),
+		}, candidates...)
+	}
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+	if manifest, err := loadManifest(); err == nil {
+		if candidate, ok := findExternalSkillMarkdown(key, canonicalSkillKeys(manifest)); ok {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("skill %q not found; try `skill-router skill search %s`", name, name)
+}
+
+func skillMarkdownFromDirectory(directory string) (string, error) {
+	clean := filepath.Clean(directory)
+	if strings.HasPrefix(clean, "..") || filepath.IsAbs(clean) {
+		return "", fmt.Errorf("unsafe skill directory in manifest: %s", directory)
+	}
+	repo := platform.RepoDir()
+	candidates := []string{filepath.Join(repo, clean, "SKILL.md")}
+	if !strings.HasPrefix(clean, "skills"+string(os.PathSeparator)) && clean != "skills" {
+		candidates = append([]string{filepath.Join(repoSkillsDir(), clean, "SKILL.md")}, candidates...)
+	}
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("skill markdown not found for manifest directory %s", directory)
+}
+
+func isSafeSkillLookupName(name string) bool {
+	trimmed := strings.TrimSpace(name)
+	if trimmed == "" || trimmed == "." || trimmed == ".." || filepath.IsAbs(trimmed) {
+		return false
+	}
+	if strings.ContainsAny(trimmed, `/\`) {
+		return false
+	}
+	clean := filepath.Clean(trimmed)
+	return clean == trimmed && !strings.Contains(clean, "..")
+}
+
+func matchesSkill(s manifestSkill, query string) bool {
 	haystack := strings.ToLower(s.Name + " " + s.Description + " " + strings.Join(s.Aliases, " "))
 	haystack = strings.NewReplacer("-", " ", "_", " ", ":", " ").Replace(haystack)
 	normalizedQuery := strings.NewReplacer("-", " ", "_", " ", ":", " ").Replace(query)
@@ -87,8 +155,7 @@ func MatchesSkill(s ManifestSkill, query string) bool {
 	return len(strings.Fields(normalizedQuery)) > 0
 }
 
-// MatchesExternalSkill reports whether an external skill matches a (lowercased) query.
-func MatchesExternalSkill(s ExternalSkill, query string) bool {
+func matchesExternalSkill(s externalSkill, query string) bool {
 	haystack := strings.ToLower(s.Name + " " + s.Description + " " + s.SourceID)
 	haystack = strings.NewReplacer("-", " ", "_", " ", ":", " ").Replace(haystack)
 	normalizedQuery := strings.NewReplacer("-", " ", "_", " ", ":", " ").Replace(query)
@@ -211,9 +278,7 @@ func normalizeForMatch(value string) string {
 	return normalizeRouteText(value)
 }
 
-// CanonicalSkillKeys returns the set of lowercased names + aliases for canonical
-// skills, used to suppress external skills that shadow canonical ones.
-func CanonicalSkillKeys(manifest Manifest) map[string]bool {
+func canonicalSkillKeys(manifest skillManifest) map[string]bool {
 	keys := map[string]bool{}
 	for _, skill := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
 		keys[strings.ToLower(strings.TrimSpace(skill.Name))] = true
@@ -224,10 +289,9 @@ func CanonicalSkillKeys(manifest Manifest) map[string]bool {
 	return keys
 }
 
-// ExternalSkillRoots returns the read-only local roots scanned for installed skills.
-func ExternalSkillRoots() []ExternalSkillRoot {
+func externalSkillRoots() []externalSkillRoot {
 	home := platform.HomeDir()
-	roots := []ExternalSkillRoot{
+	roots := []externalSkillRoot{
 		{ID: "agent", Path: filepath.Join(home, ".agent", "skills")},
 		{ID: "agent-skills-standard", Path: filepath.Join(home, ".agents", "skills")},
 		{ID: "claude-skills", Path: filepath.Join(home, ".claude", "skills")},
@@ -259,14 +323,14 @@ func ExternalSkillRoots() []ExternalSkillRoot {
 			if strings.TrimSpace(path) == "" {
 				continue
 			}
-			roots = append(roots, ExternalSkillRoot{
+			roots = append(roots, externalSkillRoot{
 				ID:   fmt.Sprintf("extra-%d", i+1),
 				Path: path,
 			})
 		}
 	}
 	seen := map[string]bool{}
-	deduped := []ExternalSkillRoot{}
+	deduped := []externalSkillRoot{}
 	for _, root := range roots {
 		abs, err := filepath.Abs(root.Path)
 		if err == nil {
@@ -282,29 +346,27 @@ func ExternalSkillRoots() []ExternalSkillRoot {
 	return deduped
 }
 
-// FindExternalSkills scans the read-only roots for installed skills, suppressing
-// any that shadow canonical names. Results are cached unless refresh is true.
-func FindExternalSkills(canonical map[string]bool, refresh bool) ([]ExternalSkill, error) {
+func findExternalSkills(canonical map[string]bool, refresh bool) ([]externalSkill, error) {
 	if !refresh {
 		if cached, ok := readExternalSkillsCache(canonical); ok {
 			return cached, nil
 		}
 	}
 	seen := map[string]bool{}
-	skills := []ExternalSkill{}
-	for _, root := range ExternalSkillRoots() {
+	skills := []externalSkill{}
+	for _, root := range externalSkillRoots() {
 		if _, err := os.Stat(root.Path); err != nil {
 			continue
 		}
 		err := walkExternalSkillMarkdown(root.Path, func(path string) error {
-			frontmatterName, description := ReadSkillFrontmatter(path)
+			frontmatterName, description := readSkillFrontmatter(path)
 			name := externalSkillName(root, path, frontmatterName)
 			key := strings.ToLower(strings.TrimSpace(name))
 			if key == "" || canonical[key] || seen[key] {
 				return nil
 			}
 			seen[key] = true
-			skills = append(skills, ExternalSkill{
+			skills = append(skills, externalSkill{
 				Name:        name,
 				Description: description,
 				SourceID:    root.ID,
@@ -327,7 +389,7 @@ func findExternalSkillMarkdown(key string, canonical map[string]bool) (string, b
 	if canonical[key] {
 		return "", false
 	}
-	if external, err := FindExternalSkills(canonical, false); err == nil {
+	if external, err := findExternalSkills(canonical, false); err == nil {
 		for _, skill := range external {
 			if strings.ToLower(strings.TrimSpace(skill.Name)) == key || strings.ToLower(filepath.Base(filepath.Dir(skill.Path))) == key {
 				if _, err := os.Stat(skill.Path); err == nil {
@@ -336,7 +398,7 @@ func findExternalSkillMarkdown(key string, canonical map[string]bool) (string, b
 			}
 		}
 	}
-	for _, root := range ExternalSkillRoots() {
+	for _, root := range externalSkillRoots() {
 		if _, err := os.Stat(root.Path); err != nil {
 			continue
 		}
@@ -346,7 +408,7 @@ func findExternalSkillMarkdown(key string, canonical map[string]bool) (string, b
 				return nil
 			}
 			dirName := strings.ToLower(filepath.Base(filepath.Dir(path)))
-			frontmatterName, _ := ReadSkillFrontmatter(path)
+			frontmatterName, _ := readSkillFrontmatter(path)
 			if dirName == key || strings.ToLower(strings.TrimSpace(frontmatterName)) == key {
 				found = path
 			}
@@ -359,7 +421,7 @@ func findExternalSkillMarkdown(key string, canonical map[string]bool) (string, b
 	return "", false
 }
 
-func readExternalSkillsCache(canonical map[string]bool) ([]ExternalSkill, bool) {
+func readExternalSkillsCache(canonical map[string]bool) ([]externalSkill, bool) {
 	data, err := os.ReadFile(externalSkillsCachePath())
 	if err != nil {
 		return nil, false
@@ -374,7 +436,7 @@ func readExternalSkillsCache(canonical map[string]bool) ([]ExternalSkill, bool) 
 	if time.Since(time.Unix(cache.GeneratedUnix, 0)) > externalSkillsCacheTTL() {
 		return nil, false
 	}
-	filtered := []ExternalSkill{}
+	filtered := []externalSkill{}
 	seen := map[string]bool{}
 	for _, skill := range cache.Skills {
 		key := strings.ToLower(strings.TrimSpace(skill.Name))
@@ -387,7 +449,7 @@ func readExternalSkillsCache(canonical map[string]bool) ([]ExternalSkill, bool) 
 	return filtered, true
 }
 
-func writeExternalSkillsCache(skills []ExternalSkill) error {
+func writeExternalSkillsCache(skills []externalSkill) error {
 	cachePath := externalSkillsCachePath()
 	if err := os.MkdirAll(filepath.Dir(cachePath), 0755); err != nil {
 		return err
@@ -410,7 +472,7 @@ func externalSkillsCachePath() string {
 }
 
 func externalSkillRootsSignature() string {
-	roots := ExternalSkillRoots()
+	roots := externalSkillRoots()
 	parts := make([]string, 0, len(roots))
 	for _, root := range roots {
 		parts = append(parts, strings.ToLower(root.ID+"="+filepath.Clean(root.Path)))
@@ -427,9 +489,7 @@ func externalSkillsCacheTTL() time.Duration {
 	return 12 * time.Hour
 }
 
-// ReadSkillFrontmatter parses the name and description from a SKILL.md YAML
-// frontmatter block, supporting block scalars for description.
-func ReadSkillFrontmatter(path string) (string, string) {
+func readSkillFrontmatter(path string) (string, string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", ""
@@ -485,29 +545,6 @@ func ReadSkillFrontmatter(path string) (string, string) {
 	return name, description
 }
 
-// CountExternalRootSkills returns the total and unique (non-canonical) skill
-// counts for one external root.
-func CountExternalRootSkills(root ExternalSkillRoot, canonical map[string]bool) (int, int) {
-	if _, err := os.Stat(root.Path); err != nil {
-		return 0, 0
-	}
-	total := 0
-	unique := 0
-	seen := map[string]bool{}
-	_ = walkExternalSkillMarkdown(root.Path, func(path string) error {
-		total++
-		frontmatterName, _ := ReadSkillFrontmatter(path)
-		name := externalSkillName(root, path, frontmatterName)
-		key := strings.ToLower(strings.TrimSpace(name))
-		if key != "" && !canonical[key] && !seen[key] {
-			seen[key] = true
-			unique++
-		}
-		return nil
-	})
-	return total, unique
-}
-
 func walkExternalSkillMarkdown(rootPath string, visit func(path string) error) error {
 	rootPath = filepath.Clean(rootPath)
 	return filepath.WalkDir(rootPath, func(path string, entry os.DirEntry, err error) error {
@@ -539,7 +576,7 @@ func walkExternalSkillMarkdown(rootPath string, visit func(path string) error) e
 	})
 }
 
-func externalSkillName(root ExternalSkillRoot, skillPath, frontmatterName string) string {
+func externalSkillName(root externalSkillRoot, skillPath, frontmatterName string) string {
 	dirName := filepath.Base(filepath.Dir(skillPath))
 	if strings.HasPrefix(strings.ToLower(dirName), "gstack-") {
 		return dirName
@@ -573,7 +610,7 @@ func shouldSkipExternalDir(name string) bool {
 	}
 }
 
-func hasAlias(s ManifestSkill, key string) bool {
+func hasAlias(s manifestSkill, key string) bool {
 	for _, alias := range s.Aliases {
 		if strings.ToLower(strings.TrimSpace(alias)) == key {
 			return true
@@ -582,8 +619,7 @@ func hasAlias(s ManifestSkill, key string) bool {
 	return false
 }
 
-// Truncate shortens s to at most max characters, appending an ellipsis.
-func Truncate(s string, max int) string {
+func truncate(s string, max int) string {
 	if len(s) <= max {
 		return s
 	}

@@ -18,6 +18,9 @@ import (
 
 // Cmd is the top-level skills command group. It also backs the singular
 // "skill" alias so agents can use `skill-router skill <name>` as the context-light path.
+//
+// The route / search / load core lives in internal/skillservice; the commands
+// below are thin adapters that call the engine and format its typed results.
 var Cmd = &cobra.Command{
 	Use:     "skills [skill-name]",
 	Aliases: []string{"skill"},
@@ -36,7 +39,7 @@ without duplicating thousands of third-party skill bodies in the repo.`,
 		if len(args) == 0 {
 			return cmd.Help()
 		}
-		return printSkill(args[0])
+		return skillservice.PrintSkill(args[0])
 	},
 }
 
@@ -46,7 +49,20 @@ var readCmd = &cobra.Command{
 	Short:   "Print one SKILL.md by name",
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return printSkill(args[0])
+		return skillservice.PrintSkill(args[0])
+	},
+}
+
+// loadSkillCmd is the canonical name for the single-skill load path. It mirrors
+// `read`/`skill <name>` and calls the same engine entry point (PrintSkill) so
+// output is identical; it exists so agents can use the snake_case canonical verb
+// `skill-router skills load_skill <name>`.
+var loadSkillCmd = &cobra.Command{
+	Use:   "load_skill <name>",
+	Short: "Print a single skill's SKILL.md (alias of `read`/`skill <name>`)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return skillservice.PrintSkill(args[0])
 	},
 }
 
@@ -67,50 +83,12 @@ var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Compatibility alias for wrapper-only default root propagation",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		check, _ := cmd.Flags().GetBool("check")
-		if check {
-			return adapterStatusReport()
-		}
-		fmt.Fprintln(os.Stderr, skillsync.DeprecationNotice())
 		counts, err := skillsync.PropagateToDefaultRoots(false)
 		for _, root := range platform.AgentRoots() {
 			fmt.Printf("  %s - copied %d skills\n", root, counts[root])
 		}
 		return err
 	},
-}
-
-// adapterStatusReport prints a read-only adapter-status report by reusing the
-// AgentRootSpecs matrix data. It does not write or copy anything.
-func adapterStatusReport() error {
-	fmt.Println("Adapter deprecation status (read-only):")
-	fmt.Println()
-	fmt.Printf("  %-22s %-16s %-12s %-10s %s\n", "AGENT", "ADAPTER", "DEFAULT-SYNC", "HAS-WRAPPER", "PATH")
-	for _, spec := range platform.AgentRootSpecs() {
-		defaultSync := "no"
-		if spec.DefaultSync {
-			defaultSync = "yes (PHYS-COPY)"
-		}
-		hasWrapper := "n/a"
-		if spec.Path != "" && spec.Adapter == "skill-root" {
-			wrapperPath := filepath.Join(spec.Path, "universal-ai-skills", "SKILL.md")
-			if _, err := os.Stat(wrapperPath); err == nil {
-				hasWrapper = "yes"
-			} else {
-				hasWrapper = "no"
-			}
-		}
-		path := spec.Path
-		if path == "" {
-			path = "(hosted/" + spec.Adapter + ")"
-		}
-		fmt.Printf("  %-22s %-16s %-12s %-10s %s\n", spec.ID, spec.Adapter, defaultSync, hasWrapper, path)
-	}
-	fmt.Println()
-	fmt.Println("Roots marked 'yes (PHYS-COPY)' rely on physical-copy propagation, which is deprecated.")
-	fmt.Println("Migrate to: skill-router route|search_skills|load_skill|compose, or skill-router serve (MCP).")
-	fmt.Println("See docs/ADAPTER_DEPRECATION.md.")
-	return nil
 }
 
 var createCmd = &cobra.Command{
@@ -168,7 +146,7 @@ var listCmd = &cobra.Command{
 		}
 		fmt.Printf("\nTotal: %d skills\n", len(manifest.CoreSkills)+len(manifest.LibrarySkills))
 		if includeExternal {
-			external, err := skillservice.FindExternalSkills(skillservice.CanonicalSkillKeys(manifest), false)
+			external, err := skillservice.FindExternalSkills(manifest.CanonicalSkillKeys(), false)
 			if err != nil {
 				return err
 			}
@@ -189,7 +167,6 @@ var searchCmd = &cobra.Command{
 	Args:    cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.ToLower(strings.Join(args, " "))
-		refreshExternal, _ := cmd.Flags().GetBool("refresh")
 		limit, _ := cmd.Flags().GetInt("limit")
 		if limit <= 0 {
 			return fmt.Errorf("--limit must be between 1 and 100")
@@ -197,21 +174,12 @@ var searchCmd = &cobra.Command{
 		if limit > 100 {
 			limit = 100
 		}
-		// Refresh the external index up front when requested so the engine's
-		// cached search reflects the latest installed skills.
-		if refreshExternal {
-			manifest, err := skillservice.LoadManifest()
-			if err != nil {
-				return err
-			}
-			if _, err := skillservice.FindExternalSkills(skillservice.CanonicalSkillKeys(manifest), true); err != nil {
-				return err
-			}
-		}
+
 		result, err := skillservice.Search(query)
 		if err != nil {
 			return err
 		}
+
 		bold := color.New(color.Bold)
 		bold.Println("Search results:")
 		shown := 0
@@ -227,18 +195,18 @@ var searchCmd = &cobra.Command{
 	},
 }
 
-// searchKind maps the engine's Source label back to the historical display kind:
-// "core" -> CORE, "library" -> LIB, "ext:<id>" -> EXT:<id>.
+// searchKind maps the engine SkillRef.Source ("core"|"library"|"ext:<id>") back
+// to the CLI's column label ("CORE"|"LIB"|"EXT:<id>") so search output is
+// byte-identical to the prior implementation.
 func searchKind(source string) string {
-	switch source {
-	case "core":
+	switch {
+	case source == "core":
 		return "CORE"
-	case "library":
+	case source == "library":
 		return "LIB"
+	case strings.HasPrefix(source, "ext:"):
+		return "EXT:" + strings.TrimPrefix(source, "ext:")
 	default:
-		if id, ok := strings.CutPrefix(source, "ext:"); ok {
-			return "EXT:" + id
-		}
 		return strings.ToUpper(source)
 	}
 }
@@ -255,11 +223,8 @@ error for generic prompts.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		opts, err := routeOptionsFromCommand(cmd, false)
-		if err != nil {
-			return err
-		}
-		return routePromptWithOptions(prompt, opts)
+		opts := cliRouteOptions(cmd, false)
+		return skillservice.RoutePromptCLI(prompt, opts)
 	},
 }
 
@@ -275,11 +240,8 @@ skill-router preflight --json and use the host AI to arbitrate ambiguous packets
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		opts, err := routeOptionsFromCommand(cmd, true)
-		if err != nil {
-			return err
-		}
-		return routePromptWithOptions(prompt, opts)
+		opts := cliRouteOptions(cmd, true)
+		return skillservice.RoutePromptCLI(prompt, opts)
 	},
 }
 
@@ -299,20 +261,9 @@ stop, background, or lifecycle events.`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		prompt := strings.Join(args, " ")
-		opts, err := routeOptionsFromCommand(cmd, false)
-		if err != nil {
-			return err
-		}
+		opts := cliRouteOptions(cmd, false)
 		jsonOutput, _ := cmd.Flags().GetBool("json")
-		preflight, err := skillservice.RunPreflight(prompt, opts.toServiceOptions())
-		if err != nil {
-			return err
-		}
-		if jsonOutput {
-			return preflight.PrintJSON(opts.explain)
-		}
-		preflight.Print(opts.explain)
-		return nil
+		return skillservice.RunPreflightCLI(prompt, opts, jsonOutput)
 	},
 }
 
@@ -322,13 +273,13 @@ var sourcesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		refreshExternal, _ := cmd.Flags().GetBool("refresh")
 		manifest, _ := skillservice.LoadManifest()
-		canonical := skillservice.CanonicalSkillKeys(manifest)
+		canonical := manifest.CanonicalSkillKeys()
 		bold := color.New(color.Bold)
 		bold.Println("Local external skill sources:")
-		for _, root := range skillservice.ExternalSkillRoots() {
+		for _, root := range skillservice.ExternalRoots() {
 			total, unique := skillservice.CountExternalRootSkills(root, canonical)
 			status := "missing"
-			if _, err := os.Stat(root.Path); err == nil {
+			if skillservice.RootExists(root.Path) {
 				status = "ready"
 			}
 			fmt.Printf("  %-18s %-7s total=%-5d unique=%-5d %s\n", root.ID, status, total, unique, root.Path)
@@ -348,7 +299,6 @@ var propagateCmd = &cobra.Command{
 	Use:   "propagate",
 	Short: "Copy wrapper skills to default agent skill roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Fprintln(os.Stderr, skillsync.DeprecationNotice())
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		fullCopy, _ := cmd.Flags().GetBool("full-copy")
 		roots := platform.AgentRoots()
@@ -423,17 +373,10 @@ var summarizeCmd = &cobra.Command{
 	},
 }
 
-var loadSkillCmd = &cobra.Command{
-	Use:     "load_skill <name>",
-	Aliases: []string{"load"},
-	Short:   "Print a single skill's SKILL.md (alias of `skill <name>`)",
-	Args:    cobra.ExactArgs(1),
-	RunE:    func(cmd *cobra.Command, args []string) error { return printSkill(args[0]) },
-}
-
 // VectorsCmd materializes the offline int8 vector store used by the optional
-// semantic routing path. It is a thin shim over skillservice.BuildVectorStore,
-// which is fully offline and deterministic.
+// semantic routing path. It is fully offline and deterministic. The vector
+// generation itself lives in the engine (skillservice.BuildVectorStoreJSON);
+// this command is a thin CLI adapter.
 var VectorsCmd = &cobra.Command{
 	Use:   "vectors",
 	Short: "Generate the offline int8 semantic vector store for SKILL_ROUTER_VECTORS",
@@ -457,7 +400,7 @@ is unchanged unless SKILL_ROUTER_SEMANTIC=1 is set.`,
 			return fmt.Errorf("no output path: pass --out <file> or set SKILL_ROUTER_VECTORS")
 		}
 		dims, _ := cmd.Flags().GetInt("dims")
-		data, count, err := skillservice.BuildVectorStore(dims)
+		data, count, err := skillservice.BuildVectorStoreJSON(dims)
 		if err != nil {
 			return err
 		}
@@ -472,7 +415,6 @@ is unchanged unless SKILL_ROUTER_SEMANTIC=1 is set.`,
 func init() {
 	installCmd.Flags().String("target", "", "Target directory for skill installation")
 	installCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to the target")
-	syncCmd.Flags().Bool("check", false, "Print read-only adapter-status report instead of copying (no files are written)")
 	listCmd.Flags().Bool("core", false, "Show only core skills")
 	listCmd.Flags().Bool("library", false, "Show only library skills")
 	listCmd.Flags().Bool("all", true, "Show all skills (default)")
@@ -490,7 +432,7 @@ func init() {
 	propagateCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
 	VectorsCmd.Flags().String("out", "", "Output path for the int8 vector store JSON (defaults to $SKILL_ROUTER_VECTORS)")
-	VectorsCmd.Flags().Int("dims", skillservice.SemanticEmbeddingDims, "Embedding dimensionality; must match the runtime embedder")
+	VectorsCmd.Flags().Int("dims", skillservice.DefaultEmbeddingDims, "Embedding dimensionality; must match the runtime embedder")
 	composeCmd.Flags().String("skills", "", "Comma-separated explicit skill names (skips routing)")
 	composeCmd.Flags().Int("top", 5, "Max skills to compose")
 	composeCmd.Flags().Int("min-score", 75, "Minimum route score to include")
@@ -498,6 +440,7 @@ func init() {
 	composeCmd.Flags().Bool("json", false, "Emit JSON")
 
 	Cmd.AddCommand(readCmd)
+	Cmd.AddCommand(loadSkillCmd)
 	Cmd.AddCommand(installCmd)
 	Cmd.AddCommand(syncCmd)
 	Cmd.AddCommand(createCmd)
@@ -505,95 +448,34 @@ func init() {
 	Cmd.AddCommand(debugCmd)
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(searchCmd)
-	Cmd.AddCommand(loadSkillCmd)
 	Cmd.AddCommand(RouteCmd)
 	Cmd.AddCommand(AutoCmd)
 	Cmd.AddCommand(PreflightCmd)
 	Cmd.AddCommand(sourcesCmd)
 	Cmd.AddCommand(propagateCmd)
-	Cmd.AddCommand(composeCmd)
 	Cmd.AddCommand(ultimateCmd)
 	Cmd.AddCommand(promptCmd)
 	Cmd.AddCommand(anchorCmd)
 	Cmd.AddCommand(summarizeCmd)
 	Cmd.AddCommand(VectorsCmd)
+	Cmd.AddCommand(composeCmd)
 }
 
-// printSkill loads one skill via the engine and prints the SKILL.md body with the
-// historical "Reading:" / "Base directory:" header preserved byte-for-byte.
-func printSkill(name string) error {
-	result, err := skillservice.Load(name)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Reading: %s\n", name)
-	fmt.Printf("Base directory: %s\n\n", filepath.Dir(result.Ref.Path))
-	fmt.Print(result.Body)
-	return nil
-}
-
-// routeOptions carries the parsed CLI routing flags. The optional flag selects
-// the auto-vs-route no-route behavior; explain/hookEvent feed the engine.
-type routeOptions struct {
-	optional         bool
-	explain          bool
-	hookEvent        string
-	enforceHookEvent bool
-}
-
-func (o routeOptions) toServiceOptions() skillservice.RouteOptions {
-	opts := skillservice.RouteOptions{Explain: o.explain}
-	if o.enforceHookEvent {
-		opts.HookEvent = o.hookEvent
-	}
-	return opts
-}
-
-func routePromptWithOptions(prompt string, opts routeOptions) error {
-	preflight, err := skillservice.RunPreflight(prompt, opts.toServiceOptions())
-	if err != nil {
-		return err
-	}
-	if opts.explain {
-		preflight.Print(true)
-	}
-	if !preflight.IsRoute() {
-		if opts.optional {
-			if preflight.HasHostReview() {
-				preflight.Print(false)
-			} else {
-				fmt.Println("No skill route: generic prompt.")
-			}
-			return nil
-		}
-		if preflight.RawBestScore() == 0 {
-			return fmt.Errorf("no skill matched prompt; try `skill-router skill search %s`", prompt)
-		}
-		if preflight.IsAmbiguous() {
-			return fmt.Errorf("ambiguous skill route (best: %s score %d, runner-up: %s score %d); try `skill-router skill search %s`", preflight.BestName(), preflight.BestScore(), preflight.SecondName(), preflight.SecondScore(), prompt)
-		}
-		return fmt.Errorf("no confident skill matched prompt (best: %s, score %d, threshold %d); try `skill-router skill search %s`", preflight.RawBestName(), preflight.RawBestScore(), skillservice.AutomaticRouteMinScore, prompt)
-	}
-	source := "canonical"
-	if preflight.BestExternal() {
-		source = "external"
-	}
-	fmt.Printf("Route: %s (%s, score %d)\n\n", preflight.BestName(), source, preflight.BestScore())
-	return printSkill(preflight.BestName())
-}
-
-func routeOptionsFromCommand(cmd *cobra.Command, optional bool) (routeOptions, error) {
+// cliRouteOptions builds the engine's CLI route options from a cobra command,
+// reading the explain and hook-event flags (and the SKILL_ROUTER_HOOK_EVENT env
+// fallback) exactly as the prior implementation did.
+func cliRouteOptions(cmd *cobra.Command, optional bool) skillservice.CLIRouteOptions {
 	explain, _ := cmd.Flags().GetBool("explain")
-	opts := routeOptions{optional: optional, explain: explain}
+	opts := skillservice.CLIRouteOptions{Optional: optional, Explain: explain}
 	if cmd.Flags().Lookup("hook-event") != nil {
 		hookEvent, _ := cmd.Flags().GetString("hook-event")
 		if hookEvent == "" {
 			hookEvent = os.Getenv("SKILL_ROUTER_HOOK_EVENT")
 		}
-		opts.hookEvent = hookEvent
-		opts.enforceHookEvent = strings.TrimSpace(hookEvent) != ""
+		opts.HookEvent = hookEvent
+		opts.EnforceHookEvent = strings.TrimSpace(hookEvent) != ""
 	}
-	return opts, nil
+	return opts
 }
 
 func installSkills(target string, fullCopy bool) error {

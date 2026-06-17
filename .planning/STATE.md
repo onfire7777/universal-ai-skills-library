@@ -1,12 +1,17 @@
 ---
-gsd_state_version: '1.0'
-status: planning
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: Routing Feedback Loop
+status: complete
+stopped_at: Milestone v1.0 (Routing Feedback Loop) shipped — engine + telemetry + eval + reranker; adversarial audit 10/10 PASS; archived.
+last_updated: "2026-06-17T11:01:22.919Z"
+last_activity: 2026-06-17 — Milestone v1.0 completed and archived (commits 7afa1b2→1181c7e)
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 3
+  total_plans: 4
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -16,23 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** Make the lexical skill router measurable and self-improving — locally, with eval metrics gating every change.
-**Current focus:** Phase 1 — Telemetry & Feedback Capture
+**Current focus:** Milestone complete — all 3 phases done
 
 ## Current Position
 
-Phase: 1 of 3 (Telemetry & Feedback Capture)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-06-17 — Bootstrapped GSD planning artifacts from approved design spec
-
-Progress: [░░░░░░░░░░] 0%
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-17 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: - min
-- Total execution time: 0 hours
+
+- Total plans completed: 4 (across 3 phases + the Phase 2 engine prerequisite)
+- Average duration: n/a (subagent-driven build)
+- Total execution time: n/a
 
 **By Phase:**
 
@@ -41,6 +45,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: -
 - Trend: -
 
@@ -73,3 +78,7 @@ None yet.
 Last session: 2026-06-17
 Stopped at: Authored ROADMAP.md, PROJECT.md, STATE.md from the approved design spec; ready to run autonomous loop from Phase 1.
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

@@ -23,7 +23,7 @@ func TestComposePlanSelectsTopAboveThreshold(t *testing.T) {
 	if got.TotalTokenEst <= 0 {
 		t.Fatal("expected a positive total token estimate")
 	}
-	// Fix 1: route-driven entries must carry the canonical path resolved by Load.
+	// D5: route-driven entries must carry the canonical path resolved by Load.
 	for i, s := range got.Skills {
 		if s.Path == "" {
 			t.Errorf("Skills[%d].Path is empty for %q; route-driven refs must get canonical path from Load()", i, s.Name)

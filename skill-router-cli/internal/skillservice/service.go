@@ -1,18 +1,213 @@
+// Package skillservice is the IO-light routing engine shared by the skill-router
+// CLI (cmd/skills) and the MCP server (cmd/serve). It exposes the route / search
+// / load verbs as typed functions: callers get structs, never terminal output,
+// so each verb has exactly one implementation behind both surfaces.
+//
+// The route pipeline (route_scorer.go + route_preflight.go + route_semantic.go)
+// was relocated here intact from cmd/skills. Default routing behavior is
+// byte-for-byte identical to the previous in-package implementation; the
+// existing characterization tests (route_test.go, route_semantic_test.go) moved
+// alongside it as the regression guard.
+//
+// Phase 3 seam: the single post-sort / pre-choose hook is applySemanticRouting
+// inside buildRoutePreflight — a future reranker slots in there, and telemetry
+// (Decision / Margin / ordered top-N Matches with routeEvidence still reachable
+// per candidate) is surfaced on RouteResult.
 package skillservice
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/telemetry"
 )
 
-// Load resolves a skill by manifest name, alias, directory name, or external
-// root, and returns its SkillRef plus the raw SKILL.md body. The resolution
-// order mirrors the CLI's historical findSkillMarkdown behavior exactly.
+// routeMatchLimit bounds the ordered top-N candidates surfaced on RouteResult.
+// Five matches give Phase 3 telemetry enough context (best, second, and the
+// next few) without echoing the whole candidate list.
+const routeMatchLimit = 5
+
+// Route scores a prompt against the canonical manifest plus read-only external
+// roots and returns a typed decision. It runs the same pipeline the CLI route /
+// auto / preflight commands used: the semantic layer (applySemanticRouting) and
+// the exact-name/alias guardrail are preserved unchanged.
+func Route(prompt string, opts RouteOptions) (RouteResult, error) {
+	internal := routeOptions{
+		explain:   opts.Explain,
+		hookEvent: opts.HookEvent,
+	}
+	if strings.TrimSpace(opts.HookEvent) != "" {
+		internal.enforceHookEvent = true
+	}
+
+	preflight, err := buildRoutePreflight(prompt, internal)
+	if err != nil {
+		return RouteResult{}, err
+	}
+
+	threshold := automaticRouteMinScore
+	if opts.MinScore > 0 {
+		threshold = opts.MinScore
+	}
+
+	result := RouteResult{
+		Prompt:    prompt,
+		Decision:  string(preflight.Decision),
+		Threshold: threshold,
+	}
+
+	// Ordered matches: best, second, then the next eligible/scored candidates.
+	// Candidates retain their routeEvidence inside the engine (the reranker
+	// feature source); RouteResult exposes only the context-light projection.
+	result.Matches = topRouteSkillRefs(preflight, routeMatchLimit)
+
+	if preflight.Decision == routeDecisionRoute && preflight.Best.name != "" {
+		ref := routeCandidateRef(preflight.Best)
+		result.Selected = &ref
+	}
+
+	if preflight.Best.name != "" && preflight.Second.name != "" {
+		margin := preflight.Best.score - preflight.Second.score
+		if margin < 0 {
+			margin = 0
+		}
+		result.Margin = margin
+	}
+
+	return result, nil
+}
+
+// logRouteDecision maps a finished preflight into a telemetry DecisionRecord and
+// hands it to the capture layer. It is called from buildRoutePreflight — the one
+// funnel shared by the public Route(), the CLI route/auto/preflight commands,
+// and the MCP server — so exactly one record is emitted per routing decision
+// across every surface. It short-circuits before building anything when
+// telemetry is disabled (the common case), keeping the disabled route path
+// allocation-free beyond the env/config check; on the first disabled run it
+// prints a one-time enable hint to stderr (never stdout).
+func logRouteDecision(prompt string, preflight routePreflight) {
+	if !telemetry.Enabled() {
+		telemetry.NotifyDisabledOnce()
+		return
+	}
+	margin := 0
+	if preflight.Best.name != "" && preflight.Second.name != "" {
+		if m := preflight.Best.score - preflight.Second.score; m > 0 {
+			margin = m
+		}
+	}
+	rec := telemetry.DecisionRecord{
+		Prompt:   prompt,
+		Decision: string(preflight.Decision),
+		Margin:   margin,
+		// Phase 3.3: reranker_used reflects whether the gated learned re-ranker
+		// actually ran for this decision (preflight.RerankerUsed is set by the
+		// single rerank hook in buildRoutePreflight).
+		RerankerUsed: preflight.RerankerUsed,
+	}
+	if preflight.Best.name != "" {
+		c := telemetryCandidate(preflight.Best)
+		rec.Best = &c
+	}
+	if preflight.Second.name != "" {
+		c := telemetryCandidate(preflight.Second)
+		rec.Second = &c
+	}
+	for _, candidate := range topRouteCandidates(preflight.Candidates, routeMatchLimit) {
+		rec.Top = append(rec.Top, telemetryCandidate(candidate))
+	}
+	telemetry.LogDecision(rec)
+}
+
+// telemetryCandidate projects a route candidate to the context-light telemetry
+// shape, carrying the same source label and eligibility flag the JSON surfaces
+// already expose.
+func telemetryCandidate(candidate routeCandidate) telemetry.Candidate {
+	source := routeCandidateSource(candidate)
+	if candidate.sourceID != "" {
+		source += ":" + candidate.sourceID
+	}
+	return telemetry.Candidate{
+		Name:     candidate.name,
+		Source:   source,
+		Score:    candidate.score,
+		Eligible: isEligibleRouteCandidate(candidate),
+	}
+}
+
+// Search returns name/description matches across the canonical manifest and the
+// read-only external overlay, ordered by lexical route score then name. It
+// reproduces the previous CLI search ranking exactly.
+func Search(query string) (SearchResult, error) {
+	normalized := strings.ToLower(strings.TrimSpace(query))
+	result := SearchResult{Query: query}
+
+	manifest, err := loadManifest()
+	if err != nil {
+		return SearchResult{}, err
+	}
+
+	type scored struct {
+		ref   SkillRef
+		score int
+	}
+	matches := []scored{}
+
+	for _, s := range manifest.CoreSkills {
+		if score := scoreManifestSkill(normalized, s); score > 0 || matchesSkill(s, normalized) {
+			matches = append(matches, scored{ref: SkillRef{
+				Name:        s.Name,
+				Source:      "core",
+				Description: s.Description,
+				Score:       score,
+			}, score: score})
+		}
+	}
+	for _, s := range manifest.LibrarySkills {
+		if score := scoreManifestSkill(normalized, s); score > 0 || matchesSkill(s, normalized) {
+			matches = append(matches, scored{ref: SkillRef{
+				Name:        s.Name,
+				Source:      "library",
+				Description: s.Description,
+				Score:       score,
+			}, score: score})
+		}
+	}
+	external, err := findExternalSkills(canonicalSkillKeys(manifest), false)
+	if err != nil {
+		return SearchResult{}, err
+	}
+	for _, s := range external {
+		if score := scoreExternalSkill(normalized, s); score > 0 || matchesExternalSkill(s, normalized) {
+			matches = append(matches, scored{ref: SkillRef{
+				Name:        s.Name,
+				Path:        s.Path,
+				Source:      "ext:" + s.SourceID,
+				Description: s.Description,
+				Score:       score,
+			}, score: score})
+		}
+	}
+
+	sort.SliceStable(matches, func(i, j int) bool {
+		if matches[i].score == matches[j].score {
+			return strings.ToLower(matches[i].ref.Name) < strings.ToLower(matches[j].ref.Name)
+		}
+		return matches[i].score > matches[j].score
+	})
+
+	result.Matches = make([]SkillRef, 0, len(matches))
+	for _, m := range matches {
+		result.Matches = append(result.Matches, m.ref)
+	}
+	return result, nil
+}
+
+// Load resolves one skill by name or alias and returns its raw SKILL.md body
+// with a context-light reference. Resolution honors the canonical library →
+// external-root order and the manus-config alias, identical to the prior CLI
+// load path.
 func Load(name string) (LoadResult, error) {
 	skillPath, err := findSkillMarkdown(name)
 	if err != nil {
@@ -22,285 +217,138 @@ func Load(name string) (LoadResult, error) {
 	if err != nil {
 		return LoadResult{}, err
 	}
-	body := string(data)
-	if len(data) > 0 && data[len(data)-1] != '\n' {
-		body += "\n"
+	ref := SkillRef{
+		Name:        strings.TrimSpace(name),
+		Path:        skillPath,
+		Source:      loadSourceForPath(skillPath, name),
+		Description: loadDescriptionForName(name),
 	}
-	return LoadResult{
-		Ref:  skillRefForPath(name, skillPath),
-		Body: body,
-	}, nil
+	return LoadResult{Ref: ref, Body: string(data)}, nil
 }
 
-// Search ranks canonical (core + library) and external skills against a
-// (lowercased) query using the engine's lexical scorer, returning every match
-// in ranked order. Callers apply any display limit. The ranking reproduces the
-// CLI search command's previous ordering exactly.
-func Search(query string) (SearchResult, error) {
-	manifest, err := LoadManifest()
-	if err != nil {
-		return SearchResult{}, err
+// topRouteSkillRefs projects the highest-scoring route candidates to the
+// context-light SkillRef shape, in pipeline order (best first). It mirrors the
+// candidate set the CLI/JSON surfaces already exposed.
+func topRouteSkillRefs(preflight routePreflight, limit int) []SkillRef {
+	refs := []SkillRef{}
+	for _, candidate := range topRouteCandidates(preflight.Candidates, limit) {
+		refs = append(refs, routeCandidateRef(candidate))
 	}
-	type scoredRef struct {
-		ref   SkillRef
-		score int
-	}
-	scored := []scoredRef{}
-	for _, s := range manifest.CoreSkills {
-		if score := scoreManifestSkill(query, s); score > 0 || MatchesSkill(s, query) {
-			path, _ := skillMarkdownFromDirectory(s.Directory)
-			scored = append(scored, scoredRef{ref: SkillRef{Name: s.Name, Source: "core", Description: s.Description, Path: path, Score: score}, score: score})
-		}
-	}
-	for _, s := range manifest.LibrarySkills {
-		if score := scoreManifestSkill(query, s); score > 0 || MatchesSkill(s, query) {
-			path, _ := skillMarkdownFromDirectory(s.Directory)
-			scored = append(scored, scoredRef{ref: SkillRef{Name: s.Name, Source: "library", Description: s.Description, Path: path, Score: score}, score: score})
-		}
-	}
-	external, err := FindExternalSkills(CanonicalSkillKeys(manifest), false)
-	if err != nil {
-		return SearchResult{}, err
-	}
-	for _, s := range external {
-		if score := scoreExternalSkill(query, s); score > 0 || MatchesExternalSkill(s, query) {
-			scored = append(scored, scoredRef{ref: SkillRef{Name: s.Name, Source: "ext:" + s.SourceID, Description: s.Description, Path: s.Path, Score: score}, score: score})
-		}
-	}
-	sort.SliceStable(scored, func(i, j int) bool {
-		if scored[i].score == scored[j].score {
-			return strings.ToLower(scored[i].ref.Name) < strings.ToLower(scored[j].ref.Name)
-		}
-		return scored[i].score > scored[j].score
-	})
-	result := SearchResult{Query: query}
-	for _, s := range scored {
-		result.Matches = append(result.Matches, s.ref)
-	}
-	return result, nil
+	return refs
 }
 
-// Route runs the full deterministic + optional-semantic preflight for a prompt
-// and returns a typed RouteResult carrying the decision, ordered matches
-// (best/second), the selected skill when confident, the margin, and the
-// confidence threshold. This is the single route path the CLI and a future MCP
-// server both call.
-func Route(prompt string, opts RouteOptions) (RouteResult, error) {
-	internalOpts := routeOptions{
-		explain: opts.Explain,
-	}
-	if strings.TrimSpace(opts.HookEvent) != "" {
-		internalOpts.hookEvent = opts.HookEvent
-		internalOpts.enforceHookEvent = true
-	}
-	preflight, err := buildRoutePreflight(prompt, internalOpts)
-	if err != nil {
-		return RouteResult{}, err
-	}
-	return routeResultFromPreflight(preflight, opts), nil
-}
-
-// Preflight is the exported, renderable view of one route preflight. It wraps
-// the engine-internal decision so the CLI (and the future MCP surface) can drive
-// identical human/JSON output without reaching into engine internals. RunPreflight
-// produces it; the accessor methods and Print/PrintJSON reproduce the CLI's
-// historical byte-for-byte output.
-type Preflight struct {
-	inner routePreflight
-}
-
-// RunPreflight executes the full route preflight and returns the renderable view.
-// It is the shared entry point for the route/auto/preflight CLI commands.
-func RunPreflight(prompt string, opts RouteOptions) (Preflight, error) {
-	internalOpts := routeOptions{explain: opts.Explain}
-	if strings.TrimSpace(opts.HookEvent) != "" {
-		internalOpts.hookEvent = opts.HookEvent
-		internalOpts.enforceHookEvent = true
-	}
-	preflight, err := buildRoutePreflight(prompt, internalOpts)
-	if err != nil {
-		return Preflight{}, err
-	}
-	return Preflight{inner: preflight}, nil
-}
-
-// IsRoute reports whether the preflight produced a confident route.
-func (p Preflight) IsRoute() bool { return p.inner.Decision == routeDecisionRoute }
-
-// IsAmbiguous reports whether the preflight produced an ambiguous route.
-func (p Preflight) IsAmbiguous() bool { return p.inner.Decision == routeDecisionAmbiguous }
-
-// HasHostReview reports whether a host-AI review packet is attached.
-func (p Preflight) HasHostReview() bool { return p.inner.HostReview != nil }
-
-// BestName returns the selected/best candidate name.
-func (p Preflight) BestName() string { return p.inner.Best.name }
-
-// BestScore returns the best candidate's lexical score.
-func (p Preflight) BestScore() int { return p.inner.Best.score }
-
-// BestExternal reports whether the best candidate came from an external root.
-func (p Preflight) BestExternal() bool { return p.inner.Best.external }
-
-// SecondName returns the runner-up candidate name.
-func (p Preflight) SecondName() string { return p.inner.Second.name }
-
-// SecondScore returns the runner-up candidate's score.
-func (p Preflight) SecondScore() int { return p.inner.Second.score }
-
-// RawBestName returns the highest-scoring candidate before evidence gating.
-func (p Preflight) RawBestName() string { return p.inner.RawBest.name }
-
-// RawBestScore returns the highest pre-gate score.
-func (p Preflight) RawBestScore() int { return p.inner.RawBest.score }
-
-// Print writes the human-readable preflight summary to stdout.
-func (p Preflight) Print(explain bool) { printPreflight(p.inner, explain) }
-
-// PrintJSON writes the structured JSON preflight to stdout.
-func (p Preflight) PrintJSON(explain bool) error { return printPreflightJSON(p.inner, explain) }
-
-// routeResultFromPreflight projects the engine-internal preflight onto the
-// public RouteResult contract.
-func routeResultFromPreflight(preflight routePreflight, opts RouteOptions) RouteResult {
-	threshold := automaticRouteMinScore
-	if opts.MinScore > 0 {
-		threshold = opts.MinScore
-	}
-	result := RouteResult{
-		Prompt:    preflight.Prompt,
-		Decision:  string(preflight.Decision),
-		Threshold: threshold,
-	}
-	if preflight.Best.name != "" {
-		result.Matches = append(result.Matches, routeCandidateRef(preflight.Best))
-	}
-	if preflight.Second.name != "" {
-		result.Matches = append(result.Matches, routeCandidateRef(preflight.Second))
-		result.Margin = preflight.Best.score - preflight.Second.score
-	}
-	if preflight.Decision == routeDecisionRoute && preflight.Best.name != "" {
-		selected := routeCandidateRef(preflight.Best)
-		result.Selected = &selected
-	}
-	return result
-}
-
-func routeCandidateRef(c routeCandidate) SkillRef {
-	source := "library"
-	if c.core {
-		source = "core"
-	} else if c.external {
-		source = "ext:" + c.sourceID
+func routeCandidateRef(candidate routeCandidate) SkillRef {
+	source := "core"
+	if candidate.external {
+		source = "ext:" + candidate.sourceID
+	} else if !isCoreManifestSkill(candidate.name) {
+		source = "library"
 	}
 	return SkillRef{
-		Name:        c.name,
+		Name:        candidate.name,
 		Source:      source,
-		Description: c.description,
-		Score:       c.score,
+		Description: candidate.description,
+		Score:       candidate.score,
 	}
 }
 
-// skillRefForPath builds a SkillRef for a resolved skill path, deriving the
-// source ("core"/"library"/"ext:<id>") and description from the manifest or
-// external overlay when possible.
-func skillRefForPath(requested, skillPath string) SkillRef {
-	key := strings.ToLower(strings.TrimSpace(requested))
-	ref := SkillRef{Name: requested, Path: skillPath}
-	if manifest, err := LoadManifest(); err == nil {
+// coreManifestNames caches the canonical core-skill names so route candidate
+// sources can be classified as core vs library. It is loaded lazily and best
+// effort; a manifest read failure simply yields the library default.
+func isCoreManifestSkill(name string) bool {
+	key := strings.ToLower(strings.TrimSpace(name))
+	manifest, err := loadManifest()
+	if err != nil {
+		return false
+	}
+	for _, s := range manifest.CoreSkills {
+		if strings.ToLower(s.Name) == key {
+			return true
+		}
+	}
+	return false
+}
+
+func loadSourceForPath(skillPath, name string) string {
+	key := strings.ToLower(strings.TrimSpace(name))
+	manifest, err := loadManifest()
+	if err == nil {
 		for _, s := range manifest.CoreSkills {
 			if strings.ToLower(s.Name) == key || hasAlias(s, key) {
-				return SkillRef{Name: s.Name, Path: skillPath, Source: "core", Description: s.Description}
+				return "core"
 			}
 		}
 		for _, s := range manifest.LibrarySkills {
 			if strings.ToLower(s.Name) == key || hasAlias(s, key) {
-				return SkillRef{Name: s.Name, Path: skillPath, Source: "library", Description: s.Description}
+				return "library"
 			}
 		}
-		if external, err := FindExternalSkills(CanonicalSkillKeys(manifest), false); err == nil {
+		if external, extErr := findExternalSkills(canonicalSkillKeys(manifest), false); extErr == nil {
 			for _, s := range external {
-				if strings.ToLower(strings.TrimSpace(s.Name)) == key || s.Path == skillPath {
-					return SkillRef{Name: s.Name, Path: skillPath, Source: "ext:" + s.SourceID, Description: s.Description}
+				if s.Path == skillPath {
+					return "ext:" + s.SourceID
 				}
 			}
 		}
 	}
-	if name, description := ReadSkillFrontmatter(skillPath); name != "" {
-		ref.Name = name
-		ref.Description = description
-	}
-	return ref
+	return "library"
 }
 
-// ---- skill markdown resolution (relocated from cmd/skills) ----
-
-func findSkillMarkdown(name string) (string, error) {
+func loadDescriptionForName(name string) string {
 	key := strings.ToLower(strings.TrimSpace(name))
-	if key == "" {
-		return "", fmt.Errorf("skill name is required")
+	manifest, err := loadManifest()
+	if err != nil {
+		return ""
 	}
-	if manifest, err := LoadManifest(); err == nil {
-		for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
-			if strings.ToLower(s.Name) == key || hasAlias(s, key) {
-				return skillMarkdownFromDirectory(s.Directory)
+	for _, s := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
+		if strings.ToLower(s.Name) == key || hasAlias(s, key) {
+			return s.Description
+		}
+	}
+	if external, extErr := findExternalSkills(canonicalSkillKeys(manifest), false); extErr == nil {
+		for _, s := range external {
+			if strings.ToLower(strings.TrimSpace(s.Name)) == key {
+				return s.Description
 			}
 		}
 	}
-	if !isSafeSkillLookupName(name) {
-		return "", fmt.Errorf("unsafe skill name %q; use a manifest skill name or alias", name)
-	}
-
-	candidates := []string{
-		filepath.Join(RepoSkillsDir(), name, "SKILL.md"),
-		filepath.Join(platform.SkillsDir(), name, "SKILL.md"),
-		filepath.Join(platform.RepoDir(), name, "SKILL.md"),
-	}
-	if key == "manus-config" {
-		candidates = append([]string{
-			filepath.Join(RepoSkillsDir(), "universal-ai-config", "SKILL.md"),
-			filepath.Join(platform.SkillsDir(), "universal-ai-config", "SKILL.md"),
-		}, candidates...)
-	}
-	for _, candidate := range candidates {
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate, nil
-		}
-	}
-	if manifest, err := LoadManifest(); err == nil {
-		if candidate, ok := findExternalSkillMarkdown(key, CanonicalSkillKeys(manifest)); ok {
-			return candidate, nil
-		}
-	}
-	return "", fmt.Errorf("skill %q not found; try `skill-router skill search %s`", name, name)
+	return ""
 }
 
-func skillMarkdownFromDirectory(directory string) (string, error) {
-	clean := filepath.Clean(directory)
-	if strings.HasPrefix(clean, "..") || filepath.IsAbs(clean) {
-		return "", fmt.Errorf("unsafe skill directory in manifest: %s", directory)
+// VectorsCorpus gathers the routable corpus (manifest core + library + external
+// overlay) as bare candidates for offline embedding. It backs the CLI `vectors`
+// command, which lives in cmd/skills as a thin adapter.
+func VectorsCorpus() ([]VectorCandidate, error) {
+	candidates, err := collectSemanticCorpus()
+	if err != nil {
+		return nil, err
 	}
-	repo := platform.RepoDir()
-	candidates := []string{filepath.Join(repo, clean, "SKILL.md")}
-	if !strings.HasPrefix(clean, "skills"+string(os.PathSeparator)) && clean != "skills" {
-		candidates = append([]string{filepath.Join(RepoSkillsDir(), clean, "SKILL.md")}, candidates...)
+	out := make([]VectorCandidate, len(candidates))
+	for i, c := range candidates {
+		out[i] = VectorCandidate{Name: c.name, Description: c.description}
 	}
-	for _, candidate := range candidates {
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate, nil
-		}
-	}
-	return "", fmt.Errorf("skill markdown not found for manifest directory %s", directory)
+	return out, nil
 }
 
-func isSafeSkillLookupName(name string) bool {
-	trimmed := strings.TrimSpace(name)
-	if trimmed == "" || trimmed == "." || trimmed == ".." || filepath.IsAbs(trimmed) {
-		return false
+// VectorCandidate is the public, context-light projection of a routable skill
+// used by the offline vector-store generator.
+type VectorCandidate struct {
+	Name        string
+	Description string
+}
+
+// BuildVectorStoreJSON materializes the offline int8 semantic vector store for
+// the routable corpus and returns it as indented JSON, fully offline and
+// deterministic. dims must match the runtime embedder width.
+func BuildVectorStoreJSON(dims int) ([]byte, int, error) {
+	corpus, err := collectSemanticCorpus()
+	if err != nil {
+		return nil, 0, err
 	}
-	if strings.ContainsAny(trimmed, `/\`) {
-		return false
+	store := buildSemanticVectorStore(corpus, newHashingEmbedder(dims))
+	data, err := marshalSemanticVectorStore(store)
+	if err != nil {
+		return nil, 0, err
 	}
-	clean := filepath.Clean(trimmed)
-	return clean == trimmed && !strings.Contains(clean, "..")
+	return data, len(store), nil
 }

@@ -1,127 +1,132 @@
-# Adapter Deprecation Guide
+# Adapter Deprecation: Physical-Copy Propagation
 
-## What Is Deprecated
+**Status:** Deprecated (guidance + instrumentation now; removal in a later phase).
+**Replacement:** Agents call the skill-router CLI directly, or connect the
+`skill-router serve` stdio MCP server.
 
-**Physical-copy propagation of the `universal-ai-skills` wrapper skill into local
-agent skill roots is deprecated.**
+---
 
-The commands `skill-router skills sync`, `skill-router skills propagate`,
-`skill-router sync propagate`, and `skill-router sync all` currently copy the
-`universal-ai-skills` wrapper directory into the ~30 roots listed in
-`platform.AgentRootSpecs()`. This physical-copy mechanism is the legacy
-integration path. It is still functional but will be removed in a later phase.
+## What is deprecated
 
-## What Replaces It
+The **physical-copy adapter** path: `skill-router sync` (and `sync all` /
+`sync propagate` / `sync installed` / `sync paperclip`) physically copies the
+compact `universal-ai-skills` wrapper skill into each agent's on-disk skill root
+(the `AgentRootSpecs()` roots below — about 30 known clients, of which only the
+`default` ones are written by default).
 
-Agents and AI clients should connect to the skill router directly instead of
-relying on a locally copied wrapper:
+This was a bootstrap convenience so a freshly installed local AI client would
+"see" the router. It has known downsides:
 
-### Option A — CLI Direct Calls
+- Every client carries a duplicated wrapper copy that can drift from the
+  canonical source.
+- New clients must be added to the default propagation set to benefit.
+- It pushes filesystem state into ~30 roots instead of exposing one service.
 
-Invoke the router binary on demand from inside the agent session:
+> The full 1,812-skill corpus was **never** copied by default — only the single
+> `universal-ai-skills` wrapper. `--full-copy` corpus propagation is the most
+> strongly discouraged form of this pattern.
 
-```
-skill-router route "<prompt>"           # auto-route + load best skill
-skill-router skills search_skills "<q>" # search the registry
-skill-router skills load_skill <name>   # load one skill by name
-skill-router skills compose "<prompt>"  # compose a multi-skill bundle
-```
+## What replaces it
 
-No files need to be copied. The binary reads the canonical `manifest.json`
-registry directly.
+Instead of receiving a copied wrapper, an agent should reach the canonical
+engine directly. There is exactly one engine
+(`internal/skillservice`) behind both surfaces:
 
-### Option B — `skill-router serve` MCP Server
+1. **CLI (direct calls)** — the four canonical verbs:
+   - `skill-router route "<task prompt>"`
+   - `skill-router search_skills "<query>"`
+   - `skill-router load_skill <name>`
+   - `skill-router compose "<task prompt>"`
+   (`search` / `skill` remain as back-compat aliases.)
 
-Connect the router as a stdio JSON-RPC MCP server so the host agent can call
-routing tools natively:
+2. **MCP server** — `skill-router serve` is a hand-rolled stdio JSON-RPC MCP
+   server exposing the same verbs as tools. Point any MCP-capable client at it:
+   ```jsonc
+   // example MCP client config entry
+   {
+     "command": "skill-router",
+     "args": ["serve"]
+   }
+   ```
 
-```
-skill-router serve
-```
+No copied skills are required for either path; the CLI is the source of truth
+and prints full skill bodies on demand.
 
-Then register the server in the agent's MCP configuration (e.g.,
-`~/.claude/settings.json`, `~/.codex/config.json`, etc.) under the
-`mcpServers` key with the command `skill-router serve`. The MCP tools exposed
-are: `route`, `search_skills`, `load_skill`, and `compose`.
+## Inspecting current adapter state
 
-## Invariants That Are Unchanged
+`skill-router sync --check` prints a **read-only** report of every known agent
+root and whether it currently holds physically-copied wrapper skills. It writes
+nothing. Add `--json` for machine-readable output. `skill-router sync matrix`
+remains available as the fuller compatibility view.
 
-- **`MANUS_*` environment aliases** (`MANUS_SKILLS_DIR`, `MANUS_REPO_DIR`) remain
-  fully supported as legacy aliases for the equivalent `SKILL_ROUTER_*` variables.
-  Nothing about the manus-compatibility surface changes.
-- **The single `manifest.json` registry** remains the authoritative source of
-  truth for all canonical skills. Its generation, format, and location are
-  unchanged.
-- **The `.manus` directory alias** (`~/.manus/skills`) continues to be a
-  recognized agent root spec entry. Agents reading from it will continue to work.
-- **Copy behavior is unchanged today** — the deprecation notice is emitted on
-  stderr but no writes are skipped. Removal will occur in a later phase with
-  advance notice.
+Any command that actually copies (`sync all`, `sync propagate`,
+`sync installed`, `sync paperclip`) now prints the deprecation notice to stderr
+once per run. **Copy behavior is unchanged** — only the guidance message and the
+read-only report were added.
 
-## Per-Adapter Migration Table
+## Per-adapter migration
 
-Derived from `platform.AgentRootSpecs()`. The "Physical Root" column shows the
-path currently targeted by propagation. The "CLI Migration" column shows the
-replacement invocation. The "MCP Config Key" column shows the key in the
-agent's MCP configuration file.
+`CLI command` = call the verbs directly. `MCP config` = register
+`skill-router serve` and call the same verbs as MCP tools. `repo-instruction`
+and `hosted` adapters never received a physical skill copy; they should carry a
+compact router pointer or an MCP connector instead.
 
-| Agent ID | Agent Name | Physical Root | Default Sync | CLI Migration | MCP Config Key |
-|---|---|---|---|---|---|
-| agent | OpenSkills / .agent | `~/.agent/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| claude | Claude Code / Claude Skills | `~/.claude/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| codex | OpenAI Codex | `~/.codex/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| manus | Manus-compatible | `~/.manus/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| gemini | Gemini CLI | `~/.gemini/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| cursor | Cursor | `~/.cursor/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| opencode | OpenCode | `~/.config/opencode/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| kiro | Kiro | `~/.kiro/skills` | yes | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| agent-skills-standard | Agent Skills open-standard root | `~/.agents/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| opencode-legacy | OpenCode legacy | `~/.opencode/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| hermes | Hermes Agent/Desktop local profile | `~/.hermes/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| hermes-agent-source | Hermes Agent source checkout | `~/.hermes/hermes-agent/skills` | no (report-only) | `skill-router route "<prompt>"` | n/a (source tree) |
-| paperclip | Paperclip local agents | `~/.paperclip/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| openclaw-global | OpenClaw global skills | `~/.openclaw/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| openclaw-workspace | OpenClaw workspace skills | `~/.openclaw/workspace/skills` | no (do not mutate) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| windsurf | Windsurf | `~/.windsurf/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| roo | Roo Code | `~/.roo/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| cline | Cline | `~/.cline/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| continue | Continue | `~/.continue/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| kimi | Kimi CLI | `~/.kimi/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| qwen | Qwen Code | `~/.qwen/skills` | no (report-only) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| kimi-openclaw | Kimi / OpenClaw workspace | `~/.kimi_openclaw/workspace/skills` | no (do not mutate) | `skill-router route "<prompt>"` | `mcpServers.skill-router` |
-| chatgpt | ChatGPT / Custom GPTs | (hosted) | no | Custom GPT instructions or Actions | n/a |
-| claude-cowork | Claude Cowork | (hosted) | no | MCP connector or compact instructions | n/a |
-| github-copilot | GitHub Copilot | `.github/copilot-instructions.md` | no | Compact router pointer in instruction file | n/a |
-| vscode-copilot | VS Code Copilot | `.github/instructions/` | no | Compact router pointer in instruction file | n/a |
-| aider | Aider | `CONVENTIONS.md` | no | Compact pointer to skill-router in CONVENTIONS | n/a |
-| openhands | OpenHands | (hosted) | no | Explicit AgentSkills integration | n/a |
-| devin | Devin | (hosted) | no | Repo instructions or MCP/API surface | n/a |
-| jetbrains-junie | JetBrains Junie | (hosted) | no | Compact repo guidance | n/a |
-| amazon-q | Amazon Q Developer | (hosted) | no | MCP or repo guidance adapter | n/a |
-| sourcegraph-cody | Sourcegraph Cody | (hosted) | no | Organization or repo instructions | n/a |
-| augment | Augment | (hosted) | no | Compact repo guidance | n/a |
+| ID | Client | Adapter | Default sync | Root path | Replacement |
+|----|--------|---------|--------------|-----------|-------------|
+| `agent` | OpenSkills / .agent | skill-root | default | `~/.agent/skills` | `skill-router serve` (MCP) or direct CLI |
+| `agent-skills-standard` | Agent Skills open-standard root | skill-root | report-only | `~/.agents/skills` | `skill-router serve` (MCP) or direct CLI |
+| `claude` | Claude Code / Claude Skills | skill-root | default | `~/.claude/skills` | `skill-router serve` (MCP) or direct CLI |
+| `codex` | OpenAI Codex | skill-root | default | `~/.codex/skills` | `skill-router serve` (MCP) or direct CLI |
+| `manus` | Manus-compatible | skill-root | default | `~/.manus/skills` | `skill-router serve` (MCP) or direct CLI |
+| `gemini` | Gemini CLI | skill-root | default | `~/.gemini/skills` | `skill-router serve` (MCP) or direct CLI |
+| `cursor` | Cursor | skill-root | default | `~/.cursor/skills` | `skill-router serve` (MCP) or direct CLI |
+| `opencode` | OpenCode | skill-root | default | `~/.config/opencode/skills` | `skill-router serve` (MCP) or direct CLI |
+| `kiro` | Kiro | skill-root | default | `~/.kiro/skills` | `skill-router serve` (MCP) or direct CLI |
+| `opencode-legacy` | OpenCode legacy | skill-root | report-only | `~/.opencode/skills` | `skill-router serve` (MCP) or direct CLI |
+| `hermes` | Hermes Agent/Desktop local profile | skill-root | report-only | `~/.hermes/skills` | `skill-router serve` (MCP) or direct CLI |
+| `hermes-agent-source` | Hermes Agent source checkout | skill-root | report-only | `~/.hermes/hermes-agent/skills` | `skill-router serve` (MCP) or direct CLI |
+| `paperclip` | Paperclip local agents | skill-root | report-only | `~/.paperclip/skills` | `skill-router serve` (MCP) or direct CLI |
+| `openclaw-global` | OpenClaw global skills | skill-root | report-only | `~/.openclaw/skills` | `skill-router serve` (MCP) or direct CLI |
+| `openclaw-workspace` | OpenClaw workspace skills | skill-root | report-only | `~/.openclaw/workspace/skills` | `skill-router serve` (MCP) or direct CLI |
+| `windsurf` | Windsurf | skill-root | report-only | `~/.windsurf/skills` | `skill-router serve` (MCP) or direct CLI |
+| `roo` | Roo Code | skill-root | report-only | `~/.roo/skills` | `skill-router serve` (MCP) or direct CLI |
+| `cline` | Cline | skill-root | report-only | `~/.cline/skills` | `skill-router serve` (MCP) or direct CLI |
+| `continue` | Continue | skill-root | report-only | `~/.continue/skills` | `skill-router serve` (MCP) or direct CLI |
+| `kimi` | Kimi CLI | skill-root | report-only | `~/.kimi/skills` | `skill-router serve` (MCP) or direct CLI |
+| `qwen` | Qwen Code | skill-root | report-only | `~/.qwen/skills` | `skill-router serve` (MCP) or direct CLI |
+| `kimi-openclaw` | Kimi / OpenClaw workspace | skill-root | report-only | `~/.kimi_openclaw/workspace/skills` | `skill-router serve` (MCP) or direct CLI |
+| `chatgpt` | ChatGPT / Custom GPTs | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `claude-cowork` | Claude Cowork | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `github-copilot` | GitHub Copilot | repo-instruction | report-only | `.github/copilot-instructions.md` | compact router pointer in repo instructions |
+| `vscode-copilot` | VS Code Copilot | repo-instruction | report-only | `.github/instructions/*.instructions.md` | compact router pointer in repo instructions |
+| `aider` | Aider | repo-instruction | report-only | `CONVENTIONS.md` | compact router pointer in repo instructions |
+| `openhands` | OpenHands | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `devin` | Devin | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `jetbrains-junie` | JetBrains Junie | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `amazon-q` | Amazon Q Developer | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `sourcegraph-cody` | Sourcegraph Cody | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `augment` | Augment | hosted | report-only | (none) | MCP connector / hosted instructions |
 
-## Checking Current Adapter Status
+> This table is derived from `internal/platform/paths.go::AgentRootSpecs()`.
+> `skill-router sync --check --json` emits the live per-root status.
 
-To see which roots currently rely on physical copies (read-only, no files
-written or modified):
+## Explicitly unchanged
 
-```
-skill-router skills sync --check
-```
+These invariants are **not** part of this deprecation and remain intact:
 
-Or use the existing matrix command in `sync`:
-
-```
-skill-router sync matrix
-```
+- **The `manus` alias.** `MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` environment
+  variables, the `~/.manus/skills` root, and the byte-identical Manus parity
+  behavior are untouched.
+- **The single registry.** `manifest.json` remains the one canonical source of
+  truth for the skill corpus; `marketplace.json` and its CI drift guard are
+  untouched. This deprecation is about *propagation* of the wrapper into agent
+  roots, not the registry.
 
 ## Timeline
 
-| Phase | Status |
-|---|---|
-| Phase 2 (now) | Deprecated — notice emitted on stderr; copy behavior unchanged |
-| Later phase | Removal — `sync`/`propagate` commands will become no-ops or be removed |
-
-After removal, agents that currently load skills through the copied wrapper will
-need to use Option A (CLI direct) or Option B (MCP serve) described above.
+- **Now:** physical-copy propagation still works exactly as before, but emits a
+  deprecation notice on every real copy and ships a read-only `sync --check`
+  adapter-status report plus this migration guide.
+- **Later phase:** physical-copy propagation may be removed once clients have
+  migrated to direct CLI calls or the `serve` MCP server. The `manus` alias and
+  single `manifest.json` registry survive that removal.
