@@ -51,7 +51,10 @@ reports/
 .universal-ai-stack/
 .local-ai/
 .firecrawl/
-models/
+# Root runtime model-download dir only — anchored so it does NOT match the Go
+# router source skill-router-cli/cmd/models/. Model weights anywhere are still
+# ignored by the *.gguf/*.safetensors/*.bin patterns below.
+/models/
 *.gguf
 *.safetensors
 *.bin
