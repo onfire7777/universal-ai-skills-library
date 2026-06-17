@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 /**
- * generate-registry.mjs — the single emitter for every registry artifact.
+ * generate-registry.mjs — the (now SECONDARY) registry emitter / parity oracle.
+ *
+ * STATUS — Node→Go cut-over, Stage 3 (see docs/MIGRATION_NODE_TO_GO.md §5):
+ * `skill-router registry build` (Go) is now the AUTHORITATIVE generator and the
+ * blocking `--check` drift gate (byte-parity proven across all 4 artifacts in
+ * both modes). This script is retained ONLY as an independent, non-blocking
+ * parity ORACLE and is slated for removal at Stage 5 after one clean release.
+ * Keep its output byte-identical to the Go generator until then.
  *
  * ONE source of truth → MANY generated artifacts (kept in lockstep, so they can
  * never drift the way the old hand-maintained pair did):
