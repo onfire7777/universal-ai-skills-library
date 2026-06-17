@@ -1,0 +1,1547 @@
+{
+  "$schema": "./registry.config.schema.json",
+  "$doc": "Single source of truth for the unified skill registry. The skill CATALOG is derived from skills/ on disk; this file holds only the curated, non-derivable metadata. Generated artifacts (manifest.json, marketplace.json, docs/build_manifest.json) are produced by generate-registry.mjs and must never be hand-edited.",
+  "schemaVersion": 1,
+  "manifest": {
+    "version": "2.2.8",
+    "generated": "2026-05-15",
+    "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,812-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+    "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
+    "alias_count": 1917,
+    "routing": {
+      "primary_access": "skill-router skill <name>",
+      "legacy_access": "manus skill <name>",
+      "search": "skill-router skill search <query>",
+      "list": "skill-router skill list"
+    }
+  },
+  "coreSkills": [
+    "chat-summarizer",
+    "context-anchor",
+    "file-organizer",
+    "manus-api",
+    "universal-ai-config",
+    "universal-ai-skills",
+    "gstack",
+    "gbrain",
+    "model-selector",
+    "multi-model-code-auditor",
+    "multi-model-oracle",
+    "music-prompter",
+    "persistent-computing",
+    "prompt-engineer",
+    "skill-creator",
+    "skill-debugger",
+    "skill-sync",
+    "ultimate-skill-creator"
+  ],
+  "aliases": {
+    "gstack": [
+      "garrytan-gstack",
+      "garry-tan-gstack",
+      "gstack-skills",
+      "gstack-router"
+    ],
+    "gbrain": [
+      "garrytan-gbrain",
+      "garry-tan-gbrain",
+      "gbrain-skills",
+      "brain-first"
+    ],
+    "ahrefs-automation": [
+      "Ahrefs Automation"
+    ],
+    "anthropic-administrator-automation": [
+      "anthropic_administrator-automation"
+    ],
+    "apify-automation": [
+      "Apify Automation"
+    ],
+    "apollo-automation": [
+      "Apollo Automation"
+    ],
+    "ashby-automation": [
+      "Ashby Automation"
+    ],
+    "attio-automation": [
+      "Attio Automation"
+    ],
+    "banner-design": [
+      "ckm-banner-design",
+      "ckm:banner-design"
+    ],
+    "braintree-automation": [
+      "Braintree Automation"
+    ],
+    "brand": [
+      "ckm-brand",
+      "ckm:brand"
+    ],
+    "brutalist-skill": [
+      "industrial-brutalist-ui"
+    ],
+    "capsule-crm-automation": [
+      "Capsule CRM Automation",
+      "capsule_crm-automation"
+    ],
+    "clockify-automation": [
+      "Clockify Automation"
+    ],
+    "cloudinary-automation": [
+      "Cloudinary Automation"
+    ],
+    "coinbase-automation": [
+      "Coinbase Automation"
+    ],
+    "compression-runtime": [
+      "bundled-compression-runtime"
+    ],
+    "conducting-internal-network-penetration-test": [
+      "conducting-internal-network-p-your-password-test",
+      "conducting-internal-network-p<YOUR_PASSWORD>-test"
+    ],
+    "contentful-automation": [
+      "Contentful Automation"
+    ],
+    "crawl4ai": [
+      "crawl4ai",
+      "crawl 4 ai",
+      "crwl",
+      "unclecode crawl4ai",
+      "crawl4ai setup",
+      "crawl4ai doctor",
+      "web crawler cli",
+      "llm web crawler",
+      "web to markdown",
+      "llm ready markdown",
+      "deep crawl",
+      "async web crawler",
+      "asyncwebcrawler",
+      "crawl4ai profiles",
+      "crawl4ai cdp"
+    ],
+    "customerio-automation": [
+      "customer-io-automation",
+      "Customer.io Automation"
+    ],
+    "design": [
+      "ckm-design",
+      "ckm:design"
+    ],
+    "design-system": [
+      "ckm-design-system",
+      "ckm:design-system"
+    ],
+    "docker-hub-automation": [
+      "Docker Hub Automation",
+      "docker_hub-automation"
+    ],
+    "dynamics365-automation": [
+      "Dynamics 365 Automation",
+      "dynamics-365-automation"
+    ],
+    "elevenlabs-automation": [
+      "ElevenLabs Automation"
+    ],
+    "eventbrite-automation": [
+      "Eventbrite Automation"
+    ],
+    "excel-automation": [
+      "Excel Automation"
+    ],
+    "facebook-automation": [
+      "Facebook Automation"
+    ],
+    "fillout-forms-automation": [
+      "fillout_forms-automation"
+    ],
+    "firecrawl": [
+      "firecrawl",
+      "firecrawl cli",
+      "firecrawl-cli",
+      "firecrawl mcp",
+      "firecrawl-mcp",
+      "firecrawl search",
+      "firecrawl scrape",
+      "firecrawl crawl",
+      "firecrawl map",
+      "firecrawl interact",
+      "firecrawl agent",
+      "firecrawl parse",
+      "firecrawl login",
+      "firecrawl api",
+      "firecrawl sdk",
+      "firecrawl/firecrawl"
+    ],
+    "firecrawl-automation": [
+      "Firecrawl Automation"
+    ],
+    "freshbooks-automation": [
+      "FreshBooks Automation"
+    ],
+    "gong-automation": [
+      "Gong Automation"
+    ],
+    "google-admin-automation": [
+      "google_admin-automation"
+    ],
+    "google-classroom-automation": [
+      "google_classroom-automation"
+    ],
+    "google-maps-automation": [
+      "google_maps-automation"
+    ],
+    "google-search-console-automation": [
+      "google_search_console-automation"
+    ],
+    "gorgias-automation": [
+      "Gorgias Automation"
+    ],
+    "gpt-tasteskill": [
+      "gpt-taste"
+    ],
+    "groqcloud-automation": [
+      "GroqCloud Automation"
+    ],
+    "gumroad-automation": [
+      "Gumroad Automation"
+    ],
+    "harvest-automation": [
+      "Harvest Automation"
+    ],
+    "heygen-automation": [
+      "HeyGen Automation"
+    ],
+    "html-ppt-presenter-mode-reveal": [
+      "html-ppt-presenter-mode"
+    ],
+    "hunter-automation": [
+      "Hunter Automation"
+    ],
+    "image-to-code-skill": [
+      "image-to-code"
+    ],
+    "instagram-cli": [
+      "instagram cli",
+      "instagram-cli",
+      "instagram-skill",
+      "i7m",
+      "i7m instagram",
+      "@i7m/instagram-cli",
+      "instagram tui",
+      "instagram terminal client",
+      "instagram direct messages",
+      "instagram messages cli",
+      "instagram dm cli",
+      "instagram inbox",
+      "instagram auth",
+      "instagram one-turn commands"
+    ],
+    "instantly-automation": [
+      "Instantly Automation"
+    ],
+    "jotform-automation": [
+      "Jotform Automation"
+    ],
+    "kommo-automation": [
+      "Kommo Automation"
+    ],
+    "launch-darkly-automation": [
+      "launch_darkly-automation",
+      "LaunchDarkly Automation",
+      "launchdarkly-automation"
+    ],
+    "lemlist-automation": [
+      "Lemlist Automation"
+    ],
+    "lemon-squeezy-automation": [
+      "Lemon Squeezy Automation",
+      "lemon_squeezy-automation"
+    ],
+    "lever-automation": [
+      "Lever Automation"
+    ],
+    "mailerlite-automation": [
+      "MailerLite Automation"
+    ],
+    "many-chat-automation": [
+      "many_chat-automation"
+    ],
+    "microsoft-clarity-automation": [
+      "Microsoft Clarity Automation",
+      "microsoft_clarity-automation"
+    ],
+    "minimalist-skill": [
+      "minimalist-ui"
+    ],
+    "mistral-ai-automation": [
+      "Mistral AI Automation",
+      "mistral_ai-automation"
+    ],
+    "neon-automation": [
+      "Neon Automation"
+    ],
+    "netsuite-automation": [
+      "NetSuite Automation"
+    ],
+    "new-relic-automation": [
+      "New Relic Automation",
+      "new_relic-automation"
+    ],
+    "notebooklm-mcp-cli": [
+      "notebooklm",
+      "notebook lm",
+      "nlm",
+      "notebooklm cli",
+      "notebooklm mcp",
+      "notebooklm-mcp",
+      "notebooklm-mcp-cli",
+      "google notebooklm",
+      "notebooklm podcast",
+      "notebooklm audio overview"
+    ],
+    "omnisend-automation": [
+      "Omnisend Automation"
+    ],
+    "onefilellm": [
+      "one llm",
+      "llm-ready xml",
+      "llm ready xml context",
+      "single llm ready xml",
+      "repo to xml context",
+      "repo to text"
+    ],
+    "onesignal-rest-api-automation": [
+      "onesignal_rest_api-automation"
+    ],
+    "openai-automation": [
+      "OpenAI Automation"
+    ],
+    "output-skill": [
+      "full-output-enforcement"
+    ],
+    "pandadoc-automation": [
+      "PandaDoc Automation"
+    ],
+    "phantombuster-automation": [
+      "PhantomBuster Automation"
+    ],
+    "printable-cards": [
+      "card-creator",
+      "card creator",
+      "greeting-card-creator",
+      "manus-card-creator",
+      "printable card",
+      "printable cards",
+      "foldable card",
+      "foldable greeting card",
+      "mother's day card",
+      "mothers day card",
+      "mother day card",
+      "birthday card"
+    ],
+    "printing-press-golden": [
+      "pp-printing-press-golden"
+    ],
+    "printing-press-rich-auth": [
+      "pp-printing-press-rich"
+    ],
+    "prismic-automation": [
+      "Prismic Automation"
+    ],
+    "productboard-automation": [
+      "Productboard Automation"
+    ],
+    "public-param-golden": [
+      "pp-public-param-golden"
+    ],
+    "quickbooks-automation": [
+      "QuickBooks Automation"
+    ],
+    "ramp-automation": [
+      "Ramp Automation"
+    ],
+    "redesign-skill": [
+      "redesign-existing-projects"
+    ],
+    "replicate-automation": [
+      "Replicate Automation"
+    ],
+    "ring-central-automation": [
+      "ring_central-automation",
+      "RingCentral Automation",
+      "ringcentral-automation"
+    ],
+    "semrush-automation": [
+      "SEMrush Automation"
+    ],
+    "share-point-automation": [
+      "share_point-automation",
+      "SharePoint Automation",
+      "sharepoint-automation"
+    ],
+    "shortcut-automation": [
+      "Shortcut Automation"
+    ],
+    "similarweb-digitalrank-api-automation": [
+      "similarweb_digitalrank_api-automation"
+    ],
+    "skill-seekers": [
+      "skill-builder"
+    ],
+    "slides": [
+      "ckm-slides",
+      "ckm:slides"
+    ],
+    "snowflake-automation": [
+      "Snowflake Automation"
+    ],
+    "soft-skill": [
+      "high-end-visual-design"
+    ],
+    "spotify-automation": [
+      "Spotify Automation"
+    ],
+    "stitch-skill": [
+      "stitch-design-taste"
+    ],
+    "survey-monkey-automation": [
+      "survey_monkey-automation",
+      "SurveyMonkey Automation",
+      "surveymonkey-automation"
+    ],
+    "taste-skill": [
+      "design-taste-frontend"
+    ],
+    "toggl-automation": [
+      "Toggl Automation"
+    ],
+    "ui-styling": [
+      "ckm-ui-styling",
+      "ckm:ui-styling"
+    ],
+    "uploadcare-automation": [
+      "Uploadcare Automation"
+    ],
+    "wave-accounting-automation": [
+      "Wave Accounting Automation",
+      "wave_accounting-automation"
+    ],
+    "webex-automation": [
+      "Webex Automation"
+    ],
+    "workday-automation": [
+      "Workday Automation"
+    ],
+    "x-cli": [
+      "sferik-x-cli",
+      "sferik x-cli",
+      "x api cli",
+      "x command line",
+      "twitter cli",
+      "twitter command line",
+      "xrc",
+      ".xrc",
+      "x-api"
+    ],
+    "xero-automation": [
+      "Xero Automation"
+    ],
+    "zoho-bigin-automation": [
+      "zoho_bigin-automation"
+    ],
+    "zoho-books-automation": [
+      "Zoho Books Automation",
+      "zoho_books-automation"
+    ],
+    "zoho-desk-automation": [
+      "Zoho Desk Automation",
+      "zoho_desk-automation"
+    ],
+    "zoho-inventory-automation": [
+      "zoho_inventory-automation"
+    ],
+    "zoho-invoice-automation": [
+      "zoho_invoice-automation"
+    ],
+    "zoho-mail-automation": [
+      "zoho_mail-automation"
+    ]
+  },
+  "descriptionOverrides": {
+    "universal-ai-config": "Configure and audit the local universal AI skills setup across Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, Paperclip agents, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, Manus compatibility surfaces, plugin manifests, optional MCP bridges, and global instruction files. Use when the user asks to organize, consolidate, optimize, rename, or repair the cross-AI skill router configuration.",
+    "universal-ai-skills": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list.",
+    "gstack": "Universal adapter for Garry Tan's gstack engineering skill stack. Use when the user asks for gstack, gstack office-hours, gstack review, gstack QA, gstack shipping, gstack security review, gstack browser/PDF tooling, or gstack integration with Claude Code, Codex, OpenCode, Hermes, OpenClaw, Kiro, Cursor, or GBrain.",
+    "gbrain": "Universal adapter for Garry Tan's GBrain personal knowledge brain. Use when the user asks for GBrain, brain-first retrieval, local PGLite brain setup, gbrain query/search/import/sync/embed, GBrain skills, Minions, durable agent jobs, soul-audit, brain maintenance, or integrating GBrain with gstack, Hermes, OpenClaw, Claude Code, or Codex.",
+    "causal-inference-root-cause": "Use when investigating why something happened and need to distinguish correlation from causation, identify root causes vs symptoms, test competing hypotheses, control for confounding variables, or design experiments to validate causal claims. Invoke when debugging systems, analyzing failures, researching health outcomes, evaluating policy impacts, or when user mentions root cause, causal chain, confounding, spurious correlation, or asks \"why did this really happen?",
+    "scaffold-nextjs": "Scaffolds a production-ready Next.js turborepo with TypeScript, Tailwind CSS, the shadcn/ui CLI, Blode UI components from the ui.blode.co registry, blode-icons-react, Oxlint, Oxfmt, Ultracite, and Vercel deployment. Use when creating a new Next.js app, bootstrapping a turborepo, scaffolding a web project, starting a new website, or asking \"create a Next.js project.",
+    "shopify-development": "Build Shopify apps, extensions, themes using GraphQL Admin API, Shopify CLI, Polaris UI, and Liquid. TRIGGER: \"shopify\", \"shopify app\", \"checkout extension\", \"admin extension\", \"POS extension\", \"shopify theme\", \"liquid template\", \"polaris\", \"shopify graphql\", \"shopify webhook\", \"shopify billing\", \"app subscription\", \"metafields\", \"shopify functions",
+    "ui-animation": "Creates, reviews, and debugs UI motion and animation implementations. Covers springs, gestures, drag interactions, clip-path reveals, easing, timing, and animation review. Use when designing, implementing, or reviewing motion, CSS transitions, keyframes, framer-motion, spring animations, asking \"add animations to\", \"make this feel smooth\", \"review my animations\", \"should this animate\", or \"add a swipe gesture"
+  },
+  "marketplace": {
+    "name": "universal-ai-skills",
+    "owner": {
+      "name": "onfire7777",
+      "url": "https://github.com/onfire7777"
+    },
+    "plugins": [
+      {
+        "name": "universal-ai-skills",
+        "source": "./plugin",
+        "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load 1,812 skills on demand without duplicating the corpus.",
+        "version": "2.2.8",
+        "author": {
+          "name": "onfire7777"
+        }
+      }
+    ]
+  },
+  "buildManifest": {
+    "schema": "universal-ai-skills-build-manifest/v2",
+    "generated_at": "2026-05-15T00:00:00.000Z",
+    "primary_binary": "skill-router",
+    "legacy_binary_alias": "manus",
+    "legacy_source_of_truth": "%USERPROFILE%\\universal-ai-skills-library\\skills",
+    "legacy_router_source": "%USERPROFILE%\\universal-ai-skills-library\\skill-router-cli",
+    "source_of_truth": "skills",
+    "router_source": "skill-router-cli",
+    "alias_count": 1917,
+    "merged_legacy_directories": [
+      {
+        "legacy_directory": "anthropic_administrator-automation",
+        "canonical_directory": "anthropic-administrator-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "capsule_crm-automation",
+        "canonical_directory": "capsule-crm-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "docker_hub-automation",
+        "canonical_directory": "docker-hub-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "fillout_forms-automation",
+        "canonical_directory": "fillout-forms-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "google_admin-automation",
+        "canonical_directory": "google-admin-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "google_classroom-automation",
+        "canonical_directory": "google-classroom-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "google_maps-automation",
+        "canonical_directory": "google-maps-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "google_search_console-automation",
+        "canonical_directory": "google-search-console-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "launch_darkly-automation",
+        "canonical_directory": "launch-darkly-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "lemon_squeezy-automation",
+        "canonical_directory": "lemon-squeezy-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "many_chat-automation",
+        "canonical_directory": "many-chat-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "microsoft_clarity-automation",
+        "canonical_directory": "microsoft-clarity-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "mistral_ai-automation",
+        "canonical_directory": "mistral-ai-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "new_relic-automation",
+        "canonical_directory": "new-relic-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "onesignal_rest_api-automation",
+        "canonical_directory": "onesignal-rest-api-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "ring_central-automation",
+        "canonical_directory": "ring-central-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "share_point-automation",
+        "canonical_directory": "share-point-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "similarweb_digitalrank_api-automation",
+        "canonical_directory": "similarweb-digitalrank-api-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "survey_monkey-automation",
+        "canonical_directory": "survey-monkey-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "wave_accounting-automation",
+        "canonical_directory": "wave-accounting-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "zoho_bigin-automation",
+        "canonical_directory": "zoho-bigin-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "zoho_books-automation",
+        "canonical_directory": "zoho-books-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "zoho_desk-automation",
+        "canonical_directory": "zoho-desk-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "zoho_inventory-automation",
+        "canonical_directory": "zoho-inventory-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "zoho_invoice-automation",
+        "canonical_directory": "zoho-invoice-automation",
+        "preserved_variant": true
+      },
+      {
+        "legacy_directory": "zoho_mail-automation",
+        "canonical_directory": "zoho-mail-automation",
+        "preserved_variant": true
+      }
+    ],
+    "disabled_colliding_aliases": {
+      "claude-native-algorithmic-art": [
+        "algorithmic-art"
+      ],
+      "claude-native-brand-guidelines": [
+        "brand-guidelines"
+      ],
+      "claude-native-canvas-design": [
+        "canvas-design"
+      ],
+      "claude-native-claude-api": [
+        "claude-api"
+      ],
+      "claude-native-code-review": [
+        "code-review"
+      ],
+      "claude-native-docx": [
+        "docx"
+      ],
+      "claude-native-mcp-builder": [
+        "mcp-builder"
+      ],
+      "claude-native-theme-factory": [
+        "theme-factory"
+      ],
+      "claude-native-web-artifacts-builder": [
+        "web-artifacts-builder"
+      ],
+      "claude-native-webapp-testing": [
+        "webapp-testing"
+      ],
+      "claude-native-xlsx": [
+        "xlsx"
+      ],
+      "saas-landing-skill": [
+        "saas-landing"
+      ],
+      "template": [
+        "template-skill"
+      ]
+    },
+    "compatibility_policy": {
+      "universal_default": "Use skill-router skill <name> for on-demand loading.",
+      "provider_names_allowed_when": "The skill targets a real API, model, client, or compatibility adapter.",
+      "legacy_aliases": [
+        "manus skill <name>",
+        "manus-config"
+      ]
+    }
+  },
+  "groupings": [
+    {
+      "name": "manus-ai-prompt-engineering",
+      "description": "AI and prompt engineering: LLM apps, agents, RAG, evals",
+      "members": [
+        "ai-expertise-engine",
+        "ai-shaped-readiness-advisor",
+        "claude-api",
+        "context-engineering-advisor",
+        "dispatching-parallel-agents",
+        "embedding-fusion-strategy",
+        "internet-skill-finder",
+        "master-skill-orchestrator",
+        "mcp-builder",
+        "meta-prompt-engineering",
+        "meta-thinking-engine",
+        "n8n-code-javascript",
+        "n8n-code-python",
+        "n8n-expression-syntax",
+        "n8n-mcp-tools-expert",
+        "n8n-node-configuration",
+        "n8n-validation-expert",
+        "n8n-workflow-patterns",
+        "prompt-engineering",
+        "second-opinion",
+        "skill-composition-protocol",
+        "skill-connection-map",
+        "skill-deployer",
+        "skill-finder",
+        "skill-judge",
+        "stable-baselines3",
+        "subagent-driven-development",
+        "task-execution-engine",
+        "tlc-spec-driven",
+        "transformers",
+        "voice-agents",
+        "voice-ai-development"
+      ]
+    },
+    {
+      "name": "manus-backend-architecture",
+      "description": "Backend architecture: APIs, system design, distributed systems, databases",
+      "members": [
+        "adr-architecture",
+        "api-design-principles",
+        "architecture-decision-records",
+        "architecture-designer",
+        "architecture-patterns",
+        "async-python-patterns",
+        "auth-implementation-patterns",
+        "clean-architecture",
+        "component-flattening-analysis",
+        "component-identification-sizing",
+        "coupling-analysis",
+        "ddia-systems",
+        "define-architecture",
+        "domain-analysis",
+        "domain-driven-design",
+        "error-handling-patterns",
+        "event-store-design",
+        "fastapi-endpoint",
+        "fastapi-templates",
+        "graphrag-evaluation",
+        "graphrag-system-design",
+        "information-architecture",
+        "inngest",
+        "knowledge-graph-construction",
+        "microservices-patterns",
+        "monorepo-management",
+        "mssql",
+        "multi-repo-git-ops",
+        "mysql",
+        "postgres",
+        "postgresql-table-design",
+        "python-design-patterns",
+        "python-error-handling",
+        "python-performance-optimization",
+        "python-testing-patterns",
+        "python-type-safety",
+        "react-patterns",
+        "relay",
+        "saga",
+        "schema",
+        "software-architecture",
+        "software-design-philosophy",
+        "sql-optimization-patterns",
+        "stripe-best-practices",
+        "supabase-postgres-best-practices",
+        "system-design",
+        "trigger-dev",
+        "typescript-clean-code",
+        "typescript-e2e-testing",
+        "typescript-expert",
+        "typescript-unit-testing",
+        "upstash-qstash",
+        "using-git-worktrees",
+        "using-neon",
+        "using-superpowers"
+      ]
+    },
+    {
+      "name": "manus-communication",
+      "description": "Communication: writing, presentations, facilitation, leadership",
+      "members": [
+        "communication-storytelling",
+        "content-research-writer",
+        "copywriting",
+        "docx",
+        "eol-message",
+        "executive-onboarding-playbook",
+        "hone",
+        "press-release",
+        "prose",
+        "reviews-retros-reflection",
+        "socratic-teaching-scaffolds",
+        "speech",
+        "tone",
+        "transcribe",
+        "translation-reframing-audience-shift",
+        "video-downloader",
+        "voice",
+        "workshop-facilitation",
+        "writing-clearly-and-concisely",
+        "writing-plans",
+        "writing-pre-publish-checklist",
+        "writing-revision",
+        "writing-skills",
+        "writing-stickiness",
+        "writing-structure-planner"
+      ]
+    },
+    {
+      "name": "manus-creativity-innovation",
+      "description": "Creativity and innovation: creative writing, art, ideation",
+      "members": [
+        "blue-ocean-strategy",
+        "brainstorm-diverge-converge",
+        "brainstorming",
+        "constraint-based-creativity",
+        "contagious",
+        "creative-connections-engine",
+        "crossing-the-chasm",
+        "drive-motivation",
+        "ethics-safety-impact",
+        "experiment",
+        "hundred-million-offers",
+        "influence-psychology",
+        "inspired-product",
+        "iterate-pr",
+        "jobs-to-be-done",
+        "made-to-stick",
+        "morphological-analysis-triz",
+        "obviously-awesome",
+        "pestel-analysis",
+        "prototyping-pretotyping",
+        "sora",
+        "storyboard",
+        "storybrand-messaging"
+      ]
+    },
+    {
+      "name": "manus-data-analysis",
+      "description": "Data analysis: analytics, viz, statistics, ML/data pipelines",
+      "members": [
+        "best-practices",
+        "bright-data-best-practices",
+        "data-analyst-engine",
+        "data-feeds",
+        "evaluation-rubrics",
+        "excel-generator",
+        "finance-metrics-quickref",
+        "geo-fundamentals",
+        "git-advanced-workflows",
+        "saas-economics-efficiency-metrics",
+        "saas-revenue-growth-metrics",
+        "spreadsheet",
+        "statistical-analysis",
+        "statsmodels",
+        "sympy",
+        "visualization-choice-reporting"
+      ]
+    },
+    {
+      "name": "manus-devops-infra",
+      "description": "DevOps and infrastructure: CI/CD, containers, cloud, IaC, SRE",
+      "members": [
+        "chrome-devtools",
+        "deployment-pipeline-design",
+        "finishing-a-development-branch",
+        "gh-fix-ci",
+        "github-actions-templates",
+        "github-gem-seeker",
+        "github-workflow-automation",
+        "gws-best-practices",
+        "it-infrastructure-sysadmin-engine",
+        "legacy-migration-planner",
+        "legacy-modernizer",
+        "pre-pr",
+        "release-it",
+        "remotion-best-practices",
+        "scaffold",
+        "terraform-module-library",
+        "vercel-cli-with-tokens",
+        "vercel-composition-patterns",
+        "vercel-react-best-practices",
+        "vercel-react-native-skills",
+        "workflow-automation"
+      ]
+    },
+    {
+      "name": "manus-domain-specific",
+      "description": "Narrow verticals: medical, legal, finance, scientific domains",
+      "members": [
+        "deep-research-scholarly-analysis-engine"
+      ]
+    },
+    {
+      "name": "manus-frontend-design",
+      "description": "Frontend and design: UI/UX, web frontend, design systems, accessibility",
+      "members": [
+        "3d-web-experience",
+        "accessibility",
+        "accessibility-compliance",
+        "accessibility-testing",
+        "artisan",
+        "brand-analyzer",
+        "brand-guidelines",
+        "brand-narrative",
+        "ckmdesign",
+        "ckmdesign-system",
+        "ckmui-styling",
+        "cognitive-design",
+        "color-palette",
+        "colormind",
+        "core-web-vitals",
+        "d3-visualization",
+        "design-audit",
+        "design-evaluation-audit",
+        "design-everyday-things",
+        "design-harden",
+        "design-hook",
+        "design-integration",
+        "design-mirror",
+        "design-of-experiments",
+        "design-optimize",
+        "design-review",
+        "design-sprint",
+        "design-system-components",
+        "design-system-creation",
+        "design-system-patterns",
+        "design-system-starter",
+        "design-to-code",
+        "distinctive-design-systems",
+        "favicon-gen",
+        "figma-implement-design",
+        "frontend-design-principles",
+        "graphic-design",
+        "gsap-core",
+        "gsap-frameworks",
+        "gsap-performance",
+        "gsap-plugins",
+        "gsap-react",
+        "gsap-scrolltrigger",
+        "gsap-timeline",
+        "gsap-utils",
+        "hooked-ux",
+        "icon-set-generator",
+        "imagegen",
+        "impeccable-frontend-design",
+        "infographic",
+        "interaction-design",
+        "interactive-portfolio",
+        "ios-hig-design",
+        "landing-page",
+        "manim",
+        "mermaid-diagrams",
+        "microinteractions",
+        "minimalist-design-system",
+        "mobile-design",
+        "motion-canvas",
+        "muapi-logo-creator",
+        "next-best-practices",
+        "next-cache-components",
+        "next-upgrade",
+        "onboarding-ux",
+        "openclaw-color-palette",
+        "palette",
+        "perf-astro",
+        "perf-lighthouse",
+        "perf-web-optimization",
+        "positioning-statement",
+        "printable-cards",
+        "product-showcase",
+        "refactoring-ui",
+        "responsive-design",
+        "responsiveness-check",
+        "roier-seo",
+        "scaffold-nextjs",
+        "scroll-experience",
+        "seo",
+        "shadcn",
+        "shadcn-ui",
+        "showcase",
+        "sketch",
+        "svg-logo-designer",
+        "tailwind-design-system",
+        "tailwind-theme-builder",
+        "theme-factory",
+        "top-design",
+        "typography-audit",
+        "ui-animation",
+        "ui-audit",
+        "ui-design",
+        "ui-design-system",
+        "ui-ux-pro-max",
+        "uiux-design-review",
+        "ux-audit",
+        "ux-heuristics",
+        "ux-researcher-designer",
+        "uxly",
+        "visual-design-foundations",
+        "visual-storytelling-design",
+        "visual-testing",
+        "web-component-design",
+        "web-design",
+        "web-design-builder",
+        "web-design-guidelines",
+        "web-perf",
+        "web-performance-optimization",
+        "web-quality-audit",
+        "web-to-markdown",
+        "web-typography",
+        "webapp-testing"
+      ]
+    },
+    {
+      "name": "manus-meta-skills",
+      "description": "Meta-skills: skill creation, learning, productivity",
+      "members": [
+        "accord",
+        "aether",
+        "algorithmic-art",
+        "architect",
+        "arena",
+        "atlas",
+        "attest",
+        "beacon",
+        "bolt",
+        "builder",
+        "canon",
+        "canvas",
+        "canvas-design",
+        "cast",
+        "clay",
+        "cli-windows-powershell-mastery",
+        "compete",
+        "cost-optimization",
+        "darwin",
+        "director",
+        "dot",
+        "draw-io",
+        "echo",
+        "exa-search",
+        "executing-plans",
+        "firecrawl-scraper",
+        "flow",
+        "flux",
+        "forge",
+        "frame",
+        "gateway",
+        "gauge",
+        "gear",
+        "grove",
+        "growth",
+        "harvest",
+        "hearth",
+        "helm",
+        "horizon",
+        "internet-search-parsing-mastery",
+        "json-canvas",
+        "judge",
+        "latch",
+        "lens",
+        "levy",
+        "loom",
+        "lore",
+        "lyric",
+        "magi",
+        "matrix",
+        "memory-retrieval-learning",
+        "mend",
+        "morph",
+        "muse",
+        "navigator",
+        "nexus",
+        "openapi-spec-generation",
+        "oracle",
+        "orbit",
+        "performance",
+        "pipe",
+        "planning-with-files",
+        "postmortem",
+        "prism",
+        "probe",
+        "profile",
+        "pulse",
+        "quest",
+        "quill",
+        "radar",
+        "rally",
+        "realm",
+        "reel",
+        "research-claim-map",
+        "research-paper-review",
+        "researcher",
+        "retrieval-search-orchestration",
+        "rewind",
+        "ripple",
+        "scout",
+        "scrape",
+        "scribe",
+        "search",
+        "sentry",
+        "sharp-edges",
+        "sherpa",
+        "shopify-development",
+        "siege",
+        "similarweb-analytics",
+        "slack-bot-builder",
+        "spark",
+        "stratum",
+        "stream",
+        "sweep",
+        "synthesis-and-analogy",
+        "tavily-web",
+        "think-tank",
+        "titan",
+        "trace",
+        "triage",
+        "tuner",
+        "vision",
+        "void",
+        "voyager",
+        "web-artifacts-builder",
+        "xlsx",
+        "yeet",
+        "zapier-make-patterns",
+        "zen"
+      ]
+    },
+    {
+      "name": "manus-planning-strategy",
+      "description": "Planning and strategy: PM, strategic planning, roadmaps, OKRs",
+      "members": [
+        "acquisition-channel-advisor",
+        "alignment-values-north-star",
+        "business-health-diagnostic",
+        "codenavi",
+        "company-research",
+        "continuous-discovery",
+        "cro-methodology",
+        "customer-journey-map",
+        "customer-journey-mapping-workshop",
+        "decision-matrix",
+        "decision-toolkit",
+        "decomposition-planning-roadmap",
+        "decomposition-reconstruction",
+        "director-readiness-advisor",
+        "discovery-interview-prep",
+        "discovery-interviews-surveys",
+        "discovery-process",
+        "environmental-scanning-foresight",
+        "epic-breakdown-advisor",
+        "epic-hypothesis",
+        "estimation-fermi",
+        "expected-value",
+        "facilitation-patterns",
+        "feature-forge",
+        "feature-investment-advisor",
+        "finance-based-pricing-advisor",
+        "focus-timeboxing-8020",
+        "guidelines-advisor",
+        "improve-retention",
+        "launch",
+        "lean-startup",
+        "lean-ux",
+        "lean-ux-canvas",
+        "metrics-tree",
+        "mom-test",
+        "negotiation",
+        "negotiation-alignment-governance",
+        "one-page-marketing",
+        "one-pager-prd",
+        "opportunity-solution-tree",
+        "portfolio-roadmapping-bets",
+        "positioning-workshop",
+        "prd-development",
+        "predictable-revenue",
+        "prioritization-advisor",
+        "prioritization-effort-impact",
+        "problem-framing-canvas",
+        "problem-statement",
+        "product-strategy-session",
+        "project-risk-register",
+        "proto-persona",
+        "recommendation-canvas",
+        "retain",
+        "roadmap-backcast",
+        "roadmap-planning",
+        "rp-why",
+        "scorecard-marketing",
+        "segment-cdp",
+        "stakeholders-org-design",
+        "strategic-planning-engine",
+        "strategy-and-competitive-analysis",
+        "tam-sam-som-calculator",
+        "traction-eos",
+        "user-story",
+        "user-story-mapping",
+        "user-story-mapping-workshop",
+        "user-story-splitting",
+        "vp-cpo-readiness-advisor"
+      ]
+    },
+    {
+      "name": "manus-privacy-compliance",
+      "description": "Privacy and compliance: GDPR/CCPA/HIPAA, DPIAs, AI Act, ISO 27701",
+      "members": [
+        "adequacy-assessment",
+        "age-verification-methods",
+        "ai-dpia",
+        "ai-federated-learning",
+        "ai-model-privacy-audit",
+        "ai-privacy-assessment",
+        "ai-training-data-class",
+        "ai-training-lawfulness",
+        "ai-transparency-reqs",
+        "ai-vendor-privacy-due",
+        "anonymization-alternative",
+        "applying-privacy-design-patterns",
+        "audit-context-building",
+        "audit-prep-assistant",
+        "auto-deletion-workflow",
+        "bcr-establishment",
+        "brazil-lgpd",
+        "ccpa-cpra-compliance",
+        "children-data-minimization",
+        "china-pipl",
+        "ciso-advisor",
+        "classification-policy",
+        "consent-pref-center",
+        "continuous-compliance",
+        "data-flow-mapping",
+        "data-portability",
+        "data-schema-knowledge-modeling",
+        "designing-privacy-preserving-analytics",
+        "differential-privacy-prod",
+        "dsar-processing",
+        "gdpr-compliance-audit",
+        "gdpr-dsgvo-expert",
+        "gdpr-gap-analysis",
+        "gdpr-policy-framework",
+        "gdpr-valid-consent",
+        "global-privacy-control",
+        "healthcare-ai-privacy",
+        "hipaa-breach-notify",
+        "hipaa-deidentification",
+        "india-dpdp-act",
+        "information-security-manager-iso27001",
+        "internal-privacy-audit",
+        "isms-audit-expert",
+        "iso-27701-pims",
+        "lawful-basis-assessment",
+        "legitimate-interest-lia",
+        "linddun-threat-model",
+        "nist-pf-govern",
+        "nist-pf-identify",
+        "nist-pf-protect",
+        "privacy-api-design",
+        "privacy-maturity-model",
+        "privacy-metrics-dashboard",
+        "purpose-based-access",
+        "risk-management-specialist"
+      ]
+    },
+    {
+      "name": "manus-quality-engineering",
+      "description": "Quality engineering: code review, testing, debugging, refactoring",
+      "members": [
+        "acceptance-testing",
+        "anvil",
+        "api-testing",
+        "browser-automation",
+        "browser-extension-builder",
+        "chaos-testing",
+        "clean-code",
+        "cloc",
+        "code-maturity-assessor",
+        "code-review-excellence",
+        "code-security",
+        "coding-guidelines",
+        "contract-testing",
+        "coverage-analysis",
+        "debugging-code",
+        "debugging-strategies",
+        "dependency-auditor",
+        "develop-web-game",
+        "dwarf-expert",
+        "e2e-testing",
+        "e2e-testing-patterns",
+        "entry-point-analyzer",
+        "find-bugs",
+        "fp-check",
+        "high-perf-browser",
+        "integration-testing",
+        "ln-002-session-analyzer",
+        "ln-020-codegraph",
+        "performance-testing",
+        "pragmatic-programmer",
+        "property-based-testing",
+        "quality-audit",
+        "quickdup",
+        "receiving-code-review",
+        "refactoring-patterns",
+        "requesting-code-review",
+        "security-testing-patterns",
+        "senior-security",
+        "static-analysis",
+        "test-driven-development",
+        "testrunner",
+        "unit-testing",
+        "variant-analysis",
+        "verification-before-completion",
+        "vibe-security",
+        "zeroize-audit"
+      ]
+    },
+    {
+      "name": "manus-reasoning-thinking",
+      "description": "Reasoning and thinking: mental models, critical thinking, epistemics",
+      "members": [
+        "abstraction-concrete-examples",
+        "altitude-horizon-framework",
+        "bayesian-reasoning-calibration",
+        "big-picture-thinking-engine",
+        "causal-inference-root-cause",
+        "chain-estimation-decision-storytelling",
+        "chain-roleplay-debate-synthesis",
+        "chain-spec-risk-metrics",
+        "cognitive-fallacies-guard",
+        "deliberation-debate-red-teaming",
+        "dialectical-mapping-steelmanning",
+        "first-principles-thinking",
+        "forecast-premortem",
+        "heuristics-and-checklists",
+        "hypotheticals-counterfactuals",
+        "introspection-self-reflection-engine",
+        "kill-criteria-exit-ramps",
+        "layered-reasoning",
+        "long-term-consequential-thinking",
+        "mapping-visualization-scaffolds",
+        "market-mechanics-betting",
+        "negative-contrastive-framing",
+        "reasoning-tools-kb",
+        "reference-class-forecasting",
+        "role-switch",
+        "scientific-brainstorming",
+        "scientific-critical-thinking",
+        "scout-mindset-bias-check",
+        "systematic-debug",
+        "systematic-debugging",
+        "systems-thinking-leverage",
+        "the-fool",
+        "thinking-archetypes",
+        "thinking-bayesian",
+        "thinking-bounded-rationality",
+        "thinking-circle-of-competence",
+        "thinking-cynefin",
+        "thinking-debiasing",
+        "thinking-dual-process",
+        "thinking-effectuation",
+        "thinking-feedback-loops",
+        "thinking-fermi-estimation",
+        "thinking-first-principles",
+        "thinking-five-whys-plus",
+        "thinking-inversion",
+        "thinking-jobs-to-be-done",
+        "thinking-kepner-tregoe",
+        "thinking-leverage-points",
+        "thinking-lindy-effect",
+        "thinking-map-territory",
+        "thinking-margin-of-safety",
+        "thinking-model-combination",
+        "thinking-model-router",
+        "thinking-model-selection",
+        "thinking-occams-razor",
+        "thinking-ooda",
+        "thinking-opportunity-cost",
+        "thinking-partner",
+        "thinking-pre-mortem",
+        "thinking-probabilistic",
+        "thinking-red-team",
+        "thinking-regret-minimization",
+        "thinking-reversibility",
+        "thinking-scientific-method",
+        "thinking-second-order",
+        "thinking-socratic",
+        "thinking-steel-manning",
+        "thinking-systems",
+        "thinking-theory-of-constraints",
+        "thinking-thought-experiment",
+        "thinking-triz",
+        "thinking-via-negativa"
+      ]
+    },
+    {
+      "name": "manus-security",
+      "description": "Security skills: pentesting, exploits, hardening, crypto, AppSec/NetSec",
+      "members": [
+        "address-sanitizer",
+        "aflpp",
+        "agentic-actions-auditor",
+        "algorand-vulnerability-scanner",
+        "analyzing-cyber-kill-chain",
+        "analyzing-indicators-of-compromise",
+        "analyzing-network-packets-with-scapy",
+        "analyzing-network-traffic-with-wireshark",
+        "analyzing-ransomware-encryption-mechanisms",
+        "atheris",
+        "breach",
+        "breach-72h-notification",
+        "breach-detection-system",
+        "breach-forensics",
+        "breach-response-playbook",
+        "breach-simulation",
+        "building-cloud-siem-with-sentinel",
+        "building-incident-response-playbook",
+        "building-ransomware-playbook-with-cisa-framework",
+        "burpsuite-project-parser",
+        "busybox-on-windows",
+        "cairo-vulnerability-scanner",
+        "cargo-fuzz",
+        "cf-crawl",
+        "codeql",
+        "compliance-audit",
+        "conducting-api-security-testing",
+        "conducting-cloud-incident-response",
+        "conducting-gdpr-dpia",
+        "conducting-internal-network-penetration-test",
+        "conducting-malware-incident-response",
+        "conducting-memory-forensics-with-volatility",
+        "conducting-network-penetration-test",
+        "conducting-phishing-incident-response",
+        "conducting-social-engineering-penetration-test",
+        "configuring-ldap-security-hardening",
+        "configuring-microsegmentation-for-zero-trust",
+        "configuring-oauth2-authorization-flow",
+        "configuring-pfsense-firewall-rules",
+        "configuring-snort-ids-for-intrusion-detection",
+        "constant-time-analysis",
+        "constant-time-testing",
+        "cosmos-vulnerability-scanner",
+        "defense-in-depth",
+        "deploy-to-vercel",
+        "deploying-edr-agent-with-crowdstrike",
+        "detecting-insider-data-exfiltration-via-dlp",
+        "detecting-oauth-token-theft",
+        "detecting-sql-injection-via-waf-logs",
+        "differential-review",
+        "firebase-apk-scanner",
+        "fuzzing-dictionary",
+        "fuzzing-obstacles",
+        "guardian",
+        "hardening-docker-daemon-configuration",
+        "harness-writing",
+        "implementing-aes-encryption-for-data-at-rest",
+        "implementing-api-gateway-security-controls",
+        "implementing-api-rate-limiting-and-throttling",
+        "implementing-api-security-posture-management",
+        "implementing-attack-surface-management",
+        "implementing-aws-iam-permission-boundaries",
+        "implementing-aws-security-hub-compliance",
+        "implementing-azure-ad-privileged-identity-management",
+        "implementing-beyondcorp-zero-trust-access-model",
+        "implementing-cloud-dlp-for-data-protection",
+        "implementing-cloud-security-posture-management",
+        "implementing-cloud-waf-rules",
+        "implementing-cloud-workload-protection",
+        "implementing-code-signing-for-artifacts",
+        "implementing-container-network-policies-with-calico",
+        "implementing-continuous-security-validation-with-bas",
+        "implementing-data-minimization-architecture",
+        "implementing-data-protection-by-default",
+        "implementing-ddos-mitigation-with-cloudflare",
+        "implementing-deception-based-detection-with-canarytoken",
+        "implementing-delinea-secret-server-for-pam",
+        "implementing-devsecops-security-scanning",
+        "implementing-diamond-model-analysis",
+        "implementing-digital-signatures-with-ed25519",
+        "implementing-disk-encryption-with-bitlocker",
+        "implementing-dmarc-dkim-spf-email-security",
+        "implementing-ebpf-security-monitoring",
+        "implementing-end-to-end-encryption-for-messaging",
+        "implementing-endpoint-detection-with-wazuh",
+        "implementing-envelope-encryption-with-aws-kms",
+        "implementing-file-integrity-monitoring-with-aide",
+        "implementing-homomorphic-encryption",
+        "implementing-identity-verification-for-zero-trust",
+        "implementing-mtls-for-zero-trust-services",
+        "implementing-secure-multi-party-computation",
+        "insecure-defaults",
+        "kubernetes-security-policies",
+        "libfuzzer",
+        "llm-security",
+        "network-101",
+        "ossfuzz",
+        "owasp-security",
+        "pii-detection-pipeline",
+        "pol-probe",
+        "polyglot",
+        "sarif-parsing",
+        "sast-configuration",
+        "seatbelt-sandboxer",
+        "secrets-management",
+        "secure-coding-practices",
+        "secure-workflow-guide",
+        "semgrep",
+        "semgrep-rule-creator",
+        "semgrep-rule-variant-creator",
+        "sentinel",
+        "sigil",
+        "skill-security-auditor",
+        "smtp-penetration-testing",
+        "solana-vulnerability-scanner",
+        "spec-miner",
+        "spec-to-code-compliance",
+        "specter",
+        "sql-injection-testing",
+        "stride-analysis-patterns",
+        "substrate-vulnerability-scanner",
+        "supply-chain-risk-auditor",
+        "threat-modeling-techniques",
+        "token-integration-analyzer",
+        "ton-vulnerability-scanner",
+        "top-100-web-vulnerabilities-reference",
+        "vigil",
+        "vulnerability-scanner",
+        "warden",
+        "windows-privilege-escalation",
+        "wireshark-network-traffic-analysis",
+        "workflow-security-audit",
+        "wycheproof",
+        "yara-rule-authoring"
+      ]
+    }
+  ]
+}
