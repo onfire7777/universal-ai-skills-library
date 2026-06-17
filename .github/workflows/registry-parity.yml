@@ -1,12 +1,15 @@
 name: registry-parity
 
-# Additive CI gate for the Node->Go registry-build migration. Runs on PRs that
-# touch the corpus, the registry config/generator, the Go router, or any
-# generated artifact. It enforces TWO things:
-#   1. the Go builder agrees with the committed artifacts (drop-in for the gate)
+# Byte-parity oracle for the registry build. Runs on PRs that touch the corpus,
+# the registry config/generator, the Go router, or any generated artifact. It
+# enforces TWO things:
+#   1. the Go builder agrees with the committed artifacts (the authoritative gate)
 #   2. the Go builder is byte-identical to the legacy Node generator
-# Until the cut-over completes, the existing Node `--check` job (characterization.yml)
-# stays authoritative; this job proves the Go path is ready to take over.
+# As of the Node→Go cut-over (Stage 3, docs/MIGRATION_NODE_TO_GO.md §5) the Go
+# `registry build --check` is the authoritative gate (here and in
+# characterization.yml); the Node generator is a non-blocking oracle. THIS job is
+# what turns red if Go and Node ever disagree — the safety net that justifies
+# keeping Node around through Stage 4.
 on:
   pull_request:
     paths:
