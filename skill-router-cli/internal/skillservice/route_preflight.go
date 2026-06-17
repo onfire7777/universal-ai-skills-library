@@ -1,4 +1,4 @@
-package skills
+package skillservice
 
 import (
 	"encoding/json"
@@ -13,6 +13,17 @@ const (
 	routeDecisionNoRoute   routeDecision = "no_route"
 	routeDecisionAmbiguous routeDecision = "ambiguous"
 )
+
+// routeOptions is the engine-internal request for the route pipeline. It is the
+// unexported counterpart of the public RouteOptions; the CLI adapter and Route()
+// translate between the two. optional drives the auto-command's quiet no-route
+// behavior; enforceHookEvent gates routing to user-prompt hook events only.
+type routeOptions struct {
+	optional         bool
+	explain          bool
+	hookEvent        string
+	enforceHookEvent bool
+}
 
 type routePreflight struct {
 	Prompt     string

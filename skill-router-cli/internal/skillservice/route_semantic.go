@@ -1,20 +1,22 @@
-package skills
+package skillservice
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"os"
 	"sort"
 	"strings"
-
-	"github.com/spf13/cobra"
 )
 
 // semanticEmbeddingDims is the width of the built-in offline embedder. A
 // precomputed vector store must be generated with the same width so the prompt
 // vector and the stored skill vectors are comparable.
 const semanticEmbeddingDims = 256
+
+// DefaultEmbeddingDims is the public width of the built-in offline embedder,
+// exposed so the CLI vectors command can default its --dims flag to the same
+// value the runtime engine uses.
+const DefaultEmbeddingDims = semanticEmbeddingDims
 
 // Phase 1 semantic routing layer.
 //
@@ -439,46 +441,4 @@ func collectSemanticCorpus() ([]routeCandidate, error) {
 		candidates = append(candidates, routeCandidate{name: s.Name, description: s.Description, sourceID: s.SourceID, external: true})
 	}
 	return candidates, nil
-}
-
-// VectorsCmd materializes the offline int8 vector store used by the optional
-// semantic routing path. It is fully offline and deterministic.
-var VectorsCmd = &cobra.Command{
-	Use:   "vectors",
-	Short: "Generate the offline int8 semantic vector store for SKILL_ROUTER_VECTORS",
-	Long: `Embed every routable skill (manifest core + library + external overlay) with the
-built-in offline embedder, quantize each vector to int8, and write a JSON store.
-
-Point the router at the file to enable the precomputed semantic path:
-
-  skill-router skills vectors --out vectors.json
-  SKILL_ROUTER_SEMANTIC=1 SKILL_ROUTER_VECTORS=vectors.json skill-router skills preflight "<prompt>"
-
-This contacts no network and loads no model weights; the exact lexical behavior
-is unchanged unless SKILL_ROUTER_SEMANTIC=1 is set.`,
-	RunE: func(cmd *cobra.Command, _ []string) error {
-		out, _ := cmd.Flags().GetString("out")
-		out = strings.TrimSpace(out)
-		if out == "" {
-			out = strings.TrimSpace(os.Getenv("SKILL_ROUTER_VECTORS"))
-		}
-		if out == "" {
-			return fmt.Errorf("no output path: pass --out <file> or set SKILL_ROUTER_VECTORS")
-		}
-		dims, _ := cmd.Flags().GetInt("dims")
-		corpus, err := collectSemanticCorpus()
-		if err != nil {
-			return err
-		}
-		store := buildSemanticVectorStore(corpus, newHashingEmbedder(dims))
-		data, err := marshalSemanticVectorStore(store)
-		if err != nil {
-			return err
-		}
-		if err := os.WriteFile(out, data, 0o644); err != nil {
-			return err
-		}
-		fmt.Printf("Wrote %d skill vectors (%d dims) to %s\n", len(store), dims, out)
-		return nil
-	},
 }

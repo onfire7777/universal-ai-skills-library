@@ -1,4 +1,4 @@
-package skills
+package skillservice
 
 import (
 	"bytes"
@@ -683,7 +683,9 @@ func TestPreflightProvidesHostReviewForAmbiguousRoute(t *testing.T) {
 // without tripping routing CI.
 func configurePreflightTest(t *testing.T) {
 	t.Helper()
-	fixture, err := filepath.Abs(filepath.Join("testdata", "route-fixture"))
+	// The route fixture stays under cmd/skills/testdata; reference it relative to
+	// the engine package after the route core was relocated here.
+	fixture, err := filepath.Abs(filepath.Join("..", "..", "cmd", "skills", "testdata", "route-fixture"))
 	if err != nil {
 		t.Fatal(err)
 	}
