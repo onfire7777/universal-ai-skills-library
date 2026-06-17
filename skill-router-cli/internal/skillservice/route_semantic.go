@@ -416,8 +416,20 @@ func newDefaultSemanticRouteEngine() *semanticRouteEngine {
 }
 
 // applySemanticRouting re-orders candidates with the default engine. It is a
-// no-op (identity) whenever semantic routing is not enabled.
-func applySemanticRouting(candidates []routeCandidate, prompt string) []routeCandidate {
+// no-op (identity) whenever semantic routing is not enabled. When a learned
+// re-ranker model is supplied AND semantic routing is enabled, the SAME model is
+// installed into the engine's single routeReranker slot so the semantic path and
+// the lexical path share one rerank implementation (no parallel path). A nil
+// model leaves the default identityReranker in place.
+func applySemanticRouting(candidates []routeCandidate, prompt string, model *RerankModel) []routeCandidate {
+	if !defaultSemanticEngine.enabled() {
+		return defaultSemanticEngine.fuse(prompt, candidates)
+	}
+	prev := defaultSemanticEngine.reranker
+	if model.valid() {
+		defaultSemanticEngine.reranker = learnedReranker{model: model}
+		defer func() { defaultSemanticEngine.reranker = prev }()
+	}
 	return defaultSemanticEngine.fuse(prompt, candidates)
 }
 

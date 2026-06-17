@@ -101,9 +101,10 @@ func logRouteDecision(prompt string, preflight routePreflight) {
 		Prompt:   prompt,
 		Decision: string(preflight.Decision),
 		Margin:   margin,
-		// reranker_used is false for now; Phase 3.3 wires the learned reranker
-		// and sets this from whether it actually reordered the candidates.
-		RerankerUsed: false,
+		// Phase 3.3: reranker_used reflects whether the gated learned re-ranker
+		// actually ran for this decision (preflight.RerankerUsed is set by the
+		// single rerank hook in buildRoutePreflight).
+		RerankerUsed: preflight.RerankerUsed,
 	}
 	if preflight.Best.name != "" {
 		c := telemetryCandidate(preflight.Best)

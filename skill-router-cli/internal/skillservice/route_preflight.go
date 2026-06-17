@@ -35,6 +35,11 @@ type routePreflight struct {
 	RawBest    routeCandidate
 	Candidates []routeCandidate
 	HostReview *hostAIReview
+	// RerankerUsed records whether the gated learned re-ranker actually ran and
+	// reordered candidates for this decision. It is the source of the telemetry
+	// reranker_used flag (set in logRouteDecision). False unless reranker.enabled
+	// AND a valid model loaded AND the reorder window had >= 2 candidates.
+	RerankerUsed bool
 }
 
 type hostAIReview struct {
@@ -99,15 +104,26 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 	sortRouteCandidates(candidates)
 	sortRouteCandidates(rawCandidates)
 
-	// Phase 1 hybrid semantic recall. A no-op (identity) unless semantic routing
-	// is explicitly enabled; the exact name/alias guardrail is enforced inside.
-	candidates = applySemanticRouting(candidates, prompt)
+	// Phase 3.3 single rerank hook (post-sort / pre-choose). This is THE one point
+	// the learned re-ranker attaches; it drives both the semantic fusion stage's
+	// routeReranker slot and the plain lexical pipeline through the SAME model and
+	// feature code (route_reranker.go) — no parallel rerank path.
+	//
+	// The model is loaded once and gated: loadEngineRerankModel returns nil unless
+	// reranker.enabled (config/env) AND a valid model.json loads. When nil, both
+	// applySemanticRouting (Phase 1, identity unless SKILL_ROUTER_SEMANTIC=1) and
+	// applyLearnedRerouting are no-ops, so default routing stays byte-for-byte
+	// unchanged. rerankerUsed is true only when the gated reorder actually ran.
+	model := loadEngineRerankModel()
+	candidates = applySemanticRouting(candidates, prompt, model)
+	candidates, rerankerUsed := applyLearnedRerouting(candidates, prompt, model)
 
 	preflight := routePreflight{
-		Prompt:     prompt,
-		HookEvent:  strings.TrimSpace(opts.hookEvent),
-		RawBest:    bestRaw,
-		Candidates: candidates,
+		Prompt:       prompt,
+		HookEvent:    strings.TrimSpace(opts.hookEvent),
+		RawBest:      bestRaw,
+		Candidates:   candidates,
+		RerankerUsed: rerankerUsed,
 	}
 	best, second, ok := chooseRouteCandidate(candidates)
 	if maintenancePrompt {
