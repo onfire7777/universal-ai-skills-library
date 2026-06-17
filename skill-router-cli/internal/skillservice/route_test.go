@@ -280,23 +280,27 @@ func TestPreflightJSONBoundsPromptAndDescriptions(t *testing.T) {
 			},
 		}}, "review"),
 	}
-	var out bytes.Buffer
 	oldStdout := os.Stdout
 	reader, writer, err := os.Pipe()
 	if err != nil {
 		t.Fatal(err)
 	}
 	os.Stdout = writer
+	// Drain concurrently so a payload larger than the OS pipe buffer (smaller on
+	// Windows) cannot deadlock the writer.
+	drained := make(chan string, 1)
+	go func() {
+		var buf bytes.Buffer
+		_, _ = buf.ReadFrom(reader)
+		drained <- buf.String()
+	}()
 	err = printPreflightJSON(preflight, false)
 	_ = writer.Close()
 	os.Stdout = oldStdout
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := out.ReadFrom(reader); err != nil {
-		t.Fatal(err)
-	}
-	output := out.String()
+	output := <-drained
 	if strings.Contains(output, longPrompt) {
 		t.Fatal("expected JSON output to avoid echoing the full prompt")
 	}

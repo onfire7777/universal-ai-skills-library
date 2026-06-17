@@ -144,20 +144,35 @@ func captureAdapterStatusJSON(t *testing.T) []adapterStatusRow {
 		t.Fatal(err)
 	}
 	os.Stdout = w
+
+	// Drain the pipe concurrently. printAdapterStatus can emit more than the OS
+	// pipe buffer (smaller on Windows than the ~64KB on macOS/Linux); reading
+	// only after it returns deadlocks the writer once the buffer fills.
+	type readResult struct {
+		data []byte
+		err  error
+	}
+	done := make(chan readResult, 1)
+	go func() {
+		var buf bytes.Buffer
+		_, copyErr := io.Copy(&buf, r)
+		done <- readResult{buf.Bytes(), copyErr}
+	}()
+
 	runErr := printAdapterStatus(true)
 	w.Close()
 	os.Stdout = orig
+
+	res := <-done
 	if runErr != nil {
 		t.Fatalf("printAdapterStatus returned error: %v", runErr)
 	}
-
-	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, r); err != nil {
-		t.Fatal(err)
+	if res.err != nil {
+		t.Fatal(res.err)
 	}
 	var rows []adapterStatusRow
-	if err := json.Unmarshal(buf.Bytes(), &rows); err != nil {
-		t.Fatalf("invalid JSON output: %v\n%s", err, buf.String())
+	if err := json.Unmarshal(res.data, &rows); err != nil {
+		t.Fatalf("invalid JSON output: %v\n%s", err, string(res.data))
 	}
 	return rows
 }
