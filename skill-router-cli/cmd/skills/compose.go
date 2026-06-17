@@ -28,6 +28,10 @@ var composeCmd = &cobra.Command{
 		full, _ := cmd.Flags().GetBool("full")
 		jsonOut, _ := cmd.Flags().GetBool("json")
 
+		if pipeline, _ := cmd.Flags().GetBool("pipeline"); pipeline {
+			return runComposePipeline(cmd, strings.Join(args, " "), minScore, jsonOut)
+		}
+
 		req := skillservice.ComposeRequest{
 			Prompt: strings.Join(args, " "), Top: top, MinScore: minScore, Full: full,
 		}
@@ -63,4 +67,67 @@ var composeCmd = &cobra.Command{
 		}
 		return nil
 	},
+}
+
+// runComposePipeline plans and prints a multi-step capability DAG (plan §3.6).
+func runComposePipeline(cmd *cobra.Command, prompt string, minScore int, jsonOut bool) error {
+	maxSteps, _ := cmd.Flags().GetInt("max-steps")
+	budget, _ := cmd.Flags().GetInt("budget")
+	load, _ := cmd.Flags().GetBool("load")
+	allowExternal, _ := cmd.Flags().GetBool("allow-external")
+
+	res, err := skillservice.ComposePlan(skillservice.ComposePlanRequest{
+		Prompt:        prompt,
+		MaxSteps:      maxSteps,
+		BudgetTokens:  budget,
+		Load:          load,
+		AllowExternal: allowExternal,
+		MinScore:      minScore,
+	})
+	if err != nil {
+		return err
+	}
+
+	out := cmd.OutOrStdout()
+	if jsonOut {
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(res)
+	}
+
+	if res.MultiStep {
+		fmt.Fprintf(out, "Composition: %d-step pipeline\n", len(res.Steps))
+	} else {
+		fmt.Fprintln(out, "Composition: single skill (multi-step pipeline not required)")
+	}
+	for _, s := range res.Steps {
+		caps := strings.Join(s.Capabilities, ",")
+		if s.Decision == "route" {
+			marker := "load"
+			if s.Loaded {
+				marker = "inlined"
+			}
+			fmt.Fprintf(out, "  %d. [%s] %s (%s, score %d, ~%d tok)\n     %s: %s\n",
+				s.Index+1, caps, s.Skill, s.Source, s.Score, s.TokenEst, marker, s.LoadPointer)
+		} else {
+			fmt.Fprintf(out, "  %d. [%s] (unresolved) %q\n", s.Index+1, caps, skillservice.Truncate(s.Text, 60))
+		}
+		if s.Note != "" {
+			fmt.Fprintf(out, "     note: %s\n", s.Note)
+		}
+	}
+	if len(res.Edges) > 0 {
+		parts := make([]string, 0, len(res.Edges))
+		for _, e := range res.Edges {
+			parts = append(parts, fmt.Sprintf("%d→%d", e.From+1, e.To+1))
+		}
+		fmt.Fprintln(out, "  flow:", strings.Join(parts, " "))
+	}
+	if res.Truncated || res.TokenEstUsed > 0 {
+		fmt.Fprintf(out, "  budget: %d/%d est tokens used\n", res.TokenEstUsed, res.BudgetTokens)
+	}
+	for _, n := range res.Notes {
+		fmt.Fprintln(out, "  -", n)
+	}
+	return nil
 }

@@ -53,10 +53,11 @@ func toolDefs() []map[string]any {
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"query": strProp("search query")}, "required": []string{"query"}}},
 		{"name": "load_skill", "description": "Return one skill's SKILL.md.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"name": strProp("skill name")}, "required": []string{"name"}}},
-		{"name": "compose", "description": "Assemble a working set of skills for a task.",
+		{"name": "compose", "description": "Assemble a working set of skills for a task, or (pipeline) a multi-step capability DAG.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{
-				"prompt": strProp("task prompt"),
-				"full":   map[string]any{"type": "boolean", "description": "include concatenated bodies"},
+				"prompt":   strProp("task prompt"),
+				"full":     map[string]any{"type": "boolean", "description": "include concatenated bodies (working-set mode)"},
+				"pipeline": map[string]any{"type": "boolean", "description": "decompose a multi-step prompt into an ordered capability DAG (plan §3.6)"},
 			}}},
 	}
 }
@@ -91,6 +92,13 @@ func callTool(name string, args map[string]any) (string, error) {
 		}
 		return r.Body, nil
 	case "compose":
+		if pipeline, _ := args["pipeline"].(bool); pipeline {
+			r, err := skillservice.ComposePlan(skillservice.ComposePlanRequest{Prompt: s("prompt")})
+			if err != nil {
+				return "", err
+			}
+			return jsonText(r)
+		}
 		full, _ := args["full"].(bool)
 		r, err := skillservice.Compose(skillservice.ComposeRequest{Prompt: s("prompt"), Full: full})
 		if err != nil {
