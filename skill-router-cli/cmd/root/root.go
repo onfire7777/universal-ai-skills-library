@@ -28,6 +28,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/instagram"
 	makeCmd "github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/make"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/mcp"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/serve"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/models"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/music"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/oracle"
@@ -121,6 +122,7 @@ func init() {
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)
 	rootCmd.AddCommand(mcp.Cmd)
+	rootCmd.AddCommand(serve.Cmd)
 	rootCmd.AddCommand(audit.Cmd)
 	rootCmd.AddCommand(oracle.Cmd)
 	rootCmd.AddCommand(print.Cmd)
