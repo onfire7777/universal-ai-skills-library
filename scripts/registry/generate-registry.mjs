@@ -18,19 +18,22 @@
  * (skill-router-cli validate-manifest → listSkillScripts), so generated output
  * always passes `skill-router validate-manifest`.
  *
- * Modes:
+ * Modes (the committed registries ARE the optimized output, so optimize is the
+ * default; --faithful selects the legacy characterization mode):
  *   --check            generate in memory, diff against the committed files,
- *                      exit 1 on drift. No writes. (Use in CI.)
+ *                      exit 1 on drift. No writes. Default covers ALL four
+ *                      artifacts + the stale-duplicate guard. (Use in CI.)
  *   --write            write the generated artifacts to disk.
  *   --print <artifact> print one artifact to stdout (manifest|marketplace|codex-marketplace|build-manifest).
- *   --optimize         apply the de-bloat transforms (see below) instead of the
- *                      byte-faithful reproduction of the legacy files.
- *   --only <list>      restrict to a comma list of artifacts (default: all).
+ *   --faithful         reproduce the legacy manifest.json/marketplace.json byte-
+ *                      for-byte instead of the optimized form (characterization).
+ *   --optimize         explicit form of the default optimized output.
+ *   --only <list>      restrict to a comma list of artifacts.
  *
- * Faithful (default) vs --optimize:
+ * Optimize (default) vs --faithful:
  *   faithful   reproduces the legacy manifest.json/marketplace.json byte-for-byte
  *              (the refactor-only proof). build_manifest is not reproduced in this
- *              mode because it is intentionally restructured by --optimize.
+ *              mode because it is intentionally restructured by optimize.
  *   optimize   - manifest entries omit empty optional fields (has_scripts:false,
  *                empty scripts/aliases) relying on the Go reader's `omitempty`
  *              - build_manifest slimmed to provenance only (drops the duplicated
@@ -328,12 +331,15 @@ export function normalizeForCompare(key, text) {
 // main
 // ---------------------------------------------------------------------------
 function parseArgs(argv) {
-  const args = { mode: "check", optimize: false, only: null, printArtifact: null };
+  // The committed registries ARE the optimized output, so optimize is the
+  // default; --faithful selects the legacy-reproduction (characterization) mode.
+  const args = { mode: "check", optimize: true, only: null, printArtifact: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--write") args.mode = "write";
     else if (a === "--check") args.mode = "check";
     else if (a === "--optimize") args.optimize = true;
+    else if (a === "--faithful") args.optimize = false;
     else if (a === "--print") {
       args.mode = "print";
       args.printArtifact = argv[++i];
@@ -352,14 +358,13 @@ function main() {
   const skills = scanSkills(config);
   const built = buildAll(config, skills, { optimize: args.optimize });
 
-  // Phase-1 safe default: faithful --check guards the artifacts that are byte-
-  // consistent with the committed tree today (manifest, marketplace). The other
-  // two (build-manifest, codex-marketplace) are intentionally restructured by
-  // --optimize, so they enter the check once optimize/--only is requested.
-  const DEFAULT_CHECK = ["manifest", "marketplace"];
+  // Default (optimize): check ALL four artifacts byte-for-byte against the
+  // committed tree. --faithful only reproduces manifest+marketplace (the legacy
+  // characterization set); build-manifest/codex have no faithful committed form.
+  const FAITHFUL_CHECK = ["manifest", "marketplace"];
   let selected;
   if (args.only) selected = args.only.filter((k) => k in ARTIFACTS);
-  else if (args.mode === "check" && !args.optimize) selected = DEFAULT_CHECK;
+  else if (args.mode === "check" && !args.optimize) selected = FAITHFUL_CHECK;
   else selected = Object.keys(ARTIFACTS);
 
   if (args.mode === "print") {

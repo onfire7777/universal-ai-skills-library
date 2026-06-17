@@ -35,24 +35,28 @@ longer drift from each other or from the `skills/` tree.
 
 ```bash
 # Validate that the committed registries are in sync with skills/ (CI guard).
-node scripts/registry/generate-registry.mjs --check            # faithful: manifest + marketplace
-node scripts/registry/generate-registry.mjs --check --optimize # all four artifacts (post-optimize state)
+# Default checks ALL four artifacts byte-for-byte + the stale-duplicate guard.
+node scripts/registry/generate-registry.mjs --check
 
 # Regenerate the registries on disk.
-node scripts/registry/generate-registry.mjs --write --optimize
+node scripts/registry/generate-registry.mjs --write
 
 # Inspect one artifact without writing.
-node scripts/registry/generate-registry.mjs --print manifest --optimize
+node scripts/registry/generate-registry.mjs --print manifest
+
+# Characterization: reproduce the legacy manifest/marketplace byte-for-byte.
+node scripts/registry/generate-registry.mjs --check --faithful
 
 # Tests.
 node --test scripts/registry/lib/frontmatter.test.mjs scripts/registry/generate-registry.test.mjs
 ```
 
-`--optimize` applies the de-bloat transforms (drop empty optional fields relying
-on the Go reader's `omitempty`; slim `build_manifest` to provenance only — the
-catalog lives in `manifest.json`; portable relative paths; recomputed counts;
-themed groupings in `marketplace.json`). Without it the generator reproduces the
-legacy `manifest.json`/`marketplace.json` for characterization.
+Optimize is the **default** (the committed registries are the optimized output):
+drop empty optional fields relying on the Go reader's `omitempty`; slim
+`build_manifest` to provenance only — the catalog lives in `manifest.json`;
+portable relative paths; recomputed counts; themed groupings in
+`marketplace.json`. `--faithful` instead reproduces the legacy
+`manifest.json`/`marketplace.json` byte-for-byte (refactor-only proof).
 
 ## Contract with the router (do not break)
 
