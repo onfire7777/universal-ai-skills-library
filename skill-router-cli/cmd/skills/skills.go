@@ -67,12 +67,50 @@ var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Compatibility alias for wrapper-only default root propagation",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		check, _ := cmd.Flags().GetBool("check")
+		if check {
+			return adapterStatusReport()
+		}
+		fmt.Fprintln(os.Stderr, skillsync.DeprecationNotice())
 		counts, err := skillsync.PropagateToDefaultRoots(false)
 		for _, root := range platform.AgentRoots() {
 			fmt.Printf("  %s - copied %d skills\n", root, counts[root])
 		}
 		return err
 	},
+}
+
+// adapterStatusReport prints a read-only adapter-status report by reusing the
+// AgentRootSpecs matrix data. It does not write or copy anything.
+func adapterStatusReport() error {
+	fmt.Println("Adapter deprecation status (read-only):")
+	fmt.Println()
+	fmt.Printf("  %-22s %-16s %-12s %-10s %s\n", "AGENT", "ADAPTER", "DEFAULT-SYNC", "HAS-WRAPPER", "PATH")
+	for _, spec := range platform.AgentRootSpecs() {
+		defaultSync := "no"
+		if spec.DefaultSync {
+			defaultSync = "yes (PHYS-COPY)"
+		}
+		hasWrapper := "n/a"
+		if spec.Path != "" && spec.Adapter == "skill-root" {
+			wrapperPath := filepath.Join(spec.Path, "universal-ai-skills", "SKILL.md")
+			if _, err := os.Stat(wrapperPath); err == nil {
+				hasWrapper = "yes"
+			} else {
+				hasWrapper = "no"
+			}
+		}
+		path := spec.Path
+		if path == "" {
+			path = "(hosted/" + spec.Adapter + ")"
+		}
+		fmt.Printf("  %-22s %-16s %-12s %-10s %s\n", spec.ID, spec.Adapter, defaultSync, hasWrapper, path)
+	}
+	fmt.Println()
+	fmt.Println("Roots marked 'yes (PHYS-COPY)' rely on physical-copy propagation, which is deprecated.")
+	fmt.Println("Migrate to: skill-router route|search_skills|load_skill|compose, or skill-router serve (MCP).")
+	fmt.Println("See docs/ADAPTER_DEPRECATION.md.")
+	return nil
 }
 
 var createCmd = &cobra.Command{
@@ -310,6 +348,7 @@ var propagateCmd = &cobra.Command{
 	Use:   "propagate",
 	Short: "Copy wrapper skills to default agent skill roots",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		fmt.Fprintln(os.Stderr, skillsync.DeprecationNotice())
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		fullCopy, _ := cmd.Flags().GetBool("full-copy")
 		roots := platform.AgentRoots()
@@ -433,6 +472,7 @@ is unchanged unless SKILL_ROUTER_SEMANTIC=1 is set.`,
 func init() {
 	installCmd.Flags().String("target", "", "Target directory for skill installation")
 	installCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to the target")
+	syncCmd.Flags().Bool("check", false, "Print read-only adapter-status report instead of copying (no files are written)")
 	listCmd.Flags().Bool("core", false, "Show only core skills")
 	listCmd.Flags().Bool("library", false, "Show only library skills")
 	listCmd.Flags().Bool("all", true, "Show all skills (default)")
