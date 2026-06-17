@@ -60,6 +60,12 @@ export const ARTIFACTS = {
   "build-manifest": "docs/build_manifest.json",
 };
 
+// Registries that were collapsed into the canonical single source and must NOT
+// reappear. plugin/marketplace.json was a stray byte-duplicate of the root
+// aggregate (it points at ./plugin, which only resolves from the repo root; the
+// plugin is self-described by plugin/plugin.json). --check fails if any return.
+export const STALE_REGISTRIES = ["plugin/marketplace.json"];
+
 // ---------------------------------------------------------------------------
 // serialization — matches the legacy files: 2-space indent, trailing newline,
 // no HTML escaping of <>& (Node's JSON.stringify already leaves them raw).
@@ -392,6 +398,15 @@ function main() {
       drift++;
     } else {
       console.log(`ok: ${ARTIFACTS[key]} in sync`);
+    }
+  }
+  // Stale-duplicate guard: collapsed registries must not reappear.
+  for (const rel of STALE_REGISTRIES) {
+    if (fs.existsSync(path.join(REPO_ROOT, rel))) {
+      console.error(`DRIFT: ${rel} is a stale duplicate registry (collapsed into the canonical marketplace.json — delete it)`);
+      drift++;
+    } else {
+      console.log(`ok: ${rel} absent (collapsed)`);
     }
   }
   if (drift > 0) {

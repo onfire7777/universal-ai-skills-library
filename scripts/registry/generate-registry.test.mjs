@@ -16,6 +16,7 @@ import path from "node:path";
 import {
   REPO_ROOT,
   CONFIG_PATH,
+  STALE_REGISTRIES,
   serialize,
   listSkillScripts,
   scanSkills,
@@ -198,6 +199,15 @@ test("marketplace optimize carries all 14 themed groupings, members resolve to s
         `grouping ${g.name} member ${id} not a real skill`
       );
     }
+  }
+});
+
+test("collapsed stale duplicate registries do not exist on disk", () => {
+  for (const rel of STALE_REGISTRIES) {
+    assert.ok(
+      !fs.existsSync(path.join(REPO_ROOT, rel)),
+      `${rel} is a stale duplicate registry and must be deleted (canonical = root marketplace.json)`
+    );
   }
 });
 

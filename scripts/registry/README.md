@@ -82,3 +82,7 @@ groupings. Neither needs to be run again in normal operation.
 - `manifest.alias_count` is recomputed deterministically (the legacy `1917` was
   not reproducible from the catalog; it is now the actual alias-string count).
 - `scripts[]` are emitted in the canonical sorted order the Go validator expects.
+- `plugin/marketplace.json` (a stray byte-duplicate of the root aggregate) was
+  collapsed — the root `marketplace.json` is the only canonical marketplace and
+  the plugin is self-described by `plugin/plugin.json`. `--check` lists it under
+  `STALE_REGISTRIES` and fails if it ever reappears.
