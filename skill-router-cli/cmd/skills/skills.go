@@ -446,6 +446,8 @@ func init() {
 	propagateCmd.Flags().Bool("dry-run", false, "Show target roots without copying")
 	propagateCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
+	VectorsCmd.Flags().String("out", "", "Output path for the int8 vector store JSON (defaults to $SKILL_ROUTER_VECTORS)")
+	VectorsCmd.Flags().Int("dims", semanticEmbeddingDims, "Embedding dimensionality; must match the runtime embedder")
 
 	Cmd.AddCommand(readCmd)
 	Cmd.AddCommand(installCmd)
@@ -464,6 +466,7 @@ func init() {
 	Cmd.AddCommand(promptCmd)
 	Cmd.AddCommand(anchorCmd)
 	Cmd.AddCommand(summarizeCmd)
+	Cmd.AddCommand(VectorsCmd)
 }
 
 func printSkill(name string) error {
