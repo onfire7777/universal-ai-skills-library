@@ -1,13 +1,26 @@
 # Performance & Bloat — Before / After (Goal 3)
 
-Hard numbers for the *"reduce bloat / improve performance"* goal. The **BEFORE**
-column is captured on canonical `main`; the **AFTER** column is filled once B2
-(router), B4 (registry slim) and B5 (asset dedup) land. Methodology and the
-measurement harness live in [`../bench/`](../bench/).
+Hard numbers for the *"reduce bloat / improve performance"* goal, measured on canonical
+`main` before (`eec826d`) and after (`3c285e0`) B2 (router decouple), B4 (registry single-source)
+and B5 (cleanup) landed. Methodology and the harness live in [`../bench/`](../bench/);
+the raw diff is [`../bench/results/delta.md`](../bench/results/delta.md).
+
+### Results (TL;DR)
+
+| Headline | Before → After | Δ |
+|----------|----------------|---|
+| **Route decision** (`preflight`) | 167.9 → 129.0 ms | **−23.2%** |
+| **Registry JSON** (manifest + build_manifest) | 1.50 MB → 0.67 MB | **−774 KB / −20.8%** |
+| `build_manifest.json` | 750 → 5.6 KB | −99.2% |
+| Go manifest parse | 4.78 → 4.03 ms | −15.7% |
+| Repo (excl `.git`) | 136.34 → 135.55 MB | −782 KB |
+
+Wins concentrate in **registry slimming** (B4) and **routing latency** (B2). Corpus (132 MB)
+and fonts (21.6 MB) are unchanged — see *Outcomes by hot-spot* for why, and the remaining opportunity.
 
 ```bash
-bench/run.sh before                                  # done — bench/results/before.json
-bench/run.sh after                                   # after B2/B4/B5 land
+bench/run.sh before    # bench/results/before.json   (eec826d)
+bench/run.sh after     # bench/results/after.json    (3c285e0)
 bench/compare.py bench/results/before.json bench/results/after.json --out bench/results/delta.md
 ```
 
@@ -21,61 +34,67 @@ bench/compare.py bench/results/before.json bench/results/after.json --out bench/
 
 | Metric | Command | BEFORE | AFTER | Δ |
 |--------|---------|-------:|------:|---|
-| Router init | `skill-router --version` | **8.17 ms** | _TBD_ | |
-| Manifest load + render | `skill-router skills list` | **15.78 ms** | _TBD_ | |
-| **Route decision** | `skill-router preflight "<prompt>"` | **167.88 ms** (min 135.16) | _TBD_ | |
-| ↳ routing overhead | `preflight − version` | 159.71 ms | _TBD_ | |
-| ↳ manifest overhead | `list − version` | 7.61 ms | _TBD_ | |
+| Router init | `skill-router --version` | 8.17 ms | 10.84 ms | +2.67 ms (+32.7%) |
+| Manifest load + render | `skill-router skills list` | 15.78 ms | 15.82 ms | +0.04 ms (≈0%) |
+| **Route decision** | `skill-router preflight "<prompt>"` | **167.88 ms** (min 135.16) | **128.97 ms** (min 120.30) | **−38.91 ms (−23.2%)** |
+| ↳ routing overhead | `preflight − version` | 159.71 ms | 118.13 ms | −41.58 ms (−26.0%) |
+| ↳ manifest overhead | `list − version` | 7.61 ms | 4.98 ms | −2.63 ms |
 
-> **Route decision is the key UX metric** (time to pick a skill for a prompt) and it
-> scales with corpus size — so B3 dedupe + B4 registry slim should move it the most.
+> **Route decision (the key UX metric) dropped 23%** after B2's config-driven resolver +
+> B4's slimmer registry. Router init rose ~2.7 ms (resolver does a little more config work
+> at startup, and process-spawn jitter dominates a ~10 ms figure) — a sub-3 ms absolute move
+> that is dwarfed by the 39 ms cut in route decision.
 
 ### Manifest parse (pure Go `json.Unmarshal`, IO excluded, median of 60)
 
 | Metric | BEFORE | AFTER | Δ |
 |--------|-------:|------:|---|
-| Parse time | **4.78 ms** (min 4.36) | _TBD_ | |
-| Heap alloc / parse | 1.30 MB | _TBD_ | |
-| Skills in manifest | 1,812 (18 core + 1,794 library) | _TBD_ | |
+| Parse time | 4.78 ms (min 4.36) | 4.03 ms (min 3.77) | −0.75 ms (−15.7%) |
+| Heap alloc / parse | 1.30 MB | 1.27 MB | −38.5 KB (−3.0%) |
+| Skills in manifest | 1,812 (18 core + 1,794 library) | 1,812 (18 + 1,794) | 0 |
 
 ### Size & on-disk footprint
 
 | Metric | BEFORE | AFTER | Δ |
 |--------|-------:|------:|---|
-| Router binary (`go build`) | **10.46 MB** | _TBD_ | |
-| `manifest.json` | 747.2 KB | _TBD_ | |
-| `docs/build_manifest.json` | 750.0 KB | _TBD_ | |
-| Repo (excl `.git`) | **136.34 MB** | _TBD_ | |
-| `skills/` directory | **132.00 MB** | _TBD_ | |
-| Tracked file bytes (excl `.git`) | 116.03 MB | _TBD_ | |
-| JSON files | 1,171 files · 3.72 MB | _TBD_ | |
-| **Font files** | **216 files · 21.65 MB** | _TBD_ | |
-| Skill directories | 1,812 | _TBD_ | |
-| Max RSS (preflight) | 21.79 MB | _TBD_ | |
+| Router binary (`go build`) | 10.46 MB | 10.46 MB | −128 B (≈0%) |
+| `manifest.json` | 747.2 KB | 668.8 KB | **−78.5 KB (−10.5%)** |
+| `docs/build_manifest.json` | 750.0 KB | 5.6 KB | **−744.4 KB (−99.2%)** |
+| Repo (excl `.git`) | 136.34 MB | 135.55 MB | −782 KB (−0.6%) |
+| `skills/` directory | 132.00 MB | 132.00 MB | 0 (see note) |
+| Tracked file bytes (excl `.git`) | 116.03 MB | 115.29 MB | −734 KB (−0.6%) |
+| JSON files | 1,171 files · 3.72 MB | 1,170 files · 2.94 MB | **−1 file · −774 KB (−20.8%)** |
+| **Font files** | 216 files · 21.65 MB | 216 files · 21.65 MB | 0 (see note) |
+| Skill directories | 1,812 | 1,812 | 0 |
+| Max RSS (preflight) | 21.79 MB | 21.66 MB | −131 KB (−0.6%) |
 
-(`.git` itself is 59.07 MB; repo total 195.41 MB. `.git` is excluded from refactor metrics.)
+(`.git` is excluded from refactor metrics; it grew 59.07 → 60.17 MB from the refactor's own commit history.)
 
-## Bloat hot-spots → owners
+## Outcomes by hot-spot
 
-Ranked by expected payoff. These are **targets for other builders** — this task only
-measures; it edits no source.
+What the BEFORE analysis flagged vs. what the refactor actually moved (✅ landed · ◻ remaining):
 
-1. **`skills/` corpus — 132 MB / 1,812 dirs (B3).** Dominates the tree and drives
-   route-decision latency. Consolidating `manus-skills-marketplace` content is reported
-   by Scout 1 as ~4,814/5,008 files identical/droppable → the largest single win in both
-   size and routing speed.
-2. **Fonts — 216 files / 21.65 MB (B5/B3).** Binary font assets embedded inside skills.
-   Dedupe/externalize for a large, low-risk size reduction.
-3. **Dual registry — `manifest.json` (747 KB) + `build_manifest.json` (750 KB) ≈ 1.5 MB (B4).**
-   Two near-duplicate registries; collapsing to a single source cuts JSON bytes and
-   per-parse allocation, and removes a drift source.
-4. **Routing overhead — ~160 ms (B2 + B3/B4).** Config-driven resolution must not regress
-   it; corpus slimming should reduce it. Re-measure with `preflight`.
-5. **Router binary — 10.46 MB (B2, optional).** `-ldflags "-s -w"` would trim it if a
-   smaller distributable is wanted (does not change behavior).
+1. **Dual registry → single source ✅ (B4).** `build_manifest.json` collapsed 750 KB → 5.6 KB
+   (−99.2%) and `manifest.json` slimmed 747 → 669 KB (−10.5%); total JSON **−774 KB (−20.8%)**,
+   with Go parse time −15.7% and per-parse alloc −3.0%. Drift source removed (single generator + CI guard).
+2. **Routing latency ✅ (B2).** The config-driven resolver cut **route decision 23.2%**
+   (167.9 → 129.0 ms) and routing overhead 26% — while keeping `go test` green (no behavior change).
+3. **`skills/` corpus — 132 MB, unchanged ◻ (B3).** B3 consolidation was a **verified no-op**:
+   `manus-skills-marketplace` proved a fully-redundant mirror (every skill already in `skills/`;
+   166 collisions all kept-canonical), so the win was *confirming zero duplication* rather than
+   deleting bytes. Goal-2 consolidation is thus achieved at the **repo** level (manus is now
+   redundant) without touching the corpus. Largest standing footprint; no reduction this round.
+4. **Fonts — 216 files / 21.65 MB, unchanged ◻.** Out of scope for B2/B4/B5 this round; the single
+   biggest **remaining** bloat opportunity (dedupe / externalize embedded font assets in skills).
+5. **Router binary — 10.46 MB, unchanged ◻ (B2, optional).** `-ldflags "-s -w"` would trim it;
+   deliberately not applied to preserve debuggability.
+
+**Net:** the refactor's wins are concentrated in the **registry** (−774 KB JSON, single source)
+and **routing latency** (−23%), exactly the "reduce bloat + improve performance + clean separation"
+goal. The corpus/font footprint is the clear next target if a follow-up pass is wanted.
 
 ## Acceptance for this task
 
-- [x] BEFORE snapshot captured (`bench/results/before.json`) + reproducible harness committed.
-- [ ] AFTER snapshot captured once B2/B4/B5 land (`bench/run.sh after`).
-- [ ] Delta table generated (`bench/compare.py … --out bench/results/delta.md`) and folded into the final report.
+- [x] BEFORE snapshot captured (`bench/results/before.json`, git `eec826d`) + reproducible harness committed.
+- [x] AFTER snapshot captured (`bench/results/after.json`, git `3c285e0`).
+- [x] Delta table generated (`bench/results/delta.md`) and folded into this report.
