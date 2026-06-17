@@ -1,0 +1,44 @@
+name: registry-parity
+
+# Additive CI gate for the Node->Go registry-build migration. Runs on PRs that
+# touch the corpus, the registry config/generator, the Go router, or any
+# generated artifact. It enforces TWO things:
+#   1. the Go builder agrees with the committed artifacts (drop-in for the gate)
+#   2. the Go builder is byte-identical to the legacy Node generator
+# Until the cut-over completes, the existing Node `--check` job (characterization.yml)
+# stays authoritative; this job proves the Go path is ready to take over.
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - "scripts/registry/**"
+      - "skill-router-cli/**"
+      - "manifest.json"
+      - "marketplace.json"
+      - ".agents/plugins/marketplace.json"
+      - "docs/build_manifest.json"
+  workflow_dispatch:
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: skill-router-cli/go.mod
+          cache-dependency-path: skill-router-cli/go.sum
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Go registry build matches committed artifacts
+        run: cd skill-router-cli && go run . registry build --check
+
+      - name: Go output is byte-identical to the Node generator
+        run: bash scripts/registry/parity-check.sh
+
+      - name: Go registry unit tests
+        run: cd skill-router-cli && go test ./internal/registry/...
