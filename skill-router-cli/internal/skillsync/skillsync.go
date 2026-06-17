@@ -16,6 +16,16 @@ import (
 // They keep every agent connected to the router without copying the corpus.
 var DefaultWrapperSkills = []string{"universal-ai-skills"}
 
+// DeprecationNotice is the user-facing message printed when physical-copy
+// propagation runs. Physical copies are deprecated in favor of agents calling
+// the skill-router CLI directly or via the `serve` MCP server.
+func DeprecationNotice() string {
+	return "DEPRECATED: physical-copy adapter propagation is deprecated. " +
+		"Agents should call `skill-router route|search_skills|load_skill|compose` directly, " +
+		"or connect the `skill-router serve` MCP server, instead of receiving copied skills. " +
+		"See docs/ADAPTER_DEPRECATION.md."
+}
+
 // SourceDir returns the canonical repository skill source directory.
 func SourceDir() string {
 	return filepath.Join(platform.RepoDir(), "skills")
