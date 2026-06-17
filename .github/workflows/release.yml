@@ -1,0 +1,49 @@
+name: release
+
+# Tag-driven release of the skill-router binary for all target platforms via
+# goreleaser, with a keyless (sigstore/cosign) signature over the checksums.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write # create the GitHub Release + upload assets
+  id-token: write # cosign keyless OIDC
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for changelog + version
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: skill-router-cli/go.mod
+          cache-dependency-path: skill-router-cli/go.sum
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Parity gate: refuse to release if the Go builder diverges from the Node
+      # generator or the committed artifacts are stale.
+      - name: Registry parity gate
+        run: |
+          cd skill-router-cli && go run . registry build --check
+          cd "$GITHUB_WORKSPACE" && bash scripts/registry/parity-check.sh
+
+      - uses: sigstore/cosign-installer@v3
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: set to publish the Homebrew tap formula.
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
