@@ -39,7 +39,14 @@ prompt needs a matching skill.
 ## What It Provides
 
 - 1,812 canonical skills in `skills/`
-- `skill-router`, a Go CLI for search, preflight routing, validation, and skill loading
+- `skill-router`, a Go CLI for search, preflight routing, validation, and skill
+  loading — **decoupled from the corpus**: it resolves skills only through the
+  generated manifest interface via env/config-driven paths, with no hardcoded
+  `skills/` or `manifest.json` locations
+- a **single-source registry generator** (`scripts/registry/`) that emits
+  `manifest.json`, `marketplace.json`, the plugin marketplace, and the slim
+  `docs/build_manifest.json` provenance record in lockstep, so the catalog
+  cannot drift (CI enforces this with `--check`)
 - compact adapters for Codex, Claude, Cursor, Gemini, OpenCode, Hermes Agent,
   Paperclip, Kiro, Qwen, Kimi, OpenHands, Cline, Continue, and similar clients
 - optional Universal AI Stack runtime for model routing, health checks,
@@ -54,6 +61,27 @@ prompt needs a matching skill.
 
 The normal architecture is router-first. Do not copy the full skill corpus into
 every AI client.
+
+## Architecture
+
+Three layers with a clean separation of concerns:
+
+1. **Router** — `skill-router-cli/` (Go). Scores prompts, runs deterministic
+   preflight, and loads skills. It depends on the corpus *only* through the
+   generated manifest and a config/env-driven path resolver
+   (`SKILL_ROUTER_REPO_DIR`, `SKILL_ROUTER_SKILLS_DIR`, `SKILL_ROUTER_MANIFEST`,
+   …), so the router and the library evolve independently.
+2. **Corpus** — `skills/`, the single source-of-truth set of 1,812 canonical
+   skill directories.
+3. **Registry** — generated from the corpus by `scripts/registry/`. One
+   generator emits every registry artifact (`manifest.json`, `marketplace.json`,
+   `.agents/plugins/marketplace.json`, `docs/build_manifest.json`) in lockstep;
+   drift is impossible and is verified in CI.
+
+The legacy `manus` binary is a preserved alias of `skill-router` (same binary),
+so existing rules and scripts keep working. See
+[docs/ARCHITECTURE-decoupling.md](docs/ARCHITECTURE-decoupling.md) and
+[docs/ARCHITECTURE_V2.md](docs/ARCHITECTURE_V2.md) for detail.
 
 ## Quick Start
 
@@ -153,14 +181,23 @@ universal-ai-skills-library/
 |-- README.md
 |-- install.ps1
 |-- install.sh
-|-- manifest.json
-|-- skill-router-cli/       # Go CLI source
+|-- manifest.json           # generated skill catalog (do not hand-edit)
+|-- marketplace.json        # generated plugin marketplace (do not hand-edit)
+|-- skill-router-cli/       # Go CLI source (the router)
 |-- skills/                 # source-of-truth skill corpus
+|-- scripts/registry/       # single-source registry generator (manifest/marketplace/...)
+|-- tests/                  # cross-cutting characterization tests + shared fixtures
 |-- ai-setup/               # portable Universal AI Stack runtime and scripts
 |-- plugin/                 # plugin metadata and compact adapters
+|-- plugin-codex/           # canonical Codex plugin artifact
 |-- infrastructure/         # optional MCP bridge and watchdog scripts
+|-- bench/                  # reproducible before/after performance harness
 `-- docs/                   # architecture, compatibility, setup, and audits
 ```
+
+The registry artifacts (`manifest.json`, `marketplace.json`,
+`.agents/plugins/marketplace.json`, `docs/build_manifest.json`) are **generated**
+from `skills/` — edit `skills/` and regenerate, never hand-edit the artifacts.
 
 ## Universal AI Stack
 
@@ -261,6 +298,23 @@ go test ./...
 Pop-Location
 ```
 
+Behavioural, registry, and secret-scan gates (run in CI; runnable locally):
+
+```bash
+# characterization baseline: router routing, registry integrity, legacy `manus` alias
+python3 -m unittest discover -s tests/characterization -p 'test_*.py'
+
+# registry single-source drift guard (every artifact matches skills/)
+node scripts/registry/generate-registry.mjs --check --optimize
+
+# secret scan (uses the .gitleaks.toml allowlist of known doc examples)
+gitleaks detect --no-git --config .gitleaks.toml
+```
+
+These run via `.github/workflows/characterization.yml` and `security.yml`. The
+PowerShell release-audit steps in `ci.yml` run only on the Windows runner — see
+[.github/workflows/README.md](.github/workflows/README.md).
+
 ## Documentation
 
 - [Documentation Hub](docs/README.md)
@@ -269,12 +323,16 @@ Pop-Location
 - [Universal AI Connection Configs](docs/UNIVERSAL_AI_CONNECTION_CONFIGS.md)
 - [Source Integrations](docs/SOURCE_INTEGRATIONS.md)
 - [Architecture](docs/ARCHITECTURE_V2.md)
+- [Architecture: Router Decoupling](docs/ARCHITECTURE-decoupling.md)
 - [Compatibility](docs/UNIVERSAL_COMPATIBILITY.md)
 - [Install Modes](docs/INSTALL_MODES.md)
 - [Agent Support Matrix](docs/AGENT_SUPPORT_MATRIX.md)
 - [Design and Messaging](docs/DESIGN_AND_MESSAGING.md)
 - [Third-Party Source Repos](docs/THIRD_PARTY_SOURCE_REPOS.md)
 - [Public Release Checklist](docs/PUBLIC_RELEASE_CHECKLIST.md)
+- [Performance](docs/PERFORMANCE.md)
+- [Known Issues](docs/KNOWN_ISSUES.md)
+- [Characterization Tests](tests/characterization/README.md)
 
 ## Contributing
 
