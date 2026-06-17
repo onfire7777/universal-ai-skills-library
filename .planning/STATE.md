@@ -1,12 +1,17 @@
 ---
-gsd_state_version: '1.0'
-status: complete
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: Awaiting next milestone
+stopped_at: Authored ROADMAP.md, PROJECT.md, STATE.md from the approved design spec; ready to run autonomous loop from Phase 1.
+last_updated: "2026-06-17T11:01:22.919Z"
+last_activity: 2026-06-17 — Milestone v1.0 completed and archived
 progress:
   total_phases: 3
-  completed_phases: 3
-  total_plans: 0
-  completed_plans: 0
-  percent: 100
+  completed_phases: 0
+  total_plans: 2
+  completed_plans: 3
+  percent: 0
 ---
 
 # Project State
@@ -20,16 +25,15 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 3 of 3 (COMPLETE)
-Plan: 0 of TBD in current phase
-Status: All phases complete — ready for milestone audit
-Last activity: 2026-06-17 — Phase 3.3 re-ranker shipped & verified (46dc55a); milestone code-complete
-
-Progress: [██████████] 100% (engine + 3.1 telemetry + 3.2 eval + 3.3 reranker complete)
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-17 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: - min
 - Total execution time: 0 hours
@@ -41,6 +45,7 @@ Progress: [██████████] 100% (engine + 3.1 telemetry + 3.2 ev
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: -
 - Trend: -
 
@@ -73,3 +78,7 @@ None yet.
 Last session: 2026-06-17
 Stopped at: Authored ROADMAP.md, PROJECT.md, STATE.md from the approved design spec; ready to run autonomous loop from Phase 1.
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
