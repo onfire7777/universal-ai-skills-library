@@ -39,6 +39,9 @@ type GateResult struct {
 // result passes only when every metric clears both checks.
 func Gate(m Metrics, floors Thresholds, base Baseline) GateResult {
 	gr := GateResult{Passed: true}
+	// Two distinct tolerances by design: the +1e-9 is float-equality slack so a
+	// value sitting exactly on the floor/baseline still passes; regressionEpsilon
+	// (0.005) is the allowed regression band below the stored baseline.
 	check := func(name string, value, floor, baseline float64) {
 		if value+1e-9 < floor {
 			gr.Passed = false
