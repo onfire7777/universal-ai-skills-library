@@ -1,6 +1,9 @@
 package sync
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -86,6 +89,77 @@ func TestCountSkillMarkdown(t *testing.T) {
 	if got := countSkillMarkdown(root); got != 2 {
 		t.Fatalf("countSkillMarkdown = %d, want 2", got)
 	}
+}
+
+func TestAdapterStatusClassifiesDeprecationState(t *testing.T) {
+	cases := []struct {
+		name string
+		row  matrixRow
+		want string
+	}{
+		{"hosted adapter", matrixRow{Adapter: "hosted"}, "no physical copy (hosted); use CLI/MCP"},
+		{"repo-instruction adapter", matrixRow{Adapter: "repo-instruction", Path: ".github/x.md"}, "no physical copy (repo-instruction); use CLI/MCP"},
+		{"skill-root missing", matrixRow{Adapter: "skill-root", Path: "/x", Exists: false}, "not present; nothing to migrate"},
+		{"wrapper copied", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, Wrapper: true, SkillFiles: 1}, "wrapper copied (deprecated); migrate to CLI/serve MCP"},
+		{"full corpus copied", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, SkillFiles: 200}, "full corpus copied (deprecated); migrate to CLI/serve MCP"},
+		{"adapter-specific skills", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, SkillFiles: 3}, "adapter-specific skills present; not a wrapper copy"},
+		{"empty root", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, SkillFiles: 0}, "empty; no copied skills"},
+	}
+	for _, tc := range cases {
+		if got := adapterStatus(tc.row); got != tc.want {
+			t.Errorf("%s: adapterStatus = %q, want %q", tc.name, got, tc.want)
+		}
+	}
+}
+
+func TestPrintAdapterStatusJSONCoversAllSpecsReadOnly(t *testing.T) {
+	tmp := t.TempDir()
+	t.Setenv("USERPROFILE", tmp)
+	t.Setenv("HOME", tmp)
+
+	rows := captureAdapterStatusJSON(t)
+	if len(rows) != len(platform.AgentRootSpecs()) {
+		t.Fatalf("adapter-status rows = %d, specs = %d", len(rows), len(platform.AgentRootSpecs()))
+	}
+	for _, row := range rows {
+		if row.Status == "" {
+			t.Fatalf("row %s missing status", row.ID)
+		}
+	}
+	// No skill-root path should exist after a read-only report on an empty home.
+	for _, entry := range platform.AgentRootSpecs() {
+		if entry.Adapter == "skill-root" && entry.Path != "" {
+			if _, err := os.Stat(entry.Path); err == nil {
+				t.Fatalf("sync --check must not create root %s", entry.Path)
+			}
+		}
+	}
+}
+
+func captureAdapterStatusJSON(t *testing.T) []adapterStatusRow {
+	t.Helper()
+	orig := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.Stdout = w
+	runErr := printAdapterStatus(true)
+	w.Close()
+	os.Stdout = orig
+	if runErr != nil {
+		t.Fatalf("printAdapterStatus returned error: %v", runErr)
+	}
+
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, r); err != nil {
+		t.Fatal(err)
+	}
+	var rows []adapterStatusRow
+	if err := json.Unmarshal(buf.Bytes(), &rows); err != nil {
+		t.Fatalf("invalid JSON output: %v\n%s", err, buf.String())
+	}
+	return rows
 }
 
 func TestPaperclipInstructionsContentIncludesUniversalMarkers(t *testing.T) {

@@ -53,6 +53,19 @@ var readCmd = &cobra.Command{
 	},
 }
 
+// loadSkillCmd is the canonical name for the single-skill load path. It mirrors
+// `read`/`skill <name>` and calls the same engine entry point (PrintSkill) so
+// output is identical; it exists so agents can use the snake_case canonical verb
+// `skill-router skills load_skill <name>`.
+var loadSkillCmd = &cobra.Command{
+	Use:   "load_skill <name>",
+	Short: "Print a single skill's SKILL.md (alias of `read`/`skill <name>`)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return skillservice.PrintSkill(args[0])
+	},
+}
+
 var installCmd = &cobra.Command{
 	Use:   "install [--target DIR]",
 	Short: "Install wrapper skills to a target skills directory",
@@ -148,9 +161,10 @@ var listCmd = &cobra.Command{
 }
 
 var searchCmd = &cobra.Command{
-	Use:   "search <query>",
-	Short: "Search skills by name or description",
-	Args:  cobra.MinimumNArgs(1),
+	Use:     "search <query>",
+	Aliases: []string{"search_skills"},
+	Short:   "Search skills by name or description",
+	Args:    cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.ToLower(strings.Join(args, " "))
 		limit, _ := cmd.Flags().GetInt("limit")
@@ -426,6 +440,7 @@ func init() {
 	composeCmd.Flags().Bool("json", false, "Emit JSON")
 
 	Cmd.AddCommand(readCmd)
+	Cmd.AddCommand(loadSkillCmd)
 	Cmd.AddCommand(installCmd)
 	Cmd.AddCommand(syncCmd)
 	Cmd.AddCommand(createCmd)
