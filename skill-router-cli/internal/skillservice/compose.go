@@ -51,6 +51,8 @@ func Compose(req ComposeRequest) (ComposeResult, error) {
 			refs = append(refs, ld.Ref)
 		}
 	} else {
+		// Route records minScore as Threshold but does not filter Matches by it;
+		// the loop below is the real threshold gate.
 		rr, err := Route(req.Prompt, RouteOptions{MinScore: minScore})
 		if err != nil {
 			return ComposeResult{}, err
@@ -75,6 +77,9 @@ func Compose(req ComposeRequest) (ComposeResult, error) {
 		if err != nil {
 			return ComposeResult{}, fmt.Errorf("compose load %s: %w", r.Name, err)
 		}
+		score := r.Score
+		r = ld.Ref            // canonical Name/Path/Source/Description from Load()
+		r.Score = score
 		r.TokenEst = EstimateTokens(ld.Body)
 		res.TotalTokenEst += r.TokenEst
 		res.Skills = append(res.Skills, r)

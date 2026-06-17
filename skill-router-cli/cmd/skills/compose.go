@@ -48,6 +48,12 @@ var composeCmd = &cobra.Command{
 			return enc.Encode(res)
 		}
 		if full {
+			fmt.Fprintf(cmd.OutOrStdout(), "Composed %d skills (~%d tokens):\n", len(res.Skills), res.TotalTokenEst)
+			for i, s := range res.Skills {
+				fmt.Fprintf(cmd.OutOrStdout(), "  %d. %s [%s] score=%d ~%dtok — %s\n",
+					i+1, s.Name, s.Source, s.Score, s.TokenEst, s.Description)
+			}
+			fmt.Fprintln(cmd.OutOrStdout())
 			fmt.Fprint(cmd.OutOrStdout(), res.Bundle)
 			return nil
 		}
