@@ -111,9 +111,9 @@ New commands nest under the existing `skills` group to match the established `ro
 - **Runner:** for each case, build the candidate ranking via the same scoring path the router uses, against the **pinned manifest fixture** for determinism. `--live` flag runs against the real manifest instead.
 - **Metrics:**
   - **P@1** — fraction of cases whose rank-1 candidate equals `expected`.
-  - **MRR** — mean of `1/rank` of the first correct candidate (0 if absent from the considered top-K).
+  - **MRR** — mean of `1/rank` of the first correct candidate over the full ranked eligible-candidate list (0 if no correct candidate appears anywhere in the list).
   - **Recall@5** — fraction of cases where any `acceptable` skill appears in the top 5.
-  - `no_route` cases score as correct when the harness produces no eligible route.
+  - **`no_route` cases** (`expected` empty or `"__no_route__"`) are scored only as a binary decision check: they contribute to **P@1** (correct = 1 when the harness produces no eligible route, else 0) and are **excluded from the MRR and Recall@5 denominators** (those metrics are about ranking a known-correct skill, which does not exist for these cases).
 - **Gate (absolute floors + no-regression):**
   - Floors in committed `cmd/skills/testdata/eval/thresholds.json` (e.g. `{"p_at_1": 0.80, "mrr": 0.85, "recall_at_5": 0.95}`).
   - Baseline in committed `cmd/skills/testdata/eval/baseline.json`.
