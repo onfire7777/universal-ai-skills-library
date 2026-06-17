@@ -1,0 +1,96 @@
+# goreleaser config — cross-platform packaging for the skill-router binary.
+# (Phase 5 / distribution: the BINARY layer. The skill-CORPUS layer — per-skill
+# signed packages — is designed in docs/PHASE_5_DISTRIBUTION_DESIGN.md.)
+#
+#   make dist          # local snapshot (no publish)
+#   make release-dry   # goreleaser check (validate this file)
+#   git tag vX.Y.Z && git push --tags   # CI release (.github/workflows/release.yml)
+#
+# Invariant: the primary binary is `skill-router`; the legacy `manus` alias is
+# preserved as a symlink (Homebrew formula below; install.sh / install.ps1 for
+# raw archives).
+version: 2
+
+project_name: skill-router
+
+builds:
+  - id: skill-router
+    dir: skill-router-cli
+    main: .
+    binary: skill-router
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/root.Version={{ .Version }}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: default
+    ids:
+      - skill-router
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE*
+      - README*
+      - src: docs/MIGRATION_NODE_TO_GO.md
+        strip_parent: true
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot-{{ .ShortCommit }}"
+
+# Keyless supply-chain signature over the checksums file (covers every archive
+# transitively). Runs only on a real tagged release in CI (needs id-token: write
+# + cosign on PATH); skipped on snapshot builds.
+signs:
+  - id: cosign-keyless
+    cmd: cosign
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--yes"
+      - "--output-signature=${artifact}.sig"
+      - "--output-certificate=${artifact}.pem"
+      - "${artifact}"
+    artifacts: checksum
+    output: true
+
+# Optional Homebrew tap (cask form — `brews` is deprecated in goreleaser v2).
+# Requires a `onfire7777/homebrew-tap` repo + HOMEBREW_TAP_GITHUB_TOKEN; on
+# snapshots / untagged builds upload is skipped automatically. The cask installs
+# the `skill-router` binary; the legacy `manus` alias is created by install.sh /
+# `make install-local` (a Homebrew cask manages a single binary cleanly, so we
+# keep the alias in the installer rather than a brittle cask post-install hook).
+homebrew_casks:
+  - name: skill-router
+    repository:
+      owner: onfire7777
+      name: homebrew-tap
+    homepage: "https://github.com/onfire7777/universal-ai-skills-library"
+    description: "Universal AI skills router — search, preflight-route, and load 1,812 skills on demand"
+    skip_upload: auto
+
+release:
+  github:
+    owner: onfire7777
+    name: universal-ai-skills-library
+  draft: false
+  prerelease: auto
+  name_template: "skill-router {{ .Tag }}"
