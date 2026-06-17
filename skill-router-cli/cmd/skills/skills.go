@@ -419,6 +419,11 @@ func init() {
 	summarizeCmd.Flags().String("output", "", "Output file path for the summary")
 	VectorsCmd.Flags().String("out", "", "Output path for the int8 vector store JSON (defaults to $SKILL_ROUTER_VECTORS)")
 	VectorsCmd.Flags().Int("dims", skillservice.DefaultEmbeddingDims, "Embedding dimensionality; must match the runtime embedder")
+	composeCmd.Flags().String("skills", "", "Comma-separated explicit skill names (skips routing)")
+	composeCmd.Flags().Int("top", 5, "Max skills to compose")
+	composeCmd.Flags().Int("min-score", 75, "Minimum route score to include")
+	composeCmd.Flags().Bool("full", false, "Emit concatenated SKILL.md bodies as one bundle")
+	composeCmd.Flags().Bool("json", false, "Emit JSON")
 
 	Cmd.AddCommand(readCmd)
 	Cmd.AddCommand(installCmd)
@@ -438,6 +443,7 @@ func init() {
 	Cmd.AddCommand(anchorCmd)
 	Cmd.AddCommand(summarizeCmd)
 	Cmd.AddCommand(VectorsCmd)
+	Cmd.AddCommand(composeCmd)
 }
 
 // cliRouteOptions builds the engine's CLI route options from a cobra command,
