@@ -57,3 +57,24 @@ jobs:
 
       - name: Run characterization suite
         run: python3 -m unittest discover -s tests/characterization -p 'test_*.py' -v
+
+  registry-drift:
+    name: Registry single-source drift guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Registry artifacts match single source (Builder 4 generator)
+        # Byte-checks all 4 generated registries (manifest.json, marketplace.json,
+        # .agents/plugins/marketplace.json, docs/build_manifest.json) against the
+        # single source of truth; exits 1 on drift. Zero npm deps.
+        run: node scripts/registry/generate-registry.mjs --check --optimize
+
+      - name: Registry generator unit tests
+        run: node --test scripts/registry/lib/frontmatter.test.mjs scripts/registry/generate-registry.test.mjs
