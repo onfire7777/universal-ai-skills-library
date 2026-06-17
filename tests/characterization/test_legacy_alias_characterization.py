@@ -47,6 +47,18 @@ class ManusBinaryAlias(unittest.TestCase):
         self.assertTrue(data.get("ok"))
         self.assertEqual(data.get("totalSkills"), harness.fixture_skill_count())
 
+    def test_manus_and_skill_router_output_parity(self):
+        """Same binary, two names: `manus <cmd>` output must equal
+        `skill-router <cmd>` output for deterministic commands."""
+        argv = ["skills", "validate-manifest", "--json"]
+        primary = harness.run_router(argv, env=harness.fixture_env(), cwd=harness.FIXTURE_DIR)
+        legacy = harness.run_router_as_alias("manus", argv, fixture=True)
+        self.assertEqual(primary.returncode, legacy.returncode)
+        self.assertEqual(
+            json.loads(primary.stdout), json.loads(legacy.stdout),
+            "manus alias produced different validate-manifest output than skill-router",
+        )
+
 
 class ManusDeclaredContract(unittest.TestCase):
     def test_manifest_declares_manus_legacy_access(self):

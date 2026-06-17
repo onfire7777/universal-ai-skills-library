@@ -201,11 +201,17 @@ def fixture_env() -> Dict[str, str]:
     iso = tempfile.mkdtemp(prefix="skill-router-fixture-home-")
     cfg = os.path.join(iso, "cfg")
     os.makedirs(cfg, exist_ok=True)
+    # Mirrors Builder 2's hermetic Go-test setup + Scout 1's golden recipe:
+    # pin repo + skills dir to the fixture, isolate HOME/config, and disable
+    # colour so text output is stable (the router uses fatih/color).
     return {
         "SKILL_ROUTER_REPO_DIR": FIXTURE_DIR,
+        "SKILL_ROUTER_SKILLS_DIR": os.path.join(FIXTURE_DIR, "skills"),
         "SKILL_ROUTER_CONFIG_DIR": cfg,
         "HOME": iso,
         "USERPROFILE": iso,
+        "NO_COLOR": "1",
+        "CLICOLOR": "0",
     }
 
 

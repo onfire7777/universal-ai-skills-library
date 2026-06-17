@@ -69,6 +69,25 @@ class RouterRoutingCharacterization(unittest.TestCase):
             "expected the loaded skill to resolve under the fixture skills/ tree",
         )
 
+    def test_route_errors_on_generic_prompt(self):
+        """`route` must keep returning a non-zero exit for generic prompts
+        (the negative case from Scout 1's golden baseline)."""
+        proc = harness.run_router(
+            ["route", "what is the capital of France"],
+            env=harness.fixture_env(), cwd=harness.FIXTURE_DIR,
+        )
+        self.assertNotEqual(proc.returncode, 0,
+                            "route should error (no confident match) on a generic prompt")
+
+    def test_router_version_is_semver(self):
+        """`--version` still works and reports a semantic version."""
+        proc = harness.run_router(["--version"], env=harness.fixture_env(), cwd=harness.FIXTURE_DIR)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertRegex(
+            proc.stdout, r"\b\d+\.\d+\.\d+\b",
+            f"expected a semver in --version output, got: {proc.stdout!r}",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
