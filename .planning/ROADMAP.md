@@ -30,10 +30,11 @@ Build a measurable improvement loop on top of the Phase 2 lexical routing servic
   3. `SKILL_ROUTER_TELEMETRY_HASH_PROMPTS=1` stores only a prompt hash + length (no raw prompt).
   4. `skills feedback <id> --correct <skill>` (and `--accept`/`--reject`) records a label; `skills feedback promote` folds labels into the golden eval set.
   5. The telemetry package imports no network library (asserted by test); a telemetry write error never breaks routing.
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD (set during planning)
+- [ ] 01-01-PLAN.md — telemetry core: internal/telemetry (types, opt-in gate, best-effort LogDecision, HASH_PROMPTS, feedback/promote, no-net), TelemetryDir(), config telemetry.enabled
+- [ ] 01-02-PLAN.md — CLI + wiring: skills telemetry/feedback/promote commands, best-effort LogDecision in route/auto/preflight, disabled stderr notice, version pass-through
 
 ### Phase 2: Eval Harness & Gate
 **Goal**: Deterministically score the router on P@1, MRR, and Recall@5 over a committed labeled dataset, gate changes against absolute floors and a stored baseline, and surface results as a CLI report.
