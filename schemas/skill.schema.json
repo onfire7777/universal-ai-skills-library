@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/onfire7777/universal-ai-skills-library/schemas/skill.schema.json",
+  "title": "SKILL.md frontmatter contract",
+  "description": "JSON Schema for the YAML frontmatter of every skills/<id>/SKILL.md file. This is the build-time contract referenced by ARCHITECTURE_IMPROVEMENT_PLAN.md §3.2. Phase 0 introduces it in --warn mode: only `name` and `description` are required (the two fields every one of the 1,812 corpus skills already carries and the only two the router reads today). Every other field is OPTIONAL and backfilled incrementally; `additionalProperties` is true so unschema'd skills and existing keys (license, metadata, allowed-tools, …) keep validating unchanged. The validator flips from --warn to --error in a later phase once the corpus is backfilled. NOTHING here changes runtime routing behavior.",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "description": "Canonical kebab-case skill id. MUST equal the skill's directory name (the router treats the directory name, not this field, as the authoritative id — they must agree). Invariant: kebab canonical ids.",
+      "type": "string",
+      "$ref": "#/$defs/kebabId",
+      "examples": ["python-testing-patterns", "firecrawl", "chat-summarizer"]
+    },
+    "version": {
+      "description": "NEW (Phase 0). Per-skill semantic version (semver 2.0.0). Absent today on all but a handful of skills; defaults conceptually to 0.0.0 / unversioned. Powers Phase 5 distribution (content-addressed, pullable packages).",
+      "$ref": "#/$defs/semver",
+      "examples": ["1.4.0", "0.1.0", "2.0.0-rc.1"]
+    },
+    "description": {
+      "description": "Single-line skill description, whitespace-collapsed. This is the primary lexical-routing signal today and the text embedded for semantic routing in Phase 1. Block scalars (| or >) are folded to a single space by the registry parser.",
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 4000
+    },
+    "aliases": {
+      "description": "Alternate kebab-case ids that resolve to this skill. Exact-alias match is a deterministic routing guardrail that wins outright (preserved invariant). Must not collide with any other skill's canonical name or alias.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/kebabId" },
+      "uniqueItems": true,
+      "examples": [["pytest-patterns"], ["c4ai", "crawl-4-ai"]]
+    },
+    "domain": {
+      "description": "NEW (Phase 0). Single top-level taxonomy bucket for the skill. One value only (facets go in `tags`). Used as a reranker feature and for browse/grouping. The enum is the recommended controlled vocabulary; unknown values are reported as warnings (not hard errors) during incremental adoption.",
+      "$ref": "#/$defs/domain"
+    },
+    "tags": {
+      "description": "NEW (Phase 0). Free-form kebab-case facets (language, framework, capability area). Unlike `domain` a skill may carry many. Feeds lexical recall and faceted search.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/kebabId" },
+      "uniqueItems": true,
+      "examples": [["python", "testing", "fixtures"]]
+    },
+    "triggers": {
+      "description": "NEW (Phase 0). Example end-user prompts that SHOULD route to this skill. These are free, skill-authored labeled routing data: the eval harness (tests/routing-eval) auto-seeds a positive case from every trigger. Write natural prompts a user would actually type, not keywords.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 400 },
+      "uniqueItems": true,
+      "examples": [["write pytest fixtures for a fastapi app", "parametrize these tests"]]
+    },
+    "capabilities": {
+      "description": "NEW (Phase 0). Typed, dotted capability verbs this skill provides (namespace.verb). Powers Phase 4 composition (capability-typed DAGs). Distinct from `requires` (which lists what the skill needs).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/capability" },
+      "uniqueItems": true,
+      "examples": [["code.generate", "test.author"]]
+    },
+    "requires": {
+      "description": "Formalized dependency declaration (806 corpus skills already carry a nested `requires:` block). All three sub-keys are optional and default to empty. A skill with no external dependencies may omit this entirely or leave the lists empty.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "mcp": {
+          "description": "MCP servers/tools this skill expects to be connected (e.g. Rube/Composio tool namespaces).",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "tools": {
+          "description": "Host tool names this skill expects (e.g. Bash, WebFetch).",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "env": {
+          "description": "Environment variables / secrets the skill needs at run time (names only — never values; public-safe invariant).",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "quality_tier": {
+      "description": "NEW (Phase 0). Lifecycle/trust tier. Reranker feature and a browse filter. Absent → treated as `experimental`.",
+      "type": "string",
+      "enum": ["verified", "experimental", "deprecated"],
+      "default": "experimental"
+    },
+    "supersedes": {
+      "description": "NEW (Phase 0). Kebab ids of skills this skill replaces (lifecycle edge). Used to steer routing away from superseded skills and to drive deprecation.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/kebabId" },
+      "uniqueItems": true
+    },
+    "conflicts": {
+      "description": "NEW (Phase 0). Kebab ids of skills that must not be composed/loaded alongside this one (mutual-exclusion edge for Phase 4 composition).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/kebabId" },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "kebabId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Lowercase kebab-case identifier: ASCII letters/digits separated by single hyphens, no leading/trailing/double hyphens."
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "description": "Semantic Version 2.0.0 string (the official semver regex)."
+    },
+    "capability": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9]*)+$",
+      "minLength": 3,
+      "maxLength": 64,
+      "description": "Dotted lowercase capability verb, namespace.verb (at least two segments), e.g. code.generate, test.author, web.scrape."
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "software-engineering",
+        "security",
+        "privacy-compliance",
+        "devops-infrastructure",
+        "data-engineering",
+        "ai-ml",
+        "design",
+        "frontend",
+        "product",
+        "research",
+        "content-writing",
+        "marketing",
+        "sales-crm",
+        "finance",
+        "automation-integrations",
+        "communication",
+        "media-generation",
+        "meta-skilling",
+        "general"
+      ],
+      "description": "Recommended single-domain controlled vocabulary. Treated as a soft constraint during incremental backfill (unknown values warn rather than error)."
+    }
+  }
+}

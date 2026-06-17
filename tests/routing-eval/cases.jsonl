@@ -1,0 +1,72 @@
+# Curated routing-eval cases — Phase 0 of ARCHITECTURE_IMPROVEMENT_PLAN.md (§3.5, §9.2).
+# One JSON object per line. Lines starting with '#' and blank lines are ignored.
+# Schema: {"id": str, "prompt": str, "expect": [skill-id...], "reject": [skill-id...], "tags": [str...]}
+#   - expect non-empty  => POSITIVE case: any listed skill is a correct top route (P@1/MRR/Recall@5).
+#   - expect empty       => NEGATIVE/abstention case: the router should NOT route (or not to `reject`).
+# Every id here is a verified canonical skill in manifest.json. `expect` is a human ground-truth
+# label of the correct skill; the committed baseline records what the CURRENT router does against it,
+# so paraphrase cases the lexical router currently misses are intentional — they quantify the recall
+# gap Phase 1 (semantic routing) must close WITHOUT regressing the exact-name cases below.
+#
+# --- Exact name / alias (deterministic guardrail; should route) -------------------------------
+{"id": "exact-firecrawl", "prompt": "use the firecrawl skill to crawl a documentation site", "expect": ["firecrawl"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-semgrep", "prompt": "run semgrep static analysis across this repository", "expect": ["semgrep"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-pdf", "prompt": "use the pdf skill to fill out and flatten this PDF form", "expect": ["pdf"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-xlsx", "prompt": "use the xlsx skill to build a spreadsheet with formulas and charts", "expect": ["xlsx"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-manim", "prompt": "animate this math explainer using manim", "expect": ["manim"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-sympy", "prompt": "use sympy to solve this integral symbolically", "expect": ["sympy"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-shadcn", "prompt": "build this form component with shadcn-ui", "expect": ["shadcn-ui"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-mermaid", "prompt": "draw a mermaid sequence diagram of this auth flow", "expect": ["mermaid-diagrams"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-d3", "prompt": "use d3 to make a force-directed graph visualization", "expect": ["d3-visualization"], "reject": [], "tags": ["exact-name"]}
+{"id": "exact-manus-alias", "prompt": "use the manus card creator to make a printable card", "expect": ["printable-cards"], "reject": [], "tags": ["exact-name", "alias"]}
+# --- Description paraphrase (hard positives; recall-sensitive) ---------------------------------
+{"id": "para-pytest", "prompt": "write pytest fixtures and parametrized tests for a fastapi app", "expect": ["python-testing-patterns"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-tdd", "prompt": "I want to write a failing test first and then make it pass", "expect": ["test-driven-development"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-typesafety", "prompt": "add type hints and make this python module pass mypy strict", "expect": ["python-type-safety"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-pgdesign", "prompt": "design normalized postgres tables for a multi-tenant SaaS", "expect": ["postgresql-table-design"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-sqli", "prompt": "check whether this login form is vulnerable to SQL injection", "expect": ["sql-injection-testing"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-cve", "prompt": "scan my project dependencies for known CVEs", "expect": ["vulnerability-scanner"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-a11y", "prompt": "audit this page for WCAG accessibility problems", "expect": ["accessibility-testing"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-gdpr", "prompt": "review how we handle user data for GDPR compliance", "expect": ["gdpr-compliance-audit"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-phi", "prompt": "strip protected health information from this clinical dataset", "expect": ["hipaa-deidentification"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-companyresearch", "prompt": "put together a research brief on a company before a sales call", "expect": ["company-research"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-deepresearch", "prompt": "do a thorough multi-source, fact-checked research report on solid-state batteries", "expect": ["deep-research"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-copy", "prompt": "rewrite this landing page headline so it is punchier and converts better", "expect": ["copywriting"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-prompteng", "prompt": "help me improve this LLM prompt so the model follows instructions reliably", "expect": ["prompt-engineering"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-ytdl", "prompt": "download this youtube video as an mp4", "expect": ["video-downloader"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-favicon", "prompt": "generate a full favicon set from this logo image", "expect": ["favicon-gen"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-worktree", "prompt": "set up a git worktree so I can work on two branches side by side", "expect": ["using-git-worktrees"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-genart", "prompt": "create generative p5.js art with a fixed random seed so it reproduces", "expect": ["algorithmic-art"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-tts", "prompt": "turn this paragraph into spoken audio narration", "expect": ["speech"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-docx", "prompt": "create a Word document with tracked changes and comments", "expect": ["docx"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-c4ai", "prompt": "crawl this website and convert the pages into llm-ready markdown", "expect": ["crawl4ai", "firecrawl"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-resume", "prompt": "tailor my resume to this specific job description", "expect": ["tailored-resume-generator"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-cleancode", "prompt": "refactor this function to be cleaner and easier to read", "expect": ["clean-code", "refactoring-patterns"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-errors", "prompt": "improve the error handling so failures are not swallowed silently", "expect": ["error-handling-patterns"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-apidesign", "prompt": "design a clean, consistent REST API for this service", "expect": ["api-design-principles"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-imagegen", "prompt": "generate an image of a misty mountain landscape at dawn", "expect": ["imagegen"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-remotion", "prompt": "render a programmatic video in react using remotion", "expect": ["remotion-best-practices"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-obsidian", "prompt": "organize my notes into an obsidian vault with backlinks", "expect": ["obsidian-vault"], "reject": [], "tags": ["paraphrase"]}
+# --- Synonym / indirect intent (hard) ---------------------------------------------------------
+{"id": "syn-debug", "prompt": "this test is failing intermittently and I cannot figure out why", "expect": ["systematic-debugging", "systematic-debug"], "reject": [], "tags": ["synonym"]}
+{"id": "syn-brainstorm", "prompt": "help me shape a rough product idea before I start building it", "expect": ["brainstorming"], "reject": [], "tags": ["synonym"]}
+{"id": "syn-codereview", "prompt": "go over my pull request diff and flag correctness and quality issues", "expect": ["code-review"], "reject": [], "tags": ["synonym"]}
+{"id": "syn-secpatterns", "prompt": "find common security anti-patterns in my application code", "expect": ["security-testing-patterns", "semgrep"], "reject": [], "tags": ["synonym"]}
+# --- Ambiguous (multiple acceptable targets) --------------------------------------------------
+{"id": "amb-scrape", "prompt": "scrape a website and extract structured data from it", "expect": ["firecrawl", "crawl4ai", "scrape"], "reject": [], "tags": ["ambiguous"]}
+{"id": "amb-research", "prompt": "research a market opportunity for a new product", "expect": ["market-research", "company-research"], "reject": [], "tags": ["ambiguous"]}
+{"id": "amb-spreadsheet", "prompt": "build me a budget spreadsheet", "expect": ["spreadsheet", "xlsx"], "reject": [], "tags": ["ambiguous"]}
+{"id": "amb-summarize", "prompt": "summarize this chat session into a handoff document", "expect": ["chat-summarizer"], "reject": [], "tags": ["ambiguous", "characterization"]}
+# --- Uninstall-intent guardrail (must NOT route a skill to do work) ----------------------------
+{"id": "gate-uninstall-firecrawl", "prompt": "uninstall the firecrawl skill from my machine", "expect": [], "reject": ["firecrawl"], "tags": ["uninstall", "guardrail"]}
+{"id": "gate-remove-semgrep", "prompt": "remove the semgrep skill, I do not want it anymore", "expect": [], "reject": ["semgrep"], "tags": ["uninstall", "guardrail"]}
+# --- No-route / abstention (generic, off-domain; should NOT route) -----------------------------
+{"id": "noroute-capital", "prompt": "what is the capital of France", "expect": [], "reject": [], "tags": ["no-route", "characterization"]}
+{"id": "noroute-weather", "prompt": "what is the weather like today", "expect": [], "reject": [], "tags": ["no-route"]}
+{"id": "noroute-joke", "prompt": "tell me a joke", "expect": [], "reject": [], "tags": ["no-route"]}
+{"id": "noroute-math", "prompt": "what is 2 plus 2", "expect": [], "reject": [], "tags": ["no-route"]}
+{"id": "noroute-greeting", "prompt": "good morning, how are you", "expect": [], "reject": [], "tags": ["no-route"]}
+{"id": "noroute-thanks", "prompt": "thanks, that is all for now", "expect": [], "reject": [], "tags": ["no-route"]}
+# --- Characterization parity prompts (pinned by tests/characterization) ------------------------
+{"id": "char-universal-setup", "prompt": "make sure the universal AI tools are cleanly and universally installed, not redundant, and everything is updated on GitHub and across the AI services on my computer", "expect": ["universal-ai-config", "universal-ai-setup"], "reject": [], "tags": ["characterization"]}
+{"id": "char-calendar", "prompt": "schedule a meeting on my google calendar for tomorrow at 3pm", "expect": ["googlecalendar-automation"], "reject": [], "tags": ["paraphrase"]}

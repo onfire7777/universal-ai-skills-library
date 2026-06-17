@@ -32,7 +32,9 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/music"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/oracle"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/print"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/registry"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/schedule"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/serve"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/skills"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/sync"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/update"
@@ -40,7 +42,9 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/xcli"
 )
 
-const Version = "2.2.8"
+// Version is the CLI version. It is a var (not const) so release builds can
+// stamp it via -ldflags "-X .../cmd/root.Version=<tag>".
+var Version = "2.2.8"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -104,6 +108,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  update      Self-update CLI, skills, and printing-press")
 		fmt.Println("  doctor      Health check all components")
 		fmt.Println("  infra       Infrastructure management guide")
+		fmt.Println("  registry    Build/verify the registry artifacts (Go owner of the build)")
 		fmt.Println()
 		fmt.Println("Use \"skill-router [command] --help\" for more information about a command.")
 		fmt.Println("Legacy alias: manus")
@@ -121,6 +126,7 @@ func init() {
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)
 	rootCmd.AddCommand(mcp.Cmd)
+	rootCmd.AddCommand(serve.Cmd)
 	rootCmd.AddCommand(audit.Cmd)
 	rootCmd.AddCommand(oracle.Cmd)
 	rootCmd.AddCommand(print.Cmd)
@@ -159,4 +165,5 @@ func init() {
 	rootCmd.AddCommand(update.Cmd)
 	rootCmd.AddCommand(doctor.Cmd)
 	rootCmd.AddCommand(infra.Cmd)
+	rootCmd.AddCommand(registry.Cmd)
 }
