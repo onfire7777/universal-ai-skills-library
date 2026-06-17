@@ -39,6 +39,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/update"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/web"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/xcli"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/telemetry"
 )
 
 const Version = "2.2.8"
@@ -116,6 +117,10 @@ func Execute() error {
 }
 
 func init() {
+	// Stamp the CLI version onto telemetry decision records (one-way wiring:
+	// cmd/root → internal/telemetry, never the reverse).
+	telemetry.Version = Version
+
 	// Core
 	rootCmd.AddCommand(skills.Cmd)
 	rootCmd.AddCommand(skills.PreflightCmd)

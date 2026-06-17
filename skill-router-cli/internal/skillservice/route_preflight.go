@@ -143,6 +143,16 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 		preflight.Reason = "deterministic preflight found a confident skill"
 	}
 	_ = opts
+
+	// Phase 3.1 telemetry seam. buildRoutePreflight is the single funnel every
+	// route surface passes through — the public Route(), the CLI route/auto
+	// (RoutePromptCLI) and preflight (RunPreflightCLI), and the MCP server
+	// (cmd/serve → Route). Logging here means ONE decision record per real
+	// routing decision, covering both the CLI and MCP with no duplication. It is
+	// best-effort and fully gated: when telemetry is disabled, nothing is built
+	// or written and routing output stays byte-for-byte identical.
+	logRouteDecision(prompt, preflight)
+
 	return preflight, nil
 }
 

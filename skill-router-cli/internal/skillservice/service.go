@@ -19,6 +19,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/telemetry"
 )
 
 // routeMatchLimit bounds the ordered top-N candidates surfaced on RouteResult.
@@ -74,6 +76,63 @@ func Route(prompt string, opts RouteOptions) (RouteResult, error) {
 	}
 
 	return result, nil
+}
+
+// logRouteDecision maps a finished preflight into a telemetry DecisionRecord and
+// hands it to the capture layer. It is called from buildRoutePreflight — the one
+// funnel shared by the public Route(), the CLI route/auto/preflight commands,
+// and the MCP server — so exactly one record is emitted per routing decision
+// across every surface. It short-circuits before building anything when
+// telemetry is disabled (the common case), keeping the disabled route path
+// allocation-free beyond the env/config check; on the first disabled run it
+// prints a one-time enable hint to stderr (never stdout).
+func logRouteDecision(prompt string, preflight routePreflight) {
+	if !telemetry.Enabled() {
+		telemetry.NotifyDisabledOnce()
+		return
+	}
+	margin := 0
+	if preflight.Best.name != "" && preflight.Second.name != "" {
+		if m := preflight.Best.score - preflight.Second.score; m > 0 {
+			margin = m
+		}
+	}
+	rec := telemetry.DecisionRecord{
+		Prompt:   prompt,
+		Decision: string(preflight.Decision),
+		Margin:   margin,
+		// reranker_used is false for now; Phase 3.3 wires the learned reranker
+		// and sets this from whether it actually reordered the candidates.
+		RerankerUsed: false,
+	}
+	if preflight.Best.name != "" {
+		c := telemetryCandidate(preflight.Best)
+		rec.Best = &c
+	}
+	if preflight.Second.name != "" {
+		c := telemetryCandidate(preflight.Second)
+		rec.Second = &c
+	}
+	for _, candidate := range topRouteCandidates(preflight.Candidates, routeMatchLimit) {
+		rec.Top = append(rec.Top, telemetryCandidate(candidate))
+	}
+	telemetry.LogDecision(rec)
+}
+
+// telemetryCandidate projects a route candidate to the context-light telemetry
+// shape, carrying the same source label and eligibility flag the JSON surfaces
+// already expose.
+func telemetryCandidate(candidate routeCandidate) telemetry.Candidate {
+	source := routeCandidateSource(candidate)
+	if candidate.sourceID != "" {
+		source += ":" + candidate.sourceID
+	}
+	return telemetry.Candidate{
+		Name:     candidate.name,
+		Source:   source,
+		Score:    candidate.score,
+		Eligible: isEligibleRouteCandidate(candidate),
+	}
 }
 
 // Search returns name/description matches across the canonical manifest and the
