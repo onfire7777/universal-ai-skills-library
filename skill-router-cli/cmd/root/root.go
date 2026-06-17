@@ -33,6 +33,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/oracle"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/print"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/schedule"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/serve"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/skills"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/sync"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/update"
@@ -121,6 +122,7 @@ func init() {
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)
 	rootCmd.AddCommand(mcp.Cmd)
+	rootCmd.AddCommand(serve.Cmd)
 	rootCmd.AddCommand(audit.Cmd)
 	rootCmd.AddCommand(oracle.Cmd)
 	rootCmd.AddCommand(print.Cmd)
