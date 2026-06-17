@@ -59,6 +59,12 @@ func TestAgentRootsStayConservative(t *testing.T) {
 
 func TestRepoDirFindsCurrentCheckoutFromNestedDirectory(t *testing.T) {
 	repo := t.TempDir()
+	// On macOS the temp root is under /var, a symlink to /private/var. RepoDir
+	// resolves the working directory via os.Getwd, so compare against the
+	// symlink-resolved path to keep the assertion environment-independent.
+	if resolved, err := filepath.EvalSymlinks(repo); err == nil {
+		repo = resolved
+	}
 	if err := os.WriteFile(filepath.Join(repo, "manifest.json"), []byte(`{"core_skills":[],"library_skills":[]}`), 0644); err != nil {
 		t.Fatal(err)
 	}
