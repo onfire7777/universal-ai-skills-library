@@ -64,14 +64,38 @@ router binary is obtained via the characterization harness (`SKILL_ROUTER_BIN`
 in CI, else built once from source). If the Go toolchain is absent the run
 **skips** (exit 0), matching the characterization policy.
 
-## Baseline (recorded at Phase 0)
+## Baseline → Phase 1 (hybrid semantic routing)
 
-| Metric | Value |
-|--------|-------|
-| P@1 | 0.5319 |
-| MRR | 0.6193 |
-| Recall@5 | 0.6879 |
-| abstention accuracy | 1.0000 |
+55 cases (47 positive, 8 negative). `baseline/metrics.json` now records the
+**Phase-1 hybrid** numbers (the no-regression gate floor); the Phase-0 lexical
+column is the comparison point.
 
-55 cases (47 positive, 8 negative). These are the numbers Phase 1 must beat on
-recall (`+≥15pts Recall@5`, `+≥10pts P@1`) with **zero** exact-match regressions.
+| Metric | Phase 0 (lexical) | Phase 1 (hybrid) | Δ |
+|--------|------------------:|-----------------:|---:|
+| P@1 | 0.5319 | 0.5957 | **+6.4 pts** |
+| MRR | 0.6193 | 0.7220 | **+10.3 pts** |
+| Recall@5 | 0.6879 | 0.8582 | **+17.0 pts** |
+| abstention | 1.0000 | 1.0000 | — |
+
+Recall@5 clears the plan's `+≥15 pts` bar (+17.0) and MRR clears `+10`. P@1
+improves +6.4 — short of the aspirational +10, which the plan defers to the
+**Phase-3 trained reranker** (RRF ships as the identity reranker in Phase 1).
+Exact name/alias routing is preserved by the deterministic guardrail (0
+exact-match regressions).
+
+### Determinism / how the gain is reproduced offline
+
+The hybrid path needs (a) `routing-index.bin` (committed, hash-pinned) and (b) a
+query embedding. For CI/eval, `query-vectors.json` (built by `build_query_cache.py`,
+committed) supplies the query vectors via `SKILL_ROUTER_QUERY_CACHE`, so
+`run_eval.py` reproduces the hybrid metrics **deterministically and without
+Ollama**. At production query time the router embeds live (local Ollama) and
+falls back to lexical-only routing when the embedder or index is absent.
+
+Rebuild the index + cache after corpus/case changes:
+
+```bash
+skill-router index build                                   # -> routing-index.bin (+ .sha256)
+python3 tests/routing-eval/build_query_cache.py             # -> query-vectors.json
+python3 tests/routing-eval/run_eval.py --baseline           # re-record metrics.json
+```

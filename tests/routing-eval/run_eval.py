@@ -60,7 +60,7 @@ def eval_env() -> Dict[str, str]:
     iso = tempfile.mkdtemp(prefix="routing-eval-home-")
     cfg = os.path.join(iso, "cfg")
     os.makedirs(cfg, exist_ok=True)
-    return {
+    env = {
         "SKILL_ROUTER_REPO_DIR": REPO_ROOT,
         "SKILL_ROUTER_SKILLS_DIR": os.path.join(REPO_ROOT, "skills"),
         "SKILL_ROUTER_CONFIG_DIR": cfg,
@@ -69,6 +69,14 @@ def eval_env() -> Dict[str, str]:
         "NO_COLOR": "1",
         "CLICOLOR": "0",
     }
+    # Phase 1: when the committed offline query-vector cache exists, point the
+    # router at it so the hybrid semantic path runs deterministically and without
+    # Ollama (CI-safe). The router auto-loads routing-index.bin next to the
+    # manifest; with no cache AND no live embedder it falls back to lexical.
+    cache = os.path.join(HERE, "query-vectors.json")
+    if os.path.isfile(cache):
+        env["SKILL_ROUTER_QUERY_CACHE"] = cache
+    return env
 
 
 def load_cases(path: str, limit: Optional[int]) -> List[Dict]:

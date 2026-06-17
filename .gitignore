@@ -58,6 +58,10 @@ reports/
 *.gguf
 *.safetensors
 *.bin
+# …except the Phase-1 semantic routing index: a hash-pinned, reproducible build
+# artifact (≈1.4 MB int8) that ships so routing + the eval gate work offline.
+!/routing-index.bin
+!/routing-index.bin.sha256
 
 # OAuth/session/browser artifacts
 auth.json
@@ -74,3 +78,6 @@ venv/
 
 # Routing-eval generated artifacts (reproducible via tests/routing-eval/seed_corpus.py)
 tests/routing-eval/cases.corpus.jsonl
+
+# Locally-built router binary (use `make install-local` / `go build`)
+/skill-router

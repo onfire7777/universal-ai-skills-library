@@ -17,6 +17,7 @@ type routeCandidate struct {
 	external    bool
 	meta        bool
 	evidence    routeEvidence
+	semScore    float64 // Phase 1: semantic cosine vs the build-time index (0 when no index/embedder)
 }
 
 type routeEvidence struct {

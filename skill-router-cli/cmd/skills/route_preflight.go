@@ -24,6 +24,7 @@ type routePreflight struct {
 	RawBest    routeCandidate
 	Candidates []routeCandidate
 	HostReview *hostAIReview
+	Hybrid     bool // Phase 1: semantic+lexical fusion was applied (vs lexical-only fallback)
 }
 
 type hostAIReview struct {
@@ -88,11 +89,17 @@ func buildRoutePreflight(prompt string, opts routeOptions) (routePreflight, erro
 	sortRouteCandidates(candidates)
 	sortRouteCandidates(rawCandidates)
 
+	// Phase 1: fuse the semantic lane in when a build-time index + query vector
+	// are available; otherwise this is a no-op and `candidates` keeps its
+	// lexical order (the deterministic fallback).
+	candidates, hybrid := applyHybridFusion(prompt, candidates)
+
 	preflight := routePreflight{
 		Prompt:     prompt,
 		HookEvent:  strings.TrimSpace(opts.hookEvent),
 		RawBest:    bestRaw,
 		Candidates: candidates,
+		Hybrid:     hybrid,
 	}
 	best, second, ok := chooseRouteCandidate(candidates)
 	if maintenancePrompt {
@@ -236,6 +243,7 @@ func printPreflightJSON(preflight routePreflight, explain bool) error {
 		Best            *candidateJSON  `json:"best,omitempty"`
 		Second          *candidateJSON  `json:"second,omitempty"`
 		HostReview      *hostAIReview   `json:"host_ai_review,omitempty"`
+		Hybrid          bool            `json:"hybrid,omitempty"`
 		Top             []candidateJSON `json:"top,omitempty"`
 	}{
 		Prompt:          truncate(preflight.Prompt, routeOutputPromptMax),
@@ -245,6 +253,7 @@ func printPreflightJSON(preflight routePreflight, explain bool) error {
 		Decision:        preflight.Decision,
 		Reason:          preflight.Reason,
 		HostReview:      preflight.HostReview,
+		Hybrid:          preflight.Hybrid,
 	}
 	if preflight.Best.name != "" {
 		best := routeCandidateJSON(preflight.Best)
@@ -255,7 +264,11 @@ func printPreflightJSON(preflight routePreflight, explain bool) error {
 		out.Second = &second
 	}
 	if explain {
-		for _, candidate := range topRouteCandidates(preflight.Candidates, 8) {
+		top := topRouteCandidates(preflight.Candidates, 8)
+		if preflight.Hybrid {
+			top = topHybridCandidates(preflight.Candidates, 8)
+		}
+		for _, candidate := range top {
 			out.Top = append(out.Top, routeCandidateJSON(candidate))
 		}
 	}

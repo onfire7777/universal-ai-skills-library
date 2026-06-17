@@ -24,6 +24,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gstack"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/gws"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/hf"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/index"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/infra"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/instagram"
 	makeCmd "github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/make"
@@ -120,6 +121,7 @@ func init() {
 	rootCmd.AddCommand(skills.PreflightCmd)
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)
+	rootCmd.AddCommand(index.Cmd)
 	rootCmd.AddCommand(mcp.Cmd)
 	rootCmd.AddCommand(audit.Cmd)
 	rootCmd.AddCommand(oracle.Cmd)

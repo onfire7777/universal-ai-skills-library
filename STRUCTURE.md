@@ -36,10 +36,11 @@ Canonical tree: `universal-ai-skills-library/` (the second autofix clone is **ab
 ```
 universal-ai-skills-library/
 ├── manifest.json          # REGISTRY — single source of truth (v2.2.8; 1812 skills, 1917 aliases)
+├── routing-index.bin      # Phase 1 — build-time semantic index (int8 embeddings, hash-pinned)
 ├── schemas/               # SKILL.md frontmatter contract (skill.schema.json) — Phase 0
 ├── skill-router-cli/      # ROUTER (Go module)
-│   ├── cmd/               # cobra subcommands
-│   └── internal/          # platform, runner, skillsync, mcpcli
+│   ├── cmd/               # cobra subcommands (incl. `index` — build/query the routing index)
+│   └── internal/          # platform, runner, skillsync, mcpcli, index (embeddings/RRF/quantization)
 ├── skills/                # SKILLS CORPUS — skills/<kebab-name>/SKILL.md
 ├── plugin/  plugin-codex/ # PACKAGING
 ├── ai-setup/              # installer / agent setup
