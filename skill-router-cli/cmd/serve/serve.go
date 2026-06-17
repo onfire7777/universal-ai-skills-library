@@ -117,22 +117,31 @@ func Serve(in io.Reader, out io.Writer) error {
 		}
 		var req rpcReq
 		if err := json.Unmarshal([]byte(line), &req); err != nil {
-			_ = write(rpcResp{Error: &rpcErr{Code: -32700, Message: "parse error"}})
+			// D1: parse error always responds with id:null per JSON-RPC 2.0 §5.1
+			_ = write(rpcResp{ID: json.RawMessage("null"), Error: &rpcErr{Code: -32700, Message: "parse error"}})
 			continue
 		}
+		// D2: requests without an id are notifications — never respond to them
+		hasID := len(req.ID) > 0 && string(req.ID) != "null"
 		switch req.Method {
 		case "initialize":
-			_ = write(rpcResp{ID: req.ID, Result: map[string]any{
-				"protocolVersion": protocolVersion,
-				"capabilities":    map[string]any{"tools": map[string]any{}},
-				"serverInfo":      map[string]any{"name": "skill-router", "version": "0.1.0"},
-			}})
+			if hasID {
+				_ = write(rpcResp{ID: req.ID, Result: map[string]any{
+					"protocolVersion": protocolVersion,
+					"capabilities":    map[string]any{"tools": map[string]any{}},
+					"serverInfo":      map[string]any{"name": "skill-router", "version": "0.1.0"},
+				}})
+			}
 		case "notifications/initialized":
 			// notification: no response
 		case "ping":
-			_ = write(rpcResp{ID: req.ID, Result: map[string]any{}})
+			if hasID {
+				_ = write(rpcResp{ID: req.ID, Result: map[string]any{}})
+			}
 		case "tools/list":
-			_ = write(rpcResp{ID: req.ID, Result: map[string]any{"tools": toolDefs()}})
+			if hasID {
+				_ = write(rpcResp{ID: req.ID, Result: map[string]any{"tools": toolDefs()}})
+			}
 		case "tools/call":
 			var p struct {
 				Name      string         `json:"name"`
@@ -141,17 +150,21 @@ func Serve(in io.Reader, out io.Writer) error {
 			_ = json.Unmarshal(req.Params, &p)
 			text, err := callTool(p.Name, p.Arguments)
 			if err != nil {
-				_ = write(rpcResp{ID: req.ID, Result: map[string]any{
-					"isError": true,
-					"content": []map[string]any{{"type": "text", "text": err.Error()}},
-				}})
+				if hasID {
+					_ = write(rpcResp{ID: req.ID, Result: map[string]any{
+						"isError": true,
+						"content": []map[string]any{{"type": "text", "text": err.Error()}},
+					}})
+				}
 				continue
 			}
-			_ = write(rpcResp{ID: req.ID, Result: map[string]any{
-				"content": []map[string]any{{"type": "text", "text": text}},
-			}})
+			if hasID {
+				_ = write(rpcResp{ID: req.ID, Result: map[string]any{
+					"content": []map[string]any{{"type": "text", "text": text}},
+				}})
+			}
 		default:
-			if len(req.ID) > 0 {
+			if hasID {
 				_ = write(rpcResp{ID: req.ID, Error: &rpcErr{Code: -32601, Message: "method not found: " + req.Method}})
 			}
 		}

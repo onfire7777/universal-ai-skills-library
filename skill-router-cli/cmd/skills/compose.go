@@ -13,7 +13,14 @@ import (
 var composeCmd = &cobra.Command{
 	Use:   "compose <prompt>",
 	Short: "Assemble a working set of skills for a task (plan by default, --full for bodies)",
-	Args:  cobra.MinimumNArgs(1),
+	// D7: --skills flag makes the positional prompt optional.
+	Args: func(cmd *cobra.Command, args []string) error {
+		skills, _ := cmd.Flags().GetString("skills")
+		if skills != "" {
+			return nil // --skills bypasses the prompt requirement
+		}
+		return cobra.MinimumNArgs(1)(cmd, args)
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		skillsFlag, _ := cmd.Flags().GetString("skills")
 		top, _ := cmd.Flags().GetInt("top")
@@ -38,7 +45,14 @@ var composeCmd = &cobra.Command{
 			enc.SetIndent("", "  ")
 			return enc.Encode(res)
 		}
+		// D6: --full prints the plan list first, then a blank line, then the bundle.
 		if full {
+			fmt.Fprintf(cmd.OutOrStdout(), "Composed %d skills (~%d tokens):\n", len(res.Skills), res.TotalTokenEst)
+			for i, s := range res.Skills {
+				fmt.Fprintf(cmd.OutOrStdout(), "  %d. %s [%s] score=%d ~%dtok — %s\n",
+					i+1, s.Name, s.Source, s.Score, s.TokenEst, s.Description)
+			}
+			fmt.Fprintln(cmd.OutOrStdout())
 			fmt.Fprint(cmd.OutOrStdout(), res.Bundle)
 			return nil
 		}

@@ -84,6 +84,11 @@ func Compose(req ComposeRequest) (ComposeResult, error) {
 		if err != nil {
 			return ComposeResult{}, fmt.Errorf("compose load %s: %w", r.Name, err)
 		}
+		// D4: preserve route score then replace ref with canonical Load() data
+		// so Path/Source/Description are populated from the actual SKILL.md.
+		score := r.Score
+		r = ld.Ref            // canonical Name/Path/Source/Description from Load()
+		r.Score = score
 		r.TokenEst = EstimateTokens(ld.Body)
 		res.TotalTokenEst += r.TokenEst
 		res.Skills = append(res.Skills, r)

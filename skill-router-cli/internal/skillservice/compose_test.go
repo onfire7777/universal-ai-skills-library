@@ -1,6 +1,9 @@
 package skillservice
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestComposePlanSelectsTopAboveThreshold(t *testing.T) {
 	fixtureRepo(t)
@@ -20,6 +23,15 @@ func TestComposePlanSelectsTopAboveThreshold(t *testing.T) {
 	if got.TotalTokenEst <= 0 {
 		t.Fatal("expected a positive total token estimate")
 	}
+	// D5: route-driven entries must carry the canonical path resolved by Load.
+	for i, s := range got.Skills {
+		if s.Path == "" {
+			t.Errorf("Skills[%d].Path is empty for %q; route-driven refs must get canonical path from Load()", i, s.Name)
+		}
+		if !strings.Contains(s.Path, "SKILL.md") {
+			t.Errorf("Skills[%d].Path = %q, want a path containing SKILL.md", i, s.Path)
+		}
+	}
 }
 
 func TestComposeFullPopulatesBundle(t *testing.T) {
@@ -31,17 +43,7 @@ func TestComposeFullPopulatesBundle(t *testing.T) {
 	if got.Bundle == "" {
 		t.Fatal("full mode must populate Bundle")
 	}
-	if !contains(got.Bundle, "crawl4ai") {
+	if !strings.Contains(got.Bundle, "crawl4ai") {
 		t.Fatal("bundle should contain the skill body")
 	}
-}
-
-func contains(s, sub string) bool { return len(s) >= len(sub) && (indexOf(s, sub) >= 0) }
-func indexOf(s, sub string) int {
-	for i := 0; i+len(sub) <= len(s); i++ {
-		if s[i:i+len(sub)] == sub {
-			return i
-		}
-	}
-	return -1
 }
