@@ -62,12 +62,18 @@ Reproduce with `make baseline` (or `cd skill-router-cli && go build ./... && go 
 |-------|--------|
 | `go build ./...` | **PASS** |
 | `go vet ./...` | **PASS** |
-| `go test ./...` | **RED** — 4 known pre-existing failures / 38 packages |
+| `go test ./...` | baseline **RED** (4 known pre-existing fails / 38 pkgs) → **now GREEN** ✅ — B2 landed fixture/platform fixes; `go test ./... -count=1` = 0 fail @ `ee19c4d` |
 
 ### Known-failing tests = the swarm baseline
 
-**"Green" for the swarm = no NEW failures beyond these 4.** All 4 are pre-existing at HEAD
-(not swarm-introduced) and should be **gone** once B2 lands fixture-pinned routing + platform fixes.
+**"Green" for the swarm = no NEW failures beyond these 4** (the recorded baseline). All 4 were
+pre-existing at HEAD (not swarm-introduced).
+
+> **RESOLVED (update):** B2 has since landed fixture-pinned routing + platform fixes. Routing
+> tests now run against a committed fixture (`skill-router-cli/cmd/skills/testdata/route-fixture/`)
+> with HOME/skills/repo dirs redirected to temp, and the platform tests are OS-aware.
+> `go test ./... -count=1` now passes with **0 failures** (verified at `ee19c4d`) — the bar is
+> now simply *all-green*. The table below is retained as the historical baseline record.
 
 | Test | Location | Class | Why it fails | Fix owner |
 |------|----------|-------|--------------|-----------|
