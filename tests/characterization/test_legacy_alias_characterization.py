@@ -48,16 +48,25 @@ class ManusBinaryAlias(unittest.TestCase):
         self.assertEqual(data.get("totalSkills"), harness.fixture_skill_count())
 
     def test_manus_and_skill_router_output_parity(self):
-        """Same binary, two names: `manus <cmd>` output must equal
-        `skill-router <cmd>` output for deterministic commands."""
-        argv = ["skills", "validate-manifest", "--json"]
-        primary = harness.run_router(argv, env=harness.fixture_env(), cwd=harness.FIXTURE_DIR)
-        legacy = harness.run_router_as_alias("manus", argv, fixture=True)
-        self.assertEqual(primary.returncode, legacy.returncode)
-        self.assertEqual(
-            json.loads(primary.stdout), json.loads(legacy.stdout),
-            "manus alias produced different validate-manifest output than skill-router",
-        )
+        """Same binary, two names: `manus <cmd>` output must be byte-identical to
+        `skill-router <cmd>` for every deterministic command (Coordinator's
+        'resolving identically to skill' contract; Scout 1 golden = identical)."""
+        commands = [
+            ["--version"],
+            ["skill", "chat-summarizer"],
+            ["skills", "validate-manifest", "--json"],
+            ["preflight", "--json", "summarize this chat session into a handoff document"],
+        ]
+        for argv in commands:
+            with self.subTest(cmd=" ".join(argv)):
+                primary = harness.run_router(argv, env=harness.fixture_env(), cwd=harness.FIXTURE_DIR)
+                legacy = harness.run_router_as_alias("manus", argv, fixture=True)
+                self.assertEqual(primary.returncode, legacy.returncode,
+                                f"exit code differs for {argv}")
+                self.assertEqual(
+                    primary.stdout, legacy.stdout,
+                    f"manus alias output differs from skill-router for {argv}",
+                )
 
 
 class ManusDeclaredContract(unittest.TestCase):

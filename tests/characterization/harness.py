@@ -179,7 +179,7 @@ def router_binary() -> str:
     proc = subprocess.run(
         ["go", "build", "-o", out_bin, "."],
         cwd=module, capture_output=True, text=True, timeout=600,
-        env={**os.environ, "GOFLAGS": "-mod=mod"},
+        env={**os.environ, "GOFLAGS": "-mod=readonly"},
     )
     if proc.returncode != 0:
         # A real compile failure is a genuine problem — surface it.
@@ -300,7 +300,7 @@ def run_go_unit_tests(timeout: int = 600) -> Tuple[set, set]:
     proc = subprocess.run(
         ["go", "test", "./...", "-json"],
         cwd=module, capture_output=True, text=True, timeout=timeout,
-        env={**os.environ, "GOFLAGS": "-mod=mod"},
+        env={**os.environ, "GOFLAGS": "-mod=readonly"},
     )
     failing_tests: set = set()
     failing_pkgs: set = set()

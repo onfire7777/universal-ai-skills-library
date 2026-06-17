@@ -43,7 +43,7 @@ jobs:
           if [ -z "$MOD_FILE" ]; then echo "::error::skill-router go.mod not found"; exit 1; fi
           MOD_DIR=$(dirname "$MOD_FILE")
           echo "Building router from $MOD_DIR"
-          (cd "$MOD_DIR" && GOFLAGS=-mod=mod go build -o "$GITHUB_WORKSPACE/skill-router" .)
+          (cd "$MOD_DIR" && GOFLAGS=-mod=readonly go build -o "$GITHUB_WORKSPACE/skill-router" .)
           echo "SKILL_ROUTER_BIN=$GITHUB_WORKSPACE/skill-router" >> "$GITHUB_ENV"
 
       - name: Lint test sources (compile check)
@@ -53,7 +53,7 @@ jobs:
         continue-on-error: true
         run: |
           MOD_DIR=$(dirname "$(find . -name go.mod -path '*skill-router*' | head -1)")
-          (cd "$MOD_DIR" && GOFLAGS=-mod=mod go vet ./...)
+          (cd "$MOD_DIR" && GOFLAGS=-mod=readonly go vet ./...)
 
       - name: Run characterization suite
         run: python3 -m unittest discover -s tests/characterization -p 'test_*.py' -v
