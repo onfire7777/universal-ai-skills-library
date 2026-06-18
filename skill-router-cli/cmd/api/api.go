@@ -14,7 +14,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const baseURL = "https://api.manus.im/v2"
+const defaultBaseURL = "https://api.manus.im/v2"
+
+var apiBaseURL = defaultBaseURL
 
 // Cmd is the top-level api command group.
 var Cmd = &cobra.Command{
@@ -22,7 +24,8 @@ var Cmd = &cobra.Command{
 	Short: "Interact with Manus API v2 (tasks, projects, files, webhooks, agents)",
 	Long: `Full Manus API v2 client — manage tasks, projects, files, webhooks,
 agents, connectors, websites, and usage data programmatically.
-Requires MANUS_API_KEY environment variable.`,
+Requires MANUS_API_KEY. Override the default endpoint with --api-base or
+SKILL_ROUTER_MANUS_API_BASE for compatible provider deployments.`,
 }
 
 // --- Tasks ---
@@ -161,7 +164,7 @@ var fileUploadCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Uploading %s...\n", args[0])
 		// Multipart upload would go here
-		return fmt.Errorf("file upload requires multipart form — use 'manus-upload-file %s' directly", args[0])
+		return fmt.Errorf("file upload requires multipart form support; use the provider-specific upload tool for %s", args[0])
 	},
 }
 
@@ -315,6 +318,11 @@ var skillListCmd = &cobra.Command{
 }
 
 func init() {
+	if value := os.Getenv("SKILL_ROUTER_MANUS_API_BASE"); value != "" {
+		apiBaseURL = value
+	}
+	Cmd.PersistentFlags().StringVar(&apiBaseURL, "api-base", apiBaseURL, "Manus API base URL")
+
 	taskListCmd.Flags().String("status", "", "Filter by status (running, completed, failed)")
 	taskListCmd.Flags().Int("limit", 20, "Maximum number of tasks to return")
 	webhookCreateCmd.Flags().String("events", "task.completed", "Comma-separated event types")
@@ -345,6 +353,29 @@ func getAPIKey() string {
 		return key
 	}
 	return ""
+}
+
+func normalizeAPIBase(value string) (string, error) {
+	base := strings.TrimRight(strings.TrimSpace(value), "/")
+	parsed, err := url.Parse(base)
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return "", fmt.Errorf("--api-base must be an absolute http(s) URL")
+	}
+	if parsed.Scheme != "https" && parsed.Scheme != "http" {
+		return "", fmt.Errorf("--api-base must use http or https")
+	}
+	if parsed.Scheme == "http" && parsed.Hostname() != "localhost" && parsed.Hostname() != "127.0.0.1" && parsed.Hostname() != "::1" {
+		return "", fmt.Errorf("--api-base must use https unless targeting localhost")
+	}
+	return base, nil
+}
+
+func apiURL(path string) (string, error) {
+	base, err := normalizeAPIBase(apiBaseURL)
+	if err != nil {
+		return "", err
+	}
+	return base + path, nil
 }
 
 func pathSegment(value string) string {
@@ -379,7 +410,14 @@ func apiGet(path string) error {
 	if key == "" {
 		return fmt.Errorf("MANUS_API_KEY not set. Get your key from https://manus.im/settings")
 	}
-	req, _ := http.NewRequest("GET", baseURL+path, nil)
+	url, err := apiURL(path)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("creating API request: %w", err)
+	}
 	req.Header.Set("Authorization", "Bearer "+key)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
@@ -404,11 +442,18 @@ func apiPost(path string, body []byte) error {
 	if key == "" {
 		return fmt.Errorf("MANUS_API_KEY not set. Get your key from https://manus.im/settings")
 	}
+	url, err := apiURL(path)
+	if err != nil {
+		return err
+	}
 	var reader io.Reader
 	if body != nil {
 		reader = bytes.NewReader(body)
 	}
-	req, _ := http.NewRequest("POST", baseURL+path, reader)
+	req, err := http.NewRequest("POST", url, reader)
+	if err != nil {
+		return fmt.Errorf("creating API request: %w", err)
+	}
 	req.Header.Set("Authorization", "Bearer "+key)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
@@ -432,7 +477,14 @@ func apiDelete(path string) error {
 	if key == "" {
 		return fmt.Errorf("MANUS_API_KEY not set. Get your key from https://manus.im/settings")
 	}
-	req, _ := http.NewRequest("DELETE", baseURL+path, nil)
+	url, err := apiURL(path)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return fmt.Errorf("creating API request: %w", err)
+	}
 	req.Header.Set("Authorization", "Bearer "+key)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

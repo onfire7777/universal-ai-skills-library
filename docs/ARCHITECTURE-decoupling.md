@@ -74,6 +74,7 @@ Loader: `loadManifest()` → `os.ReadFile(ManifestPath())`.
 | `SKILL_ROUTER_EXTERNAL_CACHE_TTL_MINUTES` | External-root cache TTL | primary |
 | `SKILL_ROUTER_HOOK_EVENT` | Hook event context | primary |
 | `SKILL_ROUTER_PAPERCLIP_SKILLS_DIR` / `..._INSTRUCTIONS_DIR` | Paperclip adapter roots | primary |
+| `SKILL_ROUTER_MANUS_API_BASE` | Manus API adapter base URL override | provider config |
 | `MANUS_API_KEY` | Manus API key | config |
 
 ## 4. Registry manifest schema (B4 produces — single source)
