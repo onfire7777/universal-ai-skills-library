@@ -34,7 +34,7 @@ longer drift from each other or from the `skills/` tree.
 ```bash
 # Validate that the committed CLI-first artifacts are in sync with skills/ (CI guard).
 # Default checks manifest.json + docs/build_manifest.json and fails if any
-# retired marketplace JSON reappears.
+# retired marketplace JSON or clone-root path reappears.
 node scripts/registry/generate-registry.mjs --check
 
 # Regenerate the registries on disk.
@@ -78,6 +78,8 @@ and validates it with `validate-manifest`. The generator therefore guarantees:
 - `manifest.alias_count` is recomputed deterministically (the legacy `1917` was
   not reproducible from the catalog; it is now the actual alias-string count).
 - `scripts[]` are emitted in the canonical sorted order the Go validator expects.
-- `marketplace.json`, `.agents/plugins/marketplace.json`, and
-  `plugin/marketplace.json` are retired. The router is CLI-first; `--check`
-  lists all three under `STALE_REGISTRIES` and fails if any reappears.
+- `marketplace.json`, `.agents/plugins/marketplace.json`,
+  `plugin/marketplace.json`, `manus-skills-marketplace`, and
+  `manus-skills-organized` style clone roots are retired. The router is
+  CLI-first; `--check` lists them under `STALE_MARKETPLACE_PATHS` and fails if
+  any reappears.

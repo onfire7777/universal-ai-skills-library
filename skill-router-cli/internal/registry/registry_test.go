@@ -38,6 +38,20 @@ func TestArtifactsInSyncWithCommitted(t *testing.T) {
 	}
 }
 
+func TestStaleMarketplacePathsAbsent(t *testing.T) {
+	root, err := FindRepoRoot(".")
+	if err != nil {
+		t.Skipf("repo root not found from test CWD: %v", err)
+	}
+	for _, rel := range StaleMarketplacePaths {
+		if _, err := os.Stat(filepath.Join(root, rel)); err == nil {
+			t.Fatalf("%s is a retired marketplace path and must be deleted", rel)
+		} else if !os.IsNotExist(err) {
+			t.Fatalf("stat %s: %v", rel, err)
+		}
+	}
+}
+
 // TestStringifyMatchesJSONStringify pins the serializer's format/escaping rules
 // against known JSON.stringify behavior (no <>& escaping, 2-space indent,
 // trailing newline, empty array as []).

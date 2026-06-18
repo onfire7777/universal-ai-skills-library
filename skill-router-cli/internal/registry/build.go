@@ -20,13 +20,21 @@ var Artifacts = map[string]string{
 // ArtifactKeys is the canonical build/write order.
 var ArtifactKeys = []string{"manifest", "build-manifest"}
 
-// StaleRegistries are retired marketplace registries that must never reappear;
-// --check fails if any are present.
+// StaleRegistries are retired marketplace registries that must never reappear.
 var StaleRegistries = []string{
 	"marketplace.json",
 	".agents/plugins/marketplace.json",
 	"plugin/marketplace.json",
 }
+
+// StaleMarketplacePaths are retired marketplace registries and clone roots that
+// must never reappear; --check fails if any are present.
+var StaleMarketplacePaths = append(append([]string{}, StaleRegistries...),
+	"manus-skills-marketplace",
+	"manus-skills-organized",
+	"mana-skills-marketplace",
+	"mana-skills-organized",
+)
 
 // Skill is a scanned skill catalog entry.
 type Skill struct {
@@ -433,9 +441,9 @@ func RunCheck(repoRoot string, built map[string]*OM, selected []string, out, err
 			fmt.Fprintf(out, "ok: %s in sync\n", rel)
 		}
 	}
-	for _, rel := range StaleRegistries {
+	for _, rel := range StaleMarketplacePaths {
 		if fileExists(filepath.Join(repoRoot, rel)) {
-			fmt.Fprintf(errw, "DRIFT: %s is a retired marketplace registry — delete it\n", rel)
+			fmt.Fprintf(errw, "DRIFT: %s is a retired marketplace path — delete it\n", rel)
 			drift++
 		} else {
 			fmt.Fprintf(out, "ok: %s absent (collapsed)\n", rel)

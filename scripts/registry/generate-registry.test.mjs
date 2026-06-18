@@ -16,7 +16,7 @@ import path from "node:path";
 import {
   REPO_ROOT,
   CONFIG_PATH,
-  STALE_REGISTRIES,
+  STALE_MARKETPLACE_PATHS,
   serialize,
   listSkillScripts,
   scanSkills,
@@ -173,11 +173,11 @@ test("build_manifest no longer drifts from manifest (single scan, equal counts)"
   assert.equal(b.skill_count, m.total_skills, "build_manifest count == manifest count");
 });
 
-test("collapsed stale duplicate registries do not exist on disk", () => {
-  for (const rel of STALE_REGISTRIES) {
+test("collapsed stale marketplace paths do not exist on disk", () => {
+  for (const rel of STALE_MARKETPLACE_PATHS) {
     assert.ok(
       !fs.existsSync(path.join(REPO_ROOT, rel)),
-      `${rel} is a retired marketplace registry and must be deleted`
+      `${rel} is a retired marketplace path and must be deleted`
     );
   }
 });

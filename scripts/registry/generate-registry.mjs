@@ -65,12 +65,19 @@ export const ARTIFACTS = {
   "build-manifest": "docs/build_manifest.json",
 };
 
-// Retired marketplace registries that must NOT reappear. The CLI-first router
-// uses manifest.json + docs/build_manifest.json only.
+// Retired marketplace registries and clone roots that must NOT reappear. The
+// CLI-first router uses manifest.json + docs/build_manifest.json only.
 export const STALE_REGISTRIES = [
   "marketplace.json",
   ".agents/plugins/marketplace.json",
   "plugin/marketplace.json",
+];
+export const STALE_MARKETPLACE_PATHS = [
+  ...STALE_REGISTRIES,
+  "manus-skills-marketplace",
+  "manus-skills-organized",
+  "mana-skills-marketplace",
+  "mana-skills-organized",
 ];
 
 // ---------------------------------------------------------------------------
@@ -353,10 +360,10 @@ function main() {
       console.log(`ok: ${ARTIFACTS[key]} in sync`);
     }
   }
-  // Stale-duplicate guard: collapsed registries must not reappear.
-  for (const rel of STALE_REGISTRIES) {
+  // Stale-duplicate guard: collapsed marketplace artifacts must not reappear.
+  for (const rel of STALE_MARKETPLACE_PATHS) {
     if (fs.existsSync(path.join(REPO_ROOT, rel))) {
-      console.error(`DRIFT: ${rel} is a retired marketplace registry — delete it`);
+      console.error(`DRIFT: ${rel} is a retired marketplace path — delete it`);
       drift++;
     } else {
       console.log(`ok: ${rel} absent (collapsed)`);
