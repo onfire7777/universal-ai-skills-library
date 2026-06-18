@@ -116,6 +116,28 @@ skips workspace/source trees that should not be mutated generically.`,
 	},
 }
 
+var codexCmd = &cobra.Command{
+	Use:   "codex",
+	Short: "Install the compact Codex CLI compatibility adapter",
+	Long: `Install only the compact universal-ai-skills wrapper into the Codex
+local skill root. This keeps Codex CLI connected to skill-router without
+copying the full skill corpus into ~/.codex/skills.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return syncNamedRoot("codex")
+	},
+}
+
+var claudeCmd = &cobra.Command{
+	Use:   "claude",
+	Short: "Install the compact Claude CLI compatibility adapter",
+	Long: `Install only the compact universal-ai-skills wrapper into the Claude
+Code / Claude Skills local root. This keeps Claude CLI connected to
+skill-router without copying the full skill corpus into ~/.claude/skills.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return syncNamedRoot("claude")
+	},
+}
+
 var paperclipCmd = &cobra.Command{
 	Use:   "paperclip",
 	Short: "Install the compact Paperclip compatibility adapter",
@@ -224,9 +246,34 @@ func init() {
 	Cmd.AddCommand(repoCmd)
 	Cmd.AddCommand(propagateAllCmd)
 	Cmd.AddCommand(installedCmd)
+	Cmd.AddCommand(codexCmd)
+	Cmd.AddCommand(claudeCmd)
 	Cmd.AddCommand(paperclipCmd)
 	Cmd.AddCommand(statusCmd)
 	Cmd.AddCommand(matrixCmd)
+}
+
+func syncNamedRoot(id string) error {
+	spec, ok := agentRootSpecByID(id)
+	if !ok {
+		return fmt.Errorf("unknown agent root: %s", id)
+	}
+	if spec.Adapter != "skill-root" || spec.Path == "" {
+		return fmt.Errorf("%s does not expose a local skill root", spec.Name)
+	}
+	fmt.Printf("Installing compact %s adapter wrapper; the full corpus stays in the canonical repo and loads through skill-router.\n", spec.Name)
+	counts, err := skillsync.Propagate(skillsync.SourceDir(), []string{spec.Path}, false)
+	fmt.Printf("  %-40s [%d skills]\n", spec.Path, counts[spec.Path])
+	return err
+}
+
+func agentRootSpecByID(id string) (platform.AgentRootSpec, bool) {
+	for _, spec := range platform.AgentRootSpecs() {
+		if spec.ID == id {
+			return spec, true
+		}
+	}
+	return platform.AgentRootSpec{}, false
 }
 
 func propagateToRoots(fullCopy bool) error {

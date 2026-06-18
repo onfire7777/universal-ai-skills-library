@@ -143,6 +143,8 @@ Every local AI client gets compact router instructions and, where supported, one
 skill-router preflight --json "<latest user prompt>"
 skill-router skill <skill-name>
 skill-router skill search <query>
+skill-router sync codex    # optional compact wrapper for Codex CLI
+skill-router sync claude   # optional compact wrapper for Claude CLI
 ```
 
 Do not copy the full corpus into every AI root. The adapter model is universal because all clients point at the same router and corpus, not because every client owns a duplicate copy.

@@ -12,6 +12,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN_DIR="${GOBIN:-"$HOME/go/bin"}"
 COPY_SKILLS_DIR=""
 SKIP_VALIDATE=0
+SYNC_CODEX=0
+SYNC_CLAUDE=0
 
 usage() {
   cat <<'USAGE'
@@ -23,6 +25,9 @@ Usage:
 Options:
   --bin-dir DIR        Install skill-router into DIR (default: $GOBIN or ~/go/bin)
   --copy-skills DIR    Optional offline/full-copy export of skills/ into DIR
+  --sync-codex         Install compact wrapper into ~/.codex/skills
+  --sync-claude        Install compact wrapper into ~/.claude/skills
+  --sync-cli-clients   Install compact wrappers for both Codex and Claude
   --skip-validate      Skip manifest validation after build
   -h, --help           Show this help
 
@@ -52,6 +57,19 @@ while [[ $# -gt 0 ]]; do
     --copy-skills)
       COPY_SKILLS_DIR="${2:?--copy-skills requires a directory}"
       shift 2
+      ;;
+    --sync-codex)
+      SYNC_CODEX=1
+      shift
+      ;;
+    --sync-claude)
+      SYNC_CLAUDE=1
+      shift
+      ;;
+    --sync-cli-clients)
+      SYNC_CODEX=1
+      SYNC_CLAUDE=1
+      shift
       ;;
     --skip-validate)
       SKIP_VALIDATE=1
@@ -98,6 +116,22 @@ if [[ "$SKIP_VALIDATE" -eq 0 ]]; then
   (
     cd "$SCRIPT_DIR"
     "$BIN_DIR/skill-router" skills validate-manifest
+  )
+fi
+
+if [[ "$SYNC_CODEX" -eq 1 ]]; then
+  echo "==> Installing Codex CLI wrapper"
+  (
+    cd "$SCRIPT_DIR"
+    "$BIN_DIR/skill-router" sync codex
+  )
+fi
+
+if [[ "$SYNC_CLAUDE" -eq 1 ]]; then
+  echo "==> Installing Claude CLI wrapper"
+  (
+    cd "$SCRIPT_DIR"
+    "$BIN_DIR/skill-router" sync claude
   )
 fi
 

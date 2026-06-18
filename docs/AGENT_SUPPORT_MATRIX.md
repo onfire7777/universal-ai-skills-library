@@ -30,6 +30,8 @@ Use this before changing any agent root:
 ```bash
 skill-router sync matrix
 skill-router sync matrix --json
+skill-router sync codex
+skill-router sync claude
 skill-router sync installed
 ```
 

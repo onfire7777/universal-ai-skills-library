@@ -108,6 +108,8 @@ skill-router --version
 skill-router skill search debugging
 skill-router skill universal-ai-skills
 skill-router skills validate-manifest
+skill-router sync codex   # optional compact wrapper for Codex CLI
+skill-router sync claude  # optional compact wrapper for Claude CLI
 skill-router doctor
 ```
 
@@ -143,6 +145,8 @@ skill-router route --explain "<prompt>"
 skill-router skills validate-manifest
 skill-router skills sources
 skill-router sync matrix
+skill-router sync codex
+skill-router sync claude
 skill-router sync installed
 skill-router doctor
 skill-router mcp status
