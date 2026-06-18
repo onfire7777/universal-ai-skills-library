@@ -219,6 +219,33 @@ func TestPrintAdapterStatusJSONCoversAllSpecsReadOnly(t *testing.T) {
 			t.Fatalf("row %s missing status", row.ID)
 		}
 	}
+	byID := map[string]adapterStatusRow{}
+	for _, row := range rows {
+		byID[row.ID] = row
+	}
+	for _, id := range []string{"codex", "claude", "hermes", "paperclip", "openclaw-global"} {
+		row, ok := byID[id]
+		if !ok {
+			t.Fatalf("adapter-status JSON missing priority adapter %s", id)
+		}
+		if row.Adapter != "skill-root" {
+			t.Fatalf("%s adapter = %q, want skill-root", id, row.Adapter)
+		}
+		if row.Path == "" {
+			t.Fatalf("%s path is empty", id)
+		}
+	}
+	if !byID["codex"].DefaultSync {
+		t.Fatalf("codex should remain a default sync adapter")
+	}
+	if !byID["claude"].DefaultSync {
+		t.Fatalf("claude should remain a default sync adapter")
+	}
+	for _, id := range []string{"hermes", "paperclip", "openclaw-global"} {
+		if byID[id].DefaultSync {
+			t.Fatalf("%s should remain report-only in adapter-status JSON", id)
+		}
+	}
 	// No skill-root path should exist after a read-only report on an empty home.
 	for _, entry := range platform.AgentRootSpecs() {
 		if entry.Adapter == "skill-root" && entry.Path != "" {
@@ -226,6 +253,39 @@ func TestPrintAdapterStatusJSONCoversAllSpecsReadOnly(t *testing.T) {
 				t.Fatalf("sync --check must not create root %s", entry.Path)
 			}
 		}
+	}
+}
+
+func TestPrintAdapterStatusJSONReportsInstalledPaperclipInstructions(t *testing.T) {
+	home := t.TempDir()
+	repo := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
+
+	writeSkill(t, filepath.Join(repo, "skills"), "universal-ai-skills")
+	writeSkill(t, filepath.Join(repo, "skills"), "extra-skill")
+
+	if err := paperclipCmd.RunE(paperclipCmd, nil); err != nil {
+		t.Fatal(err)
+	}
+
+	byID := map[string]adapterStatusRow{}
+	for _, row := range captureAdapterStatusJSON(t) {
+		byID[row.ID] = row
+	}
+	paperclip := byID["paperclip"]
+	if !paperclip.Exists {
+		t.Fatalf("paperclip adapter root should exist after install")
+	}
+	if !paperclip.WrapperCopied {
+		t.Fatalf("paperclip wrapper should be reported as copied")
+	}
+	if paperclip.SkillFiles != 1 {
+		t.Fatalf("paperclip skillFiles = %d, want wrapper-only count 1", paperclip.SkillFiles)
+	}
+	if !strings.Contains(paperclip.Status, "instructionsFilePath") {
+		t.Fatalf("paperclip status should mention instructionsFilePath: %q", paperclip.Status)
 	}
 }
 
