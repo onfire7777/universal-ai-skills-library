@@ -122,8 +122,10 @@ stop hooks, compaction/resume hooks, assistant messages, tool outputs, status
 checks, and background jobs may belong to other adapters, but they must not run
 or load routed skills.
 
-Third-party caches and marketplaces under Claude, Codex, legacy compatibility roots, and
-other AI roots remain read-only external sources. This keeps the universal setup
+Third-party skill roots under Claude, Codex, Paperclip, OpenClaw, Hermes, and
+other AI roots remain read-only external sources. Retired marketplace roots and
+legacy `.manus` roots are not auto-discovered; they require an explicit
+`SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` opt-in. This keeps the universal setup
 comprehensive without committing thousands of duplicated upstream skill bodies.
 Promote an external skill into `skills/` only when it is curated, renamed if
 needed, audited, and added to `manifest.json`.
