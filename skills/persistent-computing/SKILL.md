@@ -1,6 +1,6 @@
 ---
 name: persistent-computing
-description: "MUST read when a task needs persistent services, Docker, fixed IPs, background jobs, heavy compute, reusable environments, or always-on infrastructure beyond the current AI sandbox. Covers local desktop, managed cloud computer, and third-party cloud options, including Manus compatibility where relevant."
+description: "MUST read when a task needs persistent services, Docker, fixed IPs, background jobs, heavy compute, reusable environments, or always-on infrastructure beyond the current AI sandbox. Covers local desktop, managed cloud computer, and third-party cloud options, including hosted provider compatibility where relevant."
 ---
 
 # Persistent Computing
