@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import os
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -95,6 +96,49 @@ class LiveRegistryGuards(unittest.TestCase):
         self.assertFalse(vm.get("duplicateNames"), vm.get("duplicateNames"))
         self.assertFalse(vm.get("duplicateDirs"), vm.get("duplicateDirs"))
         self.assertFalse(vm.get("missingSkillMd"), vm.get("missingSkillMd"))
+
+    def test_representative_live_manifest_skills_load_through_cli(self):
+        try:
+            harness.router_binary()
+        except harness.RouterUnavailable as exc:
+            raise unittest.SkipTest(str(exc))
+
+        names = {name for name, _ in self.pairs}
+        samples = [
+            "universal-ai-skills",
+            "universal-ai-config",
+            "provider-api",
+            "model-selector",
+            "openrouter-automation",
+            "chat-summarizer",
+        ]
+        missing = sorted(set(samples) - names)
+        self.assertEqual([], missing, f"sample skills missing from manifest: {missing}")
+
+        repo = harness.repo_root()
+        iso = tempfile.mkdtemp(prefix="skill-router-live-load-home-")
+        env = {
+            "SKILL_ROUTER_REPO_DIR": repo,
+            "SKILL_ROUTER_SKILLS_DIR": os.path.join(repo, "skills"),
+            "SKILL_ROUTER_EXTERNAL_SKILL_ROOTS": "",
+            "SKILL_ROUTER_CONFIG_DIR": os.path.join(iso, "cfg"),
+            "HOME": iso,
+            "USERPROFILE": iso,
+            "NO_COLOR": "1",
+            "CLICOLOR": "0",
+        }
+        os.makedirs(env["SKILL_ROUTER_CONFIG_DIR"], exist_ok=True)
+
+        for name in samples:
+            with self.subTest(skill=name):
+                proc = harness.run_router(["skill", name], env=env, cwd=repo)
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                self.assertIn(f"Reading: {name}", proc.stdout)
+                self.assertIn(
+                    os.path.join("skills", name),
+                    proc.stdout,
+                    "loaded skill should resolve under the live canonical skills/ tree",
+                )
 
 
 if __name__ == "__main__":
