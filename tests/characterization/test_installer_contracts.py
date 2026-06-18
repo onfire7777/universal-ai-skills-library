@@ -18,9 +18,12 @@ class InstallerContractsTest(unittest.TestCase):
         self.assertIn("command -v skill-router", body)
         self.assertIn('--sync-codex', body)
         self.assertIn('--sync-claude', body)
+        self.assertIn('--sync-paperclip', body)
         self.assertIn('--sync-cli-clients', body)
         self.assertIn('--copy-skills', body)
         self.assertIn("SKIP_VALIDATE=0", body)
+        self.assertIn("SYNC_PAPERCLIP=0", body)
+        self.assertIn('"$BIN_DIR/skill-router" sync paperclip', body)
 
         self.assertNotIn("/home/ubuntu/skills", body)
         self.assertNotIn('cp -r "$SCRIPT_DIR/skills/"*', body)

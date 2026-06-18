@@ -30,6 +30,7 @@ COPY_SKILLS_DIR=""
 SKIP_VALIDATE=0
 SYNC_CODEX=0
 SYNC_CLAUDE=0
+SYNC_PAPERCLIP=0
 
 usage() {
   cat <<'USAGE'
@@ -44,6 +45,7 @@ Options:
   --copy-skills DIR    Optional offline/full-copy export of skills/ into DIR
   --sync-codex         Install compact wrapper into ~/.codex/skills
   --sync-claude        Install compact wrapper into ~/.claude/skills
+  --sync-paperclip     Install compact wrapper and AGENTS.md for Paperclip
   --sync-cli-clients   Install compact wrappers for both Codex and Claude
   --skip-validate      Skip manifest validation after build
   -h, --help           Show this help
@@ -81,6 +83,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --sync-claude)
       SYNC_CLAUDE=1
+      shift
+      ;;
+    --sync-paperclip)
+      SYNC_PAPERCLIP=1
       shift
       ;;
     --sync-cli-clients)
@@ -149,6 +155,14 @@ if [[ "$SYNC_CLAUDE" -eq 1 ]]; then
   (
     cd "$SCRIPT_DIR"
     "$BIN_DIR/skill-router" sync claude
+  )
+fi
+
+if [[ "$SYNC_PAPERCLIP" -eq 1 ]]; then
+  echo "==> Installing Paperclip wrapper and AGENTS.md"
+  (
+    cd "$SCRIPT_DIR"
+    "$BIN_DIR/skill-router" sync paperclip
   )
 fi
 
