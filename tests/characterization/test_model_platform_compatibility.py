@@ -35,21 +35,36 @@ class ModelPlatformCompatibilityTests(unittest.TestCase):
 
     def test_agentic_client_roots_include_priority_platforms(self) -> None:
         sources = read_json("ai-setup/manifests/source-repos.json")
-        roots = {root["id"] for root in sources["managedClientRoots"]}
+        roots = {root["id"]: root for root in sources["managedClientRoots"]}
 
-        for expected in {
-            "codex",
-            "claude",
-            "hermes",
-            "paperclip",
-            "openclaw",
-            "opencode-home",
-            "openhands",
-            "gemini",
-            "kimi",
-            "qwen",
-        }:
-            self.assertIn(expected, roots)
+        expected_contracts = {
+            "codex": ("compact-wrapper", ".codex\\skills", ".codex\\AGENTS.md"),
+            "claude": ("compact-wrapper", ".claude\\skills", ".claude\\CLAUDE.md"),
+            "hermes": ("custom-plus-wrapper", ".hermes\\skills", ".hermes\\AGENTS.md"),
+            "paperclip": (
+                "compact-wrapper",
+                ".paperclip\\skills",
+                ".paperclip\\universal-ai-skills\\AGENTS.md",
+            ),
+            "openclaw": ("compact-wrapper", ".openclaw\\skills", ".openclaw\\AGENTS.md"),
+            "opencode-home": (
+                "compact-wrapper",
+                ".opencode\\skills",
+                ".opencode\\AGENTS.md",
+            ),
+            "openhands": ("compact-wrapper", ".openhands\\skills", ".openhands\\AGENTS.md"),
+            "gemini": ("compact-wrapper", ".gemini\\skills", ".gemini\\GEMINI.md"),
+            "kimi": ("compact-wrapper", ".kimi\\skills", ".kimi\\AGENTS.md"),
+            "qwen": ("compact-wrapper", ".qwen\\skills", ".qwen\\AGENTS.md"),
+        }
+
+        for client_id, (mode, skills_suffix, instructions_suffix) in expected_contracts.items():
+            with self.subTest(client_id=client_id):
+                root = roots[client_id]
+                self.assertEqual(root["mode"], mode)
+                self.assertTrue(root["skills"].endswith(skills_suffix))
+                self.assertTrue(root["instructions"].endswith(instructions_suffix))
+                self.assertNotIn("full", root["mode"])
 
 
 if __name__ == "__main__":
