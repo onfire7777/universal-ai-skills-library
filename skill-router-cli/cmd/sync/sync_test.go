@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/spf13/cobra"
 )
 
 func TestSyncCommandExposesNamedCLIClientAdapters(t *testing.T) {
@@ -36,6 +38,36 @@ func TestNamedCLIClientAdaptersResolveSkillRoots(t *testing.T) {
 	}
 }
 
+func TestCodexAndClaudeCommandsInstallWrapperOnly(t *testing.T) {
+	cases := []struct {
+		name    string
+		cmd     *cobra.Command
+		rootRel string
+	}{
+		{name: "codex", cmd: codexCmd, rootRel: filepath.Join(".codex", "skills")},
+		{name: "claude", cmd: claudeCmd, rootRel: filepath.Join(".claude", "skills")},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			home := t.TempDir()
+			repo := t.TempDir()
+			t.Setenv("HOME", home)
+			t.Setenv("USERPROFILE", home)
+			t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
+
+			writeSkill(t, filepath.Join(repo, "skills"), "universal-ai-skills")
+			writeSkill(t, filepath.Join(repo, "skills"), "extra-skill")
+
+			if err := tc.cmd.RunE(tc.cmd, nil); err != nil {
+				t.Fatal(err)
+			}
+
+			root := filepath.Join(home, tc.rootRel)
+			assertWrapperOnly(t, root)
+		})
+	}
+}
+
 func TestPaperclipCommandInstallsWrapperAndInstructionsOnly(t *testing.T) {
 	home := t.TempDir()
 	repo := t.TempDir()
@@ -50,16 +82,7 @@ func TestPaperclipCommandInstallsWrapperAndInstructionsOnly(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	wrapper := filepath.Join(home, ".paperclip", "skills", "universal-ai-skills", "SKILL.md")
-	if _, err := os.Stat(wrapper); err != nil {
-		t.Fatalf("expected Paperclip wrapper skill at %s: %v", wrapper, err)
-	}
-	copiedExtra := filepath.Join(home, ".paperclip", "skills", "extra-skill", "SKILL.md")
-	if _, err := os.Stat(copiedExtra); err == nil {
-		t.Fatalf("paperclip sync copied full corpus skill %s", copiedExtra)
-	} else if !os.IsNotExist(err) {
-		t.Fatalf("stat copied extra skill: %v", err)
-	}
+	assertWrapperOnly(t, filepath.Join(home, ".paperclip", "skills"))
 
 	instructions := filepath.Join(home, ".paperclip", "universal-ai-skills", "AGENTS.md")
 	body, err := os.ReadFile(instructions)
@@ -74,6 +97,20 @@ func TestPaperclipCommandInstallsWrapperAndInstructionsOnly(t *testing.T) {
 		if !strings.Contains(string(body), want) {
 			t.Fatalf("Paperclip instructions missing %q", want)
 		}
+	}
+}
+
+func assertWrapperOnly(t *testing.T, root string) {
+	t.Helper()
+	wrapper := filepath.Join(root, "universal-ai-skills", "SKILL.md")
+	if _, err := os.Stat(wrapper); err != nil {
+		t.Fatalf("expected wrapper skill at %s: %v", wrapper, err)
+	}
+	copiedExtra := filepath.Join(root, "extra-skill", "SKILL.md")
+	if _, err := os.Stat(copiedExtra); err == nil {
+		t.Fatalf("sync copied full corpus skill %s", copiedExtra)
+	} else if !os.IsNotExist(err) {
+		t.Fatalf("stat copied extra skill: %v", err)
 	}
 }
 
