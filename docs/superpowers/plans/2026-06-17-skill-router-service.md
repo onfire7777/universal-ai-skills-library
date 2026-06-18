@@ -874,11 +874,11 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ## Final verification
 
-- [ ] `cd skill-router-cli && go build ./... && go test ./... -mod=readonly` — all green.
-- [ ] `go vet ./...` — clean.
-- [ ] Manus parity + single-registry characterization tests pass (part of the suite).
-- [ ] `git grep -n "modelcontextprotocol\|mark3labs" skill-router-cli/go.mod` — no match (no new dep).
-- [ ] Spec Done-when re-checked: engine + 4 verbs ✓, compose ✓, MCP server + conformance ✓, deprecation documented + instrumented ✓, invariants intact ✓.
+- [x] `cd skill-router-cli && go build ./... && go test ./... -mod=readonly` — all green.
+- [x] `go vet ./...` — clean.
+- [x] Legacy/provider compatibility + single-registry characterization tests pass.
+- [x] `git grep -n "modelcontextprotocol\|mark3labs" skill-router-cli/go.mod` — no match (no new dep).
+- [x] Spec Done-when re-checked: engine + 4 verbs ✓, compose ✓, MCP server + conformance ✓, deprecation documented + instrumented ✓, invariants intact ✓.
 
 ## Self-Review (author)
 
