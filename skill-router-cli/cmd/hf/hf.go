@@ -1,12 +1,11 @@
 package hf
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
 
-	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/mcpcli"
 )
 
 // Cmd is the top-level hf command group.
@@ -24,8 +23,7 @@ var modelsCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.Join(args, " ")
-		input := fmt.Sprintf(`{"query": "%s"}`, query)
-		return runner.RunCommand("manus-mcp-cli", "tool", "call", "search_models", "--server", "hugging-face", "--input", input)
+		return mcpcli.CallTool("hugging-face", "search_models", map[string]string{"query": query})
 	},
 }
 
@@ -35,8 +33,7 @@ var datasetsCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.Join(args, " ")
-		input := fmt.Sprintf(`{"query": "%s"}`, query)
-		return runner.RunCommand("manus-mcp-cli", "tool", "call", "search_datasets", "--server", "hugging-face", "--input", input)
+		return mcpcli.CallTool("hugging-face", "search_datasets", map[string]string{"query": query})
 	},
 }
 
@@ -46,8 +43,7 @@ var papersCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.Join(args, " ")
-		input := fmt.Sprintf(`{"query": "%s"}`, query)
-		return runner.RunCommand("manus-mcp-cli", "tool", "call", "search_papers", "--server", "hugging-face", "--input", input)
+		return mcpcli.CallTool("hugging-face", "search_papers", map[string]string{"query": query})
 	},
 }
 
@@ -57,8 +53,7 @@ var spacesCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		query := strings.Join(args, " ")
-		input := fmt.Sprintf(`{"query": "%s"}`, query)
-		return runner.RunCommand("manus-mcp-cli", "tool", "call", "search_spaces", "--server", "hugging-face", "--input", input)
+		return mcpcli.CallTool("hugging-face", "search_spaces", map[string]string{"query": query})
 	},
 }
 
@@ -67,8 +62,7 @@ var modelInfoCmd = &cobra.Command{
 	Short: "Get detailed info about a specific model",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		input := fmt.Sprintf(`{"model_id": "%s"}`, args[0])
-		return runner.RunCommand("manus-mcp-cli", "tool", "call", "get_model_info", "--server", "hugging-face", "--input", input)
+		return mcpcli.CallTool("hugging-face", "get_model_info", map[string]string{"model_id": args[0]})
 	},
 }
 

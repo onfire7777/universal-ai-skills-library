@@ -80,10 +80,10 @@ What the BEFORE analysis flagged vs. what the refactor actually moved (✅ lande
 2. **Routing latency ✅ (B2).** The config-driven resolver cut **route decision 23.2%**
    (167.9 → 129.0 ms) and routing overhead 26% — while keeping `go test` green (no behavior change).
 3. **`skills/` corpus — 132 MB, unchanged ◻ (B3).** B3 consolidation was a **verified no-op**:
-   `manus-skills-marketplace` proved a fully-redundant mirror (every skill already in `skills/`;
+   the former marketplace source proved a fully-redundant mirror (every skill already in `skills/`;
    166 collisions all kept-canonical), so the win was *confirming zero duplication* rather than
-   deleting bytes. Goal-2 consolidation is thus achieved at the **repo** level (manus is now
-   redundant) without touching the corpus. Largest standing footprint; no reduction this round.
+   deleting bytes. Consolidation is achieved at the **repo** level by keeping `skills/` as the
+   only canonical corpus. Largest standing footprint; no reduction this round.
 4. **Fonts — 216 files / 21.65 MB, unchanged ◻.** Out of scope for B2/B4/B5 this round; the single
    biggest **remaining** bloat opportunity (dedupe / externalize embedded font assets in skills).
 5. **Router binary — 10.46 MB, unchanged ◻ (B2, optional).** `-ldflags "-s -w"` would trim it;

@@ -69,10 +69,10 @@ Each release includes:
 - a `checksums.txt` (SHA-256) covering every archive,
 - archives published to **GitHub Releases**.
 
-### 2.3 The `manus` alias in packaging
+### 2.3 Compatibility aliases in packaging
 
-The legacy `manus` alias is a **hard invariant** (plan §6; `STRUCTURE.md` §5;
-`build_manifest.json.legacy_binary_alias = "manus"`). Packaging must ship it:
+Compatibility aliases are a **hard invariant** (plan §6; `STRUCTURE.md` §5;
+`build_manifest.json.compatibility_binary_aliases[]`). Packaging must ship them:
 
 - Provide `manus` as a second entry point that invokes the same binary (a
   symlink/hardlink to `skill-router`, a `manus` wrapper, or goreleaser's extra
@@ -80,7 +80,7 @@ The legacy `manus` alias is a **hard invariant** (plan §6; `STRUCTURE.md` §5;
   `skill-router.exe`.
 - `install.sh` / `install.ps1` must create/verify the `manus` alias as part of
   install, and `doctor` should check it resolves.
-- Never ship a binary that drops `manus`.
+- Never ship a binary that drops declared compatibility aliases.
 
 ### 2.4 Install scripts (target)
 

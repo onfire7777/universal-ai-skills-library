@@ -149,8 +149,8 @@ def parse_readme_skills(readme_content: str) -> list:
             desc = match.group(3).strip() if len(match.groups()) > 2 else ""
             if any(x in url.lower() for x in ['badge', 'shields.io', 'profile', 'twitter', 'linkedin']):
                 continue
-            import_url = f"https://manus.im/app#settings/skills/import?githubUrl={url}" if '/tree/' in url or url.count('/') >= 4 else ""
-            skills.append({"name": name, "description": desc[:200], "github_url": url, "import_url": import_url, "source": "readme"})
+            source_url = url if '/tree/' in url or url.count('/') >= 4 else ""
+            skills.append({"name": name, "description": desc[:200], "github_url": url, "source_url": source_url, "import_url": source_url, "source": "readme"})
     return skills
 
 
@@ -173,12 +173,11 @@ def fetch_skill_directories(owner: str, repo: str, skills_path: str, branch: str
     return sorted(skills)
 
 
-def generate_import_url(owner: str, repo: str, skill_name: str, skills_path: str, branch: str) -> str:
+def generate_source_url(owner: str, repo: str, skill_name: str, skills_path: str, branch: str) -> str:
     if skills_path == ".":
-        github_url = f"https://github.com/{owner}/{repo}/tree/{branch}/{skill_name}"
+        return f"https://github.com/{owner}/{repo}/tree/{branch}/{skill_name}"
     else:
-        github_url = f"https://github.com/{owner}/{repo}/tree/{branch}/{skills_path}/{skill_name}"
-    return f"https://manus.im/app#settings/skills/import?githubUrl={github_url}"
+        return f"https://github.com/{owner}/{repo}/tree/{branch}/{skills_path}/{skill_name}"
 
 
 def fetch_online() -> dict:
@@ -209,8 +208,8 @@ def fetch_online() -> dict:
             skill_names = fetch_skill_directories(owner, repo, skills_path, branch) or []
             skills = []
             for name in skill_names:
-                github_url = f"https://github.com/{owner}/{repo}/tree/{branch}/{skills_path}/{name}" if skills_path != "." else f"https://github.com/{owner}/{repo}/tree/{branch}/{name}"
-                skills.append({"name": name, "github_url": github_url, "import_url": generate_import_url(owner, repo, name, skills_path, branch)})
+            source_url = generate_source_url(owner, repo, name, skills_path, branch)
+            skills.append({"name": name, "github_url": source_url, "source_url": source_url, "import_url": source_url})
             result[repo_key] = {
                 "stars": repo_info["stars"], "description": repo_info["description"],
                 "url": repo_info["url"], "type": "skills", "skills": skills
@@ -260,8 +259,8 @@ def deep_dive(repo_key: str, skill_name: str) -> dict:
             elif in_fm and line.startswith("description:"):
                 description = line.replace("description:", "").strip().strip('"\'')
         
-        github_url = f"https://github.com/{owner}/{repo}/tree/{branch}/{skills_path}/{skill_name}" if skills_path != "." else f"https://github.com/{owner}/{repo}/tree/{branch}/{skill_name}"
-        return {"name": skill_name, "repository": repo_key, "description": description, "content": content, "github_url": github_url, "import_url": generate_import_url(owner, repo, skill_name, skills_path, branch)}
+    source_url = generate_source_url(owner, repo, skill_name, skills_path, branch)
+    return {"name": skill_name, "repository": repo_key, "description": description, "content": content, "github_url": source_url, "source_url": source_url, "import_url": source_url}
     return {"error": "Could not decode SKILL.md"}
 
 
@@ -308,7 +307,7 @@ def main():
         else:
             print(f"\n=== {result['name']} ({result['repository']}) ===\n")
             print(f"Description: {result['description']}\n")
-            print(f"Import: {result['import_url']}\n")
+        print(f"Source: {result.get('source_url') or result.get('import_url') or result['github_url']}\n")
             print("--- SKILL.md ---\n")
             print(result['content'][:3000])
             if len(result['content']) > 3000:
@@ -346,7 +345,7 @@ def main():
                 print(f"• {skill['name']} ({skill['repository']} ⭐{format_stars(skill['stars'])}){tag}")
                 if skill.get("description"):
                     print(f"  {skill['description'][:100]}")
-                print(f"  Import: {skill.get('import_url') or skill['github_url']}\n")
+                print(f"  Source: {skill.get('source_url') or skill.get('import_url') or skill['github_url']}\n")
             if matches:
                 print("💡 --deep-dive REPO SKILL for full description")
     else:

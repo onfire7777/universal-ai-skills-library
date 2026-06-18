@@ -1,9 +1,9 @@
 /**
  * load-groupings.mjs — fold themed plugin groupings into the registry config.
  *
- * The manus marketplace's only non-duplicate value was its 14 themed plugin
+ * The former marketplace's only non-duplicate value was its 14 themed plugin
  * groupings (security, data-analysis, ...). Every member skill already exists in
- * skills/, so the groupings are pure category metadata over existing kebab ids.
+ * skills/, so the groupings are pure universal category metadata over existing kebab ids.
  * This script imports that metadata into registry.config.json (self-contained,
  * no external file dependency) after validating every member resolves to a real
  * skills/<id>/ directory. The generator then surfaces them in marketplace.json

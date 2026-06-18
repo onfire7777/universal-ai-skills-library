@@ -13,6 +13,6 @@ Built on branch `phase2/skill-router-service-spec` as the no-compromise solution
 - 3.2 Deterministic P@1/MRR/Recall@5 harness scored via the engine, with an absolute-floor + no-regression gate and a CLI report. Commit `545445a`.
 - 3.3 Pure-Go deterministic learned re-ranker wired at the single engine hook, gated off by default, with eval-gated promotion. Commit `46dc55a`.
 
-**Invariants held:** no new Go deps (cobra+color only); default routing byte-identical when features disabled; manus alias + single `manifest.json` registry untouched; tests hermetic (`go test ./... -mod=readonly`, 9 pkgs green).
+**Invariants held:** no new Go deps (cobra+color only); default routing byte-identical when features disabled; compatibility aliases + single `manifest.json` registry untouched; tests hermetic (`go test ./... -mod=readonly`, 9 pkgs green).
 
 ---

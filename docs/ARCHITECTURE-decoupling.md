@@ -1,7 +1,7 @@
 # Skill-Router ↔ Skill-Library Decoupling — Resolution Contract
 
 > **Status:** PUBLISHED (FOUNDATION). **Implementers:** B2 (router), B4 (registry).
-> **Refactor-only — no behavior change.** Companion: [`../STRUCTURE.md`](../STRUCTURE.md).
+> **Compatibility-preserving modernization.** Companion: [`../STRUCTURE.md`](../STRUCTURE.md).
 
 ## 1. Goal
 
@@ -15,7 +15,7 @@ run independently of where the corpus lives.
 
 | Role | Artifact | Owns | Must NOT |
 |------|----------|------|----------|
-| **Router** | `skill-router-cli` → binary `skill-router` (alias `manus`) | Prompt→skill routing/scoring, CLI UX | Embed skill content; assume co-location; hardcode skill-dir names |
+| **Router** | `skill-router-cli` → binary `skill-router` plus compatibility aliases | Prompt→skill routing/scoring, CLI UX | Embed skill content; assume co-location; hardcode skill-dir names |
 | **Registry** | `manifest.json` (root) | The single index the router consumes | Exist in more than one source |
 | **Corpus** | `skills/<kebab-name>/` | `SKILL.md` + `scripts/` + `references/` | Know about the router |
 | **Consumer** | host AI agent / hooks | Calls `skill-router route …` | — |
@@ -25,7 +25,7 @@ run independently of where the corpus lives.
 Authoritative resolution order (confirmed with B2). Each resolver is an explicit override
 chain; **repo-relative `..` walking is a *last-resort fallback only*, never the primary
 mechanism.** The two NEW resolvers (`SkillSourceDir`, `ManifestPath`) are **additive and
-default to the repo, so runtime behavior is unchanged**; all `MANUS_*` legacy aliases are retained.
+default to the canonical repo; `MANUS_*` environment aliases are retained only as explicit compatibility overrides.
 
 ### 3.1 Skills corpus directory — `SkillsDir()`
 1. `SKILL_ROUTER_SKILLS_DIR` (env)
@@ -40,7 +40,7 @@ default to the repo, so runtime behavior is unchanged**; all `MANUS_*` legacy al
 4. Upward search from **cwd** for a **repo marker** = a dir containing **both** `manifest.json`
    and `skills/` (`isRepoDir`) — *fallback only*
 5. Upward search from the **executable** dir — *fallback only*
-6. Home candidates (`~/universal-ai-skills-library`, `~/manus-skills-library`, `~/repos/…`, `~/Documents/…`)
+6. Home candidates for the canonical repo name only (`~/universal-ai-skills-library`, `~/repos/universal-ai-skills-library`, `~/Documents/universal-ai-skills-library`)
 
 ### 3.3 Skills corpus source — `SkillSourceDir()` *(NEW, additive)*
 1. `SKILL_ROUTER_SKILLS_SOURCE_DIR` (env)
@@ -75,8 +75,8 @@ Loader: `loadManifest()` → `os.ReadFile(ManifestPath())`.
 | `SKILL_ROUTER_EXTERNAL_CACHE_TTL_MINUTES` | External-root cache TTL | primary |
 | `SKILL_ROUTER_HOOK_EVENT` | Hook event context | primary |
 | `SKILL_ROUTER_PAPERCLIP_SKILLS_DIR` / `..._INSTRUCTIONS_DIR` | Paperclip adapter roots | primary |
-| `MANUS_SKILLS_DIR` | Legacy alias of `SKILL_ROUTER_SKILLS_DIR` | **legacy — keep** |
-| `MANUS_REPO_DIR` | Legacy alias of `SKILL_ROUTER_REPO_DIR` | **legacy — keep** |
+| `MANUS_SKILLS_DIR` | Compatibility alias of `SKILL_ROUTER_SKILLS_DIR` | compatibility |
+| `MANUS_REPO_DIR` | Explicit compatibility alias of `SKILL_ROUTER_REPO_DIR`; old repo names are not auto-discovered | compatibility |
 | `MANUS_API_KEY` | Manus API key | config |
 
 ## 4. Registry manifest schema (B4 produces — single source)
@@ -86,12 +86,12 @@ Loader: `loadManifest()` → `os.ReadFile(ManifestPath())`.
 - **Top-level:** `version, generated, description, canonical_id_policy, core_skills[],
   library_skills[], total_skills, alias_count, routing`.
 - **Entry:** `{ name, directory ("skills/<name>"), description, has_scripts, scripts[], aliases[]? }`.
-- **`routing`:** `{ primary_access, legacy_access ("manus skill <name>"), search, list }`.
+- **`routing`:** `{ primary_access, compatibility_access[], search, list }`.
 
 **Requirements:**
-- Exactly **one** manifest is authoritative. B4 merges the `manus-skills-marketplace` registry
-  **into** this file (dedup by canonical kebab id; old/source names become aliases).
-- Preserve `routing.legacy_access` and `manus` alias semantics.
+- Exactly **one** manifest is authoritative. Historical marketplace metadata is already
+  folded into this file (dedup by canonical kebab id; old/source names become aliases).
+- Preserve `routing.compatibility_access[]` and compatibility alias semantics.
 - `directory` values are **relative to the corpus root**, so they survive relocation
   (top-level *or* `packages/`).
 
@@ -104,7 +104,7 @@ Loader: `loadManifest()` → `os.ReadFile(ManifestPath())`.
   `cmd/music`→`music-prompter`, `cmd/chat`→`chat-summarizer`, `cmd/web`→`similarweb-analytics`,
   `cmd/oracle`→`multi-model-oracle`, `cmd/models`→`model-selector`, `cmd/files`→`file-organizer`,
   `cmd/audit` (generic join), and the `universal-ai-config` references.
-- Preserve primary binary `skill-router` **and** the legacy `manus` alias.
+- Preserve primary binary `skill-router` **and** compatibility aliases.
 
 ## 6. Testing requirement (eliminates baseline failures)
 
@@ -119,12 +119,12 @@ Loader: `loadManifest()` → `os.ReadFile(ManifestPath())`.
 
 ## 7. Invariants (see STRUCTURE.md §5)
 
-`manus` alias · single registry · kebab canonical ids · refactor-only / local-only.
+compatibility aliases · single registry · kebab canonical ids · universal active naming.
 
 ## 8. Contract acceptance checklist
 
 - [ ] Router builds & runs with the corpus at a **non-default** location set **only** via env/config (no relative co-location).
-- [ ] `manus skill <name>` still works.
+- [ ] Compatibility command aliases still work.
 - [ ] Exactly one `manifest.json` is read.
 - [ ] Routing tests are green against a **pinned fixture**; the 4 baseline failures are gone.
 - [ ] No new `go vet` / `go build` breakage.

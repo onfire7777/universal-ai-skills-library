@@ -4,7 +4,9 @@
   "source_of_truth": "skills",
   "router_source": "skill-router-cli",
   "primary_binary": "skill-router",
-  "legacy_binary_alias": "manus",
+  "compatibility_binary_aliases": [
+    "manus"
+  ],
   "skill_count": 1812,
   "directories_total": 1812,
   "missing_skill_md": [],

@@ -59,7 +59,7 @@ matching skill only when a real user prompt needs it. It can also index local
 external skill roots read-only, validate manifests, sync wrapper instructions,
 check optional MCP bridges, and expose local AI stack health.
 
-Compatibility: the legacy manus executable can still call the same router.`,
+Compatibility: declared legacy executable aliases can still call the same router.`,
 	Version: Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		bold := color.New(color.Bold, color.FgCyan)
@@ -112,7 +112,7 @@ Compatibility: the legacy manus executable can still call the same router.`,
 		fmt.Println("  registry    Build/verify the registry artifacts (Go owner of the build)")
 		fmt.Println()
 		fmt.Println("Use \"skill-router [command] --help\" for more information about a command.")
-		fmt.Println("Legacy alias: manus")
+		fmt.Println("Compatibility alias: manus")
 	},
 }
 

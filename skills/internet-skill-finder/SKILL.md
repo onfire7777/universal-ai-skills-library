@@ -35,7 +35,7 @@ Format each match:
 ### [Skill Name]
 **Source**: [Repository] | ⭐ [Stars]
 **Description**: [From SKILL.md]
-👉 **[Import](import_url)**
+👉 **[Source](source_url or github_url)**
 ```
 
 ### 4. No Matches

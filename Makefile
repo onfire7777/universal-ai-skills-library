@@ -62,10 +62,10 @@ dist: ## Cross-compile a local snapshot of release binaries (requires goreleaser
 release-dry: ## Validate the goreleaser config (requires goreleaser)
 	goreleaser check
 
-install-local: ## Build skill-router and install it (+ the manus alias) into ~/.local/bin
+install-local: ## Build skill-router and install compatibility aliases into ~/.local/bin
 	cd $(ROUTER_DIR) && go build -o skill-router . \
 		&& mkdir -p $$HOME/.local/bin \
 		&& install -m 0755 skill-router $$HOME/.local/bin/skill-router \
 		&& ln -sf skill-router $$HOME/.local/bin/manus \
 		&& rm -f skill-router \
-		&& echo "installed skill-router + manus alias -> $$HOME/.local/bin"
+	&& echo "installed skill-router + compatibility alias -> $$HOME/.local/bin"

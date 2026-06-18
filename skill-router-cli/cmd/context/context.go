@@ -46,9 +46,9 @@ var showCmd = &cobra.Command{
 			fmt.Println(string(data))
 			fmt.Println()
 		}
-		// Check for .manus/instructions.md as a compatibility surface.
-		manusInstr := filepath.Join(dir, ".manus", "instructions.md")
-		if data, err := os.ReadFile(manusInstr); err == nil {
+		// Check for the legacy compatibility instruction path.
+		legacyInstr := filepath.Join(dir, ".manus", "instructions.md")
+		if data, err := os.ReadFile(legacyInstr); err == nil {
 			fmt.Println("=== .manus/instructions.md ===")
 			fmt.Println(string(data))
 		}
@@ -58,7 +58,7 @@ var showCmd = &cobra.Command{
 
 var createCmd = &cobra.Command{
 	Use:   "create <type> [directory]",
-	Short: "Create a context anchor (agents, universal, claude, codex, manus-compat)",
+	Short: "Create a context anchor (agents, universal, claude, codex, legacy-compat)",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		anchorType := args[0]
@@ -87,11 +87,11 @@ var createCmd = &cobra.Command{
 			path := filepath.Join(instrDir, "instructions.md")
 			template := "# Universal AI Instructions\n\n## Project Context\n\n## Skill Routing\n\nUse `skill-router preflight --json` as an internal precheck and `skill-router skill <name>` for one-skill-on-demand loading.\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
-		case "manus", "manus-compat":
+		case "legacy", "legacy-compat", "manus", "manus-compat":
 			instrDir := filepath.Join(dir, ".manus")
 			os.MkdirAll(instrDir, 0755)
 			path := filepath.Join(instrDir, "instructions.md")
-			template := "# Manus Compatibility Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
+			template := "# Legacy Compatibility Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
 		case "codex":
 			instrDir := filepath.Join(dir, ".codex")
@@ -100,7 +100,7 @@ var createCmd = &cobra.Command{
 			template := "# Codex Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
 		default:
-			return fmt.Errorf("unknown anchor type: %s (valid: agents, universal, claude, codex, manus-compat)", anchorType)
+			return fmt.Errorf("unknown anchor type: %s (valid: agents, universal, claude, codex, legacy-compat)", anchorType)
 		}
 	},
 }

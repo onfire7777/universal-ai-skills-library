@@ -38,7 +38,7 @@ Full detail in the Phase 2 plan. Summary of what it lands:
 1. **`internal/skillservice` engine** — the route/search/load/semantic core relocated out of `cmd/skills`; typed results; one implementation of every verb.
 2. **Four verbs, CLI-first** — `route`, `search_skills`, `load_skill`, `compose` (compose is new: plan by default, `--full` bundle).
 3. **Thin stdio MCP server** (`cmd/serve`) — hand-rolled JSON-RPC 2.0, stdlib only, advertising the same four tools over the same engine.
-4. **Adapter deprecation** — notice + `sync --check` report + `docs/ADAPTER_DEPRECATION.md`; manus alias + single registry untouched.
+4. **Adapter deprecation** — notice + `sync --check` report + `docs/ADAPTER_DEPRECATION.md`; compatibility aliases + single registry untouched.
 
 **Gate status:** Phase 1 is committed, so Phase 2's prior execution gate is **cleared**.
 
@@ -117,7 +117,7 @@ Phase 1 already has a `reranker` interface (`identityReranker`) in `route_semant
 1. **Phase 2 first (this track).** Land `internal/skillservice` + compose + `cmd/serve` + adapter deprecation. This relocates the routing core and defines the engine seam.
 2. **Phase 3 rebases, then implements.** The Phase 3 owner updates `.planning/phases/*/0X-CONTEXT.md` "Existing Code Insights" to the new `internal/skillservice` symbols (use the map above), then runs 3.1 → 3.2 → 3.3.
 3. **Ownership boundaries:** this track does **not** edit `.planning/` (GSD-owned); the Phase 3 track does **not** re-extract the engine (Phase 2 owns `internal/skillservice`). If Phase 3 must start before Phase 2 lands, it pins hooks behind the engine interface and accepts a rebase — but the default is Phase 2 first.
-4. **Shared invariants (both tracks):** no new Go module dependencies; default routing byte-identical when new features are disabled; manus alias + single `manifest.json` registry untouched; all tests hermetic (`go test ./... -mod=readonly`).
+4. **Shared invariants (both tracks):** no new Go module dependencies; default routing byte-identical when new features are disabled; compatibility aliases + single `manifest.json` registry untouched; all tests hermetic (`go test ./... -mod=readonly`).
 
 ## Combined Done-when (initiative Phases 2–3)
 - **Phase 2:** engine + four verbs (incl. compose) ✓, thin MCP `serve` + conformance test ✓, adapter deprecation documented + instrumented ✓, invariants intact ✓.

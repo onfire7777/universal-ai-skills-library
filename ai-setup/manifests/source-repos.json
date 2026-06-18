@@ -83,7 +83,7 @@
       "mode": "compact-wrapper"
     },
     {
-      "id": "manus",
+      "id": "legacy-compatibility",
       "kind": "skill-root",
       "instructions": "{{USERPROFILE}}\\.manus\\AGENTS.md",
       "skills": "{{USERPROFILE}}\\.manus\\skills",

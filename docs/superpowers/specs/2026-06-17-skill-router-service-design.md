@@ -12,7 +12,7 @@ Provide one coherent surface for the four skill-router operations — **route**,
 - One shared engine implements all four verbs; CLI is the first-class surface; a thin MCP server exposes the same four tools.
 - `compose` is implemented (it has no prior behavior).
 - Adapter deprecation path is documented and instrumented (warn + report), with invariants intact.
-- Service unit tests + MCP conformance test pass; existing manus-parity and single-registry characterization tests stay green.
+- Service unit tests + MCP conformance test pass; existing compatibility-alias parity and single-registry characterization tests stay green.
 
 ## 2. Background / current state (verified)
 
@@ -22,7 +22,7 @@ Provide one coherent surface for the four skill-router operations — **route**,
 - **Does not exist:** `compose`.
 - The `mcp` command (`cmd/mcp/mcp.go`) is a **bridge process manager** (starts/stops PowerShell MCP bridges); it is *not* an MCP protocol server. `go.mod` has no MCP SDK.
 - **Physical-copy adapters:** `platform.AgentRootSpecs()` enumerates ~30 known agent skill roots (`.claude/skills`, `.codex/skills`, `.manus/skills`, `.gemini/skills`, …). `skillsync.Propagate` (via `skill-router sync`) copies the **single** default wrapper skill `universal-ai-skills` into the `DefaultSync` subset of those roots. Full-corpus copy is opt-in (`--full-copy`).
-- **Invariants:** manus alias (`MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` env aliases, `.manus/skills` root, byte-identical parity test) and single registry (`manifest.json` canonical source, CI drift guard).
+- **Invariants:** compatibility aliases (`MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` env aliases, `.manus/skills` root, byte-identical parity test) and single registry (`manifest.json` canonical source, CI drift guard).
 
 ## 3. Architecture — one engine, two entry points
 
@@ -86,7 +86,7 @@ CLI aliases (`search_skills`, `load_skill`) are added so the command names line 
 - **Default output (context-light):** an ordered manifest — for each skill: name, path, source, score, one-line description, per-skill token estimate; plus a total token estimate. `--json` emits `ComposeResult` without `Bundle`.
 - **`--full` output:** additionally emit the concatenated `SKILL.md` bodies as one ready-to-paste bundle (each section headed by skill name + path). `--json` populates `ComposeResult.Bundle`.
 - **Flags:** `--top N` (default 5), `--min-score` (default = route threshold, 75), `--full`, `--json`.
-- Respects the standard resolution order (canonical library → external roots), single registry, and manus alias.
+- Respects the standard resolution order (canonical library → external roots), single registry, and compatibility aliases.
 
 ## 6. MCP shim (thin, same engine)
 
@@ -104,13 +104,13 @@ Today only one wrapper skill is physically copied into the `DefaultSync` roots. 
 1. **Keep `sync` functional** but emit a **deprecation notice**: agents should invoke `skill-router` directly (CLI) or configure the MCP server (`serve`) rather than receive physical copies. No behavior removed in this phase.
 2. **Report:** extend `sync --check` (and/or `doctor`) to list which roots still rely on physical copies vs. which are wired to the CLI/MCP surface (read-only matrix; no mutation).
 3. **Document:** new `docs/ADAPTER_DEPRECATION.md` with per-adapter migration (CLI invocation or MCP server config), and a timeline note that physical-copy propagation is deprecated and slated for removal in a later phase.
-4. **Invariants held:** manus alias (`MANUS_*` env + `.manus` root + parity test) and single registry (`manifest.json` + CI drift guard) are untouched.
+4. **Invariants held:** compatibility aliases (`MANUS_*` env + `.manus` root + parity test) and single registry (`manifest.json` + CI drift guard) are untouched.
 
 ## 8. Testing & compliance
 
 - **Engine unit tests** (`internal/skillservice`): route / search / load / compose against existing `cmd/skills/testdata/route-fixture/` (deterministic, hermetic).
 - **MCP conformance test** (`cmd/serve`): drive the server through `initialize` → `tools/list` → `tools/call` for all four tools; assert JSON-RPC 2.0 framing, tool schemas, and that results match the engine's direct output.
-- **Regression:** existing manus-parity and single-registry characterization tests must stay green; run with `-mod=readonly`.
+- **Regression:** existing compatibility-alias parity and single-registry characterization tests must stay green; run with `-mod=readonly`.
 
 ## 9. Out of scope (YAGNI)
 
@@ -126,4 +126,4 @@ Today only one wrapper skill is physically copied into the `DefaultSync` roots. 
 3. Add CLI aliases `search_skills`, `load_skill`.
 4. Add `cmd/serve` (hand-rolled stdio MCP) wrapping the engine; add conformance test.
 5. Add deprecation notice to `sync`, report to `sync --check`/`doctor`, and write `docs/ADAPTER_DEPRECATION.md`.
-6. Full test pass (`-mod=readonly`), including manus-parity + single-registry.
+6. Full test pass (`-mod=readonly`), including compatibility-alias parity + single-registry.

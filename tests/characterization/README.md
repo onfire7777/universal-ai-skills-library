@@ -1,7 +1,7 @@
 # Characterization tests
 
 These tests pin the **current behaviour** of the skill-router and the registry
-*before* the Goal 1–3 refactor (router decoupling, manus consolidation, registry
+*before* the Goal 1–3 refactor (router decoupling, repository consolidation, registry
 unification), so any unintended behaviour change is caught. They are the
 regression safety net for a "refactor / consolidate without breaking anything"
 effort.
@@ -12,7 +12,7 @@ effort.
 |------|------|
 | `test_router_characterization.py` | The router's `decision` + chosen skill (`best.name`, `best.source`) for a battery of prompts, and that `skill <name>` still loads a known skill. |
 | `test_registry_characterization.py` | Fixture `validate-manifest` is clean; **live** registry keeps structural integrity (no dup names/dirs, no missing SKILL.md), never loses or relocates an existing skill, and only ever grows. |
-| `test_legacy_alias_characterization.py` | The legacy **`manus`** binary alias still resolves skills and validates the manifest identically, and the manifest still advertises the `manus` legacy access path. |
+| `test_legacy_alias_characterization.py` | Compatibility binary aliases still resolve skills and validate the manifest identically, and the manifest records them in generic compatibility fields. |
 | `test_go_unit_baseline.py` | `go test ./...` introduces **no new** failures (subset of `baseline/go_known_failures.json`, now empty = stay green). |
 
 ## The fixture (why behaviour is pinned against it, not `skills/`)

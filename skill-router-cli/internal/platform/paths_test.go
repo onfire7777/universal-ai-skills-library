@@ -13,7 +13,7 @@ func TestAgentRootSpecsIncludeReportOnlyAgents(t *testing.T) {
 	for _, spec := range specs {
 		byID[spec.ID] = spec
 	}
-	for _, id := range []string{"agent", "claude", "codex", "manus", "gemini", "cursor", "opencode", "kiro"} {
+	for _, id := range []string{"agent", "claude", "codex", "legacy-compatibility", "gemini", "cursor", "opencode", "kiro"} {
 		spec, ok := byID[id]
 		if !ok {
 			t.Fatalf("missing default sync agent %q", id)
@@ -121,5 +121,52 @@ func TestRepoDirUsesSavedConfigWhenValid(t *testing.T) {
 
 	if got := RepoDir(); got != repo {
 		t.Fatalf("expected RepoDir to use saved config %q, got %q", repo, got)
+	}
+}
+
+func TestRepoDirDoesNotAutoSelectLegacyBrandedRepoName(t *testing.T) {
+	home := t.TempDir()
+	legacyRepo := filepath.Join(home, "manus-skills-library")
+	if err := os.MkdirAll(filepath.Join(legacyRepo, "skills"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(legacyRepo, "manifest.json"), []byte(`{"core_skills":[],"library_skills":[]}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	cwd := t.TempDir()
+	previous, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(previous)
+	})
+	if err := os.Chdir(cwd); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv("SKILL_ROUTER_REPO_DIR", "")
+	t.Setenv("MANUS_REPO_DIR", "")
+	t.Setenv("SKILL_ROUTER_CONFIG_DIR", filepath.Join(home, ".skill-router"))
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+
+	want := filepath.Join(home, "universal-ai-skills-library")
+	if got := RepoDir(); got != want {
+		t.Fatalf("expected canonical repo fallback %q, got %q", want, got)
+	}
+}
+
+func TestRepoDirAllowsExplicitLegacyEnvOverride(t *testing.T) {
+	repo := t.TempDir()
+	t.Setenv("SKILL_ROUTER_REPO_DIR", "")
+	t.Setenv("MANUS_REPO_DIR", repo)
+	t.Setenv("SKILL_ROUTER_CONFIG_DIR", t.TempDir())
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+
+	if got := RepoDir(); got != repo {
+		t.Fatalf("expected explicit compatibility override %q, got %q", repo, got)
 	}
 }

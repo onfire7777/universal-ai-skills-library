@@ -149,12 +149,16 @@ test("every skills/ directory with a SKILL.md is indexed (no unindexed top dirs)
   assert.equal(indexed.size, onDisk.length, "indexed count equals on-disk count");
 });
 
-test("the manus legacy alias is preserved in both modes", () => {
+test("compatibility aliases are preserved in generic fields", () => {
   for (const optimize of [false, true]) {
     const m = buildManifest(config, skills, { optimize });
-    assert.equal(m.routing.legacy_access, "manus skill <name>", "routing.legacy_access");
+    assert.ok(Array.isArray(m.routing.compatibility_access), "routing.compatibility_access");
+    assert.ok(
+      m.routing.compatibility_access.includes("manus skill <name>"),
+      "routing compatibility command alias"
+    );
     const b = buildBuildManifest(config, skills, { optimize });
-    assert.equal(b.legacy_binary_alias, "manus", "legacy_binary_alias");
+    assert.deepEqual(b.compatibility_binary_aliases, ["manus"], "compatibility_binary_aliases");
   }
 });
 
@@ -192,6 +196,7 @@ test("marketplace optimize carries all 14 themed groupings, members resolve to s
   const market = buildMarketplace(config, skills, { optimize: true });
   assert.equal(market.groupings.length, 14, "14 groupings");
   for (const g of market.groupings) {
+    assert.ok(!g.name.startsWith("manus-"), `${g.name} should use universal branding`);
     assert.ok(g.name && Array.isArray(g.members) && g.members.length > 0, `${g.name} shape`);
     for (const id of g.members) {
       assert.ok(

@@ -15,7 +15,7 @@
 - **Go module:** `github.com/onfire7777/universal-ai-skills-library/skill-router-cli`; engine import path `github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillservice`.
 - **No new third-party dependencies.** MCP server is hand-rolled on stdlib only. (`go.mod` must not gain a new `require` line.)
 - **All tests run hermetic:** `go test ./... -mod=readonly`. No network, no `Date.now`-style nondeterminism in tests.
-- **Invariants preserved, untouched:** manus alias (`MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` env + `.manus/skills` root + byte-identical parity test) and single registry (`manifest.json` canonical source + CI drift guard). No edits to `manifest.json` generation or `marketplace.json`.
+- **Invariants preserved, untouched:** compatibility aliases (`MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` env + `.manus/skills` root + byte-identical parity test) and single registry (`manifest.json` canonical source + CI drift guard). No edits to `manifest.json` generation or `marketplace.json`.
 - **Behavior preservation:** existing CLI commands (`route`, `auto`, `preflight`, `search`, `skill`, `sync`, …) keep identical output. The existing characterization test suite is the gate.
 - **Semantic layer:** route/compose candidate ordering MUST pass through `applySemanticRouting`; the exact name/alias guardrail (`isGuardrailPinned`) is never bypassed.
 - **Commands `route` / `search_skills` / `load_skill` / `compose`** are the canonical names; `search` and `skill` remain as back-compat aliases.
@@ -215,7 +215,7 @@ In `cmd/skills/skills.go`, make `printSkill`, the `search` command `RunE`, and `
 - [ ] **Step 7: Run the full suite (behavior preservation gate)**
 
 Run: `cd skill-router-cli && go test ./... -mod=readonly`
-Expected: PASS — including existing `route_test.go`, `route_semantic_test.go`, manus-parity, and registry tests. If any characterization test changed output, you altered behavior — revert and relocate more faithfully.
+Expected: PASS — including existing `route_test.go`, `route_semantic_test.go`, compatibility-alias parity, and registry tests. If any characterization test changed output, you altered behavior — revert and relocate more faithfully.
 
 - [ ] **Step 8: Commit**
 
@@ -865,7 +865,7 @@ git add skill-router-cli/internal/skillsync skill-router-cli/cmd docs/ADAPTER_DE
 git commit -m "feat(router): deprecate physical-copy adapters (notice + sync --check report + doc)
 
 Behavior unchanged; emits deprecation guidance and a read-only adapter-status
-report. manus alias + single registry invariants untouched.
+report. compatibility aliases + single registry invariants untouched.
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ```

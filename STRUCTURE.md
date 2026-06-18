@@ -15,7 +15,7 @@ skills themselves + the registry that indexes them).
 
 | Component | Path | Format | Responsibility | Owner |
 |-----------|------|--------|----------------|-------|
-| **Router** | `skill-router-cli/` | Go | Prompt → skill routing/scoring; CLI UX (binary `skill-router` + legacy alias `manus`). Owns **no** skill content. | B2 |
+| **Router** | `skill-router-cli/` | Go | Prompt → skill routing/scoring; CLI UX (binary `skill-router` plus compatibility aliases). Owns **no** skill content. | B2 |
 | **Skills corpus** | `skills/<kebab-name>/` | Markdown + `scripts/`, `references/` | The skills themselves (`SKILL.md`). 1812 skills. Knows nothing about the router. | B3 |
 | **Registry / manifest** | `manifest.json` (root) | JSON | **Single** index of the corpus consumed by the router (name, directory, description, aliases, scripts). | B4 |
 | **Packaging / setup** | `plugin/`, `plugin-codex/`, `ai-setup/`, `infrastructure/` | mixed | Distribution & install (`plugin*`); Python AI stack & agent setup (`ai-setup`); infra (`infrastructure`). | B5 / B6 |
@@ -30,8 +30,9 @@ The **registry (`manifest.json`) is the only contract surface** between them.
 
 ## 3. Current canonical layout
 
-Canonical tree: `universal-ai-skills-library/` (the second autofix clone is **abandoned**;
-`manus-skills-marketplace` is read-only source for consolidation).
+Canonical tree: `universal-ai-skills-library/`. Historical marketplace/source
+checkouts are not active skill repositories; any useful metadata has been folded
+into the single registry.
 
 ```
 universal-ai-skills-library/
@@ -53,8 +54,8 @@ universal-ai-skills-library/
 > Rationale: the router is **already physically separate** from the corpus (`skills/`); the
 > real coupling is **logical** (repo-relative paths + a live-tree test assumption), which B2
 > fixes via config-driven resolution. A `git-mv` to `packages/` would break install scripts
-> (B5), CI (B7) and `manifest.router_source` (B4) and risk the `manus` alias — high blast
-> radius for marginal gain, and a behavior-risking change in a refactor-only effort.
+> (B5), CI (B7), `manifest.router_source` (B4), and compatibility alias packaging — high
+> blast radius for marginal gain.
 
 ## 4. Baseline (recorded 2026-06-16 · HEAD `a2fad4b` · go 1.26.3 darwin/arm64)
 
@@ -90,15 +91,17 @@ the contract's *Testing* section.
 
 ## 5. Invariants — MUST NOT break (refactor-only)
 
-- **Legacy `manus` command alias.** `manifest.routing.legacy_access = "manus skill <name>"`,
-  `build_manifest.legacy_binary_alias = "manus"`. The primary binary `skill-router` **and**
-  the `manus` alias must keep working. This is **separate** from consolidating the
-  `manus-skills-marketplace` *repo* — do **not** drop the alias while cleaning repo content.
-- **Single registry.** Exactly one `manifest.json` is authoritative (B4 merges the manus
-  marketplace registry **into** it). The router reads no second registry.
+- **Compatibility command aliases.** `manifest.routing.compatibility_access[]` and
+  `build_manifest.compatibility_binary_aliases[]` carry legacy command names. The primary
+  binary `skill-router` and existing aliases must keep working, but new workflows use
+  universal naming.
+- **Single registry.** Exactly one `manifest.json` is authoritative. Historical marketplace
+  metadata has already been folded into generated artifacts. The router reads no second
+  registry and does not auto-discover old branded repo names.
 - **Canonical-id policy.** Skill ids are kebab-case top-level directory names; legacy/display
   names are aliases only.
-- **No behavior change; local only.** No `git push`, no new branches, no GitHub repo deletion.
+- **Compatibility-preserving modernization.** Existing skills and aliases remain accessible
+  while active names, registry fields, and adapter IDs stay universal.
 
 ## 6. See also
 

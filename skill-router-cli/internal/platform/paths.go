@@ -76,7 +76,9 @@ func TelemetryDir() string {
 }
 
 // RepoDir returns the skills library repo directory.
-// Checks multiple standard locations.
+// It discovers only the neutral canonical repository name automatically.
+// MANUS_REPO_DIR remains an explicit compatibility override, but old branded
+// repo names are no longer implicit source-of-truth candidates.
 func RepoDir() string {
 	if d := os.Getenv("SKILL_ROUTER_REPO_DIR"); d != "" {
 		return d
@@ -101,17 +103,13 @@ func RepoDir() string {
 	// Check standard locations in order of preference
 	candidates := []string{
 		filepath.Join(home, "universal-ai-skills-library"),
-		filepath.Join(home, "manus-skills-library"),
 		filepath.Join(home, "repos", "universal-ai-skills-library"),
-		filepath.Join(home, "repos", "manus-skills-library"),
 		filepath.Join(home, "Documents", "universal-ai-skills-library"),
-		filepath.Join(home, "Documents", "manus-skills-library"),
 	}
 	// Also check TEMP on Windows (where it was cloned)
 	if runtime.GOOS == "windows" {
 		if tmp := os.Getenv("TEMP"); tmp != "" {
 			candidates = append(candidates, filepath.Join(tmp, "universal-ai-skills-library"))
-			candidates = append(candidates, filepath.Join(tmp, "manus-skills-library"))
 		}
 	}
 	for _, c := range candidates {
@@ -250,7 +248,7 @@ func AgentRootSpecs() []AgentRootSpec {
 		{ID: "agent-skills-standard", Name: "Agent Skills open-standard root", Path: filepath.Join(home, ".agents", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Shared AgentSkills-compatible root used by clients such as OpenCode/OpenClaw when configured"},
 		{ID: "claude", Name: "Claude Code / Claude Skills", Path: filepath.Join(home, ".claude", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Claude Code filesystem skill root"},
 		{ID: "codex", Name: "OpenAI Codex", Path: filepath.Join(home, ".codex", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Codex local skill root plus AGENTS.md project instructions"},
-		{ID: "manus", Name: "Manus-compatible", Path: filepath.Join(home, ".manus", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Legacy Manus compatibility root"},
+		{ID: "legacy-compatibility", Name: "Legacy compatibility root", Path: filepath.Join(home, ".manus", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Compatibility root for existing local clients that still read this path"},
 		{ID: "gemini", Name: "Gemini CLI", Path: filepath.Join(home, ".gemini", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Gemini CLI skill root plus AGENTS.md project instructions"},
 		{ID: "cursor", Name: "Cursor", Path: filepath.Join(home, ".cursor", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Cursor skill root plus .cursor/rules project rules"},
 		{ID: "opencode", Name: "OpenCode", Path: filepath.Join(home, ".config", "opencode", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "OpenCode canonical skill root"},

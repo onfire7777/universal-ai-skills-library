@@ -78,8 +78,9 @@ Three layers with a clean separation of concerns:
    `.agents/plugins/marketplace.json`, `docs/build_manifest.json`) in lockstep;
    drift is impossible and is verified in CI.
 
-The legacy `manus` binary is a preserved alias of `skill-router` (same binary),
-so existing rules and scripts keep working. See
+Compatibility binary aliases, including `manus`, invoke the same `skill-router`
+binary so existing rules and scripts keep working. New workflows should use the
+universal `skill-router` name. See
 [docs/ARCHITECTURE-decoupling.md](docs/ARCHITECTURE-decoupling.md) and
 [docs/ARCHITECTURE_V2.md](docs/ARCHITECTURE_V2.md) for detail.
 
@@ -148,7 +149,7 @@ skill-router doctor
 skill-router mcp status
 ```
 
-`manus` remains a legacy compatibility executable for existing local rules and
+Compatibility executables remain available for existing local rules and
 scripts. New docs and integrations should use `skill-router`.
 
 ## Automatic Skill Selection
@@ -301,7 +302,7 @@ Pop-Location
 Behavioural, registry, and secret-scan gates (run in CI; runnable locally):
 
 ```bash
-# characterization baseline: router routing, registry integrity, legacy `manus` alias
+# characterization baseline: router routing, registry integrity, compatibility aliases
 python3 -m unittest discover -s tests/characterization -p 'test_*.py'
 
 # registry single-source drift guard (every artifact matches skills/)

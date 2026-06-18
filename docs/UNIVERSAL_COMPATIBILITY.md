@@ -121,7 +121,7 @@ stop hooks, compaction/resume hooks, assistant messages, tool outputs, status
 checks, and background jobs may belong to other adapters, but they must not run
 or load routed skills.
 
-Third-party caches and marketplaces under Claude, Codex, Manus-compatible, and
+Third-party caches and marketplaces under Claude, Codex, legacy compatibility roots, and
 other AI roots remain read-only external sources. This keeps the universal setup
 comprehensive without committing thousands of duplicated upstream skill bodies.
 Promote an external skill into `skills/` only when it is curated, renamed if

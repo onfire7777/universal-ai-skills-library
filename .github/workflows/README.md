@@ -2,7 +2,7 @@
 
 | Workflow | Runner | Gate |
 |----------|--------|------|
-| `characterization.yml` | ubuntu-latest | Builds the Go router once, then runs the Python **characterization suite** (`tests/characterization/`): router routing, registry integrity + no-skill-lost, the legacy `manus` alias, and **no new Go test failures**. |
+| `characterization.yml` | ubuntu-latest | Builds the Go router once, then runs the Python **characterization suite** (`tests/characterization/`): router routing, registry integrity + no-skill-lost, compatibility aliases, and **no new Go test failures**. |
 | `security.yml` | ubuntu-latest | **gitleaks** secret scan using `.gitleaks.toml` (allowlists Scout 1's 45 known-illustrative findings; fails on future real leaks). |
 | `ci.yml` | windows-latest | Pre-existing: Go build + `go test ./...`, plus the two PowerShell release-audit scripts. |
 

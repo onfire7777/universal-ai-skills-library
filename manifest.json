@@ -10859,7 +10859,9 @@
   "alias_count": 215,
   "routing": {
     "primary_access": "skill-router skill <name>",
-    "legacy_access": "manus skill <name>",
+    "compatibility_access": [
+      "manus skill <name>"
+    ],
     "search": "skill-router skill search <query>",
     "list": "skill-router skill list"
   }

@@ -206,7 +206,7 @@ func Search(query string) (SearchResult, error) {
 
 // Load resolves one skill by name or alias and returns its raw SKILL.md body
 // with a context-light reference. Resolution honors the canonical library →
-// external-root order and the manus-config alias, identical to the prior CLI
+// external-root order and compatibility aliases, identical to the prior CLI
 // load path.
 func Load(name string) (LoadResult, error) {
 	skillPath, err := findSkillMarkdown(name)

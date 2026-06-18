@@ -351,7 +351,7 @@ func buildBuildManifest(config *OM, skills []Skill, optimize bool) *OM {
 		out.Set("router_source", get(b, "legacy_router_source"))
 	}
 	out.Set("primary_binary", get(b, "primary_binary"))
-	out.Set("legacy_binary_alias", get(b, "legacy_binary_alias"))
+	out.Set("compatibility_binary_aliases", get(b, "compatibility_binary_aliases"))
 	out.Set("skill_count", len(skills))
 	out.Set("directories_total", len(skills))
 	out.Set("missing_skill_md", []any{})

@@ -4,7 +4,7 @@
 **Pipeline:** universal router architecture pass
 **Source of truth:** `skills/`
 **Current corpus:** 1,812 canonical skills, all with `SKILL.md`
-**Access model:** on-demand loading through `skill-router skill <name>` with `manus skill <name>` kept only as a legacy alias.
+**Access model:** on-demand loading through `skill-router skill <name>` with compatibility command aliases kept only for existing users.
 
 ## Ledger
 

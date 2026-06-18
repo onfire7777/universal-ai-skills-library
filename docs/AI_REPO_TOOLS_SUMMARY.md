@@ -2,7 +2,7 @@
 
 ## Current Completion State
 
-The Universal AI Skills Library is complete as a working local cross-agent skill stack. The current router release is `skill-router` v2.2.8, with `manus.exe` kept only as a legacy alias. The canonical repo contains 1,812 indexed skills, a validated manifest, compact wrapper skills synced into local AI clients, and adapter docs for Codex, Claude, Hermes, Paperclip, OpenSkills-style roots, and other local AI surfaces.
+The Universal AI Skills Library is complete as a working local cross-agent skill stack. The current router release is `skill-router` v2.2.8, with compatibility executable aliases kept only for existing installs. The canonical repo contains 1,812 indexed skills, a validated manifest, compact wrapper skills synced into local AI clients, and adapter docs for Codex, Claude, Hermes, Paperclip, OpenSkills-style roots, and other local AI surfaces.
 
 The architecture is intentionally router-first and CLI-driven. AI clients should not preload or copy the full skill corpus into every prompt. They should keep one compact wrapper/instruction surface and call the router only when a real user prompt needs a skill.
 
@@ -37,7 +37,7 @@ Repo path: `skill-router-cli/`
 Installed binaries:
 
 - `%USERPROFILE%\go\bin\skill-router.exe`
-- `%USERPROFILE%\go\bin\manus.exe` as a compatibility alias
+- declared compatibility aliases such as `%USERPROFILE%\go\bin\manus.exe`
 
 The CLI routes prompts, loads skills, searches skills, validates the repo, syncs wrappers, checks local health, manages optional MCP bridge services, and exposes utility command groups for audits, oracle answers, files, GStack, GBrain, Hugging Face, Google Workspace, Gmail, databases, schedules, and related local AI workflows.
 
@@ -62,7 +62,7 @@ These files describe how Codex, Claude, and similar clients should use the route
 
 The current sync model installs the compact wrapper into local AI roots and preserves each platform's native/custom skills. It does not full-copy the 1,812-skill corpus.
 
-Known supported local roots include Codex, Claude, OpenSkills `.agent`, Manus-compatible roots, Gemini, Cursor, OpenCode, Kiro, Hermes, Paperclip, OpenClaw, Windsurf, Roo, Continue, Kimi, Qwen, and compatible `SKILL.md`-style clients.
+Known supported local roots include Codex, Claude, OpenSkills `.agent`, legacy compatibility roots, Gemini, Cursor, OpenCode, Kiro, Hermes, Paperclip, OpenClaw, Windsurf, Roo, Continue, Kimi, Qwen, and compatible `SKILL.md`-style clients.
 
 Hosted tools such as ChatGPT, Claude Cowork, Devin, Amazon Q Developer, Sourcegraph Cody, Augment, and similar platforms should use adapter instructions, Apps/Actions/MCP/API bridges, or uploaded compact rules instead of local full-copy sync.
 

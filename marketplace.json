@@ -17,7 +17,7 @@
   ],
   "groupings": [
     {
-      "name": "manus-ai-prompt-engineering",
+      "name": "universal-ai-prompt-engineering",
       "description": "AI and prompt engineering: LLM apps, agents, RAG, evals",
       "members": [
         "ai-expertise-engine",
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "name": "manus-backend-architecture",
+      "name": "universal-backend-architecture",
       "description": "Backend architecture: APIs, system design, distributed systems, databases",
       "members": [
         "adr-architecture",
@@ -116,7 +116,7 @@
       ]
     },
     {
-      "name": "manus-communication",
+      "name": "universal-communication",
       "description": "Communication: writing, presentations, facilitation, leadership",
       "members": [
         "communication-storytelling",
@@ -147,7 +147,7 @@
       ]
     },
     {
-      "name": "manus-creativity-innovation",
+      "name": "universal-creativity-innovation",
       "description": "Creativity and innovation: creative writing, art, ideation",
       "members": [
         "blue-ocean-strategy",
@@ -176,7 +176,7 @@
       ]
     },
     {
-      "name": "manus-data-analysis",
+      "name": "universal-data-analysis",
       "description": "Data analysis: analytics, viz, statistics, ML/data pipelines",
       "members": [
         "best-practices",
@@ -198,7 +198,7 @@
       ]
     },
     {
-      "name": "manus-devops-infra",
+      "name": "universal-devops-infra",
       "description": "DevOps and infrastructure: CI/CD, containers, cloud, IaC, SRE",
       "members": [
         "chrome-devtools",
@@ -225,14 +225,14 @@
       ]
     },
     {
-      "name": "manus-domain-specific",
+      "name": "universal-domain-specific",
       "description": "Narrow verticals: medical, legal, finance, scientific domains",
       "members": [
         "deep-research-scholarly-analysis-engine"
       ]
     },
     {
-      "name": "manus-frontend-design",
+      "name": "universal-frontend-design",
       "description": "Frontend and design: UI/UX, web frontend, design systems, accessibility",
       "members": [
         "3d-web-experience",
@@ -351,7 +351,7 @@
       ]
     },
     {
-      "name": "manus-meta-skills",
+      "name": "universal-meta-skills",
       "description": "Meta-skills: skill creation, learning, productivity",
       "members": [
         "accord",
@@ -466,7 +466,7 @@
       ]
     },
     {
-      "name": "manus-planning-strategy",
+      "name": "universal-planning-strategy",
       "description": "Planning and strategy: PM, strategic planning, roadmaps, OKRs",
       "members": [
         "acquisition-channel-advisor",
@@ -540,7 +540,7 @@
       ]
     },
     {
-      "name": "manus-privacy-compliance",
+      "name": "universal-privacy-compliance",
       "description": "Privacy and compliance: GDPR/CCPA/HIPAA, DPIAs, AI Act, ISO 27701",
       "members": [
         "adequacy-assessment",
@@ -601,7 +601,7 @@
       ]
     },
     {
-      "name": "manus-quality-engineering",
+      "name": "universal-quality-engineering",
       "description": "Quality engineering: code review, testing, debugging, refactoring",
       "members": [
         "acceptance-testing",
@@ -653,7 +653,7 @@
       ]
     },
     {
-      "name": "manus-reasoning-thinking",
+      "name": "universal-reasoning-thinking",
       "description": "Reasoning and thinking: mental models, critical thinking, epistemics",
       "members": [
         "abstraction-concrete-examples",
@@ -731,7 +731,7 @@
       ]
     },
     {
-      "name": "manus-security",
+      "name": "universal-security",
       "description": "Security skills: pentesting, exploits, hardening, crypto, AppSec/NetSec",
       "members": [
         "address-sanitizer",

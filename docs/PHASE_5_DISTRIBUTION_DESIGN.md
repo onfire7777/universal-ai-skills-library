@@ -294,7 +294,7 @@ never drift from the catalog:
   "registry_version": "2.3.0",
   "source_of_truth": "manifest.json",
   "primary_binary": "skill-router",
-  "legacy_binary_alias": "manus",
+  "compatibility_binary_aliases": ["manus"],
   "root_hash": "sha256:1a2b3c...e2",
   "package_format": "uasl-skill-package/v1",
   "hash_algorithm": "sha256",
@@ -327,7 +327,7 @@ root over a sorted list is enough for "verify the whole index is intact" and is 
 revisit per-entry proofs only if partial-index streaming becomes a requirement.)
 
 The index intentionally mirrors fields already present in `docs/build_manifest.json`
-(`legacy_binary_alias: "manus"`, `primary_binary: "skill-router"`) so the supply-chain artifact
+(`compatibility_binary_aliases: ["manus"]`, `primary_binary: "skill-router"`) so the supply-chain artifact
 and the provenance artifact stay self-consistent.
 
 ### 4.2 Signing — minisign **and** cosign (both, by design)
@@ -473,7 +473,7 @@ escape hatch for fully self-hosted/air-gapped mirrors. The client abstracts the 
 | Invariant | How Phase 5 preserves it |
 |---|---|
 | **Exactly one authoritative registry (`manifest.json`)** | `skills-index.json` is *generated from* `manifest.json` in the same build run. It is a derived artifact, peer to `marketplace.json`/`build_manifest.json` — never a second source of truth. `--check` proves no drift. |
-| **`manus` legacy alias** | `routing.legacy_access = "manus skill <name>"` in `manifest.json` and `legacy_binary_alias = "manus"` in `build_manifest.json` are untouched. The index carries `legacy_binary_alias: "manus"`, and each package's `package.json` carries `legacy_aliases[]`, so alias resolution survives into pulled installs. The `manus` binary alias resolves the new `pkg` verbs identically. |
+| **Compatibility aliases** | `routing.compatibility_access[]` in `manifest.json` and `compatibility_binary_aliases[]` in `build_manifest.json` are preserved. The index carries declared compatibility aliases, and each package's `package.json` carries `legacy_aliases[]`, so alias resolution survives into pulled installs. Compatibility binary aliases resolve the new `pkg` verbs identically. |
 | **Deterministic, offline, no-remote-LLM query path** | `pull`/`add` are the *only* verbs that touch the network, and only when explicitly invoked. `route`/`search`/`load_skill` never change. Embeddings/index for routing stay build-time and hash-pinned. |
 | **kebab-case canonical ids** | Package names, index `name`, and `manifest.json` `name` are the same kebab id (schema `pattern` enforces it). |
 | **Telemetry local-only + opt-in** | Pull adds no telemetry. No "phone home" on install. Any pull metrics (if added later) follow the existing `~/.skill-router/telemetry.jsonl` local-only + opt-in rule. |

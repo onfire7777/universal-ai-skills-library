@@ -50,8 +50,8 @@
  *              - marketplace gains the 14 themed groupings + live skill count
  *
  * Invariants preserved in BOTH modes (breaking these is CHANGES_REQUESTED):
- *   - manifest.routing.legacy_access = "manus skill <name>"   (the `manus` alias)
- *   - build_manifest.legacy_binary_alias = "manus"
+ *   - manifest.routing.compatibility_access records legacy command aliases
+ *   - build_manifest.compatibility_binary_aliases records legacy binary names
  *   - merged_legacy_directories / disabled_colliding_aliases / compatibility_policy
  */
 import fs from "node:fs";
@@ -180,7 +180,7 @@ export function buildManifest(config, skills, { optimize }) {
     library_skills: library.map((s) => manifestEntry(s, { optimize })),
     total_skills: total,
     alias_count: aliasCount,
-    routing: config.manifest.routing, // preserves legacy_access = "manus skill <name>"
+    routing: config.manifest.routing,
   };
 }
 
@@ -195,7 +195,7 @@ export function buildMarketplace(config, skills, { optimize }) {
       }
     }
     if (Array.isArray(config.groupings) && config.groupings.length > 0) {
-      // Preserve the manus marketplace's only unique value: themed collections.
+    // Preserve the former marketplace's only unique value: themed collections.
       market.groupings = config.groupings.map((g) => ({
         name: g.name,
         description: g.description,
@@ -214,7 +214,7 @@ export function buildBuildManifest(config, skills, { optimize }) {
     source_of_truth: optimize ? b.source_of_truth : b.legacy_source_of_truth,
     router_source: optimize ? b.router_source : b.legacy_router_source,
     primary_binary: b.primary_binary,
-    legacy_binary_alias: b.legacy_binary_alias, // "manus"
+    compatibility_binary_aliases: b.compatibility_binary_aliases,
     skill_count: skills.length,
     directories_total: skills.length,
     missing_skill_md: [],

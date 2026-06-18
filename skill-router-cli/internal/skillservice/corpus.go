@@ -300,7 +300,7 @@ func externalSkillRoots() []externalSkillRoot {
 		{ID: "claude-repos", Path: filepath.Join(home, ".claude", "skills-repos")},
 		{ID: "codex-skills", Path: filepath.Join(home, ".codex", "skills")},
 		{ID: "codex-cache", Path: filepath.Join(home, ".codex", "plugins", "cache")},
-		{ID: "manus-compat", Path: filepath.Join(home, ".manus", "skills")},
+		{ID: "legacy-compat", Path: filepath.Join(home, ".manus", "skills")},
 		{ID: "gemini", Path: filepath.Join(home, ".gemini", "skills")},
 		{ID: "cursor", Path: filepath.Join(home, ".cursor", "skills")},
 		{ID: "opencode", Path: filepath.Join(home, ".config", "opencode", "skills")},

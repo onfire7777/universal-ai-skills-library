@@ -6,9 +6,8 @@
 #   make release-dry   # goreleaser check (validate this file)
 #   git tag vX.Y.Z && git push --tags   # CI release (.github/workflows/release.yml)
 #
-# Invariant: the primary binary is `skill-router`; the legacy `manus` alias is
-# preserved as a symlink (Homebrew formula below; install.sh / install.ps1 for
-# raw archives).
+# Invariant: the primary binary is `skill-router`; declared compatibility aliases
+# are preserved as symlinks/wrappers by install.sh / install.ps1 for raw archives.
 version: 2
 
 project_name: skill-router
@@ -75,7 +74,7 @@ signs:
 # Optional Homebrew tap (cask form — `brews` is deprecated in goreleaser v2).
 # Requires a `onfire7777/homebrew-tap` repo + HOMEBREW_TAP_GITHUB_TOKEN; on
 # snapshots / untagged builds upload is skipped automatically. The cask installs
-# the `skill-router` binary; the legacy `manus` alias is created by install.sh /
+# the `skill-router` binary; compatibility aliases are created by install.sh /
 # `make install-local` (a Homebrew cask manages a single binary cleanly, so we
 # keep the alias in the installer rather than a brittle cask post-install hook).
 homebrew_casks:

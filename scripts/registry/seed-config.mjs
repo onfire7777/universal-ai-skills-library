@@ -97,7 +97,7 @@ function main() {
       schema: build.schema,
       generated_at: build.generated_at,
       primary_binary: build.primary_binary,
-      legacy_binary_alias: build.legacy_binary_alias,
+      compatibility_binary_aliases: build.compatibility_binary_aliases || [],
       // Legacy Windows-only paths preserved for provenance; the generator emits
       // the portable relative forms below instead.
       legacy_source_of_truth: build.source_of_truth,
@@ -109,7 +109,7 @@ function main() {
       disabled_colliding_aliases: build.disabled_colliding_aliases,
       compatibility_policy: build.compatibility_policy,
     },
-    // Themed plugin groupings (the manus marketplace's unique value). Populated
+    // Themed plugin groupings (the former marketplace's unique value). Populated
     // from Builder 3's grouping map; each: { name, description, members: [] }.
     groupings: [],
   };

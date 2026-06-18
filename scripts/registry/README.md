@@ -29,7 +29,7 @@ longer drift from each other or from the `skills/` tree.
     intentionally differ from the skill's own `SKILL.md`
   - `manifest` / `marketplace` / `buildManifest` — package + provenance metadata
   - `groupings` — the 14 themed plugin collections imported from the former
-    manus marketplace (its only non-duplicate value)
+    marketplace source (its only non-duplicate value), now with universal IDs
 
 ## Commands
 
@@ -67,9 +67,9 @@ and validates it with `validate-manifest`. The generator therefore guarantees:
   description, aliases?, has_scripts?, scripts?}`, `directory` relative to repo root
 - `has_scripts` / `scripts` computed exactly like `validate_manifest.go`
   (`listSkillScripts`: recursive, skips `__pycache__`/`.git` and `.pyc`/`.pyo`, sorted)
-- **the `manus` legacy command alias is preserved**:
-  `manifest.routing.legacy_access = "manus skill <name>"` and
-  `build_manifest.legacy_binary_alias = "manus"`
+- **compatibility command aliases are preserved in generic fields**:
+  `manifest.routing.compatibility_access[]` and
+  `build_manifest.compatibility_binary_aliases[]`
 - `merged_legacy_directories`, `disabled_colliding_aliases`, `compatibility_policy`
   carried through unchanged
 
