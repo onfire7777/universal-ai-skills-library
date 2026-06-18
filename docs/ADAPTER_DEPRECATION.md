@@ -77,6 +77,7 @@ compact router pointer or an MCP connector instead.
 | `agent-skills-standard` | Agent Skills open-standard root | skill-root | report-only | `~/.agents/skills` | `skill-router serve` (MCP) or direct CLI |
 | `claude` | Claude Code / Claude Skills | skill-root | default | `~/.claude/skills` | `skill-router serve` (MCP) or direct CLI |
 | `codex` | OpenAI Codex | skill-root | default | `~/.codex/skills` | `skill-router serve` (MCP) or direct CLI |
+| `aion-codex-home` | Aion Codex home | skill-root | report-only | `%USERPROFILE%\AppData\Roaming\AionUi\codex-home\skills` | `skill-router serve` (MCP) or direct CLI |
 | `gemini` | Gemini CLI | skill-root | default | `~/.gemini/skills` | `skill-router serve` (MCP) or direct CLI |
 | `cursor` | Cursor | skill-root | default | `~/.cursor/skills` | `skill-router serve` (MCP) or direct CLI |
 | `opencode` | OpenCode | skill-root | default | `~/.config/opencode/skills` | `skill-router serve` (MCP) or direct CLI |
@@ -98,8 +99,8 @@ compact router pointer or an MCP connector instead.
 | `claude-cowork` | Claude Cowork | hosted | report-only | (none) | MCP connector / hosted instructions |
 | `github-copilot` | GitHub Copilot | repo-instruction | report-only | `.github/copilot-instructions.md` | compact router pointer in repo instructions |
 | `vscode-copilot` | VS Code Copilot | repo-instruction | report-only | `.github/instructions/*.instructions.md` | compact router pointer in repo instructions |
-| `aider` | Aider | repo-instruction | report-only | `CONVENTIONS.md` | compact router pointer in repo instructions |
-| `openhands` | OpenHands | hosted | report-only | (none) | MCP connector / hosted instructions |
+| `aider` | Aider | skill-root | report-only | `~/.aider/skills` | `skill-router serve` (MCP) or direct CLI |
+| `openhands` | OpenHands | skill-root | report-only | `~/.openhands/skills` | `skill-router serve` (MCP) or direct CLI |
 | `devin` | Devin | hosted | report-only | (none) | MCP connector / hosted instructions |
 | `jetbrains-junie` | JetBrains Junie | hosted | report-only | (none) | MCP connector / hosted instructions |
 | `amazon-q` | Amazon Q Developer | hosted | report-only | (none) | MCP connector / hosted instructions |

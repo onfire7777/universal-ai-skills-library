@@ -50,6 +50,7 @@ The matrix reports:
 | Agent Skills open-standard root | `skill-root` | `~/.agents/skills` | installed-wrapper | Shared location used by OpenCode and OpenHands-style clients when configured; wrapper-only when the root exists. |
 | Claude Code / Claude Skills | `skill-root` | `~/.claude/skills` | default | Wrapper root plus Claude plugin support. |
 | OpenAI Codex | `skill-root` | `~/.codex/skills` and `AGENTS.md` | default | Local wrapper root plus project instructions. |
+| Aion Codex home | `skill-root` | `%USERPROFILE%\AppData\Roaming\AionUi\codex-home\skills` | report-only | Aion-hosted Codex profile root; wrapper-only when configured. |
 | Gemini CLI | `skill-root` / `repo-instruction` | `~/.gemini/skills`, `GEMINI.md`, `AGENTS.md` | default | Wrapper root and context-file compatibility. |
 | Cursor | `skill-root` / `repo-instruction` | `~/.cursor/skills`, `.cursor/rules`, `AGENTS.md` | default | Project rules remain the preferred Cursor-native surface. |
 | OpenCode | `skill-root` | `~/.config/opencode/skills` | default | Canonical OpenCode skill root. |
@@ -69,11 +70,11 @@ The matrix reports:
 | Qwen Code | `skill-root` / `repo-instruction` | `~/.qwen/skills`, `QWEN.md` / AGENTS-style project guidance | installed-wrapper | Wrapper-only in the local skill root; keep prompts compact. |
 | GitHub Copilot | `repo-instruction` | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Compact repository instructions and path-scoped instructions only. |
 | VS Code Copilot | `repo-instruction` | `.github/instructions/*.instructions.md`, `AGENTS.md` | report-only | Same repo instruction model, IDE-scoped behavior. |
-| Aider | `repo-instruction` | `CONVENTIONS.md` | report-only | Add router pointer only when intentionally included in chat. |
+| Aider | `skill-root` / `repo-instruction` | `~/.aider/skills`, `CONVENTIONS.md` | report-only | Wrapper-only in the local skill root when configured; repo conventions stay separate. |
 | JetBrains Junie | `repo-instruction` | `.junie/guidelines.md`, `AGENTS.md` | report-only | IDE guidelines, not a skill-copy root. |
 | ChatGPT / Custom GPTs | `hosted` | Custom GPT instructions, Actions, Apps SDK, MCP connectors | report-only | Hosted adapter; expose CLI through an API/MCP/action, not filesystem sync. |
 | Claude Cowork | `hosted` | Claude-hosted instructions, Skills/API/MCP where available | report-only | Hosted/desktop adapter; avoid assuming a local root. |
-| OpenHands | `skill-root` / `hosted` | `~/.agents/skills`, `.agents/skills`, SDK skills, cloud skills | report-only | Supports AgentSkills-style loading; explicit adapter only. |
+| OpenHands | `skill-root` / `hosted` | `~/.openhands/skills`, `~/.agents/skills`, `.agents/skills`, SDK skills, cloud skills | report-only | Supports AgentSkills-style loading; wrapper-only in local roots when configured. |
 | Amazon Q Developer | `hosted` | MCP config under `~/.aws/amazonq/*` | report-only | Use MCP integration, not skill-copy sync. |
 | Devin | `hosted` | Hosted agent instructions/API surfaces | report-only | No stable local skill root modeled. |
 | Sourcegraph Cody | `hosted` | Organization/repository instruction surfaces | report-only | Prefer repo guidance and MCP/API integrations. |

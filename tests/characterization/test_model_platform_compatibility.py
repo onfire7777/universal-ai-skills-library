@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -38,6 +40,12 @@ class ModelPlatformCompatibilityTests(unittest.TestCase):
         roots = {root["id"]: root for root in sources["managedClientRoots"]}
 
         expected_contracts = {
+            "aion-codex-home": (
+                "compact-wrapper",
+                "AppData\\Roaming\\AionUi\\codex-home\\skills",
+                "AppData\\Roaming\\AionUi\\codex-home\\AGENTS.md",
+            ),
+            "aider": ("compact-wrapper", ".aider\\skills", ".aider\\OPENSKILLS.md"),
             "codex": ("compact-wrapper", ".codex\\skills", ".codex\\AGENTS.md"),
             "claude": ("compact-wrapper", ".claude\\skills", ".claude\\CLAUDE.md"),
             "hermes": ("custom-plus-wrapper", ".hermes\\skills", ".hermes\\AGENTS.md"),
@@ -65,6 +73,50 @@ class ModelPlatformCompatibilityTests(unittest.TestCase):
                 self.assertTrue(root["skills"].endswith(skills_suffix))
                 self.assertTrue(root["instructions"].endswith(instructions_suffix))
                 self.assertNotIn("full", root["mode"])
+
+    def test_managed_client_roots_are_represented_in_router_matrix(self) -> None:
+        if shutil.which("go") is None:
+            self.skipTest("go toolchain is not available")
+
+        sources = read_json("ai-setup/manifests/source-repos.json")
+        proc = subprocess.run(
+            ["go", "run", ".", "sync", "--check", "--json"],
+            cwd=ROOT / "skill-router-cli",
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        matrix = {row["id"]: row for row in json.loads(proc.stdout)}
+        aliases = {
+            "agents": "agent-skills-standard",
+            "openclaw": "openclaw-global",
+            "opencode-config": "opencode",
+            "opencode-home": "opencode-legacy",
+        }
+        offenders: list[str] = []
+
+        for root in sources["managedClientRoots"]:
+            matrix_id = aliases.get(root["id"], root["id"])
+            row = matrix.get(matrix_id)
+            if row is None:
+                offenders.append(f"{root['id']}: missing router matrix row {matrix_id}")
+                continue
+            if root["mode"] in {"compact-wrapper", "custom-plus-wrapper"}:
+                if row["adapter"] != "skill-root":
+                    offenders.append(f"{root['id']}: router adapter is {row['adapter']}")
+                expected_suffix = (
+                    root["skills"]
+                    .replace("{{USERPROFILE}}\\", "")
+                    .replace("\\", "/")
+                )
+                actual_path = row["path"].replace("\\", "/")
+                if expected_suffix not in actual_path:
+                    offenders.append(
+                        f"{root['id']}: router path {row['path']} does not match {root['skills']}"
+                    )
+
+        self.assertEqual([], offenders)
 
 
 if __name__ == "__main__":
