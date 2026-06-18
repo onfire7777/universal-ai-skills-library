@@ -64,7 +64,7 @@ The management page introduced in Branch B exposes:
 The cloud computer uses UFW with a restrictive default policy:
 - **Only port 22 (SSH) and ICMP (ping) are open by default**
 - When deploying services, the required ports MUST be opened via `sudo ufw allow <port>`. Never expose unprotected services (no-auth databases, admin panels without passwords) directly to the internet.
-- For web-facing services, configure a domain. Manus has built-in domain purchasing at [Settings → Purchased Domains](https://manus.im/app#settings/data-controls/purchased-domains). After purchase, guide the user to configure DNS records (A record pointing to the cloud computer's public IP). For HTTPS, use Let's Encrypt (certbot) or RapidSSL.
+- For web-facing services, configure a domain. The default hosted provider has built-in domain purchasing at [Settings → Purchased Domains](https://manus.im/app#settings/data-controls/purchased-domains). After purchase, guide the user to configure DNS records (A record pointing to the cloud computer's public IP). For HTTPS, use Let's Encrypt (certbot) or RapidSSL.
 
 ## Important: Service Recovery
 
@@ -74,7 +74,7 @@ Services deployed on the cloud computer MUST be configured to auto-start on rebo
 
 ## Environment Configuration with agents.md
 
-An `agents.md` file placed in the cloud computer's home directory (`/home/ubuntu/agents.md`) is automatically read by Manus for all Tasks using the cloud computer. Configuration, directory structure, and other environment-related information stored there is shared across sessions without needing to repeat setup instructions.
+An `agents.md` file placed in the cloud computer's home directory (`/home/ubuntu/agents.md`) is automatically read by the hosted provider for all tasks using the cloud computer. Configuration, directory structure, and other environment-related information stored there is shared across sessions without needing to repeat setup instructions.
 
 **Example use cases:**
 - Document installed software and versions

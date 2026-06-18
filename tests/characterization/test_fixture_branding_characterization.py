@@ -43,6 +43,32 @@ class FixtureBrandingCharacterizationTest(unittest.TestCase):
                 self.assertNotIn(old_phrase, body)
                 self.assertIn("hosted provider compatibility where relevant", body)
 
+    def test_persistent_computing_references_are_provider_neutral(self) -> None:
+        files = [
+            ROOT / "skills" / "persistent-computing" / "SKILL.md",
+            ROOT / "skills" / "persistent-computing" / "references" / "work-with-connectors.md",
+            ROOT / "skills" / "persistent-computing" / "references" / "cloud-computer-reference.md",
+        ]
+        forbidden = [
+            "Man" + "us desktop client",
+            "Man" + "us account",
+            "Use the Man" + "us API",
+            "Man" + "us Agent",
+            "Man" + "us Credits",
+            "Man" + "us API Key",
+            "Man" + "us executes",
+            "automatically read by Man" + "us",
+            "provided by Man" + "us",
+            "Man" + "us sessions",
+            "Man" + "us OAuth",
+            "Man" + "us's side",
+        ]
+        for path in files:
+            body = path.read_text(encoding="utf-8")
+            for term in forbidden:
+                with self.subTest(path=path.name, term=term):
+                    self.assertNotIn(term, body)
+
 
 if __name__ == "__main__":
     unittest.main()
