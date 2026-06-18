@@ -110,6 +110,7 @@ skill-router skill universal-ai-skills
 skill-router skills validate-manifest
 skill-router sync codex   # optional compact wrapper for Codex CLI
 skill-router sync claude  # optional compact wrapper for Claude CLI
+skill-router sync paperclip  # optional compact wrapper for Paperclip local agents
 skill-router doctor
 skill-router doctor --json  # machine-readable installer/CI health
 ```
@@ -134,6 +135,10 @@ The installer writes real secrets only to:
 
 That file is machine-local and must not be committed.
 
+To use OpenRouter as an optional OpenAI-compatible fallback, set
+`OPENROUTER_API_KEY` in that machine-local secrets file or in the process
+environment. The default install leaves it blank.
+
 ## Primary Commands
 
 ```bash
@@ -148,6 +153,7 @@ skill-router skills sources
 skill-router sync matrix
 skill-router sync codex
 skill-router sync claude
+skill-router sync paperclip
 skill-router sync installed
 skill-router doctor
 skill-router doctor --json
@@ -217,6 +223,7 @@ It provides:
 - OpenAI-compatible local router at `http://127.0.0.1:18100/v1`
 - model registry and failover policy in JSON
 - Kimi API fallback support
+- optional OpenRouter fallback through `OPENROUTER_API_KEY`
 - guarded local Qwen3-Coder fallback through llama.cpp
 - local Qwen embedding service for GBrain memory search
 - Hermes Agent and Paperclip configuration helpers

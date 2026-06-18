@@ -64,7 +64,7 @@ $curated = Read-Json (Join-Path $RepoRoot 'ai-setup\manifests\curated-skills.jso
 if ($modelRegistry) {
   $models = @($modelRegistry.models)
   $ids = @($models | ForEach-Object { $_.id })
-  foreach ($id in 'gpt-5.5', 'kimi-k2.6-thinking', 'claude-opus-4.7', 'qwen3-coder-30b-a3b-q4', 'qwen3-embedding-0.6b-q8') {
+  foreach ($id in 'gpt-5.5', 'kimi-k2.6-thinking', 'claude-opus-4.7', 'openrouter-auto', 'qwen3-coder-30b-a3b-q4', 'qwen3-embedding-0.6b-q8') {
     if ($ids -notcontains $id) { Add-Failure "Model registry missing $id" }
   }
   $qwen = $models | Where-Object { $_.id -eq 'qwen3-coder-30b-a3b-q4' } | Select-Object -First 1
@@ -86,6 +86,13 @@ if ($modelRegistry) {
   if ($kimi) {
     if ($kimi.providerRequestDefaults.temperature -ne 1) { Add-Failure 'Kimi temperature default must be 1.' }
     if ($kimi.providerRequestDefaults.top_p -ne 0.95) { Add-Failure 'Kimi top_p default must be 0.95.' }
+  }
+  $openrouter = $models | Where-Object { $_.id -eq 'openrouter-auto' } | Select-Object -First 1
+  if ($openrouter) {
+    if ($openrouter.provider -ne 'openrouter') { Add-Failure "OpenRouter provider should be openrouter, got $($openrouter.provider)" }
+    if ($openrouter.routeKind -ne 'openai-compatible-http') { Add-Failure "OpenRouter routeKind should be openai-compatible-http, got $($openrouter.routeKind)" }
+    if ($openrouter.baseUrl -ne 'https://openrouter.ai/api/v1') { Add-Failure "OpenRouter baseUrl should be https://openrouter.ai/api/v1, got $($openrouter.baseUrl)" }
+    if ($openrouter.apiKeyEnv -ne 'OPENROUTER_API_KEY') { Add-Failure "OpenRouter apiKeyEnv should be OPENROUTER_API_KEY, got $($openrouter.apiKeyEnv)" }
   }
   $embedding = $models | Where-Object { $_.id -eq 'qwen3-embedding-0.6b-q8' } | Select-Object -First 1
   if (!$embedding) {
