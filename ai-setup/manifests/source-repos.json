@@ -87,7 +87,7 @@
       "kind": "skill-root",
       "instructions": "{{USERPROFILE}}\\.manus\\AGENTS.md",
       "skills": "{{USERPROFILE}}\\.manus\\skills",
-      "mode": "compact-wrapper"
+      "mode": "legacy-opt-in-wrapper"
     },
     {
       "id": "opencode-home",

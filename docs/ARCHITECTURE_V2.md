@@ -22,7 +22,7 @@ Compatibility names remain only where they identify a real platform adapter or p
 
 - `manus.exe` remains a compatibility executable alias.
 - `manus-api` remains the Manus API adapter.
-- `.manus` remains a compatibility root for existing local clients.
+- `.manus` remains an opt-in compatibility root for existing local clients.
 - Optional MCP bridges use neutral `UniversalAI-*` Windows task names.
 
 ## Rationale
@@ -45,7 +45,7 @@ The revised design follows ports and adapters:
 2. Search before loading with `skill-router skill search <query>`.
 3. Keep global agent instructions as indexes only.
 4. Treat MCP bridges as optional persistent adapters.
-5. Keep compatibility aliases but avoid using them in new docs unless the target is platform-specific.
+5. Keep historical aliases as lookup metadata only; do not package or document them as active command paths.
 
 ## Directory Contract
 
@@ -63,7 +63,7 @@ universal-ai-skills-library/
 | Surface | Primary Name | Compatibility Name |
 |---|---|---|
 | CLI binary | `skill-router` | `manus` |
-| Setup skill | `universal-ai-config` | `manus-config` CLI lookup alias |
+| Setup skill | `universal-ai-config` | old setup aliases are retired |
 | Repo | `universal-ai-skills-library` | explicit `MANUS_REPO_DIR` override only |
 | Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |
 | API adapter | `manus-api` | N/A, platform-specific by design |
@@ -81,7 +81,7 @@ Lightpanda, Hermes, and Paperclip.
 
 - `skill-router --version` works.
 - `skill-router skill universal-ai-config` prints the renamed skill.
-- `skill-router skill manus-config` still resolves as a compatibility alias.
+- Use `skill-router skill universal-ai-config` for setup guidance.
 - `manifest.json` matches the actual `skills/` tree.
 - Local AI instruction files mention the router, not embedded skill tables.
 - Optional MCP bridges use neutral `UniversalAI-*` task names.

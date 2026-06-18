@@ -40,10 +40,11 @@ shared memory, embeddings, Context Mode, Lightpanda, Hermes, and Paperclip, see
 index surface; the repo-owned config map is the authority for local runtime
 connections.
 
-Compatibility:
+Command:
 
 ```bash
-manus skill <name>
+skill-router skill <name>
 ```
 
-Use the compatibility command only for existing clients or scripts that have not moved to `skill-router` yet.
+Historical command aliases are lookup metadata only and are not installed by
+default.

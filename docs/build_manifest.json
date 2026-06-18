@@ -4,9 +4,7 @@
   "source_of_truth": "skills",
   "router_source": "skill-router-cli",
   "primary_binary": "skill-router",
-  "compatibility_binary_aliases": [
-    "manus"
-  ],
+  "compatibility_binary_aliases": [],
   "skill_count": 1812,
   "directories_total": 1812,
   "missing_skill_md": [],
@@ -187,10 +185,7 @@
   "compatibility_policy": {
     "universal_default": "Use skill-router skill <name> for on-demand loading.",
     "provider_names_allowed_when": "The skill targets a real API, model, client, or compatibility adapter.",
-    "legacy_aliases": [
-      "manus skill <name>",
-      "manus-config"
-    ]
+    "legacy_aliases": []
   },
   "catalog_ref": "../manifest.json"
 }

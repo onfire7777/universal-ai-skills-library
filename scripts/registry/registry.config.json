@@ -10,9 +10,7 @@
     "alias_count": 1917,
     "routing": {
       "primary_access": "skill-router skill <name>",
-      "compatibility_access": [
-        "manus skill <name>"
-      ],
+      "compatibility_access": [],
       "search": "skill-router skill search <query>",
       "list": "skill-router skill list"
     }
@@ -484,9 +482,7 @@
     "schema": "universal-ai-skills-build-manifest/v2",
     "generated_at": "2026-05-15T00:00:00.000Z",
     "primary_binary": "skill-router",
-    "compatibility_binary_aliases": [
-      "manus"
-    ],
+    "compatibility_binary_aliases": [],
     "legacy_source_of_truth": "%USERPROFILE%\\universal-ai-skills-library\\skills",
     "legacy_router_source": "%USERPROFILE%\\universal-ai-skills-library\\skill-router-cli",
     "source_of_truth": "skills",
@@ -668,10 +664,7 @@
     "compatibility_policy": {
       "universal_default": "Use skill-router skill <name> for on-demand loading.",
       "provider_names_allowed_when": "The skill targets a real API, model, client, or compatibility adapter.",
-      "legacy_aliases": [
-        "manus skill <name>",
-        "manus-config"
-      ]
+      "legacy_aliases": []
     }
   }
 }

@@ -5,7 +5,8 @@ This repository is a universal AI skills setup. The default interface is platfor
 - Source of truth: `skills/`
 - Router source: `skill-router-cli/`
 - Primary command: `skill-router skill <name>`
-- Legacy command: `manus skill <name>`
+- Historical command aliases are lookup metadata only; new installs and docs use
+  `skill-router skill <name>`.
 - Universal setup skill: `universal-ai-config`
 - Optional MCP runtime directory: `C:\ProgramData\universal-ai-mcps`
 - Optional MCP scheduled task prefix: `UniversalAI-*`
@@ -38,7 +39,7 @@ Use provider or client names only when they identify a real compatibility surfac
 - Adapters: Claude Code hooks, Codex review, Manus UI deployer, Lightpanda CDP, MemPalace MCP
 - Models: exact model IDs used by scripts or user-facing model benchmarks
 
-Legacy `.manus\tools` may remain only as a compatibility junction to
+Legacy `.manus\tools` may remain only as an explicit compatibility junction to
 `.universal-ai\tools`.
 
 ## Context Policy

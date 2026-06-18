@@ -14,5 +14,4 @@ Load a skill on demand through the universal router.
 2. If no exact match is obvious, run `skill-router skill search <name-or-query>`.
 3. Load only the best matching skill needed for the current task.
 
-`manus skill <name>` remains a legacy alias for clients that have not moved to `skill-router`.
-
+Historical command aliases are not installed by default. Use `skill-router skill <name>`.

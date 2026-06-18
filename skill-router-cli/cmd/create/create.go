@@ -110,7 +110,7 @@ var projectCmd = &cobra.Command{
 		os.WriteFile(filepath.Join(name, "AGENTS.md"), []byte(agentsMD), 0644)
 
 		// Create platform dirs
-		platforms := []string{".claude", ".manus", ".codex", ".cursor"}
+		platforms := []string{".claude", ".codex", ".cursor"}
 		for _, p := range platforms {
 			os.MkdirAll(filepath.Join(name, p), 0755)
 			os.WriteFile(filepath.Join(name, p, "instructions.md"), []byte(agentsMD), 0644)

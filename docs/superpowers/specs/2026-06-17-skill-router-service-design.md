@@ -22,7 +22,7 @@ Provide one coherent surface for the four skill-router operations — **route**,
 - **Does not exist:** `compose`.
 - The `mcp` command (`cmd/mcp/mcp.go`) is a **bridge process manager** (starts/stops PowerShell MCP bridges); it is *not* an MCP protocol server. `go.mod` has no MCP SDK.
 - **Physical-copy adapters:** `platform.AgentRootSpecs()` enumerates ~30 known agent skill roots (`.claude/skills`, `.codex/skills`, `.manus/skills`, `.gemini/skills`, …). `skillsync.Propagate` (via `skill-router sync`) copies the **single** default wrapper skill `universal-ai-skills` into the `DefaultSync` subset of those roots. Full-corpus copy is opt-in (`--full-copy`).
-- **Invariants:** compatibility aliases (`MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` env aliases, `.manus/skills` root, byte-identical parity test) and single registry (`manifest.json` canonical source, CI drift guard).
+- **Invariants:** compatibility env aliases (`MANUS_SKILLS_DIR` / `MANUS_REPO_DIR`) remain explicit opt-in overrides, `.manus/skills` is report-only, and the single registry (`manifest.json` canonical source, CI drift guard) remains authoritative.
 
 ## 3. Architecture — one engine, two entry points
 
@@ -104,7 +104,7 @@ Today only one wrapper skill is physically copied into the `DefaultSync` roots. 
 1. **Keep `sync` functional** but emit a **deprecation notice**: agents should invoke `skill-router` directly (CLI) or configure the MCP server (`serve`) rather than receive physical copies. No behavior removed in this phase.
 2. **Report:** extend `sync --check` (and/or `doctor`) to list which roots still rely on physical copies vs. which are wired to the CLI/MCP surface (read-only matrix; no mutation).
 3. **Document:** new `docs/ADAPTER_DEPRECATION.md` with per-adapter migration (CLI invocation or MCP server config), and a timeline note that physical-copy propagation is deprecated and slated for removal in a later phase.
-4. **Invariants held:** compatibility aliases (`MANUS_*` env + `.manus` root + parity test) and single registry (`manifest.json` + CI drift guard) are untouched.
+4. **Invariants held:** `MANUS_*` env overrides remain opt-in compatibility, `.manus` is report-only, and the single registry (`manifest.json` + CI drift guard) is untouched.
 
 ## 8. Testing & compliance
 

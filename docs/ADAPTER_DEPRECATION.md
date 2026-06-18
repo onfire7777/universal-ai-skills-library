@@ -77,7 +77,7 @@ compact router pointer or an MCP connector instead.
 | `agent-skills-standard` | Agent Skills open-standard root | skill-root | report-only | `~/.agents/skills` | `skill-router serve` (MCP) or direct CLI |
 | `claude` | Claude Code / Claude Skills | skill-root | default | `~/.claude/skills` | `skill-router serve` (MCP) or direct CLI |
 | `codex` | OpenAI Codex | skill-root | default | `~/.codex/skills` | `skill-router serve` (MCP) or direct CLI |
-| `legacy-compatibility` | Legacy compatibility root | skill-root | default | `~/.manus/skills` | `skill-router serve` (MCP) or direct CLI |
+| `legacy-compatibility` | Legacy compatibility root | skill-root | report-only / opt-in | `~/.manus/skills` | `skill-router serve` (MCP) or direct CLI |
 | `gemini` | Gemini CLI | skill-root | default | `~/.gemini/skills` | `skill-router serve` (MCP) or direct CLI |
 | `cursor` | Cursor | skill-root | default | `~/.cursor/skills` | `skill-router serve` (MCP) or direct CLI |
 | `opencode` | OpenCode | skill-root | default | `~/.config/opencode/skills` | `skill-router serve` (MCP) or direct CLI |
@@ -115,8 +115,9 @@ compact router pointer or an MCP connector instead.
 These invariants are **not** part of this deprecation and remain intact:
 
 - **Compatibility aliases.** `MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` environment
-  variables, the `~/.manus/skills` root, and byte-identical alias parity
-  behavior are untouched.
+  variables and the `~/.manus/skills` root remain as explicit opt-in
+  compatibility surfaces. The packaged binary and generated active command
+  contract are universal-first: `skill-router`.
 - **The single registry.** `manifest.json` remains the one canonical source of
   truth for the skill corpus; marketplace JSON artifacts are retired and guarded
   against reappearing. This deprecation is about *propagation* of the wrapper
@@ -128,5 +129,6 @@ These invariants are **not** part of this deprecation and remain intact:
   deprecation notice on every real copy and ships a read-only `sync --check`
   adapter-status report plus this migration guide.
 - **Later phase:** physical-copy propagation may be removed once clients have
-migrated to direct CLI calls or the `serve` MCP server. Compatibility aliases and
-  single `manifest.json` registry survive that removal.
+  migrated to direct CLI calls or the `serve` MCP server. Historical aliases
+  remain lookup metadata only; the single `manifest.json` registry survives that
+  removal.

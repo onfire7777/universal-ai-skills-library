@@ -656,7 +656,7 @@ def main():
     parser.add_argument("skill", help="Skill name or path to skill directory")
     parser.add_argument("--fix", action="store_true", help="Auto-apply fixes after analysis")
     parser.add_argument("--deep", action="store_true", help="Extended deep analysis mode")
-    parser.add_argument("--model", choices=["both", "claude", "fast", "manus"], default="both",
+    parser.add_argument("--model", choices=["both", "claude", "fast"], default="both",
                         help="Which model(s) to use (default: both)")
     parser.add_argument("--output", default=None, help="Output report path")
     args = parser.parse_args()
@@ -700,7 +700,7 @@ def main():
             futures = {}
             if args.model in ("both", "claude"):
                 futures["claude"] = pool.submit(query_claude, payload, args.deep)
-            if args.model in ("both", "fast", "manus"):
+            if args.model in ("both", "fast"):
                 futures["fast"] = pool.submit(query_fast_model, payload, args.deep)
 
             for name, future in futures.items():
@@ -715,7 +715,7 @@ def main():
     else:
         if args.model == "claude":
             claude_result = query_claude(payload, args.deep)
-        elif args.model in ("fast", "manus"):
+        elif args.model == "fast":
             fast_result = query_fast_model(payload, args.deep)
 
     print()

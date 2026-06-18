@@ -133,16 +133,13 @@ test("every skills/ directory with a SKILL.md is indexed (no unindexed top dirs)
   assert.equal(indexed.size, onDisk.length, "indexed count equals on-disk count");
 });
 
-test("compatibility aliases are preserved in generic fields", () => {
+test("historical binary aliases are retired from generated active contracts", () => {
   for (const optimize of [false, true]) {
     const m = buildManifest(config, skills, { optimize });
     assert.ok(Array.isArray(m.routing.compatibility_access), "routing.compatibility_access");
-    assert.ok(
-      m.routing.compatibility_access.includes("manus skill <name>"),
-      "routing compatibility command alias"
-    );
+    assert.deepEqual(m.routing.compatibility_access, [], "routing compatibility command aliases");
     const b = buildBuildManifest(config, skills, { optimize });
-    assert.deepEqual(b.compatibility_binary_aliases, ["manus"], "compatibility_binary_aliases");
+    assert.deepEqual(b.compatibility_binary_aliases, [], "compatibility_binary_aliases");
   }
 });
 

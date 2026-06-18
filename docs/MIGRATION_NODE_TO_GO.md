@@ -76,8 +76,8 @@ if retired marketplace files reappear.
 
 ## 3. Command mapping (Node flag → Go flag)
 
-The Go command mirrors the Node CLI surface 1:1. Binary is `skill-router`
-with declared compatibility aliases — see invariants.
+The Go command mirrors the Node CLI surface 1:1. Binary is `skill-router`;
+historical binary aliases are no longer packaged by default.
 
 | Intent | Node (today, authoritative) | Go (Track A, target) |
 |--------|------------------------------|----------------------|
@@ -259,10 +259,9 @@ Because Node is retained through Stage 4, rollback is cheap until Stage 5:
 These are hard invariants from `docs/ARCHITECTURE_IMPROVEMENT_PLAN.md` §6 and
 `STRUCTURE.md` §5. Breaking any of them is `CHANGES_REQUESTED`:
 
-- **Compatibility aliases.** `manifest.routing.compatibility_access[]` must retain
-  existing command aliases, and `docs/build_manifest.json` must keep
-  `compatibility_binary_aliases[]`. The primary binary `skill-router` **and**
-  compatibility aliases must both keep working. The Go generator must emit these exactly.
+- **Universal binary surface.** `manifest.routing.compatibility_access[]` and
+  `docs/build_manifest.json.compatibility_binary_aliases[]` remain schema fields,
+  but default builds keep them empty. The primary binary is `skill-router`.
 - **Exactly one authoritative registry.** `manifest.json` is the single contract.
   The Go generator must not introduce a second registry, and the router reads no
   second registry.
@@ -299,7 +298,7 @@ their Node counterparts before cut-over.
 **Q: `build_manifest.json` differs only by a timestamp — is that a parity fail?**
 Provenance fields like `generated_at` are expected to differ. The harness
 normalizes/pins them before diffing. A difference in any *content* field
-(counts, paths, alias data, `compatibility_binary_aliases`) **is** a fail.
+(counts, paths, alias metadata, `compatibility_binary_aliases`) **is** a fail.
 
 **Q: Does this change the manifest the router reads?**
 No. The contract (`manifest.json`) shape is unchanged. This migration only
@@ -312,7 +311,7 @@ scoped to the four artifacts the Node generator emits today. See
 `docs/ARCHITECTURE_IMPROVEMENT_PLAN.md` §3.3 and `docs/PHASE_STATUS.md`.
 
 **Q: Where do binaries come from for users?**
-Binary packaging (goreleaser, install scripts, compatibility aliases) is Track B.
+Binary packaging (goreleaser and install scripts) is Track B.
 See `docs/DISTRIBUTION_STRATEGY.md`.
 
 ---

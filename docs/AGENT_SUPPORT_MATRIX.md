@@ -50,7 +50,7 @@ The matrix reports:
 | Agent Skills open-standard root | `skill-root` | `~/.agents/skills` | installed-wrapper | Shared location used by OpenCode and OpenHands-style clients when configured; wrapper-only when the root exists. |
 | Claude Code / Claude Skills | `skill-root` | `~/.claude/skills` | default | Wrapper root plus Claude plugin support. |
 | OpenAI Codex | `skill-root` | `~/.codex/skills` and `AGENTS.md` | default | Local wrapper root plus project instructions. |
-| Legacy compatibility root | `skill-root` | `~/.manus/skills` | default | Compatibility root for existing local clients. |
+| Legacy compatibility root | `skill-root` | `~/.manus/skills` | report-only / opt-in | Compatibility root for existing local clients; not updated by default sync. |
 | Gemini CLI | `skill-root` / `repo-instruction` | `~/.gemini/skills`, `GEMINI.md`, `AGENTS.md` | default | Wrapper root and context-file compatibility. |
 | Cursor | `skill-root` / `repo-instruction` | `~/.cursor/skills`, `.cursor/rules`, `AGENTS.md` | default | Project rules remain the preferred Cursor-native surface. |
 | OpenCode | `skill-root` | `~/.config/opencode/skills` | default | Canonical OpenCode skill root. |

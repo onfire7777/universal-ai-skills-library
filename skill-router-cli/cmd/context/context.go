@@ -58,7 +58,7 @@ var showCmd = &cobra.Command{
 
 var createCmd = &cobra.Command{
 	Use:   "create <type> [directory]",
-	Short: "Create a context anchor (agents, universal, claude, codex, legacy-compat)",
+	Short: "Create a context anchor (agents, universal, claude, codex)",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		anchorType := args[0]
@@ -87,12 +87,6 @@ var createCmd = &cobra.Command{
 			path := filepath.Join(instrDir, "instructions.md")
 			template := "# Universal AI Instructions\n\n## Project Context\n\n## Skill Routing\n\nUse `skill-router preflight --json` as an internal precheck and `skill-router skill <name>` for one-skill-on-demand loading.\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
-		case "legacy", "legacy-compat", "manus", "manus-compat":
-			instrDir := filepath.Join(dir, ".manus")
-			os.MkdirAll(instrDir, 0755)
-			path := filepath.Join(instrDir, "instructions.md")
-			template := "# Legacy Compatibility Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
-			return os.WriteFile(path, []byte(template), 0644)
 		case "codex":
 			instrDir := filepath.Join(dir, ".codex")
 			os.MkdirAll(instrDir, 0755)
@@ -100,7 +94,7 @@ var createCmd = &cobra.Command{
 			template := "# Codex Instructions\n\n## Project Context\n\n## Preferences\n\n## Constraints\n"
 			return os.WriteFile(path, []byte(template), 0644)
 		default:
-			return fmt.Errorf("unknown anchor type: %s (valid: agents, universal, claude, codex, legacy-compat)", anchorType)
+			return fmt.Errorf("unknown anchor type: %s (valid: agents, universal, claude, codex)", anchorType)
 		}
 	},
 }
@@ -120,7 +114,7 @@ var propagateCmd = &cobra.Command{
 			return fmt.Errorf("no AGENTS.md found in %s - create one first with 'skill-router context create agents'", dir)
 		}
 
-		platforms := []string{".universal-ai", ".claude", ".manus", ".codex", ".cursor", ".gemini", ".kiro", filepath.Join(".config", "opencode"), ".agent"}
+		platforms := []string{".universal-ai", ".claude", ".codex", ".cursor", ".gemini", ".kiro", filepath.Join(".config", "opencode"), ".agent"}
 		for _, p := range platforms {
 			instrDir := filepath.Join(dir, p)
 			os.MkdirAll(instrDir, 0755)

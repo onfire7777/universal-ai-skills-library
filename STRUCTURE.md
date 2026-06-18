@@ -15,7 +15,7 @@ skills themselves + the registry that indexes them).
 
 | Component | Path | Format | Responsibility | Owner |
 |-----------|------|--------|----------------|-------|
-| **Router** | `skill-router-cli/` | Go | Prompt → skill routing/scoring; CLI UX (binary `skill-router` plus compatibility aliases). Owns **no** skill content. | B2 |
+| **Router** | `skill-router-cli/` | Go | Prompt → skill routing/scoring; CLI UX (binary `skill-router`). Owns **no** skill content. | B2 |
 | **Skills corpus** | `skills/<kebab-name>/` | Markdown + `scripts/`, `references/` | The skills themselves (`SKILL.md`). 1812 skills. Knows nothing about the router. | B3 |
 | **Registry / manifest** | `manifest.json` (root) | JSON | **Single** index of the corpus consumed by the router (name, directory, description, aliases, scripts). | B4 |
 | **Packaging / setup** | `plugin/`, `plugin-codex/`, `ai-setup/`, `infrastructure/` | mixed | Distribution & install (`plugin*`); Python AI stack & agent setup (`ai-setup`); infra (`infrastructure`). | B5 / B6 |
@@ -91,10 +91,10 @@ the contract's *Testing* section.
 
 ## 5. Invariants — MUST NOT break (refactor-only)
 
-- **Compatibility command aliases.** `manifest.routing.compatibility_access[]` and
-  `build_manifest.compatibility_binary_aliases[]` carry legacy command names. The primary
-  binary `skill-router` and existing aliases must keep working, but new workflows use
-  universal naming.
+- **Universal command surface.** `manifest.routing.compatibility_access[]` and
+  `build_manifest.compatibility_binary_aliases[]` remain metadata fields, but new
+  universal-first releases keep them empty unless an explicit migration plan
+  re-enables an opt-in alias. The active binary is `skill-router`.
 - **Single registry.** Exactly one `manifest.json` is authoritative. Historical marketplace
   metadata has already been folded into generated artifacts. The router reads no second
   registry and does not auto-discover old branded repo names.

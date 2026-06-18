@@ -67,7 +67,6 @@ if ($Target) {
         @{ Name = "OpenSkills / .agent"; Path = "$env:USERPROFILE\.agent\skills" },
         @{ Name = "Claude Code"; Path = "$env:USERPROFILE\.claude\skills" },
         @{ Name = "Codex"; Path = "$env:USERPROFILE\.codex\skills" },
-        @{ Name = "Legacy compatibility root"; Path = "$env:USERPROFILE\.manus\skills" },
         @{ Name = "Gemini CLI"; Path = "$env:USERPROFILE\.gemini\skills" },
         @{ Name = "Cursor"; Path = "$env:USERPROFILE\.cursor\skills" },
         @{ Name = "OpenCode"; Path = "$env:USERPROFILE\.config\opencode\skills" },

@@ -46,6 +46,9 @@ func TestBuildMatrixIncludesReportOnlyRoots(t *testing.T) {
 	if byID["paperclip"].Adapter != "skill-root" {
 		t.Fatalf("expected Paperclip wrapper to use skill-root mode")
 	}
+	if byID["legacy-compatibility"].DefaultSync {
+		t.Fatalf("expected legacy Manus compatibility root to be opt-in/report-only")
+	}
 }
 
 func TestClassifyMode(t *testing.T) {

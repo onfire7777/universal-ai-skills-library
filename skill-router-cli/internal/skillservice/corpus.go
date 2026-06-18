@@ -91,12 +91,6 @@ func findSkillMarkdown(name string) (string, error) {
 		filepath.Join(platform.SkillsDir(), name, "SKILL.md"),
 		filepath.Join(platform.RepoDir(), name, "SKILL.md"),
 	}
-	if key == "manus-config" {
-		candidates = append([]string{
-			filepath.Join(repoSkillsDir(), "universal-ai-config", "SKILL.md"),
-			filepath.Join(platform.SkillsDir(), "universal-ai-config", "SKILL.md"),
-		}, candidates...)
-	}
 	for _, candidate := range candidates {
 		if _, err := os.Stat(candidate); err == nil {
 			return candidate, nil

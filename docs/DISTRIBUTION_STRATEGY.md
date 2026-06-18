@@ -69,18 +69,15 @@ Each release includes:
 - a `checksums.txt` (SHA-256) covering every archive,
 - archives published to **GitHub Releases**.
 
-### 2.3 Compatibility aliases in packaging
+### 2.3 Universal binary in packaging
 
-Compatibility aliases are a **hard invariant** (plan §6; `STRUCTURE.md` §5;
-`build_manifest.json.compatibility_binary_aliases[]`). Packaging must ship them:
+The packaged command surface is universal-first:
 
-- Provide `manus` as a second entry point that invokes the same binary (a
-  symlink/hardlink to `skill-router`, a `manus` wrapper, or goreleaser's extra
-  binary-name mechanism). On Windows, ship `manus.exe` alongside
-  `skill-router.exe`.
-- `install.sh` / `install.ps1` must create/verify the `manus` alias as part of
-  install, and `doctor` should check it resolves.
-- Never ship a binary that drops declared compatibility aliases.
+- Ship `skill-router` as the only default binary (`skill-router.exe` on Windows).
+- Keep `build_manifest.json.compatibility_binary_aliases[]` as metadata, but it
+  should be empty for default releases.
+- Historical aliases must be explicit opt-in migration targets, not automatic
+  install artifacts.
 
 ### 2.4 Install scripts (target)
 

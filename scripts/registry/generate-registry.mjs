@@ -47,8 +47,8 @@
  *              - counts recomputed from the live tree (kills the 1812/1811 drift)
  *
  * Invariants preserved in BOTH modes (breaking these is CHANGES_REQUESTED):
- *   - manifest.routing.compatibility_access records legacy command aliases
- *   - build_manifest.compatibility_binary_aliases records legacy binary names
+ *   - manifest.routing.compatibility_access records opt-in command aliases
+ *   - build_manifest.compatibility_binary_aliases records opt-in binary aliases
  *   - merged_legacy_directories / disabled_colliding_aliases / compatibility_policy
  */
 import fs from "node:fs";
