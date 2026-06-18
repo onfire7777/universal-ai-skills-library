@@ -8,7 +8,7 @@ import (
 
 // frontmatter.go is a byte-faithful Go port of scripts/registry/lib/frontmatter.mjs.
 // It MUST reproduce that reader's normalization exactly, because ~1,804 of the
-// 1,812 skill descriptions in manifest.json come straight from SKILL.md front
+// Skill descriptions in manifest.json come straight from SKILL.md front
 // matter — any divergence breaks byte-parity with the Node generator.
 
 // jsWhitespace matches the exact set JavaScript's \s matches (used by the Node

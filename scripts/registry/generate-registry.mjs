@@ -44,7 +44,7 @@
  *              - build_manifest slimmed to provenance only (drops the duplicated
  *                ~750KB catalog; nothing consumes its skills[])
  *              - build_manifest paths made portable (relative, not %USERPROFILE%)
- *              - counts recomputed from the live tree (kills the 1812/1811 drift)
+ *              - counts recomputed from the live tree (kills historical count drift)
  *
  * Invariants preserved in BOTH modes (breaking these is CHANGES_REQUESTED):
  *   - manifest.routing.compatibility_access records opt-in command aliases
@@ -74,10 +74,13 @@ export const STALE_REGISTRIES = [
 ];
 export const STALE_MARKETPLACE_PATHS = [
   ...STALE_REGISTRIES,
-  "manus-skills-marketplace",
-  "manus-skills-organized",
-  "mana-skills-marketplace",
-  "mana-skills-organized",
+];
+
+// Generic retired clone-root markers keep the guard without preserving old
+// provider branding in the universal codebase.
+export const STALE_MARKETPLACE_ROOT_MARKERS = [
+  "skills-marketplace",
+  "skills-organized",
 ];
 
 // ---------------------------------------------------------------------------
@@ -86,6 +89,18 @@ export const STALE_MARKETPLACE_PATHS = [
 // ---------------------------------------------------------------------------
 export function serialize(obj) {
   return JSON.stringify(obj, null, 2) + "\n";
+}
+
+export function retiredMarketplaceCloneRoots(root = REPO_ROOT) {
+  return fs
+    .readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => {
+      const lower = name.toLowerCase();
+      return STALE_MARKETPLACE_ROOT_MARKERS.some((marker) => lower.includes(marker));
+    })
+    .sort();
 }
 
 // ---------------------------------------------------------------------------
@@ -368,6 +383,15 @@ function main() {
     } else {
       console.log(`ok: ${rel} absent (collapsed)`);
     }
+  }
+  const staleRoots = retiredMarketplaceCloneRoots();
+  if (staleRoots.length) {
+    for (const rel of staleRoots) {
+      console.error(`DRIFT: ${rel} is a retired marketplace clone root — delete it`);
+      drift++;
+    }
+  } else {
+    console.log("ok: retired marketplace clone roots absent (collapsed)");
   }
   if (drift > 0) {
     console.error(`\n${drift} registry artifact(s) drifted. Run: node scripts/registry/generate-registry.mjs --write`);

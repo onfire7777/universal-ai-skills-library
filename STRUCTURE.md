@@ -16,7 +16,7 @@ skills themselves + the registry that indexes them).
 | Component | Path | Format | Responsibility | Owner |
 |-----------|------|--------|----------------|-------|
 | **Router** | `skill-router-cli/` | Go | Prompt → skill routing/scoring; CLI UX (binary `skill-router`). Owns **no** skill content. | B2 |
-| **Skills corpus** | `skills/<kebab-name>/` | Markdown + `scripts/`, `references/` | The skills themselves (`SKILL.md`). 1812 skills. Knows nothing about the router. | B3 |
+| **Skills corpus** | `skills/<kebab-name>/` | Markdown + `scripts/`, `references/` | The skills themselves (`SKILL.md`). Count is generated from the live tree. Knows nothing about the router. | B3 |
 | **Registry / manifest** | `manifest.json` (root) | JSON | **Single** index of the corpus consumed by the router (name, directory, description, aliases, scripts). | B4 |
 | **Packaging / setup** | `plugin/`, `plugin-codex/`, `ai-setup/`, `infrastructure/` | mixed | Distribution & install (`plugin*`); Python AI stack & agent setup (`ai-setup`); infra (`infrastructure`). | B5 / B6 |
 | **Docs** | `docs/` | md + `build_manifest.json` | Architecture & build metadata. | B5 |
@@ -36,7 +36,7 @@ into the single registry.
 
 ```
 universal-ai-skills-library/
-├── manifest.json          # REGISTRY — single source of truth (v2.2.8; 1812 skills, 1917 aliases)
+├── manifest.json          # REGISTRY — single source of truth (v2.2.8; generated skill/alias counts)
 ├── schemas/               # SKILL.md frontmatter contract (skill.schema.json) — Phase 0
 ├── skill-router-cli/      # ROUTER (Go module)
 │   ├── cmd/               # cobra subcommands

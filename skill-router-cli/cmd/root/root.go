@@ -54,8 +54,8 @@ var rootCmd = &cobra.Command{
 syncing compact agent adapters, validating the skill corpus, and managing the
 optional local Universal AI Stack.
 
-The router keeps 1,812 canonical skills in one repository and loads a single
-matching skill only when a real user prompt needs it. It can also index local
+The router keeps the canonical skill corpus in one repository and loads a
+single matching skill only when a real user prompt needs it. It can also index local
 external skill roots read-only, validate manifests, sync wrapper instructions,
 check optional MCP bridges, and expose local AI stack health.`,
 	Version: Version,

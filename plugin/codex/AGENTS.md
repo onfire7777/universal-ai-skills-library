@@ -14,4 +14,4 @@ Run preflight only for real user prompts. Do not route from lifecycle hooks, ass
 
 If the route clearly matches the user's core task, object, and action, load exactly one skill through `skill-router skill <name>`. If it is weak, generic, ambiguous, or only matches words like "issue", "install", "setup", "local", "AI", or "skill", continue without loading a skill.
 
-Keep preflight internal and quiet. Do not use host-native skill tools for router-selected universal skills. Do not preload or duplicate the full 1,812-skill corpus.
+Keep preflight internal and quiet. Do not use host-native skill tools for router-selected universal skills. Do not preload or duplicate the full canonical skill corpus.

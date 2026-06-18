@@ -50,6 +50,13 @@ func TestStaleMarketplacePathsAbsent(t *testing.T) {
 			t.Fatalf("stat %s: %v", rel, err)
 		}
 	}
+	roots, err := RetiredMarketplaceCloneRoots(root)
+	if err != nil {
+		t.Fatalf("scan retired marketplace clone roots: %v", err)
+	}
+	if len(roots) > 0 {
+		t.Fatalf("retired marketplace clone roots must be deleted: %v", roots)
+	}
 }
 
 // TestStringifyMatchesJSONStringify pins the serializer's format/escaping rules

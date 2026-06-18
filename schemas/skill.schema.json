@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/onfire7777/universal-ai-skills-library/schemas/skill.schema.json",
   "title": "SKILL.md frontmatter contract",
-  "description": "JSON Schema for the YAML frontmatter of every skills/<id>/SKILL.md file. This is the build-time contract referenced by ARCHITECTURE_IMPROVEMENT_PLAN.md §3.2. Phase 0 introduces it in --warn mode: only `name` and `description` are required (the two fields every one of the 1,812 corpus skills already carries and the only two the router reads today). Every other field is OPTIONAL and backfilled incrementally; `additionalProperties` is true so unschema'd skills and existing keys (license, metadata, allowed-tools, …) keep validating unchanged. The validator flips from --warn to --error in a later phase once the corpus is backfilled. NOTHING here changes runtime routing behavior.",
+  "description": "JSON Schema for the YAML frontmatter of every skills/<id>/SKILL.md file. This is the build-time contract referenced by ARCHITECTURE_IMPROVEMENT_PLAN.md §3.2. Phase 0 introduces it in --warn mode: only `name` and `description` are required (the two fields every current corpus skill already carries and the only two the router reads today). Every other field is OPTIONAL and backfilled incrementally; `additionalProperties` is true so unschema'd skills and existing keys (license, metadata, allowed-tools, …) keep validating unchanged. The validator flips from --warn to --error in a later phase once the corpus is backfilled. NOTHING here changes runtime routing behavior.",
   "type": "object",
   "required": ["name", "description"],
   "additionalProperties": true,

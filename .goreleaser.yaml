@@ -83,7 +83,7 @@ homebrew_casks:
       owner: onfire7777
       name: homebrew-tap
     homepage: "https://github.com/onfire7777/universal-ai-skills-library"
-    description: "Universal AI skills router — search, preflight-route, and load 1,812 skills on demand"
+    description: "Universal AI skills router — search, preflight-route, and load skills on demand"
     skip_upload: auto
 
 release:

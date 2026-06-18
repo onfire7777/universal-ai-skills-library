@@ -10,7 +10,7 @@ JSON Schema (draft 2020-12) for the YAML frontmatter of every
 `skills/<id>/SKILL.md`. It is the documented contract that Phase 1+ consumers
 (the Go `registry build`, editors, future validators) can share.
 
-**Required today:** only `name` and `description` — the two fields all 1,812
+**Required today:** only `name` and `description` — the two fields all current
 corpus skills already carry and the only two the router reads. Everything else
 (`version`, `domain`, `tags`, `triggers`, `capabilities`, `requires`,
 `quality_tier`, `supersedes`, `conflicts`, `aliases`) is **optional** and

@@ -59,7 +59,7 @@ After install:
   skill-router skills validate-manifest
 
 Notes:
-  - The normal install does not duplicate the 1,812-skill corpus.
+  - The normal install does not duplicate the canonical skill corpus.
   - AI clients should load skills on demand through skill-router.
   - Windows users should prefer ./install.ps1 for the full local AI stack.
 USAGE

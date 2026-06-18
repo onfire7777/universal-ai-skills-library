@@ -1,8 +1,7 @@
 # Registry generator — single source of truth
 
 This directory unifies what used to be **multiple hand-maintained registries**
-(which drifted: `manifest.json` listed 1,812 skills while
-`docs/build_manifest.json` listed 1,811) into **one source → CLI-first generated
+(which drifted across skill counts) into **one source → CLI-first generated
 artifacts**.
 
 ```
@@ -79,7 +78,7 @@ and validates it with `validate-manifest`. The generator therefore guarantees:
   not reproducible from the catalog; it is now the actual alias-string count).
 - `scripts[]` are emitted in the canonical sorted order the Go validator expects.
 - `marketplace.json`, `.agents/plugins/marketplace.json`,
-  `plugin/marketplace.json`, `manus-skills-marketplace`, and
-  `manus-skills-organized` style clone roots are retired. The router is
-  CLI-first; `--check` lists them under `STALE_MARKETPLACE_PATHS` and fails if
-  any reappears.
+  `plugin/marketplace.json`, and top-level `*-skills-marketplace` /
+  `*-skills-organized` style clone roots are retired. The router is CLI-first;
+  `--check` lists file artifacts under `STALE_MARKETPLACE_PATHS`, scans clone
+  roots generically, and fails if any reappears.

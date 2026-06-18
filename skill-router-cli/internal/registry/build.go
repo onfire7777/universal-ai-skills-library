@@ -29,12 +29,14 @@ var StaleRegistries = []string{
 
 // StaleMarketplacePaths are retired marketplace registries and clone roots that
 // must never reappear; --check fails if any are present.
-var StaleMarketplacePaths = append(append([]string{}, StaleRegistries...),
-	"manus-skills-marketplace",
-	"manus-skills-organized",
-	"mana-skills-marketplace",
-	"mana-skills-organized",
-)
+var StaleMarketplacePaths = append([]string{}, StaleRegistries...)
+
+// StaleMarketplaceRootMarkers identify retired top-level marketplace clone
+// roots without preserving old provider branding in the universal codebase.
+var StaleMarketplaceRootMarkers = []string{
+	"skills-marketplace",
+	"skills-organized",
+}
 
 // Skill is a scanned skill catalog entry.
 type Skill struct {
@@ -449,10 +451,47 @@ func RunCheck(repoRoot string, built map[string]*OM, selected []string, out, err
 			fmt.Fprintf(out, "ok: %s absent (collapsed)\n", rel)
 		}
 	}
+	staleRoots, err := RetiredMarketplaceCloneRoots(repoRoot)
+	if err != nil {
+		fmt.Fprintf(errw, "DRIFT: could not scan retired marketplace clone roots: %v\n", err)
+		drift++
+	} else if len(staleRoots) > 0 {
+		for _, rel := range staleRoots {
+			fmt.Fprintf(errw, "DRIFT: %s is a retired marketplace clone root — delete it\n", rel)
+			drift++
+		}
+	} else {
+		fmt.Fprintln(out, "ok: retired marketplace clone roots absent (collapsed)")
+	}
 	if drift > 0 {
 		fmt.Fprintf(errw, "\n%d registry artifact(s) drifted. Run: skill-router registry build --write\n", drift)
 		return ErrDrift
 	}
 	fmt.Fprintf(out, "\nall %d registry artifact(s) in sync\n", len(selected))
 	return nil
+}
+
+// RetiredMarketplaceCloneRoots returns top-level clone roots that match retired
+// marketplace naming patterns. The check is intentionally generic so the
+// universal codebase does not need to retain old ecosystem names.
+func RetiredMarketplaceCloneRoots(repoRoot string) ([]string, error) {
+	entries, err := os.ReadDir(repoRoot)
+	if err != nil {
+		return nil, err
+	}
+	var stale []string
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		name := strings.ToLower(entry.Name())
+		for _, marker := range StaleMarketplaceRootMarkers {
+			if strings.Contains(name, marker) {
+				stale = append(stale, entry.Name())
+				break
+			}
+		}
+	}
+	sort.Strings(stale)
+	return stale, nil
 }

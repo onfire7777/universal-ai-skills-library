@@ -7,7 +7,7 @@
  *                     single line (block scalars are folded with single spaces)
  *
  * This reader reproduces that exact normalization so the generated manifest is
- * byte-identical to the hand-authored one for the 1,770/1,812 skills whose
+ * byte-identical to the hand-authored one for the existing skills whose
  * descriptions are pure front-matter. The remaining curated descriptions are
  * supplied as overrides by the generator (see registry.config.json).
  *

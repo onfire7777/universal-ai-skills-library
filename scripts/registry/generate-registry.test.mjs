@@ -18,6 +18,7 @@ import {
   CONFIG_PATH,
   STALE_MARKETPLACE_PATHS,
   serialize,
+  retiredMarketplaceCloneRoots,
   listSkillScripts,
   scanSkills,
   buildManifest,
@@ -180,6 +181,11 @@ test("collapsed stale marketplace paths do not exist on disk", () => {
       `${rel} is a retired marketplace path and must be deleted`
     );
   }
+  assert.deepEqual(
+    retiredMarketplaceCloneRoots(),
+    [],
+    "retired marketplace clone roots must be deleted"
+  );
 });
 
 test("normalizeForCompare treats scripts[] order as insignificant", () => {

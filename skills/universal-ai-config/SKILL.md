@@ -54,7 +54,6 @@ Keep these compact:
 - `%USERPROFILE%\.cursor\rules\openskills.md`
 - `%USERPROFILE%\.gemini\GEMINI.md`
 - `%USERPROFILE%\.config\opencode\AGENTS.md`
-- `%USERPROFILE%\.manus\MANUS_LOCAL_INTEGRATION.md`
 
 Minimum rule:
 
