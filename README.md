@@ -10,14 +10,14 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0f172a"></a>
-  <img alt="Skills: 1,813" src="https://img.shields.io/badge/skills-1,813-2563eb">
+  <img alt="Skills: 1,812" src="https://img.shields.io/badge/skills-1,812-2563eb">
   <img alt="Router-first" src="https://img.shields.io/badge/architecture-router--first-0891b2">
   <img alt="Public safe" src="https://img.shields.io/badge/release-public--safe-059669">
 </p>
 
 Universal AI Skills Library is a router-first skill system for local and CLI AI
 tools. It lets Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, Kimi, Qwen,
-Gemini, OpenHands, and other agents search, preflight-route, and load 1,813
+Gemini, OpenHands, and other agents search, preflight-route, and load 1,812
 skills on demand from one shared corpus without copying thousands of files into
 every client.
 
@@ -38,7 +38,7 @@ prompt needs a matching skill.
 
 ## What It Provides
 
-- 1,813 canonical skills in `skills/`
+- 1,812 canonical skills in `skills/`
 - `skill-router`, a Go CLI for search, preflight routing, validation, and skill
   loading — **decoupled from the corpus**: it resolves skills only through the
   generated manifest interface via env/config-driven paths, with no hardcoded
@@ -70,7 +70,7 @@ Three layers with a clean separation of concerns:
    generated manifest and a config/env-driven path resolver
    (`SKILL_ROUTER_REPO_DIR`, `SKILL_ROUTER_SKILLS_DIR`, `SKILL_ROUTER_MANIFEST`,
    …), so the router and the library evolve independently.
-2. **Corpus** — `skills/`, the single source-of-truth set of 1,813 canonical
+2. **Corpus** — `skills/`, the single source-of-truth set of 1,812 canonical
    skill directories.
 3. **Registry** — generated from the corpus by `scripts/registry/`. One
    generator emits the CLI-first registry artifacts (`manifest.json`,

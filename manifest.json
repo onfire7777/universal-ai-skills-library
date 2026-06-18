@@ -1,7 +1,7 @@
 {
   "version": "2.2.8",
   "generated": "2026-05-15",
-  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,813-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,812-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
   "core_skills": [
     {
@@ -6394,11 +6394,6 @@
       "description": "Comprehensive guide for Manim Community - Python framework for creating mathematical animations and educational videos with programmatic control"
     },
     {
-      "name": "manus-api",
-      "directory": "skills/manus-api",
-      "description": "Manus API compatibility adapter. Manage tasks, projects, and other data in Manus via API, or create Manus tasks programmatically when a workflow specifically needs Manus-hosted agentic capabilities."
-    },
-    {
       "name": "many-chat-automation",
       "directory": "skills/many-chat-automation",
       "description": "Automate ManyChat tasks via Rube MCP (Composio): chatbot flows, subscribers, broadcasts, and messenger automation. Always search tools first for current schemas.",
@@ -10854,7 +10849,7 @@
       "description": "Automate Zyte API tasks via Rube MCP (Composio). Always search tools first for current schemas."
     }
   ],
-  "total_skills": 1813,
+  "total_skills": 1812,
   "alias_count": 214,
   "routing": {
     "primary_access": "skill-router skill <name>",

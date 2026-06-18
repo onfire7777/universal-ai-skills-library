@@ -15,7 +15,7 @@ skill-router skill search <query>
 skill-router skill <name>
 ```
 
-Use this for most agents. It keeps always-loaded context small and avoids copying 1,813 canonical skills into every client.
+Use this for most agents. It keeps always-loaded context small and avoids copying 1,812 canonical skills into every client.
 
 ## 2. Selected-skill install — explicit
 

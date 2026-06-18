@@ -57,6 +57,7 @@ class MigrationEndStateContractsTest(unittest.TestCase):
             if path.is_dir()
         }
         cli_safe_name = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+        retired_branding = re.compile(r"(^|[-_])(mana|manus)([-_]|$)", re.IGNORECASE)
         offenders: list[str] = []
 
         for directory in sorted(canonical_dirs - set(manifest_by_directory)):
@@ -70,6 +71,8 @@ class MigrationEndStateContractsTest(unittest.TestCase):
                 offenders.append(f"{name}: directory basename mismatch: {directory}")
             if not cli_safe_name.fullmatch(name):
                 offenders.append(f"{name}: not CLI-safe kebab-case")
+            if retired_branding.search(name):
+                offenders.append(f"{name}: retired provider branding in canonical skill id")
 
         nested_skill_files = [
             path.relative_to(ROOT).as_posix()

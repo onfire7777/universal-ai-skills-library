@@ -7,7 +7,7 @@
     "total": 1812
   },
   "validate_manifest_ok": true,
-  "fingerprint_sha256": "9cb28ff6b3a93e26bfd331e31f9c06cb6d9fc26b846993b7d372007c6f035c2d",
+  "fingerprint_sha256": "c477155db45006e29d4124cf6f8400a46e277bad05ee137e2262404c104c6b41",
   "skills": [
     [
       "21risk-automation",
@@ -4042,10 +4042,6 @@
       "skills/manim"
     ],
     [
-      "manus-api",
-      "skills/manus-api"
-    ],
-    [
       "many-chat-automation",
       "skills/many-chat-automation"
     ],
@@ -5056,6 +5052,10 @@
     [
       "prototyping-pretotyping",
       "skills/prototyping-pretotyping"
+    ],
+    [
+      "provider-api",
+      "skills/provider-api"
     ],
     [
       "proxiedmail-automation",

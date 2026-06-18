@@ -145,7 +145,7 @@ Safety defaults:
 
 ## Cross-Agent Skill Access
 
-Every local AI client gets compact router instructions and, where supported, one wrapper skill. The full 1,813-skill corpus remains in this repo and is loaded on demand:
+Every local AI client gets compact router instructions and, where supported, one wrapper skill. The full 1,812-skill corpus remains in this repo and is loaded on demand:
 
 ```powershell
 skill-router preflight --json "<latest user prompt>"

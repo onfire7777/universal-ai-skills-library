@@ -5,8 +5,8 @@
   "router_source": "skill-router-cli",
   "primary_binary": "skill-router",
   "compatibility_binary_aliases": [],
-  "skill_count": 1813,
-  "directories_total": 1813,
+  "skill_count": 1812,
+  "directories_total": 1812,
   "missing_skill_md": [],
   "alias_count": 214,
   "merged_legacy_directories": [

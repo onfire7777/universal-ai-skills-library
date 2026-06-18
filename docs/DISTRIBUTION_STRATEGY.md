@@ -40,8 +40,8 @@ corpus, and the corpus knows nothing about the router. The **registry
 | **Owner concept** | Router (Go module) | Skills corpus + registry |
 
 The binary is small and changes on its own cadence. The corpus is large
-(1813 skills) and changes constantly. Decoupling them means a user can update the
-tool without re-downloading 1813 skills, and (Phase 5) pull only the skills they
+(1812 skills) and changes constantly. Decoupling them means a user can update the
+tool without re-downloading 1812 skills, and (Phase 5) pull only the skills they
 need without cloning the whole repo.
 
 ---
@@ -131,7 +131,7 @@ The packaged command surface is universal-first:
 Users get the skills by cloning/installing the repository. The corpus lives in
 `skills/<kebab-name>/SKILL.md` (+ `scripts/`, `references/`), and `manifest.json`
 is the single index the router consumes. Packaging lives in `plugin/`,
-`plugin-codex/`, and `ai-setup/`. This is coarse-grained: you take all 1813
+`plugin-codex/`, and `ai-setup/`. This is coarse-grained: you take all 1812
 skills or none.
 
 ### 3.2 Future: per-skill signed packages (Phase 5)
@@ -184,7 +184,7 @@ MIGRATION_NODE_TO_GO.md).                                          PHASE_5_DISTR
 
 Together: a user installs one verified `skill-router` binary (Track A + B), and
 (eventually) pulls only the skills they need from a signed index (Phase 5),
-without cloning a 1813-skill repo.
+without cloning a 1812-skill repo.
 
 ---
 

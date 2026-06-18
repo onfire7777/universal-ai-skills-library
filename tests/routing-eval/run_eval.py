@@ -51,7 +51,7 @@ RANK_DEPTH = 8  # `preflight --explain` emits up to 8 ranked candidates ("top").
 def eval_env() -> Dict[str, str]:
     """Isolated env that pins the router to the LIVE corpus, deterministically.
 
-    Points the router at the real ``skills/`` tree (so the full 1,813-skill
+    Points the router at the real ``skills/`` tree (so the full 1,812-skill
     corpus is in play) but redirects HOME / USERPROFILE / config to throwaway
     temp dirs so no host-specific *external* skill roots are discovered. Colour
     is disabled for stable text. Mirrors harness.fixture_env() but for the live
