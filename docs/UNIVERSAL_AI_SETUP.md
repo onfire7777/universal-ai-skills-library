@@ -46,6 +46,14 @@ The canonical model registry is:
 ai-setup/runtime/config/model-registry.json
 ```
 
+Inspect it through the CLI:
+
+```bash
+skill-router models list
+skill-router models list --provider openrouter
+skill-router models list --provider openrouter --json
+```
+
 Primary:
 
 - `gpt-5.5`

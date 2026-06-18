@@ -106,6 +106,9 @@ HTTP-routeable models:
 - `kimi-k2.6-thinking` is the primary paid API fallback.
 - `openrouter-auto` is the OpenAI-compatible OpenRouter fallback, exposed only
   when `OPENROUTER_API_KEY` is intentionally configured.
+- `skill-router models list --provider openrouter` reads the canonical registry
+  and shows the exact OpenRouter route, model id, and `OPENROUTER_API_KEY`
+  contract without requiring the key to be set.
 - `qwen3-coder-30b-a3b-q4` is the local final generative fallback.
 - `qwen3-embedding-0.6b-q8` is the local embedding model for GBrain and shared memory search.
 - The local llama.cpp profiles use `--n-gpu-layers 99`, 16k context for coding, 8k server context for embeddings, and one local parallel slot to keep Windows responsive. The coding proxy refuses backend startup below `20GB` free VRAM or `6GB` free RAM, rejects request bodies over `8MB`, and runs `llama-server` below-normal priority.
