@@ -18,6 +18,7 @@ class SkillDeployerCharacterizationTest(unittest.TestCase):
             "scripts/deploy_skills.py": self.read("scripts/deploy_skills.py"),
             "scripts/extract_token.py": self.read("scripts/extract_token.py"),
             "scripts/curate_for_project.py": self.read("scripts/curate_for_project.py"),
+            "references/provider-grpc-web-api.md": self.read("references/provider-grpc-web-api.md"),
         }
         forbidden = [
             "Man" + "us UI compatibility adapter",
@@ -26,11 +27,15 @@ class SkillDeployerCharacterizationTest(unittest.TestCase):
             "Curate skills for Man" + "us projects",
             "Man" + "us AI project",
             "/tmp/man" + "us_token.txt",
+            "https://api.man" + "us.im",
+            "man" + "us.im",
         ]
         for path, body in surfaces.items():
             for term in forbidden:
                 with self.subTest(path=path, term=term):
                     self.assertNotIn(term, body)
+
+        self.assertFalse((SKILL_DEPLOYER / "references" / "manus-api.md").exists())
 
     def test_deploy_script_honors_default_api_base_override(self) -> None:
         body = self.read("scripts/deploy_skills.py")

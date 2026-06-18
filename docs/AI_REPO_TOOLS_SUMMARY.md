@@ -165,7 +165,7 @@ Incorrect behavior that has been fixed:
 ## Current Known Gaps
 
 - Hermes Agent itself reports an upstream update is available, but its source checkout is dirty. Updating it should be done in a separate controlled pass to avoid overwriting or mixing local edits.
-- Some optional API-backed tools report missing keys in the current process, such as OpenRouter, OpenAI, Manus, Exa, Tavily, Firecrawl, or similar optional providers. These do not block local skill routing.
+- Some optional API-backed tools report missing keys in the current process, such as OpenRouter, OpenAI, Exa, Tavily, Firecrawl, or similar optional providers. These do not block local skill routing.
 - MCP bridges are available, but they are optional. The clean default is CLI-first routing and skill loading.
 - Downloaded local model files are not committed to the repo. The installer expects the Qwen3-Coder GGUF and Qwen3-Embedding GGUF paths to be supplied or to exist at the documented defaults.
 

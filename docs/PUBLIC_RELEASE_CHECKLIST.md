@@ -36,7 +36,7 @@ with another user.
   GBrain, and GSkills/GStack are documented and validated without vendoring private
   state
 - command names use `skill-router`; provider-specific integrations are exposed
-  under explicit adapter names such as `manus-api`
+  only as opt-in provider skills and neutral `provider-api` configuration
 - docs describe the actual scripts and runtime paths
 - manifest validates against `skills/`
 - Go tests pass

@@ -47,7 +47,7 @@ User connects their own machine via the hosted provider desktop client. Same too
 
 **Limitations:** machine must stay online during session, AI scope limited to mounted directories
 
-**User action:** Download at [manus.im/desktop](https://manus.im/desktop), install, and connect
+**User action:** Download and connect the hosted provider's desktop client, then mount the project directory for the session.
 
 ### Option C: Third-Party Cloud Services
 

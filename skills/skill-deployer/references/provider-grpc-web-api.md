@@ -1,14 +1,14 @@
-# Manus Project Skills gRPC-web API Reference
+# Hosted Provider Project Skills gRPC-web API Reference
 
 ## Base URL
 
 ```
-https://api.manus.im
+https://provider.example
 ```
 
 ## Authentication
 
-All requests require a JWT session token from the Manus browser session.
+All requests require a JWT session token or API key from the hosted provider browser session.
 
 ```
 Authorization: Bearer <JWT_TOKEN>
@@ -18,7 +18,7 @@ Connect-Protocol-Version: 1
 
 ### Extracting the Token
 
-Run in browser console at `manus.im` (while logged in):
+Run in the provider web app browser console while logged in:
 ```javascript
 document.cookie.split(';').find(c => c.trim().startsWith('session_id=')).split('=').slice(1).join('=')
 ```
@@ -109,9 +109,9 @@ Response: `200 OK` on success.
 
 ## Project UIDs
 
-Get project UIDs by navigating to project settings in the Manus UI:
+Get project UIDs by navigating to project settings in the hosted provider UI:
 ```
-https://manus.im/app/project/<PROJECT_UID>
+/app/project/<PROJECT_UID>
 ```
 
 Or extract from sidebar links via browser console:

@@ -55,14 +55,14 @@ The provider API can be called from the application to create a task for the hos
 - The user prefers not to manage credentials in the application
 
 **How it works:**
-1. The user creates a provider API key at the default provider's [API integration settings](https://manus.im/app?show_settings=integrations&app_name=api)
+1. The user creates a provider API key in the hosted provider's API integration settings
 2. The application calls the provider API to create a task, specifying the required connector IDs
 3. The hosted provider executes the task (including connector access) and returns the results
 4. The application receives the result, optionally validated against a JSON Schema via Structured Output
 
 **Important security note:** A provider API key grants access to all of the user's configured connectors. The application must protect it with the same care as any sensitive credential.
 
-For implementation details and API reference, see the `manus-api` skill.
+For implementation details and CLI usage, see the `provider-api` skill. Use a provider-specific skill only when exact endpoint schemas or proprietary authentication details are required.
 
 ## Decision Guide
 
@@ -80,4 +80,4 @@ For implementation details and API reference, see the `manus-api` skill.
 - **For WebDev:** Use environment variables configured through the WebDev project settings, or implement Option 2 (provider API) for connector access.
 - **For local computers:** Extracted credentials can be stored in the local environment or configuration files.
 
-Refer to the `manus-api` skill for specific endpoints and authentication details when choosing Option 2.
+Refer to `provider-api` for neutral CLI usage, then load the explicit provider-specific skill only when Option 2 requires exact endpoint schemas or authentication details.

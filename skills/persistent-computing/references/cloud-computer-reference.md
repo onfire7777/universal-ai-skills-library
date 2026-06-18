@@ -17,7 +17,7 @@ Monthly billing. All plans include Ubuntu Server 24.04 LTS 64-bit, independent p
 - Storage beyond 10 GB: $1/month per 10 GB (up to 500 GB)
 - Outbound traffic beyond included: $0.15/GB
 
-**Outbound traffic warning:** When the included traffic allowance is exhausted, the cloud computer will be automatically shut down unless the user has both (1) a payment method on file and (2) the "Cloud computers" auto top-up toggle enabled. For any service expected to generate significant outbound traffic (websites, APIs, file downloads), proactively remind the user to enable auto top-up at `https://manus.im/app#settings/usage/computer-${device_id}/manage-budget` to avoid unexpected downtime.
+**Outbound traffic warning:** When the included traffic allowance is exhausted, the cloud computer may be automatically shut down unless the user has both (1) a payment method on file and (2) the provider's cloud-computer auto top-up toggle enabled. For any service expected to generate significant outbound traffic (websites, APIs, file downloads), proactively remind the user to enable provider-side auto top-up for the cloud computer to avoid unexpected downtime.
 
 **Locations:** US East, US West, East Asia, Southeast Asia, West Europe
 
@@ -31,20 +31,20 @@ First determine the attachment state from the system context, then follow exactl
 
 This branch applies when the system context contains no `persistent_vms` block.
 
-Include `https://manus.im/app#settings/my-computer/create` inline in the same reply. In that reply, also remind the user that if they already own a cloud computer, they can attach it via the computer icon below the chat input rather than purchasing a new one.
+Include the hosted provider's cloud-computer creation link or navigation path inline in the same reply. In that reply, also remind the user that if they already own a cloud computer, they can attach it through the provider's computer picker rather than purchasing a new one.
 
 ### Branch B. A cloud computer is attached
 
 This branch applies when the system context contains a `persistent_vms` block. Substitute its identifier into `${device_id}` below.
 
 - If the attached machine has enough resources for the workload, proceed with the task and include no Cloud Computer link.
-- If it is short on disk space, include `https://manus.im/app#settings/my-computer/cloud-${device_id}/expand`. Storage expansion is seamless and requires no reboot; storage can only be expanded, never reduced.
-- If it is short on any other resource (compute, memory, outbound bandwidth, traffic allowance), include `https://manus.im/app#settings/my-computer/cloud-${device_id}/manage`. Tier upgrades require a reboot, take effect immediately, and the user pays the prorated difference; tier downgrades take effect on the next billing cycle.
+- If it is short on disk space, direct the user to the provider's storage-expansion control for the attached cloud computer. Storage expansion is seamless and requires no reboot; storage can only be expanded, never reduced.
+- If it is short on any other resource (compute, memory, outbound bandwidth, traffic allowance), direct the user to the provider's plan-management control for the attached cloud computer. Tier upgrades require a reboot, take effect immediately, and the user pays the prorated difference; tier downgrades take effect on the next billing cycle.
 - If the attached machine is already on the top tier (Advanced) and still cannot meet the workload, do not suggest an upgrade; discuss alternatives with the user instead.
 
 ## Backup & Recovery
 
-Manage at: `https://manus.im/app#settings/my-computer/cloud-${device_id}/backups`
+Manage backups from the hosted provider's cloud-computer backup settings for the attached device.
 
 - **Automatic backup:** daily full-disk snapshots (up to 10 retained)
 - **Manual backup:** user can create additional snapshots from the computer settings page
@@ -64,7 +64,7 @@ The management page introduced in Branch B exposes:
 The cloud computer uses UFW with a restrictive default policy:
 - **Only port 22 (SSH) and ICMP (ping) are open by default**
 - When deploying services, the required ports MUST be opened via `sudo ufw allow <port>`. Never expose unprotected services (no-auth databases, admin panels without passwords) directly to the internet.
-- For web-facing services, configure a domain. The default hosted provider has built-in domain purchasing at [Settings → Purchased Domains](https://manus.im/app#settings/data-controls/purchased-domains). After purchase, guide the user to configure DNS records (A record pointing to the cloud computer's public IP). For HTTPS, use Let's Encrypt (certbot) or RapidSSL.
+- For web-facing services, configure a domain through the provider's domain settings or the user's existing registrar. After purchase or DNS setup, guide the user to configure DNS records (A record pointing to the cloud computer's public IP). For HTTPS, use Let's Encrypt (certbot) or RapidSSL.
 
 ## Important: Service Recovery
 
