@@ -560,6 +560,9 @@ func recommendation(row matrixRow) string {
 	if row.ID == "kimi-openclaw" || row.ID == "openclaw-workspace" {
 		return "do not mutate with generic sync"
 	}
+	if row.ID == "paperclip" && row.Wrapper {
+		return "wrapper installed; configure instructionsFilePath"
+	}
 	if row.LikelyMode == "full-copy" {
 		if row.Wrapper {
 			return "wrapper installed; full copy remains, verify intentional"

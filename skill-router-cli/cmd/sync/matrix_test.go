@@ -87,6 +87,22 @@ func TestRecommendationDoesNotMaskFullCopyWithWrapper(t *testing.T) {
 	}
 }
 
+func TestRecommendationForInstalledPaperclipWrapper(t *testing.T) {
+	row := matrixRow{
+		ID:          "paperclip",
+		Adapter:     "skill-root",
+		Exists:      true,
+		Wrapper:     true,
+		SkillFiles:  1,
+		DefaultSync: false,
+	}
+	row.LikelyMode = classifyMode(row)
+
+	if got, want := recommendation(row), "wrapper installed; configure instructionsFilePath"; got != want {
+		t.Fatalf("recommendation = %q, want %q", got, want)
+	}
+}
+
 func TestCountSkillMarkdown(t *testing.T) {
 	root := t.TempDir()
 	write := func(rel string) {
