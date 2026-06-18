@@ -144,6 +144,58 @@ func TestInstalledWrapperRootsIncludeInstalledReportOnlyRootsAndSkipSpecial(t *t
 	}
 }
 
+func TestInstalledCommandInstallsWrappersOnlyAndSkipsSpecialRoots(t *testing.T) {
+	home := t.TempDir()
+	repo := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
+	t.Setenv("SKILL_ROUTER_PAPERCLIP_SKILLS_DIR", "")
+
+	writeSkill(t, filepath.Join(repo, "skills"), "universal-ai-skills")
+	writeSkill(t, filepath.Join(repo, "skills"), "extra-skill")
+
+	makeRoot := func(rel string) string {
+		t.Helper()
+		root := filepath.Join(home, rel)
+		if err := os.MkdirAll(root, 0755); err != nil {
+			t.Fatal(err)
+		}
+		return root
+	}
+
+	wantRoots := []string{
+		filepath.Join(home, ".agent", "skills"),
+		makeRoot(filepath.Join(".agents", "skills")),
+		filepath.Join(home, ".claude", "skills"),
+		filepath.Join(home, ".codex", "skills"),
+		filepath.Join(home, ".gemini", "skills"),
+		filepath.Join(home, ".cursor", "skills"),
+		filepath.Join(home, ".config", "opencode", "skills"),
+		filepath.Join(home, ".kiro", "skills"),
+		makeRoot(filepath.Join(".hermes", "skills")),
+		makeRoot(filepath.Join(".paperclip", "skills")),
+		makeRoot(filepath.Join(".openclaw", "skills")),
+	}
+	denyRoots := []string{
+		makeRoot(filepath.Join(".opencode", "skills")),
+		makeRoot(filepath.Join(".hermes", "hermes-agent", "skills")),
+		makeRoot(filepath.Join(".openclaw", "workspace", "skills")),
+		makeRoot(filepath.Join(".kimi_openclaw", "workspace", "skills")),
+	}
+
+	if err := installedCmd.RunE(installedCmd, nil); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, root := range wantRoots {
+		assertWrapperOnly(t, root)
+	}
+	for _, root := range denyRoots {
+		assertNoWrapper(t, root)
+	}
+}
+
 func assertWrapperOnly(t *testing.T, root string) {
 	t.Helper()
 	wrapper := filepath.Join(root, "universal-ai-skills", "SKILL.md")
@@ -155,6 +207,16 @@ func assertWrapperOnly(t *testing.T, root string) {
 		t.Fatalf("sync copied full corpus skill %s", copiedExtra)
 	} else if !os.IsNotExist(err) {
 		t.Fatalf("stat copied extra skill: %v", err)
+	}
+}
+
+func assertNoWrapper(t *testing.T, root string) {
+	t.Helper()
+	wrapper := filepath.Join(root, "universal-ai-skills", "SKILL.md")
+	if _, err := os.Stat(wrapper); err == nil {
+		t.Fatalf("sync unexpectedly wrote wrapper skill %s", wrapper)
+	} else if !os.IsNotExist(err) {
+		t.Fatalf("stat wrapper skill: %v", err)
 	}
 }
 
