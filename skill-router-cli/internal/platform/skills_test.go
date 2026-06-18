@@ -14,9 +14,7 @@ func isolateCorpusEnv(t *testing.T) {
 		"SKILL_ROUTER_SKILLS_SOURCE_DIR",
 		"SKILL_ROUTER_MANIFEST",
 		"SKILL_ROUTER_REPO_DIR",
-		"MANUS_REPO_DIR",
 		"SKILL_ROUTER_SKILLS_DIR",
-		"MANUS_SKILLS_DIR",
 	} {
 		t.Setenv(key, "")
 	}

@@ -22,7 +22,7 @@ Provide one coherent surface for the four skill-router operations — **route**,
 - **Does not exist:** `compose`.
 - The `mcp` command (`cmd/mcp/mcp.go`) is a **bridge process manager** (starts/stops PowerShell MCP bridges); it is *not* an MCP protocol server. `go.mod` has no MCP SDK.
 - **Physical-copy adapters:** `platform.AgentRootSpecs()` enumerates ~30 known agent skill roots (`.claude/skills`, `.codex/skills`, `.manus/skills`, `.gemini/skills`, …). `skillsync.Propagate` (via `skill-router sync`) copies the **single** default wrapper skill `universal-ai-skills` into the `DefaultSync` subset of those roots. Full-corpus copy is opt-in (`--full-copy`).
-- **Invariants:** compatibility env aliases (`MANUS_SKILLS_DIR` / `MANUS_REPO_DIR`) remain explicit opt-in overrides, `.manus/skills` is report-only, and the single registry (`manifest.json` canonical source, CI drift guard) remains authoritative.
+- **Invariants:** legacy `MANUS_*` path env aliases are retired in favor of `SKILL_ROUTER_*` overrides, `.manus/skills` is report-only, and the single registry (`manifest.json` canonical source, CI drift guard) remains authoritative.
 
 ## 3. Architecture — one engine, two entry points
 

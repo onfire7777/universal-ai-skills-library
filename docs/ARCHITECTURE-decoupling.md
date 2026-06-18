@@ -25,21 +25,20 @@ run independently of where the corpus lives.
 Authoritative resolution order (confirmed with B2). Each resolver is an explicit override
 chain; **repo-relative `..` walking is a *last-resort fallback only*, never the primary
 mechanism.** The two NEW resolvers (`SkillSourceDir`, `ManifestPath`) are **additive and
-default to the canonical repo; `MANUS_*` environment aliases are retained only as explicit compatibility overrides.
+default to the canonical repo; old `MANUS_*` path aliases are retired in favor of
+`SKILL_ROUTER_*` environment variables.
 
 ### 3.1 Skills corpus directory — `SkillsDir()`
 1. `SKILL_ROUTER_SKILLS_DIR` (env)
-2. `MANUS_SKILLS_DIR` (env, legacy alias — keep)
-3. `skills_dir` in config.json
-4. Installed default `~/.agent/skills` (OpenSkills standard)
+2. `skills_dir` in config.json
+3. Installed default `~/.agent/skills` (OpenSkills standard)
 
 ### 3.2 Library repo root — `RepoDir()`
 1. `SKILL_ROUTER_REPO_DIR` (env)
-2. `MANUS_REPO_DIR` (env, legacy alias — keep)
-3. `repo_dir` in config.json (validated)
-4. Upward search from **cwd** for a **repo marker** = a dir containing **both** `manifest.json`
+2. `repo_dir` in config.json (validated)
+3. Upward search from **cwd** for a **repo marker** = a dir containing **both** `manifest.json`
    and `skills/` (`isRepoDir`) — *fallback only*
-5. Upward search from the **executable** dir — *fallback only*
+4. Upward search from the **executable** dir — *fallback only*
 6. Home candidates for the canonical repo name only (`~/universal-ai-skills-library`, `~/repos/universal-ai-skills-library`, `~/Documents/universal-ai-skills-library`)
 
 ### 3.3 Skills corpus source — `SkillSourceDir()` *(NEW, additive)*
@@ -75,8 +74,6 @@ Loader: `loadManifest()` → `os.ReadFile(ManifestPath())`.
 | `SKILL_ROUTER_EXTERNAL_CACHE_TTL_MINUTES` | External-root cache TTL | primary |
 | `SKILL_ROUTER_HOOK_EVENT` | Hook event context | primary |
 | `SKILL_ROUTER_PAPERCLIP_SKILLS_DIR` / `..._INSTRUCTIONS_DIR` | Paperclip adapter roots | primary |
-| `MANUS_SKILLS_DIR` | Compatibility alias of `SKILL_ROUTER_SKILLS_DIR` | compatibility |
-| `MANUS_REPO_DIR` | Explicit compatibility alias of `SKILL_ROUTER_REPO_DIR`; old repo names are not auto-discovered | compatibility |
 | `MANUS_API_KEY` | Manus API key | config |
 
 ## 4. Registry manifest schema (B4 produces — single source)

@@ -88,7 +88,6 @@ func TestRepoDirFindsCurrentCheckoutFromNestedDirectory(t *testing.T) {
 	}
 
 	t.Setenv("SKILL_ROUTER_REPO_DIR", "")
-	t.Setenv("MANUS_REPO_DIR", "")
 	t.Setenv("USERPROFILE", filepath.Join(t.TempDir(), "isolated-user"))
 
 	if got := RepoDir(); got != repo {
@@ -115,7 +114,6 @@ func TestRepoDirUsesSavedConfigWhenValid(t *testing.T) {
 	}
 
 	t.Setenv("SKILL_ROUTER_REPO_DIR", "")
-	t.Setenv("MANUS_REPO_DIR", "")
 	t.Setenv("SKILL_ROUTER_CONFIG_DIR", configDir)
 	t.Setenv("USERPROFILE", home)
 
@@ -146,7 +144,6 @@ func TestRepoDirDoesNotAutoSelectLegacyBrandedRepoName(t *testing.T) {
 	}
 
 	t.Setenv("SKILL_ROUTER_REPO_DIR", "")
-	t.Setenv("MANUS_REPO_DIR", "")
 	t.Setenv("SKILL_ROUTER_CONFIG_DIR", filepath.Join(home, ".skill-router"))
 	t.Setenv("HOME", home)
 	t.Setenv("USERPROFILE", home)
@@ -157,16 +154,29 @@ func TestRepoDirDoesNotAutoSelectLegacyBrandedRepoName(t *testing.T) {
 	}
 }
 
-func TestRepoDirAllowsExplicitLegacyEnvOverride(t *testing.T) {
-	repo := t.TempDir()
+func TestRepoDirIgnoresLegacyEnvOverride(t *testing.T) {
+	legacyRepo := t.TempDir()
+	cwd := t.TempDir()
+	previous, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(previous)
+	})
+	if err := os.Chdir(cwd); err != nil {
+		t.Fatal(err)
+	}
+
 	t.Setenv("SKILL_ROUTER_REPO_DIR", "")
-	t.Setenv("MANUS_REPO_DIR", repo)
+	t.Setenv("MANUS_REPO_DIR", legacyRepo)
 	t.Setenv("SKILL_ROUTER_CONFIG_DIR", t.TempDir())
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	t.Setenv("USERPROFILE", home)
 
-	if got := RepoDir(); got != repo {
-		t.Fatalf("expected explicit compatibility override %q, got %q", repo, got)
+	want := filepath.Join(home, "universal-ai-skills-library")
+	if got := RepoDir(); got != want {
+		t.Fatalf("expected legacy env override to be ignored and fallback to %q, got %q", want, got)
 	}
 }

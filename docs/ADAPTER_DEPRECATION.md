@@ -114,10 +114,10 @@ compact router pointer or an MCP connector instead.
 
 These invariants are **not** part of this deprecation and remain intact:
 
-- **Compatibility aliases.** `MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` environment
-  variables and the `~/.manus/skills` root remain as explicit opt-in
-  compatibility surfaces. The packaged binary and generated active command
-  contract are universal-first: `skill-router`.
+- **Compatibility roots.** The `~/.manus/skills` root remains report-only for
+  existing local clients, but legacy `MANUS_SKILLS_DIR` / `MANUS_REPO_DIR`
+  environment aliases are retired. Use `SKILL_ROUTER_SKILLS_DIR` and
+  `SKILL_ROUTER_REPO_DIR` for explicit overrides.
 - **The single registry.** `manifest.json` remains the one canonical source of
   truth for the skill corpus; marketplace JSON artifacts are retired and guarded
   against reappearing. This deprecation is about *propagation* of the wrapper

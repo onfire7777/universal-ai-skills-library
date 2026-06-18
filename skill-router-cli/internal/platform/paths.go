@@ -9,12 +9,9 @@ import (
 
 // SkillsDir returns the primary installed skills directory.
 // On Windows, the canonical installed root is ~/.agent/skills (OpenSkills standard).
-// Override with SKILL_ROUTER_SKILLS_DIR. MANUS_SKILLS_DIR is kept as a legacy alias.
+// Override with SKILL_ROUTER_SKILLS_DIR.
 func SkillsDir() string {
 	if d := os.Getenv("SKILL_ROUTER_SKILLS_DIR"); d != "" {
-		return d
-	}
-	if d := os.Getenv("MANUS_SKILLS_DIR"); d != "" {
 		return d
 	}
 	if d := configString("skills_dir"); d != "" {
@@ -77,13 +74,9 @@ func TelemetryDir() string {
 
 // RepoDir returns the skills library repo directory.
 // It discovers only the neutral canonical repository name automatically.
-// MANUS_REPO_DIR remains an explicit compatibility override, but old branded
-// repo names are no longer implicit source-of-truth candidates.
+// Old branded repo names are no longer implicit source-of-truth candidates.
 func RepoDir() string {
 	if d := os.Getenv("SKILL_ROUTER_REPO_DIR"); d != "" {
-		return d
-	}
-	if d := os.Getenv("MANUS_REPO_DIR"); d != "" {
 		return d
 	}
 	if d := configString("repo_dir"); d != "" && isRepoDir(d) {

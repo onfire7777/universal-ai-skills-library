@@ -63,7 +63,7 @@ universal-ai-skills-library/
 |---|---|---|
 | CLI binary | `skill-router` | old executable aliases are retired |
 | Setup skill | `universal-ai-config` | old setup aliases are retired |
-| Repo | `universal-ai-skills-library` | explicit `MANUS_REPO_DIR` override only |
+| Repo | `universal-ai-skills-library` | use `SKILL_ROUTER_REPO_DIR` for explicit overrides |
 | Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |
 | API adapter | `manus-api` | N/A, platform-specific by design |
 | MCP task prefix | `UniversalAI-*` | old `Manus-*` tasks are cleanup-only compatibility targets |

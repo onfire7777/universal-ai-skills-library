@@ -15,7 +15,7 @@
 - **Go module:** `github.com/onfire7777/universal-ai-skills-library/skill-router-cli`; engine import path `github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillservice`.
 - **No new third-party dependencies.** MCP server is hand-rolled on stdlib only. (`go.mod` must not gain a new `require` line.)
 - **All tests run hermetic:** `go test ./... -mod=readonly`. No network, no `Date.now`-style nondeterminism in tests.
-- **Invariants preserved:** `MANUS_SKILLS_DIR` / `MANUS_REPO_DIR` remain explicit opt-in compatibility overrides, `.manus/skills` is report-only, and the single registry (`manifest.json` canonical source + CI drift guard) stays authoritative. Marketplace JSON artifacts are retired.
+- **Invariants preserved:** legacy `MANUS_*` path env aliases are retired in favor of `SKILL_ROUTER_*` overrides, `.manus/skills` is report-only, and the single registry (`manifest.json` canonical source + CI drift guard) stays authoritative. Marketplace JSON artifacts are retired.
 - **Behavior preservation:** existing CLI commands (`route`, `auto`, `preflight`, `search`, `skill`, `sync`, …) keep identical output. The existing characterization test suite is the gate.
 - **Semantic layer:** route/compose candidate ordering MUST pass through `applySemanticRouting`; the exact name/alias guardrail (`isGuardrailPinned`) is never bypassed.
 - **Commands `route` / `search_skills` / `load_skill` / `compose`** are the canonical names; `search` and `skill` remain as back-compat aliases.
