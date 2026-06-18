@@ -123,6 +123,7 @@ python3 /home/ubuntu/skills/skill-deployer/scripts/deploy_skills.py \
 
 | Flag | Default | Description |
 |---|---|---|
+| `--api-base` | `https://api.manus.im` | Provider API base URL; can also be set with `SKILL_DEPLOYER_API_BASE` |
 | `--skills-dir` | `/home/ubuntu/skills` | Source skills directory |
 | `--zip-dir` | `/tmp/skill_zips` | Directory for packaged zips |
 | `--rate-limit` | `0.15` | Seconds between API calls |

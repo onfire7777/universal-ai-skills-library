@@ -11,7 +11,23 @@ Usage:
 """
 import argparse
 import json
+import os
 import sys
+from urllib.parse import urlparse
+
+
+def normalize_api_base(value):
+    """Return a safe API base URL for token-bearing provider calls."""
+    base = (value or "").strip().rstrip("/")
+    parsed = urlparse(base)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ValueError("--api-base must be an absolute http(s) URL")
+    if parsed.scheme == "http" and parsed.hostname not in {"localhost", "127.0.0.1", "::1"}:
+        raise ValueError("--api-base must use https unless targeting localhost")
+    return base
+
+
+DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "https://api.manus.im")
 
 JS_SNIPPET = """
 // Run this in the browser console at manus.im (while logged in):
@@ -44,8 +60,9 @@ JS_SNIPPET = """
 """.strip()
 
 
-def verify_token(token):
+def verify_token(token, api_base=None):
     """Verify a token works by listing skills for a test call."""
+    api_base = normalize_api_base(api_base or DEFAULT_API_BASE)
     try:
         import requests
     except ImportError:
@@ -53,7 +70,7 @@ def verify_token(token):
         return False
 
     resp = requests.post(
-        "https://api.manus.im/skill.v1.ProjectSkillService/ListProjectSkills",
+        f"{api_base}/skill.v1.ProjectSkillService/ListProjectSkills",
         json={"project_uid": "test"},
         headers={
             "Content-Type": "application/json",
@@ -77,10 +94,15 @@ def verify_token(token):
 def main():
     parser = argparse.ArgumentParser(description="Extract/verify Manus JWT token")
     parser.add_argument("--verify", help="Verify a token")
+    parser.add_argument("--api-base", default=DEFAULT_API_BASE, help="Provider API base URL")
     args = parser.parse_args()
 
     if args.verify:
-        verify_token(args.verify)
+        try:
+            api_base = normalize_api_base(args.api_base)
+        except ValueError as e:
+            parser.error(str(e))
+        verify_token(args.verify, api_base)
     else:
         print("=== Manus JWT Token Extraction ===\n")
         print("Run this JavaScript in your browser console at manus.im:\n")

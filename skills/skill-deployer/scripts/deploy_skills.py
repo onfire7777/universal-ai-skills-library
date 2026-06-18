@@ -20,6 +20,7 @@ Required:
     --project-uid UID       Target project UID (not needed with --plan/--package)
 
 Options:
+    --api-base URL         Provider API base URL (default: https://api.manus.im)
     --skills-dir DIR        Source skills directory (default: /home/ubuntu/skills)
     --zip-dir DIR           Directory for zip files (default: /tmp/skill_zips)
     --rate-limit SECS       Delay between API calls (default: 0.15)
@@ -34,6 +35,7 @@ import subprocess
 import sys
 import time
 import zipfile
+from urllib.parse import urlparse
 
 try:
     import requests
@@ -44,7 +46,19 @@ except ImportError:
         sys.exit(1)
     import requests
 
-API_BASE = "https://api.manus.im"
+def normalize_api_base(value):
+    """Return a safe API base URL for token-bearing provider calls."""
+    base = (value or "").strip().rstrip("/")
+    parsed = urlparse(base)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ValueError("--api-base must be an absolute http(s) URL")
+    if parsed.scheme == "http" and parsed.hostname not in {"localhost", "127.0.0.1", "::1"}:
+        raise ValueError("--api-base must use https unless targeting localhost")
+    return base
+
+
+DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "https://api.manus.im")
+API_BASE = normalize_api_base("https://api.manus.im")
 HEADERS_TEMPLATE = {
     "Content-Type": "application/json",
     "Connect-Protocol-Version": "1",
@@ -327,9 +341,12 @@ def deploy_plan(plan_path, zip_dir, token, rate_limit=0.15, dry_run=False, max_r
 
 
 def main():
+    global API_BASE
+
     parser = argparse.ArgumentParser(description="Deploy skills to Manus projects via API")
     parser.add_argument("--token", required=True, help="JWT session token")
     parser.add_argument("--project-uid", help="Target project UID")
+    parser.add_argument("--api-base", default=DEFAULT_API_BASE, help="Provider API base URL")
     parser.add_argument("--skills-dir", default=DEFAULT_SKILLS_DIR, help="Source skills directory")
     parser.add_argument("--zip-dir", default="/tmp/skill_zips", help="Directory for zip files")
     parser.add_argument("--rate-limit", type=float, default=0.15, help="Delay between API calls")
@@ -348,6 +365,10 @@ def main():
     group.add_argument("--package", action="store_true", help="Package all skills as zips (no upload)")
 
     args = parser.parse_args()
+    try:
+        API_BASE = normalize_api_base(args.api_base)
+    except ValueError as e:
+        parser.error(str(e))
 
     if args.package:
         zips = package_all_skills(args.skills_dir, args.zip_dir)
