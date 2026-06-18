@@ -72,6 +72,7 @@ skill-router skill search debugging
 skill-router skill universal-ai-skills
 skill-router skills validate-manifest
 skill-router doctor
+skill-router doctor --json
 ```
 
 Expected model:

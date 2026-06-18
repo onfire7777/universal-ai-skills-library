@@ -245,8 +245,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal
 powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1" -Deep -StartLightpanda
 skill-router skills validate-manifest
 skill-router doctor
+skill-router doctor --json
 gbrain stats
 mempalace status
 ```
 
-`skill-router doctor` may warn that optional persistent MCP bridge ports are down. That is normal for the low-resource profile unless the active task needs those endpoints.
+`skill-router doctor --json` emits the same health checks in a stable
+machine-readable format for installers, CI, and support scripts.

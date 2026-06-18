@@ -111,6 +111,7 @@ skill-router skills validate-manifest
 skill-router sync codex   # optional compact wrapper for Codex CLI
 skill-router sync claude  # optional compact wrapper for Claude CLI
 skill-router doctor
+skill-router doctor --json  # machine-readable installer/CI health
 ```
 
 Windows users who want the local Universal AI Stack to start at login can run:
@@ -149,6 +150,7 @@ skill-router sync codex
 skill-router sync claude
 skill-router sync installed
 skill-router doctor
+skill-router doctor --json
 skill-router mcp status
 ```
 

@@ -138,6 +138,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $env:USERPROFILE\.universal-
 powershell -NoProfile -ExecutionPolicy Bypass -File $env:USERPROFILE\.universal-ai-stack\scripts\Test-UniversalAIContextTools.ps1 -Deep -StartLightpanda
 skill-router skills validate-manifest
 skill-router doctor
+skill-router doctor --json
 skill-router mcp status
 skill-router skill search gstack
 skill-router skill search gbrain

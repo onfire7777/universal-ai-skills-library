@@ -1,6 +1,7 @@
 package doctor
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,6 +17,21 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
 )
 
+type doctorCheck struct {
+	Section  string `json:"section"`
+	Name     string `json:"name"`
+	Status   string `json:"status"`
+	Message  string `json:"message"`
+	Optional bool   `json:"optional"`
+}
+
+type doctorReport struct {
+	Passed   int           `json:"passed"`
+	Warnings int           `json:"warnings"`
+	Failed   int           `json:"failed"`
+	Checks   []doctorCheck `json:"checks"`
+}
+
 // Cmd is the doctor command.
 var Cmd = &cobra.Command{
 	Use:   "doctor",
@@ -24,6 +40,7 @@ var Cmd = &cobra.Command{
 skills installation, MCP bridges, API keys, Python, Go, Node.js,
 printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		jsonOutput, _ := cmd.Flags().GetBool("json")
 		bold := color.New(color.Bold)
 		green := color.New(color.FgGreen)
 		red := color.New(color.FgRed)
@@ -32,36 +49,69 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 		pass := 0
 		warn := 0
 		fail := 0
+		section := ""
+		report := doctorReport{Checks: []doctorCheck{}}
+
+		header := func(name string) {
+			section = name
+			if !jsonOutput {
+				bold.Println(name + ":")
+			}
+		}
+
+		record := func(status, name, message string, optional bool) {
+			switch status {
+			case "fail":
+				fail++
+				if !jsonOutput {
+					red.Printf("  FAIL  %-35s %s\n", name, message)
+				}
+			case "warn":
+				warn++
+				if !jsonOutput {
+					yellow.Printf("  WARN  %-35s %s\n", name, message)
+				}
+			default:
+				pass++
+				if !jsonOutput {
+					green.Printf("  OK    %-35s %s\n", name, message)
+				}
+			}
+			report.Checks = append(report.Checks, doctorCheck{
+				Section:  section,
+				Name:     name,
+				Status:   status,
+				Message:  message,
+				Optional: optional,
+			})
+		}
 
 		check := func(name string, fn func() (string, error)) {
 			result, err := fn()
 			if err != nil {
-				red.Printf("  FAIL  %-35s %s\n", name, err.Error())
-				fail++
+				record("fail", name, err.Error(), false)
 			} else if result == "warn" {
-				yellow.Printf("  WARN  %-35s warning\n", name)
-				warn++
+				record("warn", name, "warning", false)
 			} else {
-				green.Printf("  OK    %-35s %s\n", name, result)
-				pass++
+				record("ok", name, result, false)
 			}
 		}
 		optional := func(name string, fn func() (string, error)) {
 			result, err := fn()
 			if err != nil {
-				yellow.Printf("  WARN  %-35s %s\n", name, err.Error())
-				warn++
+				record("warn", name, err.Error(), true)
 				return
 			}
-			green.Printf("  OK    %-35s %s\n", name, result)
-			pass++
+			record("ok", name, result, true)
 		}
 
-		bold.Println("Universal AI Skills Router Health Check")
-		fmt.Println()
+		if !jsonOutput {
+			bold.Println("Universal AI Skills Router Health Check")
+			fmt.Println()
+		}
 
 		// --- Runtime ---
-		bold.Println("Runtime:")
+		header("Runtime")
 		check("Go", func() (string, error) {
 			out, err := runner.RunCommandCapture("go", "version")
 			if err != nil {
@@ -132,10 +182,12 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			return "available", nil
 		})
 
-		fmt.Println()
+		if !jsonOutput {
+			fmt.Println()
+		}
 
 		// --- Skills ---
-		bold.Println("Skills:")
+		header("Skills")
 		check("Repository Skills", func() (string, error) {
 			dir := filepath.Join(platform.RepoDir(), "skills")
 			if _, err := os.Stat(dir); err != nil {
@@ -166,10 +218,12 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			return "present", nil
 		})
 
-		fmt.Println()
+		if !jsonOutput {
+			fmt.Println()
+		}
 
 		// --- Agent Roots ---
-		bold.Println("Agent Roots (optional physical copies):")
+		header("Agent Roots")
 		for _, root := range platform.AgentRoots() {
 			name := filepath.Base(filepath.Dir(root))
 			optional(name, func() (string, error) {
@@ -181,11 +235,13 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			})
 		}
 
-		fmt.Println()
+		if !jsonOutput {
+			fmt.Println()
+		}
 
 		// --- MCP Bridges (Windows only) ---
 		if runtime.GOOS == "windows" {
-			bold.Println("MCP Bridges:")
+			header("MCP Bridges")
 			type bridgeInfo struct {
 				name         string
 				port         int
@@ -216,9 +272,11 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 					return fmt.Sprintf("port %d UP", bCopy.port), nil
 				})
 			}
-			fmt.Println()
+			if !jsonOutput {
+				fmt.Println()
+			}
 
-			bold.Println("Scheduled Tasks:")
+			header("Scheduled Tasks")
 			tasks := []string{"UniversalAI-SkillSeekersMcp", "UniversalAI-MemPalaceMcp", "UniversalAI-ContextModeMcp", "UniversalAI-LightpandaMcp", "UniversalAI-McpWatchdog"}
 			for _, t := range tasks {
 				tCopy := t
@@ -239,11 +297,13 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 					return "Unknown state", nil
 				})
 			}
-			fmt.Println()
+			if !jsonOutput {
+				fmt.Println()
+			}
 		}
 
 		// --- API Keys ---
-		bold.Println("API Keys:")
+		header("API Keys")
 		optional("OPENROUTER_API_KEY", func() (string, error) {
 			if os.Getenv("OPENROUTER_API_KEY") != "" {
 				return "set", nil
@@ -263,9 +323,19 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			return "not set; optional", nil
 		})
 
-		fmt.Println()
+		if !jsonOutput {
+			fmt.Println()
+		}
 
 		// --- Summary ---
+		report.Passed = pass
+		report.Warnings = warn
+		report.Failed = fail
+		if jsonOutput {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			return enc.Encode(report)
+		}
 		bold.Println("Summary:")
 		fmt.Printf("  Passed: %d | Warnings: %d | Failed: %d\n", pass, warn, fail)
 		if fail == 0 && warn == 0 {
@@ -277,6 +347,10 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 		}
 		return nil
 	},
+}
+
+func init() {
+	Cmd.Flags().Bool("json", false, "Emit machine-readable doctor results")
 }
 
 func findPP() string {

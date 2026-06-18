@@ -195,7 +195,7 @@
         "gstack-openclaw"
       ],
       "skillNamePattern": "gstack-*",
-      "validation": "skill-router doctor",
+      "validation": "skill-router doctor --json",
       "notes": "Load namespaced skills such as gstack-review, gstack-qa, gstack-cso, and gstack-browse on demand. Do not copy the full GStack or GBrain skill trees into AI roots."
     }
   ]
