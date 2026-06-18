@@ -9,15 +9,18 @@ import (
 )
 
 func TestRootCommandDoesNotAdvertiseRetiredAlias(t *testing.T) {
-	if strings.Contains(rootCmd.Long, "manus") || strings.Contains(rootCmd.Long, "Compatibility alias") {
+	if strings.Contains(rootCmd.Long, "manus skill") || strings.Contains(rootCmd.Long, "Compatibility alias") {
 		t.Fatalf("root command long help still advertises retired alias")
 	}
 
 	output := captureStdout(t, func() {
 		rootCmd.Run(rootCmd, nil)
 	})
-	if strings.Contains(output, "Compatibility alias") || strings.Contains(output, "manus") {
+	if strings.Contains(output, "Compatibility alias") || strings.Contains(output, "manus skill") {
 		t.Fatalf("root command output still advertises retired alias: %q", output)
+	}
+	if !strings.Contains(output, "manus-api") {
+		t.Fatalf("root command output should advertise the provider-specific Manus API adapter: %q", output)
 	}
 }
 

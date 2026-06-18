@@ -20,8 +20,9 @@ var apiBaseURL = defaultBaseURL
 
 // Cmd is the top-level api command group.
 var Cmd = &cobra.Command{
-	Use:   "api",
-	Short: "Interact with Manus API v2 (tasks, projects, files, webhooks, agents)",
+	Use:     "manus-api",
+	Aliases: []string{"api"},
+	Short:   "Interact with Manus API v2 (tasks, projects, files, webhooks, agents)",
 	Long: `Full Manus API v2 client — manage tasks, projects, files, webhooks,
 agents, connectors, websites, and usage data programmatically.
 Requires MANUS_API_KEY. Override the default endpoint with --api-base or
