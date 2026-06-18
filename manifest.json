@@ -7585,7 +7585,6 @@
         "card-creator",
         "card creator",
         "greeting-card-creator",
-        "manus-card-creator",
         "printable card",
         "printable cards",
         "foldable card",
@@ -10856,7 +10855,7 @@
     }
   ],
   "total_skills": 1812,
-  "alias_count": 215,
+  "alias_count": 214,
   "routing": {
     "primary_access": "skill-router skill <name>",
     "compatibility_access": [],

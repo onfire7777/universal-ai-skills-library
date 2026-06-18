@@ -260,12 +260,11 @@ def validate_manifest(fixture: bool = False) -> Dict[str, object]:
 def run_router_as_alias(
     alias: str, args: List[str], timeout: int = 120, fixture: bool = True,
 ) -> subprocess.CompletedProcess:
-    """Run the same router binary under a different argv[0] (e.g. ``manus``).
+    """Run the same router binary under a different argv[0].
 
-    The CLI is argv[0]-aware: the legacy ``manus`` binary must keep resolving the
-    same router. We copy the binary to a temp file named ``alias`` so the test is
-    robust whether the alias is shipped as a copy or a symlink. Pinned to the
-    frozen fixture by default.
+    This supports compatibility characterization for explicitly tested command
+    names without advertising historical project-specific binaries as an active
+    install contract. Pinned to the frozen fixture by default.
     """
     src = router_binary()
     alias_dir = tempfile.mkdtemp(prefix=f"skill-router-alias-{alias}-")

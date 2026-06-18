@@ -225,8 +225,7 @@
     "printable-cards": [
       "card-creator",
       "card creator",
-      "greeting-card-creator",
-      "manus-card-creator"
+      "greeting-card-creator"
     ],
     "public-param-golden": [
       "pp-public-param-golden"
