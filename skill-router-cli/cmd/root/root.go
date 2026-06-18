@@ -75,7 +75,7 @@ check optional MCP bridges, and expose local AI stack health.`,
 		fmt.Println("  print       Generate production CLIs from API specs (Printing Press)")
 		fmt.Println()
 		fmt.Println("Provider Adapters:")
-		fmt.Println("  manus-api   Interact with the Manus API provider adapter (api alias kept)")
+		fmt.Println("  provider-api Interact with compatible hosted provider APIs (api alias kept)")
 		fmt.Println()
 		fmt.Println("AI & Research:")
 		fmt.Println("  models      Select and manage AI model preferences")

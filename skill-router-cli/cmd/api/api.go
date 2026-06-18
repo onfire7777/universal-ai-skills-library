@@ -14,26 +14,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const defaultBaseURL = "https://api.manus.im/v2"
+const defaultBaseURL = ""
 
 var apiBaseURL = defaultBaseURL
 
 // Cmd is the top-level api command group.
 var Cmd = &cobra.Command{
-	Use:     "manus-api",
+	Use:     "provider-api",
 	Aliases: []string{"api"},
-	Short:   "Interact with Manus API v2 (tasks, projects, files, webhooks, agents)",
-	Long: `Full Manus API v2 client — manage tasks, projects, files, webhooks,
-agents, connectors, websites, and usage data programmatically.
-Requires MANUS_API_KEY. Override the default endpoint with --api-base or
-SKILL_ROUTER_MANUS_API_BASE for compatible provider deployments.`,
+	Short:   "Interact with compatible provider APIs (tasks, projects, files, webhooks, agents)",
+	Long: `Provider API client for compatible hosted project systems. Manage tasks,
+projects, files, webhooks, agents, connectors, websites, and usage data
+programmatically. Requires SKILL_ROUTER_API_KEY. Set the endpoint with
+--api-base or SKILL_ROUTER_API_BASE.`,
 }
 
 // --- Tasks ---
 
 var tasksCmd = &cobra.Command{
 	Use:   "tasks",
-	Short: "Manage Manus tasks",
+	Short: "Manage provider tasks",
 }
 
 var taskListCmd = &cobra.Command{
@@ -119,7 +119,7 @@ var taskSendCmd = &cobra.Command{
 
 var projectsCmd = &cobra.Command{
 	Use:   "projects",
-	Short: "Manage Manus projects",
+	Short: "Manage provider projects",
 }
 
 var projectListCmd = &cobra.Command{
@@ -147,7 +147,7 @@ var projectCreateCmd = &cobra.Command{
 
 var filesCmd = &cobra.Command{
 	Use:   "files",
-	Short: "Manage Manus files",
+	Short: "Manage provider files",
 }
 
 var fileListCmd = &cobra.Command{
@@ -160,7 +160,7 @@ var fileListCmd = &cobra.Command{
 
 var fileUploadCmd = &cobra.Command{
 	Use:   "upload <filepath>",
-	Short: "Upload a file to Manus",
+	Short: "Upload a file to the provider",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Uploading %s...\n", args[0])
@@ -182,7 +182,7 @@ var fileDeleteCmd = &cobra.Command{
 
 var webhooksCmd = &cobra.Command{
 	Use:   "webhooks",
-	Short: "Manage Manus webhooks",
+	Short: "Manage provider webhooks",
 }
 
 var webhookListCmd = &cobra.Command{
@@ -220,7 +220,7 @@ var webhookDeleteCmd = &cobra.Command{
 
 var agentsCmd = &cobra.Command{
 	Use:   "agents",
-	Short: "Manage Manus agents",
+	Short: "Manage provider agents",
 }
 
 var agentListCmd = &cobra.Command{
@@ -319,10 +319,10 @@ var skillListCmd = &cobra.Command{
 }
 
 func init() {
-	if value := os.Getenv("SKILL_ROUTER_MANUS_API_BASE"); value != "" {
+	if value := os.Getenv("SKILL_ROUTER_API_BASE"); value != "" {
 		apiBaseURL = value
 	}
-	Cmd.PersistentFlags().StringVar(&apiBaseURL, "api-base", apiBaseURL, "Manus API base URL")
+	Cmd.PersistentFlags().StringVar(&apiBaseURL, "api-base", apiBaseURL, "provider API base URL")
 
 	taskListCmd.Flags().String("status", "", "Filter by status (running, completed, failed)")
 	taskListCmd.Flags().Int("limit", 20, "Maximum number of tasks to return")
@@ -350,7 +350,7 @@ func init() {
 }
 
 func getAPIKey() string {
-	if key := os.Getenv("MANUS_API_KEY"); key != "" {
+	if key := os.Getenv("SKILL_ROUTER_API_KEY"); key != "" {
 		return key
 	}
 	return ""
@@ -409,7 +409,7 @@ func splitEvents(events string) []string {
 func apiGet(path string) error {
 	key := getAPIKey()
 	if key == "" {
-		return fmt.Errorf("MANUS_API_KEY not set. Get your key from https://manus.im/settings")
+		return fmt.Errorf("SKILL_ROUTER_API_KEY not set")
 	}
 	url, err := apiURL(path)
 	if err != nil {
@@ -441,7 +441,7 @@ func apiGet(path string) error {
 func apiPost(path string, body []byte) error {
 	key := getAPIKey()
 	if key == "" {
-		return fmt.Errorf("MANUS_API_KEY not set. Get your key from https://manus.im/settings")
+		return fmt.Errorf("SKILL_ROUTER_API_KEY not set")
 	}
 	url, err := apiURL(path)
 	if err != nil {
@@ -476,7 +476,7 @@ func apiPost(path string, body []byte) error {
 func apiDelete(path string) error {
 	key := getAPIKey()
 	if key == "" {
-		return fmt.Errorf("MANUS_API_KEY not set. Get your key from https://manus.im/settings")
+		return fmt.Errorf("SKILL_ROUTER_API_KEY not set")
 	}
 	url, err := apiURL(path)
 	if err != nil {

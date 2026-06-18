@@ -19,8 +19,11 @@ func TestRootCommandDoesNotAdvertiseRetiredAlias(t *testing.T) {
 	if strings.Contains(output, "Compatibility alias") || strings.Contains(output, "manus skill") {
 		t.Fatalf("root command output still advertises retired alias: %q", output)
 	}
-	if !strings.Contains(output, "manus-api") {
-		t.Fatalf("root command output should advertise the provider-specific Manus API adapter: %q", output)
+	if !strings.Contains(output, "provider-api") {
+		t.Fatalf("root command output should advertise the provider API adapter: %q", output)
+	}
+	if strings.Contains(output, "Manus API") {
+		t.Fatalf("root command output should not advertise Manus as the primary API adapter: %q", output)
 	}
 }
 

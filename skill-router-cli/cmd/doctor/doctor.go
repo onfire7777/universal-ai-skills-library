@@ -316,12 +316,6 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			}
 			return "not set; prefer OpenAI CLI/session auth", nil
 		})
-		optional("MANUS_API_KEY", func() (string, error) {
-			if os.Getenv("MANUS_API_KEY") != "" {
-				return "set", nil
-			}
-			return "not set; optional", nil
-		})
 
 		if !jsonOutput {
 			fmt.Println()

@@ -123,7 +123,7 @@ python3 /home/ubuntu/skills/skill-deployer/scripts/deploy_skills.py \
 
 | Flag | Default | Description |
 |---|---|---|
-| `--api-base` | `https://api.manus.im` | Default provider API base URL; can also be set with `SKILL_DEPLOYER_API_BASE` |
+| `--api-base` | none | Provider API base URL; required for API calls unless `SKILL_DEPLOYER_API_BASE` is set |
 | `--skills-dir` | `/home/ubuntu/skills` | Source skills directory |
 | `--zip-dir` | `/tmp/skill_zips` | Directory for packaged zips |
 | `--rate-limit` | `0.15` | Seconds between API calls |
@@ -142,6 +142,7 @@ python3 /home/ubuntu/skills/skill-deployer/scripts/deploy_skills.py \
 | Error | Fix |
 |---|---|
 | 401 Unauthorized | Token expired. Re-extract from browser. |
+| Missing API base | Pass `--api-base https://provider.example` or set `SKILL_DEPLOYER_API_BASE`. |
 | 429 Rate Limited | Increase `--rate-limit` to 0.3+. |
 | 500 SKILL_MD_INVALID_FORMAT | Fix SKILL.md YAML frontmatter in the source skill. |
 | Project limit reached | Max 500. Use curation to select only the best skills. |
@@ -149,4 +150,4 @@ python3 /home/ubuntu/skills/skill-deployer/scripts/deploy_skills.py \
 
 ## API Reference
 
-Default provider endpoint documentation is in `references/manus-api.md`.
+Provider endpoint details vary by hosted UI. Use the provider's gRPC-web project-skill API reference when setting `--api-base`.

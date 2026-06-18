@@ -9,7 +9,23 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BIN_DIR="${GOBIN:-"$HOME/go/bin"}"
+default_bin_dir() {
+  if command -v skill-router >/dev/null 2>&1; then
+    dirname "$(command -v skill-router)"
+    return
+  fi
+  if [[ -d "$HOME/.local/bin" || ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
+    printf '%s\n' "$HOME/.local/bin"
+    return
+  fi
+  if [[ -n "${GOBIN:-}" ]]; then
+    printf '%s\n' "$GOBIN"
+    return
+  fi
+  printf '%s\n' "$HOME/go/bin"
+}
+
+BIN_DIR="$(default_bin_dir)"
 COPY_SKILLS_DIR=""
 SKIP_VALIDATE=0
 SYNC_CODEX=0
@@ -23,7 +39,8 @@ Usage:
   bash install.sh [options]
 
 Options:
-  --bin-dir DIR        Install skill-router into DIR (default: $GOBIN or ~/go/bin)
+  --bin-dir DIR        Install skill-router into DIR (default: active PATH binary
+                       dir, ~/.local/bin, $GOBIN, or ~/go/bin)
   --copy-skills DIR    Optional offline/full-copy export of skills/ into DIR
   --sync-codex         Install compact wrapper into ~/.codex/skills
   --sync-claude        Install compact wrapper into ~/.claude/skills

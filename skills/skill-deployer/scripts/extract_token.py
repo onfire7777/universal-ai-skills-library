@@ -27,7 +27,7 @@ def normalize_api_base(value):
     return base
 
 
-DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "https://api.manus.im")
+DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "")
 
 JS_SNIPPET = """
 // Run this in the provider web app browser console while logged in:
@@ -94,14 +94,18 @@ def verify_token(token, api_base=None):
 def main():
     parser = argparse.ArgumentParser(description="Extract/verify provider JWT token")
     parser.add_argument("--verify", help="Verify a token")
-    parser.add_argument("--api-base", default=DEFAULT_API_BASE, help="Provider API base URL")
+    parser.add_argument(
+        "--api-base",
+        default=DEFAULT_API_BASE,
+        help="Provider API base URL; required with --verify unless SKILL_DEPLOYER_API_BASE is set",
+    )
     args = parser.parse_args()
 
     if args.verify:
         try:
             api_base = normalize_api_base(args.api_base)
         except ValueError as e:
-            parser.error(str(e))
+            parser.error(f"{e}; set --api-base or SKILL_DEPLOYER_API_BASE")
         verify_token(args.verify, api_base)
     else:
         print("=== Provider JWT Token Extraction ===\n")

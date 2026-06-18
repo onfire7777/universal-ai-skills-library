@@ -20,7 +20,7 @@ type Config struct {
 	MCPDir           string          `json:"mcp_dir"`
 	AgentRoots       []string        `json:"agent_roots"`
 	OpenRouterAPIKey string          `json:"openrouter_api_key,omitempty"`
-	ManusAPIKey      string          `json:"manus_api_key,omitempty"`
+	ProviderAPIKey   string          `json:"provider_api_key,omitempty"`
 	MCPProxyVersion  string          `json:"mcp_proxy_version"`
 	AutoUpdate       bool            `json:"auto_update"`
 	Telemetry        TelemetryConfig `json:"telemetry"`
@@ -84,10 +84,10 @@ var showCmd = &cobra.Command{
 		} else {
 			fmt.Println("  OpenRouter:  not set")
 		}
-		if cfg.ManusAPIKey != "" || os.Getenv("MANUS_API_KEY") != "" {
-			fmt.Println("  Manus API:   configured")
+		if cfg.ProviderAPIKey != "" || os.Getenv("SKILL_ROUTER_API_KEY") != "" {
+			fmt.Println("  Provider:    configured")
 		} else {
-			fmt.Println("  Manus API:   not set")
+			fmt.Println("  Provider:    not set")
 		}
 		if os.Getenv("OPENAI_API_KEY") != "" {
 			fmt.Println("  OpenAI:      configured")
@@ -116,8 +116,8 @@ var setCmd = &cobra.Command{
 			cfg.MCPProxyVersion = value
 		case "openrouter_api_key":
 			cfg.OpenRouterAPIKey = value
-		case "manus_api_key":
-			cfg.ManusAPIKey = value
+		case "provider_api_key":
+			cfg.ProviderAPIKey = value
 		case "auto_update":
 			cfg.AutoUpdate = value == "true"
 		case "telemetry.enabled":
@@ -125,7 +125,7 @@ var setCmd = &cobra.Command{
 		case "reranker.enabled":
 			cfg.Reranker.Enabled = value == "true"
 		default:
-			return fmt.Errorf("unknown config key: %s\nValid keys: skills_dir, repo_dir, mcp_dir, mcp_proxy_version, openrouter_api_key, manus_api_key, auto_update, telemetry.enabled, reranker.enabled", key)
+			return fmt.Errorf("unknown config key: %s\nValid keys: skills_dir, repo_dir, mcp_dir, mcp_proxy_version, openrouter_api_key, provider_api_key, auto_update, telemetry.enabled, reranker.enabled", key)
 		}
 		return saveConfig(cfg)
 	},

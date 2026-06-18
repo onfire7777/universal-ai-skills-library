@@ -20,7 +20,7 @@ Required:
     --project-uid UID       Target project UID (not needed with --plan/--package)
 
 Options:
-    --api-base URL         Provider API base URL (default: https://api.manus.im)
+    --api-base URL         Provider API base URL (or SKILL_DEPLOYER_API_BASE)
     --skills-dir DIR        Source skills directory (default: /home/ubuntu/skills)
     --zip-dir DIR           Directory for zip files (default: /tmp/skill_zips)
     --rate-limit SECS       Delay between API calls (default: 0.15)
@@ -57,8 +57,8 @@ def normalize_api_base(value):
     return base
 
 
-DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "https://api.manus.im")
-API_BASE = normalize_api_base(DEFAULT_API_BASE)
+DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "")
+API_BASE = ""
 HEADERS_TEMPLATE = {
     "Content-Type": "application/json",
     "Connect-Protocol-Version": "1",
@@ -346,7 +346,11 @@ def main():
     parser = argparse.ArgumentParser(description="Deploy skills to hosted provider projects via API")
     parser.add_argument("--token", required=True, help="JWT session token")
     parser.add_argument("--project-uid", help="Target project UID")
-    parser.add_argument("--api-base", default=DEFAULT_API_BASE, help="Provider API base URL")
+    parser.add_argument(
+        "--api-base",
+        default=DEFAULT_API_BASE,
+        help="Provider API base URL; required unless SKILL_DEPLOYER_API_BASE is set",
+    )
     parser.add_argument("--skills-dir", default=DEFAULT_SKILLS_DIR, help="Source skills directory")
     parser.add_argument("--zip-dir", default="/tmp/skill_zips", help="Directory for zip files")
     parser.add_argument("--rate-limit", type=float, default=0.15, help="Delay between API calls")
@@ -365,15 +369,15 @@ def main():
     group.add_argument("--package", action="store_true", help="Package all skills as zips (no upload)")
 
     args = parser.parse_args()
-    try:
-        API_BASE = normalize_api_base(args.api_base)
-    except ValueError as e:
-        parser.error(str(e))
-
     if args.package:
         zips = package_all_skills(args.skills_dir, args.zip_dir)
         print(f"Done. {len(zips)} zips in {args.zip_dir}")
         return
+
+    try:
+        API_BASE = normalize_api_base(args.api_base)
+    except ValueError as e:
+        parser.error(f"{e}; set --api-base or SKILL_DEPLOYER_API_BASE")
 
     if args.plan:
         # Ensure zips exist — check for actual .zip files, not just any files

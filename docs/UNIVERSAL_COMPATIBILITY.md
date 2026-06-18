@@ -34,7 +34,8 @@ Use universal names for shared infrastructure:
 
 Use provider or client names only when they identify a real compatibility surface:
 
-- APIs: OpenAI, Anthropic, Claude, Sora, Manus API
+- APIs: OpenAI, Anthropic, Claude, Sora, and explicitly configured hosted
+  provider APIs
 - Clients: Codex, Claude Code, Gemini CLI, Cursor, OpenCode
 - Adapters: Claude Code hooks, Codex review, hosted project UI deployer, Lightpanda CDP, MemPalace MCP
 - Models: exact model IDs used by scripts or user-facing model benchmarks

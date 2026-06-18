@@ -35,11 +35,12 @@ class SkillDeployerCharacterizationTest(unittest.TestCase):
     def test_deploy_script_honors_default_api_base_override(self) -> None:
         body = self.read("scripts/deploy_skills.py")
         self.assertIn(
-            'DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "https://api.manus.im")',
+            'DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "")',
             body,
         )
-        self.assertIn("API_BASE = normalize_api_base(DEFAULT_API_BASE)", body)
+        self.assertIn('API_BASE = ""', body)
         self.assertNotIn('API_BASE = normalize_api_base("https://api.manus.im")', body)
+        self.assertIn("set --api-base or SKILL_DEPLOYER_API_BASE", body)
 
 
 if __name__ == "__main__":

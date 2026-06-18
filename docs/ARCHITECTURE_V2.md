@@ -20,7 +20,8 @@ Primary names:
 
 Compatibility names remain only where they identify a real platform adapter or preserve installed clients:
 
-- `manus-api` remains the Manus API adapter.
+- `provider-api` is the neutral hosted-provider API adapter; provider-specific
+  details belong in optional skills or explicit `--api-base` configuration.
 - Old `.manus` local roots are not built-in adapter roots; use
   `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` when a retired root must be searched.
 - Optional MCP bridges use neutral `UniversalAI-*` Windows task names.
