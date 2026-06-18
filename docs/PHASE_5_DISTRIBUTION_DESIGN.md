@@ -265,7 +265,9 @@ Example: `chat-summarizer@2.1.0+9f3a2c1.tar.zst`.
 
 `content_hash` is the §3.2 hash and is **self-excluding**: it is computed over the tar in which
 `package.json` carries `content_hash: ""`, then written back. (Standard self-reference handling.)
-`legacy_aliases` is carried so the `manus`-style alias resolution survives into pulled installs.
+`legacy_aliases` is carried only as historical lookup metadata so renamed skills
+remain discoverable after pulled installs. It must not reintroduce legacy
+ecosystem branding into package names, command names, or install targets.
 
 ### 3.5 Reproducibility guarantees
 
@@ -393,7 +395,7 @@ minisign-required, cosign-required-if-online.
 
 ### 5.1 New CLI verbs
 
-All under the existing `skill-router` binary (and its `manus` alias). Two groups:
+All under the existing `skill-router` binary. Two groups:
 
 ```
 # Authoring / release side (CI + maintainers)

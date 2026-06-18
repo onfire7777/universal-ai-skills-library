@@ -35,7 +35,8 @@ with another user.
 - Lightpanda, Context Mode, MemPalace, NotebookLM MCP CLI, x-cli, Instagram CLI, Crawl4AI, web search,
   GBrain, and GSkills/GStack are documented and validated without vendoring private
   state
-- command names prefer `skill-router`; `manus` is compatibility-only
+- command names use `skill-router`; provider-specific integrations are exposed
+  under explicit adapter names such as `manus-api`
 - docs describe the actual scripts and runtime paths
 - manifest validates against `skills/`
 - Go tests pass
