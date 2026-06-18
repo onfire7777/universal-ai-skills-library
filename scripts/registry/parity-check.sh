@@ -2,9 +2,9 @@
 #
 # parity-check.sh — the registry migration cut-over gate.
 #
-# Proves the Go `skill-router registry build` emits BYTE-IDENTICAL artifacts to
-# the legacy Node generator (generate-registry.mjs), for every artifact in both
-# the optimize (committed) and faithful (legacy byte-for-byte) modes. Exit 0 only
+# Proves the Go `skill-router registry build` emits BYTE-IDENTICAL CLI-first
+# artifacts to the legacy Node generator (generate-registry.mjs), for every
+# current artifact in both optimize (committed) and faithful modes. Exit 0 only
 # when every comparison matches. Run from anywhere; it locates the repo root.
 #
 #   make parity            # convenience wrapper
@@ -48,9 +48,9 @@ compare() { # <label> <mode-flag> <artifact...>
 }
 
 echo "== optimize (the committed form) =="
-compare optimize --optimize manifest marketplace codex-marketplace build-manifest
+compare optimize --optimize manifest build-manifest
 echo "== faithful (legacy byte-for-byte) =="
-compare faithful --faithful manifest marketplace
+compare faithful --faithful manifest
 
 echo
 if [ "$fail" -ne 0 ]; then

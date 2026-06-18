@@ -1,6 +1,6 @@
 {
   "schema": "universal-ai-stack.model-registry.v1",
-  "updated": "2026-05-13",
+  "updated": "2026-06-18",
   "purpose": "Portable canonical model registry for local AI tools, agents, automations, and fallback routing.",
   "credentialPolicy": {
     "sourceOfTruth": "{{USERPROFILE}}\\.universal-ai-stack\\secrets\\.env",
@@ -15,7 +15,8 @@
     "primary-api": "kimi-k2.6-thinking",
     "local-coding": "qwen3-coder-30b-a3b-q4",
     "local-embedding": "qwen3-embedding-0.6b-q8",
-    "shared-memory-embedding": "qwen3-embedding-0.6b-q8"
+    "shared-memory-embedding": "qwen3-embedding-0.6b-q8",
+    "openrouter-coding": "openrouter-auto"
   },
   "models": [
     {
@@ -29,7 +30,11 @@
       "reasoningEffort": "xhigh",
       "serviceTier": "fast",
       "contextLength": 1000000,
-      "accessPriority": ["official-cli-browser-auth", "session-auth", "api-only-if-required"],
+      "accessPriority": [
+        "official-cli-browser-auth",
+        "session-auth",
+        "api-only-if-required"
+      ],
       "notes": "Primary for Hermes/Codex-style hosts that can use OpenAI CLI or browser/session auth. Not exposed through the local HTTP router unless an official API key is intentionally added."
     },
     {
@@ -48,10 +53,42 @@
         "temperature": 1,
         "top_p": 0.95,
         "minMaxTokens": 256,
-        "stripUnsupported": ["top_k", "repeat_penalty", "repetition_penalty"]
+        "stripUnsupported": [
+          "top_k",
+          "repeat_penalty",
+          "repetition_penalty"
+        ]
       },
-      "accessPriority": ["official-cli-session-auth", "api-when-required"],
+      "accessPriority": [
+        "official-cli-session-auth",
+        "api-when-required"
+      ],
       "notes": "Primary paid API fallback and default HTTP-routeable cloud model. Router normalizes request parameters because this model rejects generic low-temperature coding defaults."
+    },
+    {
+      "id": "openrouter-auto",
+      "displayName": "OpenRouter Auto",
+      "provider": "openrouter",
+      "routeKind": "openai-compatible-http",
+      "enabled": true,
+      "priority": 3,
+      "model": "openrouter/auto",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKeyEnv": "OPENROUTER_API_KEY",
+      "contextLength": 200000,
+      "providerRequestDefaults": {
+        "temperature": 0.3,
+        "top_p": 0.9,
+        "extraHeaders": {
+          "HTTP-Referer": "https://github.com/onfire7777/universal-ai-skills-library",
+          "X-Title": "Universal AI Skills Router"
+        }
+      },
+      "accessPriority": [
+        "openrouter-api-key",
+        "api-when-required"
+      ],
+      "notes": "OpenAI-compatible OpenRouter route for users who prefer OpenRouter model brokerage. Kept behind OPENROUTER_API_KEY and used as a cloud fallback when configured."
     },
     {
       "id": "claude-opus-4.7",
@@ -59,11 +96,14 @@
       "provider": "claude-cli",
       "routeKind": "host-cli-session",
       "enabled": true,
-      "priority": 3,
+      "priority": 4,
       "model": "claude-opus-4.7",
       "reasoningEffort": "max",
       "contextLength": 1000000,
-      "accessPriority": ["claude-cli-session-auth", "api-only-if-required"],
+      "accessPriority": [
+        "claude-cli-session-auth",
+        "api-only-if-required"
+      ],
       "notes": "Fallback for hosts that can call Claude CLI/session auth. Not exposed through the local HTTP router without an Anthropic API key."
     },
     {
@@ -72,7 +112,7 @@
       "provider": "local-llama-cpp",
       "routeKind": "openai-compatible-http",
       "enabled": true,
-      "priority": 4,
+      "priority": 5,
       "model": "qwen3-coder-local",
       "baseUrl": "http://127.0.0.1:18080/v1",
       "healthUrl": "http://127.0.0.1:18080/health",
@@ -130,7 +170,7 @@
       "provider": "local-llama-cpp",
       "routeKind": "openai-compatible-http",
       "enabled": true,
-      "priority": 5,
+      "priority": 6,
       "model": "qwen3-embedding-0.6b",
       "baseUrl": "http://127.0.0.1:18084/v1",
       "healthUrl": "http://127.0.0.1:18084/health",

@@ -1,8 +1,8 @@
 // Package registry is the Go owner of the build step: it scans skills/ + the
-// registry config and emits the registry artifacts (manifest.json,
-// marketplace.json, the codex marketplace, and docs/build_manifest.json),
-// reproducing the legacy Node generator (scripts/registry/generate-registry.mjs)
-// byte-for-byte so the Node tool can be retired behind the --check parity gate.
+// registry config and emits the CLI-first registry artifacts (manifest.json and
+// docs/build_manifest.json), reproducing the legacy Node generator
+// (scripts/registry/generate-registry.mjs) byte-for-byte so the Node tool can be
+// retired behind the --check parity gate.
 //
 // regjson.go provides an insertion-ordered JSON value model plus a serializer
 // that is byte-compatible with Node's `JSON.stringify(obj, null, 2) + "\n"`:
@@ -85,7 +85,7 @@ func cloneVal(v any) any {
 // Parse decodes JSON bytes into the ordered model: objects -> *OM, arrays ->
 // []any, plus string / json.Number-or-float64 / bool / nil. Object key order is
 // preserved exactly as written, which is what lets embedded config sub-trees
-// (routing, marketplace, ...) round-trip byte-for-byte.
+// (routing, build provenance, ...) round-trip byte-for-byte.
 func Parse(data []byte) (any, error) {
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.UseNumber()

@@ -93,8 +93,8 @@ jobs:
 
       - name: Registry artifacts match single source (Go — AUTHORITATIVE)
         # Cut-over Stage 3 (docs/MIGRATION_NODE_TO_GO.md §5): the Go generator is
-        # now the BLOCKING drift gate. Byte-checks all 4 registries (manifest.json,
-        # marketplace.json, .agents/plugins/marketplace.json, docs/build_manifest.json)
+        # now the BLOCKING drift gate. Byte-checks the CLI-first artifacts
+        # (manifest.json, docs/build_manifest.json)
         # against the single source of truth; exits 1 on drift.
         run: |
           "$SKILL_ROUTER_BIN" registry build --check

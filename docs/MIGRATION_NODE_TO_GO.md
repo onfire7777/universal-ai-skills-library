@@ -60,19 +60,17 @@ branches (the repo invariant "No behavior change; local only").
 
 ## 2. What the Node generator does today (the thing being replaced)
 
-`generate-registry.mjs` is the single emitter. From one source of truth
-(`skills/` on disk + `scripts/registry/registry.config.json`) it emits **four**
-artifacts in lockstep:
+`generate-registry.mjs` is now the secondary parity oracle. From one source of
+truth (`skills/` on disk + `scripts/registry/registry.config.json`) it emits
+the CLI-first artifacts in lockstep:
 
 | # | Artifact | Role |
 |---|----------|------|
 | 1 | `manifest.json` | Router catalog — the contract read by `skill-router` |
-| 2 | `marketplace.json` | Canonical Claude plugin marketplace |
-| 3 | `.agents/plugins/marketplace.json` | Codex variant; shared metadata in lockstep |
-| 4 | `docs/build_manifest.json` | Provenance / build report |
+| 2 | `docs/build_manifest.json` | Provenance / build report |
 
-The Go `skill-router registry build` must emit **the same four artifacts** with
-**identical bytes** in `--faithful` mode before it can replace Node.
+The Go `skill-router registry build` emits the same artifacts and fails closed
+if retired marketplace files reappear.
 
 ---
 
@@ -93,14 +91,14 @@ with declared compatibility aliases — see invariants.
 Flag semantics (must match exactly on both sides):
 
 - **`--check`** — generate in memory, diff against the committed files, exit `1`
-  on drift. No writes. Default covers **all four** artifacts plus the
-  stale-duplicate guard. This is the CI gate.
+  on drift. No writes. Default covers the CLI-first artifacts plus the retired
+  marketplace guard. This is the CI gate.
 - **`--write`** — write the generated artifacts to disk.
 - **`--print <artifact>`** — print one artifact to stdout. Valid values:
-  `manifest` | `marketplace` | `codex-marketplace` | `build-manifest`.
-- **`--faithful`** — reproduce the legacy `manifest.json` / `marketplace.json`
-  **byte-for-byte** (the refactor-only proof). `build_manifest.json` is **not**
-  reproduced in this mode (optimize intentionally restructures it).
+  `manifest` | `build-manifest`.
+- **`--faithful`** — reproduce the legacy `manifest.json` **byte-for-byte** (the
+  refactor-only proof). `build_manifest.json` is **not** reproduced in this mode
+  (optimize intentionally restructures it).
 - **`--optimize`** — the optimized output. This is the **default** (the committed
   registries *are* the optimized output); `--optimize` is the explicit form.
 - **`--only <list>`** — restrict to a comma-separated list of artifacts.
@@ -120,19 +118,16 @@ generator and the Node generator produce **byte-identical** artifacts.
 
 The parity harness — `make parity` wrapping `scripts/registry/parity-check.sh`
 — now exists in the working tree (Track A). Running it against the current
-corpus reports **byte-identical** output for all four artifacts in `--optimize`
-mode and for `manifest` + `marketplace` in `--faithful` mode:
+corpus reports **byte-identical** output for the current CLI-first artifacts in
+`--optimize` mode and for `manifest` in `--faithful` mode:
 
 ```
 $ make parity
 == optimize (the committed form) ==
 OK   [optimize] manifest             668773 bytes
-OK   [optimize] marketplace           26637 bytes
-OK   [optimize] codex-marketplace       402 bytes
 OK   [optimize] build-manifest         5638 bytes
 == faithful (legacy byte-for-byte) ==
 OK   [faithful] manifest             747223 bytes
-OK   [faithful] marketplace             520 bytes
 PARITY GATE: PASS — Go output is byte-identical to the Node generator.
 ```
 
@@ -145,10 +140,8 @@ plan in §6.
 The harness does the following:
 
 1. Run **both** generators in `--faithful` mode to a scratch dir.
-2. `diff` all four artifacts byte-for-byte:
+2. `diff` all current artifacts byte-for-byte:
    - `manifest.json`
-   - `marketplace.json`
-   - `.agents/plugins/marketplace.json`
    - `docs/build_manifest.json` *(note: `build_manifest` is not reproduced under
      `--faithful`; parity for it is asserted in `--optimize` mode — see §4.3)*
 3. Exit non-zero on any difference.
@@ -161,18 +154,12 @@ set -euo pipefail
 
 # 1. Node reference (authoritative) — faithful mode for the byte-identical proof
 node scripts/registry/generate-registry.mjs --faithful --print manifest        > /tmp/node.manifest.json
-node scripts/registry/generate-registry.mjs --faithful --print marketplace     > /tmp/node.marketplace.json
-node scripts/registry/generate-registry.mjs --faithful --print codex-marketplace > /tmp/node.codex.json
 
 # 2. Go candidate (Track A) — same flags
 skill-router registry build --faithful --print manifest        > /tmp/go.manifest.json
-skill-router registry build --faithful --print marketplace     > /tmp/go.marketplace.json
-skill-router registry build --faithful --print codex-marketplace > /tmp/go.codex.json
 
 # 3. Byte diff — must be empty
 diff /tmp/node.manifest.json    /tmp/go.manifest.json
-diff /tmp/node.marketplace.json /tmp/go.marketplace.json
-diff /tmp/node.codex.json       /tmp/go.codex.json
 ```
 
 Any non-empty `diff` is a parity failure and blocks cut-over.

@@ -4,7 +4,7 @@
  * Run: node --test scripts/registry/   (or: npm test if wired by Foundation)
  *
  * These tests are the refactor-only proof: the generator reproduces today's
- * manifest.json (and marketplace.json) and the generated output obeys the exact
+ * manifest.json and build provenance, and the generated output obeys the exact
  * contract enforced by skill-router-cli validate_manifest.go, so the decoupled
  * router reads it unchanged.
  */
@@ -21,7 +21,6 @@ import {
   listSkillScripts,
   scanSkills,
   buildManifest,
-  buildMarketplace,
   buildBuildManifest,
   normalizeForCompare,
 } from "./generate-registry.mjs";
@@ -71,21 +70,6 @@ test("faithful manifest is semantically identical to the committed manifest", ()
     assert.deepEqual(g.aliases || null, c.aliases || null, `${c.name} aliases`);
     assert.deepEqual(sorted(g.scripts), sorted(c.scripts), `${c.name} scripts (set)`);
   }
-});
-
-test("committed marketplace preserves the canonical plugin identity", () => {
-  // Compare by identity (name/owner/plugins core), tolerant of the optimize-mode
-  // additions (themed groupings, refreshed skill-count token in the description).
-  const committed = JSON.parse(readCommitted("marketplace.json"));
-  const canon = config.marketplace;
-  assert.equal(committed.name, canon.name, "marketplace name");
-  assert.deepEqual(committed.owner, canon.owner, "marketplace owner");
-  assert.equal(committed.plugins.length, canon.plugins.length, "plugin count");
-  committed.plugins.forEach((p, i) => {
-    assert.equal(p.name, canon.plugins[i].name, "plugin name");
-    assert.deepEqual(p.source, canon.plugins[i].source, "plugin source");
-    assert.equal(p.version, canon.plugins[i].version, "plugin version");
-  });
 });
 
 test("optimize is behaviour-neutral: faithful and optimized manifests are semantically equal", () => {
@@ -192,26 +176,11 @@ test("build_manifest no longer drifts from manifest (single scan, equal counts)"
   assert.equal(b.skill_count, m.total_skills, "build_manifest count == manifest count");
 });
 
-test("marketplace optimize carries all 14 themed groupings, members resolve to skills/", () => {
-  const market = buildMarketplace(config, skills, { optimize: true });
-  assert.equal(market.groupings.length, 14, "14 groupings");
-  for (const g of market.groupings) {
-    assert.ok(!g.name.startsWith("manus-"), `${g.name} should use universal branding`);
-    assert.ok(g.name && Array.isArray(g.members) && g.members.length > 0, `${g.name} shape`);
-    for (const id of g.members) {
-      assert.ok(
-        fs.existsSync(path.join(REPO_ROOT, "skills", id, "SKILL.md")),
-        `grouping ${g.name} member ${id} not a real skill`
-      );
-    }
-  }
-});
-
 test("collapsed stale duplicate registries do not exist on disk", () => {
   for (const rel of STALE_REGISTRIES) {
     assert.ok(
       !fs.existsSync(path.join(REPO_ROOT, rel)),
-      `${rel} is a stale duplicate registry and must be deleted (canonical = root marketplace.json)`
+      `${rel} is a retired marketplace registry and must be deleted`
     );
   }
 });
@@ -222,12 +191,10 @@ test("normalizeForCompare treats scripts[] order as insignificant", () => {
   assert.equal(normalizeForCompare("manifest", serialize(a)), normalizeForCompare("manifest", serialize(b)));
 });
 
-test("--check (faithful default) reports manifest + marketplace in sync today", () => {
+test("--check (faithful default) reports manifest in sync today", () => {
   // mirrors the CLI default-selection behavior without spawning a subprocess
-  for (const [key, rel] of [["manifest", "manifest.json"], ["marketplace", "marketplace.json"]]) {
-    const built = key === "manifest"
-      ? buildManifest(config, skills, { optimize: false })
-      : buildMarketplace(config, skills, { optimize: false });
+  for (const [key, rel] of [["manifest", "manifest.json"]]) {
+    const built = buildManifest(config, skills, { optimize: false });
     const generated = normalizeForCompare(key, serialize(built));
     const committed = normalizeForCompare(key, readCommitted(rel));
     assert.equal(generated, committed, `${rel} drifted`);

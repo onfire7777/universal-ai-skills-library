@@ -1,9 +1,8 @@
 # Foundation Makefile — build/test entrypoints for the canonical tree.
 # Owner: FOUNDATION task. See STRUCTURE.md + docs/ARCHITECTURE-decoupling.md.
 #
-# NOTE: `make test` is RED at HEAD by design — 4 known pre-existing failures
-# (2 real routing-drift, 2 macOS-only). "Green" for the refactor = no NEW
-# failures beyond those 4. See STRUCTURE.md §4.
+# NOTE: `make test` is expected to pass at HEAD. Use `make eval-check` for
+# routing-quality regression gating in addition to unit tests.
 
 ROUTER_DIR := skill-router-cli
 
@@ -20,13 +19,13 @@ build: ## go build ./... (router)
 vet: ## go vet ./... (router)
 	cd $(ROUTER_DIR) && go vet ./...
 
-test: ## go test ./... (router) — RED at HEAD: 4 known baseline failures
+test: ## go test ./... (router)
 	cd $(ROUTER_DIR) && go test ./...
 
-baseline: ## Record the baseline: build + vet + test (test failures are expected/known)
+baseline: ## Record the baseline: build + vet + test
 	@echo "== go build ==" ; cd $(ROUTER_DIR) && go build ./... && echo "BUILD_PASS"
 	@echo "== go vet ==" ; cd $(ROUTER_DIR) && go vet ./... && echo "VET_PASS"
-	@echo "== go test (expect 4 known failures; see STRUCTURE.md) ==" ; \
+	@echo "== go test ==" ; \
 		cd $(ROUTER_DIR) && go test ./... ; echo "test rc=$$?"
 
 # --- Phase 0 (docs/ARCHITECTURE_IMPROVEMENT_PLAN.md) — measurable routing ---

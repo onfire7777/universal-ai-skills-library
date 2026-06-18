@@ -44,9 +44,8 @@ prompt needs a matching skill.
   generated manifest interface via env/config-driven paths, with no hardcoded
   `skills/` or `manifest.json` locations
 - a **single-source registry generator** (`scripts/registry/`) that emits
-  `manifest.json`, `marketplace.json`, the plugin marketplace, and the slim
-  `docs/build_manifest.json` provenance record in lockstep, so the catalog
-  cannot drift (CI enforces this with `--check`)
+  `manifest.json` and the slim `docs/build_manifest.json` provenance record in
+  lockstep, so the catalog cannot drift (CI enforces this with `--check`)
 - compact adapters for Codex, Claude, Cursor, Gemini, OpenCode, Hermes Agent,
   Paperclip, Kiro, Qwen, Kimi, OpenHands, Cline, Continue, and similar clients
 - optional Universal AI Stack runtime for model routing, health checks,
@@ -74,9 +73,9 @@ Three layers with a clean separation of concerns:
 2. **Corpus** — `skills/`, the single source-of-truth set of 1,812 canonical
    skill directories.
 3. **Registry** — generated from the corpus by `scripts/registry/`. One
-   generator emits every registry artifact (`manifest.json`, `marketplace.json`,
-   `.agents/plugins/marketplace.json`, `docs/build_manifest.json`) in lockstep;
-   drift is impossible and is verified in CI.
+   generator emits the CLI-first registry artifacts (`manifest.json`,
+   `docs/build_manifest.json`) in lockstep; drift is impossible and is verified
+   in CI. Marketplace JSON outputs are retired and guarded against reappearing.
 
 Compatibility binary aliases, including `manus`, invoke the same `skill-router`
 binary so existing rules and scripts keep working. New workflows should use the
@@ -183,10 +182,9 @@ universal-ai-skills-library/
 |-- install.ps1
 |-- install.sh
 |-- manifest.json           # generated skill catalog (do not hand-edit)
-|-- marketplace.json        # generated plugin marketplace (do not hand-edit)
 |-- skill-router-cli/       # Go CLI source (the router)
 |-- skills/                 # source-of-truth skill corpus
-|-- scripts/registry/       # single-source registry generator (manifest/marketplace/...)
+|-- scripts/registry/       # single-source registry generator
 |-- tests/                  # cross-cutting characterization tests + shared fixtures
 |-- ai-setup/               # portable Universal AI Stack runtime and scripts
 |-- plugin/                 # plugin metadata and compact adapters
@@ -196,9 +194,9 @@ universal-ai-skills-library/
 `-- docs/                   # architecture, compatibility, setup, and audits
 ```
 
-The registry artifacts (`manifest.json`, `marketplace.json`,
-`.agents/plugins/marketplace.json`, `docs/build_manifest.json`) are **generated**
-from `skills/` — edit `skills/` and regenerate, never hand-edit the artifacts.
+The registry artifacts (`manifest.json`, `docs/build_manifest.json`) are
+**generated** from `skills/` — edit `skills/` and regenerate, never hand-edit
+the artifacts.
 
 ## Universal AI Stack
 

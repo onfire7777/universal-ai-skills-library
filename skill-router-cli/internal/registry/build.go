@@ -6,26 +6,27 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 )
 
-// Artifacts maps an artifact key to its repo-relative path. The KEY ORDER for
-// "build all" is fixed by ArtifactKeys to match the Node generator's
-// Object.keys(ARTIFACTS) iteration order.
+// Artifacts maps an artifact key to its repo-relative path. The CLI-first
+// architecture keeps manifest.json as the catalog and docs/build_manifest.json
+// as provenance; marketplace JSON outputs are intentionally retired.
 var Artifacts = map[string]string{
-	"manifest":          "manifest.json",
-	"marketplace":       "marketplace.json",
-	"codex-marketplace": ".agents/plugins/marketplace.json",
-	"build-manifest":    "docs/build_manifest.json",
+	"manifest":       "manifest.json",
+	"build-manifest": "docs/build_manifest.json",
 }
 
 // ArtifactKeys is the canonical build/write order.
-var ArtifactKeys = []string{"manifest", "marketplace", "codex-marketplace", "build-manifest"}
+var ArtifactKeys = []string{"manifest", "build-manifest"}
 
-// StaleRegistries are collapsed registries that must never reappear; --check
-// fails if any are present.
-var StaleRegistries = []string{"plugin/marketplace.json"}
+// StaleRegistries are retired marketplace registries that must never reappear;
+// --check fails if any are present.
+var StaleRegistries = []string{
+	"marketplace.json",
+	".agents/plugins/marketplace.json",
+	"plugin/marketplace.json",
+}
 
 // Skill is a scanned skill catalog entry.
 type Skill struct {
@@ -304,40 +305,6 @@ func buildManifest(config *OM, skills []Skill, optimize bool) *OM {
 	return out
 }
 
-func buildMarketplace(config *OM, skills []Skill, optimize bool) *OM {
-	market := asOM(get(config, "marketplace")).Clone()
-	if optimize {
-		count := formatThousands(len(skills))
-		if plugins, ok := market.Get("plugins"); ok {
-			for _, p := range asArr(plugins) {
-				po, ok := p.(*OM)
-				if !ok {
-					continue
-				}
-				if d, ok := po.Get("description"); ok {
-					if ds, isStr := d.(string); isStr {
-						po.Set("description", skillsCountPattern.ReplaceAllString(ds, count+" skills"))
-					}
-				}
-			}
-		}
-		groupings := asArr(get(config, "groupings"))
-		if len(groupings) > 0 {
-			gout := make([]any, 0, len(groupings))
-			for _, g := range groupings {
-				gm := asOM(g)
-				ng := NewOM()
-				ng.Set("name", get(gm, "name"))
-				ng.Set("description", get(gm, "description"))
-				ng.Set("members", get(gm, "members"))
-				gout = append(gout, ng)
-			}
-			market.Set("groupings", gout)
-		}
-	}
-	return market
-}
-
 func buildBuildManifest(config *OM, skills []Skill, optimize bool) *OM {
 	b := asOM(get(config, "buildManifest"))
 	out := NewOM()
@@ -387,62 +354,12 @@ func buildBuildManifest(config *OM, skills []Skill, optimize bool) *OM {
 	return out
 }
 
-func buildCodexMarketplace(config *OM) *OM {
-	canonical := asOM(get(config, "marketplace"))
-	name := get(canonical, "name")
-	displayName := name
-	if plugins, ok := canonical.Get("plugins"); ok {
-		if arr := asArr(plugins); len(arr) > 0 {
-			displayName = "Universal AI Skills"
-		}
-	}
-	iface := NewOM()
-	iface.Set("displayName", displayName)
-	src := NewOM()
-	src.Set("source", "local")
-	src.Set("path", "./plugin-codex")
-	policy := NewOM()
-	policy.Set("installation", "INSTALLED_BY_DEFAULT")
-	policy.Set("authentication", "ON_INSTALL")
-	plugin := NewOM()
-	plugin.Set("name", name)
-	plugin.Set("source", src)
-	plugin.Set("policy", policy)
-	plugin.Set("category", "Productivity")
-	out := NewOM()
-	out.Set("name", name)
-	out.Set("interface", iface)
-	out.Set("plugins", []any{plugin})
-	return out
-}
-
 // BuildAll builds every artifact keyed by its artifact key.
 func BuildAll(config *OM, skills []Skill, optimize bool) map[string]*OM {
 	return map[string]*OM{
-		"manifest":          buildManifest(config, skills, optimize),
-		"marketplace":       buildMarketplace(config, skills, optimize),
-		"codex-marketplace": buildCodexMarketplace(config),
-		"build-manifest":    buildBuildManifest(config, skills, optimize),
+		"manifest":       buildManifest(config, skills, optimize),
+		"build-manifest": buildBuildManifest(config, skills, optimize),
 	}
-}
-
-func formatThousands(n int) string {
-	s := strconv.Itoa(n)
-	neg := strings.HasPrefix(s, "-")
-	if neg {
-		s = s[1:]
-	}
-	var parts []string
-	for len(s) > 3 {
-		parts = append([]string{s[len(s)-3:]}, parts...)
-		s = s[:len(s)-3]
-	}
-	parts = append([]string{s}, parts...)
-	out := strings.Join(parts, ",")
-	if neg {
-		out = "-" + out
-	}
-	return out
 }
 
 // ----------------------------------------------------------------------------
@@ -450,7 +367,7 @@ func formatThousands(n int) string {
 // ----------------------------------------------------------------------------
 
 // SelectArtifacts mirrors the Node generator's artifact selection: --only wins;
-// a faithful check is restricted to {manifest, marketplace}; otherwise all.
+// otherwise all current CLI-first artifacts are checked or written.
 func SelectArtifacts(only []string, isCheck, optimize bool) []string {
 	if len(only) > 0 {
 		sel := make([]string, 0, len(only))
@@ -460,9 +377,6 @@ func SelectArtifacts(only []string, isCheck, optimize bool) []string {
 			}
 		}
 		return sel
-	}
-	if isCheck && !optimize {
-		return []string{"manifest", "marketplace"}
 	}
 	return ArtifactKeys
 }
@@ -521,7 +435,7 @@ func RunCheck(repoRoot string, built map[string]*OM, selected []string, out, err
 	}
 	for _, rel := range StaleRegistries {
 		if fileExists(filepath.Join(repoRoot, rel)) {
-			fmt.Fprintf(errw, "DRIFT: %s is a stale duplicate registry (collapsed into the canonical marketplace.json — delete it)\n", rel)
+			fmt.Fprintf(errw, "DRIFT: %s is a retired marketplace registry — delete it\n", rel)
 			drift++
 		} else {
 			fmt.Fprintf(out, "ok: %s absent (collapsed)\n", rel)

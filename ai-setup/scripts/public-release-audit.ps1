@@ -63,7 +63,6 @@ $requiredFiles = @(
   'skill-router-cli\go.mod',
   'skill-router-cli\main.go',
   'manifest.json',
-  'marketplace.json',
   'plugin\plugin.json'
 )
 

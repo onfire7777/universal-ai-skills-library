@@ -118,9 +118,9 @@ These invariants are **not** part of this deprecation and remain intact:
   variables, the `~/.manus/skills` root, and byte-identical alias parity
   behavior are untouched.
 - **The single registry.** `manifest.json` remains the one canonical source of
-  truth for the skill corpus; `marketplace.json` and its CI drift guard are
-  untouched. This deprecation is about *propagation* of the wrapper into agent
-  roots, not the registry.
+  truth for the skill corpus; marketplace JSON artifacts are retired and guarded
+  against reappearing. This deprecation is about *propagation* of the wrapper
+  into agent roots, not the registry.
 
 ## Timeline
 

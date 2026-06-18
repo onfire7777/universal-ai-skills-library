@@ -17,8 +17,6 @@ on:
       - "scripts/registry/**"
       - "skill-router-cli/**"
       - "manifest.json"
-      - "marketplace.json"
-      - ".agents/plugins/marketplace.json"
       - "docs/build_manifest.json"
   workflow_dispatch:
 

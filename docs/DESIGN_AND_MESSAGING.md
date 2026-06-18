@@ -82,9 +82,7 @@ Keep these surfaces aligned when the product description changes:
 
 - GitHub About description
 - `README.md`
-- `marketplace.json`
 - `plugin/plugin.json`
-- `plugin/marketplace.json`
 - `plugin-codex/.codex-plugin/plugin.json`
 - `manifest.json`
 - `docs/PUBLIC_RELEASE_CHECKLIST.md`

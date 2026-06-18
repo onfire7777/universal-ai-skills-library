@@ -4,7 +4,7 @@
  *
  * STATUS — Node→Go cut-over, Stage 3 (see docs/MIGRATION_NODE_TO_GO.md §5):
  * `skill-router registry build` (Go) is now the AUTHORITATIVE generator and the
- * blocking `--check` drift gate (byte-parity proven across all 4 artifacts in
+ * blocking `--check` drift gate (byte-parity proven across all current artifacts in
  * both modes). This script is retained ONLY as an independent, non-blocking
  * parity ORACLE and is slated for removal at Stage 5 after one clean release.
  * Keep its output byte-identical to the Go generator until then.
@@ -14,8 +14,6 @@
  *
  *   source:   skills/ on disk  +  scripts/registry/registry.config.json
  *   emits:    manifest.json                 (router catalog — read by skill-router)
- *             marketplace.json              (canonical Claude plugin marketplace)
- *             .agents/plugins/marketplace.json (codex variant; shared metadata in lockstep)
  *             docs/build_manifest.json      (provenance / build report)
  *
  * The skill CATALOG is derived from skills/ (every top-level dir containing a
@@ -28,17 +26,17 @@
  * Modes (the committed registries ARE the optimized output, so optimize is the
  * default; --faithful selects the legacy characterization mode):
  *   --check            generate in memory, diff against the committed files,
- *                      exit 1 on drift. No writes. Default covers ALL four
- *                      artifacts + the stale-duplicate guard. (Use in CI.)
+ *                      exit 1 on drift. No writes. Default covers all current
+ *                      artifacts + the stale-marketplace guard. (Use in CI.)
  *   --write            write the generated artifacts to disk.
- *   --print <artifact> print one artifact to stdout (manifest|marketplace|codex-marketplace|build-manifest).
- *   --faithful         reproduce the legacy manifest.json/marketplace.json byte-
+ *   --print <artifact> print one artifact to stdout (manifest|build-manifest).
+ *   --faithful         reproduce the legacy manifest.json byte-
  *                      for-byte instead of the optimized form (characterization).
  *   --optimize         explicit form of the default optimized output.
  *   --only <list>      restrict to a comma list of artifacts.
  *
  * Optimize (default) vs --faithful:
- *   faithful   reproduces the legacy manifest.json/marketplace.json byte-for-byte
+ *   faithful   reproduces the legacy manifest.json byte-for-byte
  *              (the refactor-only proof). build_manifest is not reproduced in this
  *              mode because it is intentionally restructured by optimize.
  *   optimize   - manifest entries omit empty optional fields (has_scripts:false,
@@ -47,7 +45,6 @@
  *                ~750KB catalog; nothing consumes its skills[])
  *              - build_manifest paths made portable (relative, not %USERPROFILE%)
  *              - counts recomputed from the live tree (kills the 1812/1811 drift)
- *              - marketplace gains the 14 themed groupings + live skill count
  *
  * Invariants preserved in BOTH modes (breaking these is CHANGES_REQUESTED):
  *   - manifest.routing.compatibility_access records legacy command aliases
@@ -65,16 +62,16 @@ export const CONFIG_PATH = path.join(HERE, "registry.config.json");
 
 export const ARTIFACTS = {
   manifest: "manifest.json",
-  marketplace: "marketplace.json",
-  "codex-marketplace": ".agents/plugins/marketplace.json",
   "build-manifest": "docs/build_manifest.json",
 };
 
-// Registries that were collapsed into the canonical single source and must NOT
-// reappear. plugin/marketplace.json was a stray byte-duplicate of the root
-// aggregate (it points at ./plugin, which only resolves from the repo root; the
-// plugin is self-described by plugin/plugin.json). --check fails if any return.
-export const STALE_REGISTRIES = ["plugin/marketplace.json"];
+// Retired marketplace registries that must NOT reappear. The CLI-first router
+// uses manifest.json + docs/build_manifest.json only.
+export const STALE_REGISTRIES = [
+  "marketplace.json",
+  ".agents/plugins/marketplace.json",
+  "plugin/marketplace.json",
+];
 
 // ---------------------------------------------------------------------------
 // serialization — matches the legacy files: 2-space indent, trailing newline,
@@ -184,28 +181,6 @@ export function buildManifest(config, skills, { optimize }) {
   };
 }
 
-export function buildMarketplace(config, skills, { optimize }) {
-  // Deep clone so we never mutate the loaded config.
-  const market = JSON.parse(JSON.stringify(config.marketplace));
-  if (optimize) {
-    const count = skills.length.toLocaleString("en-US");
-    for (const plugin of market.plugins || []) {
-      if (typeof plugin.description === "string") {
-        plugin.description = plugin.description.replace(/[\d,]+ skills/g, `${count} skills`);
-      }
-    }
-    if (Array.isArray(config.groupings) && config.groupings.length > 0) {
-    // Preserve the former marketplace's only unique value: themed collections.
-      market.groupings = config.groupings.map((g) => ({
-        name: g.name,
-        description: g.description,
-        members: g.members,
-      }));
-    }
-  }
-  return market;
-}
-
 export function buildBuildManifest(config, skills, { optimize }) {
   const b = config.buildManifest;
   const base = {
@@ -245,29 +220,9 @@ export function buildBuildManifest(config, skills, { optimize }) {
   return base;
 }
 
-export function buildCodexMarketplace(config) {
-  // Lockstep codex variant: shares identity with the canonical marketplace but
-  // points at ./plugin-codex with the agents-runtime schema.
-  const canonical = config.marketplace;
-  return {
-    name: canonical.name,
-    interface: { displayName: canonical.plugins?.[0] ? "Universal AI Skills" : canonical.name },
-    plugins: [
-      {
-        name: canonical.name,
-        source: { source: "local", path: "./plugin-codex" },
-        policy: { installation: "INSTALLED_BY_DEFAULT", authentication: "ON_INSTALL" },
-        category: "Productivity",
-      },
-    ],
-  };
-}
-
 export function buildAll(config, skills, opts) {
   return {
     manifest: buildManifest(config, skills, opts),
-    marketplace: buildMarketplace(config, skills, opts),
-    "codex-marketplace": buildCodexMarketplace(config, skills, opts),
     "build-manifest": buildBuildManifest(config, skills, opts),
   };
 }
@@ -278,7 +233,6 @@ export function buildAll(config, skills, opts) {
 // real drift (skills added/removed, descriptions/aliases/script-sets changed)
 // regardless of which form is committed:
 //   - drop volatile / mode-dependent fields (generated, alias_count, the
-//     marketplace skill-count token, groupings)
 //   - canonicalize each entry: aliases default [], has_scripts := scripts
 //     non-empty, scripts sorted (the Go validator sorts both sides anyway)
 // ---------------------------------------------------------------------------
@@ -310,18 +264,6 @@ export function normalizeForCompare(key, text) {
       total_skills: obj.total_skills,
       core_skills: (obj.core_skills || []).map(canonicalEntry),
       library_skills: (obj.library_skills || []).map(canonicalEntry),
-    });
-  }
-  if (key === "marketplace") {
-    return serialize({
-      name: obj.name,
-      owner: obj.owner,
-      plugins: (obj.plugins || []).map((p) => ({
-        name: p.name,
-        source: p.source,
-        version: p.version,
-        author: p.author,
-      })),
     });
   }
   if (key === "build-manifest") {
@@ -365,10 +307,9 @@ function main() {
   const skills = scanSkills(config);
   const built = buildAll(config, skills, { optimize: args.optimize });
 
-  // Default (optimize): check ALL four artifacts byte-for-byte against the
-  // committed tree. --faithful only reproduces manifest+marketplace (the legacy
-  // characterization set); build-manifest/codex have no faithful committed form.
-  const FAITHFUL_CHECK = ["manifest", "marketplace"];
+  // Default (optimize): check all current artifacts against the committed tree.
+  // --faithful only reproduces manifest (the legacy characterization set).
+  const FAITHFUL_CHECK = ["manifest"];
   let selected;
   if (args.only) selected = args.only.filter((k) => k in ARTIFACTS);
   else if (args.mode === "check" && !args.optimize) selected = FAITHFUL_CHECK;
@@ -415,7 +356,7 @@ function main() {
   // Stale-duplicate guard: collapsed registries must not reappear.
   for (const rel of STALE_REGISTRIES) {
     if (fs.existsSync(path.join(REPO_ROOT, rel))) {
-      console.error(`DRIFT: ${rel} is a stale duplicate registry (collapsed into the canonical marketplace.json — delete it)`);
+      console.error(`DRIFT: ${rel} is a retired marketplace registry — delete it`);
       drift++;
     } else {
       console.log(`ok: ${rel} absent (collapsed)`);

@@ -55,11 +55,11 @@ Phase 5 is unbuildable today and unbuildable first. Concretely:
 | **Phase 2** — `skill-router serve` (MCP) + CLI-as-thin-client; physical-copy sync deprecated | Subset pull only makes sense once the resolution/serve surface exists and `DefaultSync` is on its way out. Pull-on-demand is the *replacement* for the deprecation Phase 2 starts. |
 | **Phase 1/3/4** — routing-index, telemetry, capability DAG | The index's `deps[]` edges are exactly the Phase-4 capability DAG. Without it, "transitive deps" has no source. |
 
-**Verified current state (so the gap is explicit):** the `skill-router` Go binary has **no
-`registry` command and no `serve` command** today. There is **no goreleaser** and **no per-skill
-packaging**. The Node generator emits the four artifacts (`manifest.json`, `marketplace.json`,
-`.agents/plugins/marketplace.json`, `docs/build_manifest.json`). Therefore Phase 5 is a
-**design-only deliverable** at this time.
+**Current state note:** the `skill-router` Go binary owns registry generation
+and emits the CLI-first artifacts (`manifest.json`, `docs/build_manifest.json`).
+Marketplace JSON outputs are retired and guarded against reappearing. Per-skill
+packaging remains a design-level extension until the package/pull lifecycle is
+implemented.
 
 ---
 
@@ -472,7 +472,7 @@ escape hatch for fully self-hosted/air-gapped mirrors. The client abstracts the 
 
 | Invariant | How Phase 5 preserves it |
 |---|---|
-| **Exactly one authoritative registry (`manifest.json`)** | `skills-index.json` is *generated from* `manifest.json` in the same build run. It is a derived artifact, peer to `marketplace.json`/`build_manifest.json` — never a second source of truth. `--check` proves no drift. |
+| **Exactly one authoritative registry (`manifest.json`)** | `skills-index.json` is *generated from* `manifest.json` in the same build run. It is a derived artifact, peer to `build_manifest.json` — never a second source of truth. `--check` proves no drift. |
 | **Compatibility aliases** | `routing.compatibility_access[]` in `manifest.json` and `compatibility_binary_aliases[]` in `build_manifest.json` are preserved. The index carries declared compatibility aliases, and each package's `package.json` carries `legacy_aliases[]`, so alias resolution survives into pulled installs. Compatibility binary aliases resolve the new `pkg` verbs identically. |
 | **Deterministic, offline, no-remote-LLM query path** | `pull`/`add` are the *only* verbs that touch the network, and only when explicitly invoked. `route`/`search`/`load_skill` never change. Embeddings/index for routing stay build-time and hash-pinned. |
 | **kebab-case canonical ids** | Package names, index `name`, and `manifest.json` `name` are the same kebab id (schema `pattern` enforces it). |

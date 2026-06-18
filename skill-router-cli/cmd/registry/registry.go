@@ -31,10 +31,8 @@ var Cmd = &cobra.Command{
 	Long: "registry - generate and verify the canonical registry artifacts from the\n" +
 		"skills/ corpus and scripts/registry/registry.config.json.\n\n" +
 		"This is the Go reimplementation of scripts/registry/generate-registry.mjs.\n" +
-		"It emits the same four artifacts in lockstep:\n" +
+		"It emits the CLI-first artifacts in lockstep:\n" +
 		"  manifest.json                    (router catalog)\n" +
-		"  marketplace.json                 (Claude plugin marketplace)\n" +
-		"  .agents/plugins/marketplace.json (codex variant)\n" +
 		"  docs/build_manifest.json         (provenance)\n\n" +
 		"Once `registry build --check` and the parity harness (make parity) prove\n" +
 		"byte-identical output, the Node generator can be retired behind this gate.",
@@ -49,7 +47,7 @@ var buildCmd = &cobra.Command{
 		"                     the committed tree; exit non-zero on drift. No writes.\n" +
 		"  --write            write the generated artifacts to disk.\n" +
 		"  --print <artifact> print one artifact to stdout\n" +
-		"                     (manifest|marketplace|codex-marketplace|build-manifest).\n" +
+		"                     (manifest|build-manifest).\n" +
 		"  --faithful         reproduce the legacy byte-for-byte form instead of optimize.\n" +
 		"  --optimize         explicit form of the default optimized output.\n" +
 		"  --only <list>      restrict to a comma-separated list of artifacts.",

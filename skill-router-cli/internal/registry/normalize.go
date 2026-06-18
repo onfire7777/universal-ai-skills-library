@@ -1,14 +1,8 @@
 package registry
 
 import (
-	"regexp"
 	"sort"
 )
-
-// skillsCountPattern matches the "<n> skills" token in marketplace descriptions
-// (mirrors the Node generator's /[\d,]+ skills/g), so optimize-mode rewrites the
-// live skill count consistently.
-var skillsCountPattern = regexp.MustCompile(`[0-9,]+ skills`)
 
 // normalize.go ports the Node generator's drift comparison: --check compares by
 // MEANING, not bytes, so it is invariant to the faithful-vs-optimize formatting
@@ -74,22 +68,6 @@ func normalizeForCompare(key, text string) string {
 		out.Set("total_skills", get(obj, "total_skills"))
 		out.Set("core_skills", mapCanonical(obj, "core_skills"))
 		out.Set("library_skills", mapCanonical(obj, "library_skills"))
-		return Stringify(out)
-	case "marketplace":
-		out := NewOM()
-		out.Set("name", get(obj, "name"))
-		out.Set("owner", get(obj, "owner"))
-		plugins := make([]any, 0)
-		for _, p := range asArr(get(obj, "plugins")) {
-			po := asOM(p)
-			np := NewOM()
-			np.Set("name", get(po, "name"))
-			np.Set("source", get(po, "source"))
-			np.Set("version", get(po, "version"))
-			np.Set("author", get(po, "author"))
-			plugins = append(plugins, np)
-		}
-		out.Set("plugins", plugins)
 		return Stringify(out)
 	case "build-manifest":
 		obj.Delete("generated_at")
