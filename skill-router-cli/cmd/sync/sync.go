@@ -12,6 +12,7 @@ import (
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/runner"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillservice"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillsync"
 )
 
@@ -198,6 +199,7 @@ type matrixRow struct {
 	DefaultSync    bool   `json:"defaultSync"`
 	TopLevelDirs   int    `json:"topLevelDirs"`
 	SkillFiles     int    `json:"skillFiles"`
+	CanonicalDirs  int    `json:"canonicalDirs"`
 	Wrapper        bool   `json:"wrapper"`
 	LikelyMode     string `json:"likelyMode"`
 	Recommendation string `json:"recommendation"`
@@ -301,6 +303,7 @@ type adapterStatusRow struct {
 	Exists        bool   `json:"exists"`
 	WrapperCopied bool   `json:"wrapperCopied"`
 	SkillFiles    int    `json:"skillFiles"`
+	CanonicalDirs int    `json:"canonicalDirs"`
 	Status        string `json:"status"`
 }
 
@@ -320,6 +323,7 @@ func printAdapterStatus(jsonOut bool) error {
 			Exists:        m.Exists,
 			WrapperCopied: m.Wrapper,
 			SkillFiles:    m.SkillFiles,
+			CanonicalDirs: m.CanonicalDirs,
 			Status:        adapterStatus(m),
 		})
 	}
@@ -358,11 +362,17 @@ func adapterStatus(row matrixRow) string {
 	if !row.Exists {
 		return "not present; nothing to migrate"
 	}
+	if row.LikelyMode == "full-copy" {
+		return "full corpus copied (deprecated); migrate to CLI/serve MCP"
+	}
+	if row.ID == "paperclip" && row.Wrapper {
+		return "wrapper copied (compatibility adapter); configure instructionsFilePath"
+	}
+	if row.LikelyMode == "custom+wrapper" {
+		return "wrapper copied (deprecated); adapter-specific skills present; preserve custom skills"
+	}
 	if row.Wrapper {
 		return "wrapper copied (deprecated); migrate to CLI/serve MCP"
-	}
-	if row.SkillFiles > 100 {
-		return "full corpus copied (deprecated); migrate to CLI/serve MCP"
 	}
 	if row.SkillFiles > 0 {
 		return "adapter-specific skills present; not a wrapper copy"
@@ -488,6 +498,7 @@ func pathExists(path string) bool {
 
 func buildMatrix() []matrixRow {
 	rows := []matrixRow{}
+	canonicalDirs := canonicalSkillDirSet()
 	for _, spec := range platform.AgentRootSpecs() {
 		row := matrixRow{
 			ID:          spec.ID,
@@ -513,6 +524,7 @@ func buildMatrix() []matrixRow {
 		row.Exists = true
 		row.TopLevelDirs = countDirs(entries)
 		row.SkillFiles = countSkillMarkdown(spec.Path)
+		row.CanonicalDirs = countCanonicalDirs(entries, canonicalDirs)
 		row.Wrapper = fileExists(filepath.Join(spec.Path, "universal-ai-skills", "SKILL.md"))
 		// WalkDir does not follow junction/symlinked directories on every platform,
 		// but a wrapper SKILL.md reachable through the known path is still installed.
@@ -534,12 +546,12 @@ func classifyMode(row matrixRow) string {
 		return "missing"
 	case row.ID == "kimi-openclaw" || row.ID == "openclaw-workspace":
 		return "special"
-	case row.Wrapper && !row.DefaultSync && row.SkillFiles > 10:
-		return "custom+wrapper"
-	case row.SkillFiles > 100:
+	case isLikelyFullCopy(row):
 		return "full-copy"
-	case row.Wrapper && row.SkillFiles <= 10:
+	case row.Wrapper && row.SkillFiles == 1:
 		return "wrapper"
+	case row.Wrapper && row.SkillFiles > 1:
+		return "custom+wrapper"
 	case row.SkillFiles == 0:
 		return "empty"
 	default:
@@ -579,6 +591,41 @@ func recommendation(row matrixRow) string {
 		return "healthy wrapper install"
 	}
 	return "consider wrapper install"
+}
+
+func isLikelyFullCopy(row matrixRow) bool {
+	if row.SkillFiles <= 100 || row.CanonicalDirs < 100 {
+		return false
+	}
+	return float64(row.CanonicalDirs)/float64(row.SkillFiles) >= 0.5
+}
+
+func canonicalSkillDirSet() map[string]bool {
+	manifest, err := skillservice.LoadManifest()
+	if err != nil {
+		return map[string]bool{}
+	}
+	dirs := map[string]bool{}
+	for _, skill := range append(manifest.CoreSkills, manifest.LibrarySkills...) {
+		dir := filepath.Base(filepath.FromSlash(skill.Directory))
+		if dir != "." && dir != "" {
+			dirs[strings.ToLower(dir)] = true
+		}
+		if skill.Name != "" {
+			dirs[strings.ToLower(skill.Name)] = true
+		}
+	}
+	return dirs
+}
+
+func countCanonicalDirs(entries []os.DirEntry, canonical map[string]bool) int {
+	count := 0
+	for _, entry := range entries {
+		if entry.IsDir() && canonical[strings.ToLower(entry.Name())] {
+			count++
+		}
+	}
+	return count
 }
 
 func countSkillMarkdown(root string) int {

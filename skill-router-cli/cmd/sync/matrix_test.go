@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +12,30 @@ import (
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
 )
+
+type mockDirEntry struct {
+	name string
+	dir  bool
+}
+
+func (m mockDirEntry) Name() string {
+	return m.name
+}
+
+func (m mockDirEntry) IsDir() bool {
+	return m.dir
+}
+
+func (m mockDirEntry) Type() fs.FileMode {
+	if m.dir {
+		return fs.ModeDir
+	}
+	return 0
+}
+
+func (m mockDirEntry) Info() (fs.FileInfo, error) {
+	return nil, nil
+}
 
 func TestBuildMatrixIncludesReportOnlyRoots(t *testing.T) {
 	t.Setenv("USERPROFILE", t.TempDir())
@@ -58,9 +83,10 @@ func TestClassifyMode(t *testing.T) {
 		{matrixRow{Adapter: "repo-instruction"}, "repo-instruction"},
 		{matrixRow{Exists: true, ID: "kimi-openclaw"}, "special"},
 		{matrixRow{Exists: true, ID: "openclaw-workspace"}, "special"},
-		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 200, DefaultSync: true}, "full-copy"},
-		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 200, DefaultSync: false}, "custom+wrapper"},
-		{matrixRow{Exists: true, SkillFiles: 200}, "full-copy"},
+		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 200, CanonicalDirs: 180, DefaultSync: true}, "full-copy"},
+		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 200, CanonicalDirs: 20, DefaultSync: false}, "custom+wrapper"},
+		{matrixRow{Exists: true, SkillFiles: 200, CanonicalDirs: 180}, "full-copy"},
+		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 273, CanonicalDirs: 41, DefaultSync: true}, "custom+wrapper"},
 		{matrixRow{Exists: true, Wrapper: true, SkillFiles: 1}, "wrapper"},
 		{matrixRow{Exists: true, SkillFiles: 0}, "empty"},
 		{matrixRow{Exists: true, SkillFiles: 3}, "custom"},
@@ -74,15 +100,35 @@ func TestClassifyMode(t *testing.T) {
 
 func TestRecommendationDoesNotMaskFullCopyWithWrapper(t *testing.T) {
 	row := matrixRow{
-		Adapter:     "skill-root",
-		Exists:      true,
-		Wrapper:     true,
-		SkillFiles:  200,
-		DefaultSync: true,
+		Adapter:       "skill-root",
+		Exists:        true,
+		Wrapper:       true,
+		SkillFiles:    200,
+		CanonicalDirs: 180,
+		DefaultSync:   true,
 	}
 	row.LikelyMode = classifyMode(row)
 
 	if got, want := recommendation(row), "wrapper installed; full copy remains, verify intentional"; got != want {
+		t.Fatalf("recommendation = %q, want %q", got, want)
+	}
+}
+
+func TestRecommendationForLargeCustomRootWithWrapper(t *testing.T) {
+	row := matrixRow{
+		Adapter:       "skill-root",
+		Exists:        true,
+		Wrapper:       true,
+		SkillFiles:    273,
+		CanonicalDirs: 41,
+		DefaultSync:   true,
+	}
+	row.LikelyMode = classifyMode(row)
+
+	if got, want := row.LikelyMode, "custom+wrapper"; got != want {
+		t.Fatalf("LikelyMode = %q, want %q", got, want)
+	}
+	if got, want := recommendation(row), "wrapper installed; preserve adapter-specific skills"; got != want {
 		t.Fatalf("recommendation = %q, want %q", got, want)
 	}
 }
@@ -122,6 +168,20 @@ func TestCountSkillMarkdown(t *testing.T) {
 	}
 }
 
+func TestCountCanonicalDirs(t *testing.T) {
+	entries := []os.DirEntry{
+		mockDirEntry{name: "alpha", dir: true},
+		mockDirEntry{name: "notes", dir: true},
+		mockDirEntry{name: "beta", dir: true},
+		mockDirEntry{name: "README.md", dir: false},
+	}
+	canonical := map[string]bool{"alpha": true, "beta": true}
+
+	if got := countCanonicalDirs(entries, canonical); got != 2 {
+		t.Fatalf("countCanonicalDirs = %d, want 2", got)
+	}
+}
+
 func TestAdapterStatusClassifiesDeprecationState(t *testing.T) {
 	cases := []struct {
 		name string
@@ -132,7 +192,9 @@ func TestAdapterStatusClassifiesDeprecationState(t *testing.T) {
 		{"repo-instruction adapter", matrixRow{Adapter: "repo-instruction", Path: ".github/x.md"}, "no physical copy (repo-instruction); use CLI/MCP"},
 		{"skill-root missing", matrixRow{Adapter: "skill-root", Path: "/x", Exists: false}, "not present; nothing to migrate"},
 		{"wrapper copied", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, Wrapper: true, SkillFiles: 1}, "wrapper copied (deprecated); migrate to CLI/serve MCP"},
-		{"full corpus copied", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, SkillFiles: 200}, "full corpus copied (deprecated); migrate to CLI/serve MCP"},
+		{"full corpus copied", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, SkillFiles: 200, CanonicalDirs: 180, LikelyMode: "full-copy"}, "full corpus copied (deprecated); migrate to CLI/serve MCP"},
+		{"custom skills with wrapper", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, Wrapper: true, SkillFiles: 30, CanonicalDirs: 2, LikelyMode: "custom+wrapper"}, "wrapper copied (deprecated); adapter-specific skills present; preserve custom skills"},
+		{"paperclip wrapper", matrixRow{ID: "paperclip", Adapter: "skill-root", Path: "/x", Exists: true, Wrapper: true, SkillFiles: 1, LikelyMode: "wrapper"}, "wrapper copied (compatibility adapter); configure instructionsFilePath"},
 		{"adapter-specific skills", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, SkillFiles: 3}, "adapter-specific skills present; not a wrapper copy"},
 		{"empty root", matrixRow{Adapter: "skill-root", Path: "/x", Exists: true, SkillFiles: 0}, "empty; no copied skills"},
 	}
