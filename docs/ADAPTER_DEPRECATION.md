@@ -77,7 +77,6 @@ compact router pointer or an MCP connector instead.
 | `agent-skills-standard` | Agent Skills open-standard root | skill-root | report-only | `~/.agents/skills` | `skill-router serve` (MCP) or direct CLI |
 | `claude` | Claude Code / Claude Skills | skill-root | default | `~/.claude/skills` | `skill-router serve` (MCP) or direct CLI |
 | `codex` | OpenAI Codex | skill-root | default | `~/.codex/skills` | `skill-router serve` (MCP) or direct CLI |
-| `legacy-compatibility` | Legacy compatibility root | skill-root | report-only / opt-in | `~/.manus/skills` | `skill-router serve` (MCP) or direct CLI |
 | `gemini` | Gemini CLI | skill-root | default | `~/.gemini/skills` | `skill-router serve` (MCP) or direct CLI |
 | `cursor` | Cursor | skill-root | default | `~/.cursor/skills` | `skill-router serve` (MCP) or direct CLI |
 | `opencode` | OpenCode | skill-root | default | `~/.config/opencode/skills` | `skill-router serve` (MCP) or direct CLI |
@@ -114,10 +113,10 @@ compact router pointer or an MCP connector instead.
 
 These invariants are **not** part of this deprecation and remain intact:
 
-- **Compatibility roots.** The `~/.manus/skills` root remains report-only for
-  existing local clients, but legacy `MANUS_SKILLS_DIR` / `MANUS_REPO_DIR`
-  environment aliases are retired. Use `SKILL_ROUTER_SKILLS_DIR` and
-  `SKILL_ROUTER_REPO_DIR` for explicit overrides.
+- **Compatibility roots.** The old `~/.manus/skills` root is no longer part of
+  the built-in adapter matrix. Add any retired local root explicitly through
+  `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` if it must be searched as a read-only
+  external source.
 - **The single registry.** `manifest.json` remains the one canonical source of
   truth for the skill corpus; marketplace JSON artifacts are retired and guarded
   against reappearing. This deprecation is about *propagation* of the wrapper

@@ -50,11 +50,10 @@ The matrix reports:
 | Agent Skills open-standard root | `skill-root` | `~/.agents/skills` | installed-wrapper | Shared location used by OpenCode and OpenHands-style clients when configured; wrapper-only when the root exists. |
 | Claude Code / Claude Skills | `skill-root` | `~/.claude/skills` | default | Wrapper root plus Claude plugin support. |
 | OpenAI Codex | `skill-root` | `~/.codex/skills` and `AGENTS.md` | default | Local wrapper root plus project instructions. |
-| Legacy compatibility root | `skill-root` | `~/.manus/skills` | report-only / opt-in | Compatibility root for existing local clients; not updated by default sync. |
 | Gemini CLI | `skill-root` / `repo-instruction` | `~/.gemini/skills`, `GEMINI.md`, `AGENTS.md` | default | Wrapper root and context-file compatibility. |
 | Cursor | `skill-root` / `repo-instruction` | `~/.cursor/skills`, `.cursor/rules`, `AGENTS.md` | default | Project rules remain the preferred Cursor-native surface. |
 | OpenCode | `skill-root` | `~/.config/opencode/skills` | default | Canonical OpenCode skill root. |
-| OpenCode legacy | `skill-root` | `~/.opencode/skills` | report-only | Legacy compatibility root; do not use as a sync target when `~/.config/opencode/skills` exists. |
+| OpenCode legacy | `skill-root` | `~/.opencode/skills` | report-only | Old OpenCode path; do not use as a sync target when `~/.config/opencode/skills` exists. |
 | Kiro | `skill-root` / `repo-instruction` | `~/.kiro/skills`, `~/.kiro/steering`, `.kiro/steering`, `AGENTS.md` | default | Steering files are separate from skill-root sync. |
 | Hermes Agent/Desktop | `skill-root` | `~/.hermes/skills` | installed-wrapper | Install only the wrapper skill and run `skill-router preflight --json` only for user-submitted prompts as an internal adapter; do not full-copy the corpus. |
 | Hermes Agent source | `skill-root` | `~/.hermes/hermes-agent/skills` | report-only special | Source/bundled skill tree; adapter-specific wrapper updates only. |

@@ -21,7 +21,8 @@ Primary names:
 Compatibility names remain only where they identify a real platform adapter or preserve installed clients:
 
 - `manus-api` remains the Manus API adapter.
-- `.manus` remains an opt-in compatibility root for existing local clients.
+- Old `.manus` local roots are not built-in adapter roots; use
+  `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` when a retired root must be searched.
 - Optional MCP bridges use neutral `UniversalAI-*` Windows task names.
 
 ## Rationale
@@ -68,7 +69,7 @@ universal-ai-skills-library/
 | API adapter | `manus-api` | N/A, platform-specific by design |
 | MCP task prefix | `UniversalAI-*` | old `Manus-*` tasks are cleanup-only compatibility targets |
 | MCP runtime dir | `C:\ProgramData\universal-ai-mcps` | old `C:\ProgramData\manus-mcps` is historical log/cache data |
-| Local tool dir | `%USERPROFILE%\.universal-ai\tools` | `%USERPROFILE%\.manus\tools` may be a compatibility junction |
+| Local tool dir | `%USERPROFILE%\.universal-ai\tools` | old `%USERPROFILE%\.manus\tools` paths are not required |
 
 Detailed compatibility rules live in `docs/UNIVERSAL_COMPATIBILITY.md`.
 The repo-owned config connection map lives in

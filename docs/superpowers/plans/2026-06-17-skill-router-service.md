@@ -15,7 +15,7 @@
 - **Go module:** `github.com/onfire7777/universal-ai-skills-library/skill-router-cli`; engine import path `github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillservice`.
 - **No new third-party dependencies.** MCP server is hand-rolled on stdlib only. (`go.mod` must not gain a new `require` line.)
 - **All tests run hermetic:** `go test ./... -mod=readonly`. No network, no `Date.now`-style nondeterminism in tests.
-- **Invariants preserved:** legacy `MANUS_*` path env aliases are retired in favor of `SKILL_ROUTER_*` overrides, `.manus/skills` is report-only, and the single registry (`manifest.json` canonical source + CI drift guard) stays authoritative. Marketplace JSON artifacts are retired.
+- **Invariants preserved:** legacy `MANUS_*` path env aliases are retired in favor of `SKILL_ROUTER_*` overrides, retired `.manus/skills` roots require explicit `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` opt-in, and the single registry (`manifest.json` canonical source + CI drift guard) stays authoritative. Marketplace JSON artifacts are retired.
 - **Behavior preservation:** existing CLI commands (`route`, `auto`, `preflight`, `search`, `skill`, `sync`, …) keep identical output. The existing characterization test suite is the gate.
 - **Semantic layer:** route/compose candidate ordering MUST pass through `applySemanticRouting`; the exact name/alias guardrail (`isGuardrailPinned`) is never bypassed.
 - **Commands `route` / `search_skills` / `load_skill` / `compose`** are the canonical names; `search` and `skill` remain as back-compat aliases.
@@ -848,7 +848,7 @@ In the `sync`/`propagate` command, when `--check` is set, print each `platform.A
 
 - [ ] **Step 5: Write the migration doc**
 
-Create `docs/ADAPTER_DEPRECATION.md` documenting: (a) what is deprecated (physical-copy propagation of the `universal-ai-skills` wrapper into ~30 `AgentRootSpecs` roots), (b) the replacement (CLI direct calls or `serve` MCP), (c) a per-adapter table (CLI command vs MCP config) derived from `AgentRootSpecs()`, (d) that `MANUS_*` aliases and the single `manifest.json` registry are unchanged, (e) timeline: deprecated now, removal in a later phase.
+Create `docs/ADAPTER_DEPRECATION.md` documenting: (a) what is deprecated (physical-copy propagation of the `universal-ai-skills` wrapper into broad `AgentRootSpecs` roots), (b) the replacement (CLI direct calls or `serve` MCP), (c) a per-adapter table (CLI command vs MCP config) derived from `AgentRootSpecs()`, (d) that old `MANUS_*` path aliases are retired and the single `manifest.json` registry is unchanged, (e) timeline: deprecated now, removal in a later phase.
 
 - [ ] **Step 6: Run suite + smoke the notice**
 

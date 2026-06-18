@@ -39,8 +39,8 @@ Use provider or client names only when they identify a real compatibility surfac
 - Adapters: Claude Code hooks, Codex review, Manus UI deployer, Lightpanda CDP, MemPalace MCP
 - Models: exact model IDs used by scripts or user-facing model benchmarks
 
-Legacy `.manus\tools` may remain only as an explicit compatibility junction to
-`.universal-ai\tools`.
+Retired `.manus\tools` junctions are not required by the universal toolchain.
+Use `%USERPROFILE%\.universal-ai\tools` for local tools.
 
 ## Context Policy
 
@@ -124,7 +124,7 @@ or load routed skills.
 
 Third-party skill roots under Claude, Codex, Paperclip, OpenClaw, Hermes, and
 other AI roots remain read-only external sources. Retired marketplace roots and
-legacy `.manus` roots are not auto-discovered; they require an explicit
+old `.manus` roots are not auto-discovered; they require an explicit
 `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` opt-in. This keeps the universal setup
 comprehensive without committing thousands of duplicated upstream skill bodies.
 Promote an external skill into `skills/` only when it is curated, renamed if

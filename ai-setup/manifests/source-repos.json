@@ -83,13 +83,6 @@
       "mode": "compact-wrapper"
     },
     {
-      "id": "legacy-compatibility",
-      "kind": "skill-root",
-      "instructions": "{{USERPROFILE}}\\.manus\\AGENTS.md",
-      "skills": "{{USERPROFILE}}\\.manus\\skills",
-      "mode": "legacy-opt-in-wrapper"
-    },
-    {
       "id": "opencode-home",
       "kind": "skill-root",
       "instructions": "{{USERPROFILE}}\\.opencode\\AGENTS.md",

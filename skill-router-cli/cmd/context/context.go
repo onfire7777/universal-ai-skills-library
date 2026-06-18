@@ -46,12 +46,6 @@ var showCmd = &cobra.Command{
 			fmt.Println(string(data))
 			fmt.Println()
 		}
-		// Check for the legacy compatibility instruction path.
-		legacyInstr := filepath.Join(dir, ".manus", "instructions.md")
-		if data, err := os.ReadFile(legacyInstr); err == nil {
-			fmt.Println("=== .manus/instructions.md ===")
-			fmt.Println(string(data))
-		}
 		return nil
 	},
 }

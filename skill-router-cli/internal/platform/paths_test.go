@@ -23,7 +23,7 @@ func TestAgentRootSpecsIncludeReportOnlyAgents(t *testing.T) {
 		}
 	}
 	for _, id := range []string{
-		"agent-skills-standard", "legacy-compatibility", "opencode-legacy", "hermes", "hermes-agent-source",
+		"agent-skills-standard", "opencode-legacy", "hermes", "hermes-agent-source",
 		"paperclip", "openclaw-global", "openclaw-workspace", "windsurf", "roo", "cline",
 		"continue", "qwen", "kimi-openclaw", "chatgpt", "claude-cowork",
 		"github-copilot", "vscode-copilot", "aider", "openhands", "devin",

@@ -62,7 +62,7 @@ These files describe how Codex, Claude, and similar clients should use the route
 
 The current sync model installs the compact wrapper into local AI roots and preserves each platform's native/custom skills. It does not full-copy the 1,812-skill corpus.
 
-Known supported local roots include Codex, Claude, OpenSkills `.agent`, legacy compatibility roots, Gemini, Cursor, OpenCode, Kiro, Hermes, Paperclip, OpenClaw, Windsurf, Roo, Continue, Kimi, Qwen, and compatible `SKILL.md`-style clients.
+Known supported local roots include Codex, Claude, OpenSkills `.agent`, Gemini, Cursor, OpenCode, Kiro, Hermes, Paperclip, OpenClaw, Windsurf, Roo, Continue, Kimi, Qwen, and compatible `SKILL.md`-style clients.
 
 Hosted tools such as ChatGPT, Claude Cowork, Devin, Amazon Q Developer, Sourcegraph Cody, Augment, and similar platforms should use adapter instructions, Apps/Actions/MCP/API bridges, or uploaded compact rules instead of local full-copy sync.
 

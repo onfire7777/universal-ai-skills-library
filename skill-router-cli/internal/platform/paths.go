@@ -241,7 +241,6 @@ func AgentRootSpecs() []AgentRootSpec {
 		{ID: "agent-skills-standard", Name: "Agent Skills open-standard root", Path: filepath.Join(home, ".agents", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Shared AgentSkills-compatible root used by clients such as OpenCode/OpenClaw when configured"},
 		{ID: "claude", Name: "Claude Code / Claude Skills", Path: filepath.Join(home, ".claude", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Claude Code filesystem skill root"},
 		{ID: "codex", Name: "OpenAI Codex", Path: filepath.Join(home, ".codex", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Codex local skill root plus AGENTS.md project instructions"},
-		{ID: "legacy-compatibility", Name: "Legacy compatibility root", Path: filepath.Join(home, ".manus", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Opt-in compatibility root for existing local clients that still read this path; never updated by default sync"},
 		{ID: "gemini", Name: "Gemini CLI", Path: filepath.Join(home, ".gemini", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Gemini CLI skill root plus AGENTS.md project instructions"},
 		{ID: "cursor", Name: "Cursor", Path: filepath.Join(home, ".cursor", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Cursor skill root plus .cursor/rules project rules"},
 		{ID: "opencode", Name: "OpenCode", Path: filepath.Join(home, ".config", "opencode", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "OpenCode canonical skill root"},
