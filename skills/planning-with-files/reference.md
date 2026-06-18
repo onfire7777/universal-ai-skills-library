@@ -87,24 +87,10 @@ Long-running agents operate in a continuous loop:
 | `edit` | Updating specific parts (checkboxes, status) |
 | `read` | Reviewing before decisions |
 
-## Agent Workflow Statistics
-
-| Metric | Value |
-|--------|-------|
-| Average tool calls per task | ~50 |
-| Input-to-output ratio | 100:1 |
-| Acquisition price | $2 billion |
-| Time to $100M revenue | 8 months |
-
-## Key Quotes
+## Operational Takeaways
 
 Model capability improvements work best when the surrounding agent loop can preserve state, recover from errors, and keep intent visible.
 
-> "For complex tasks, I save notes, code, and findings to files so I can reference them as I work."
-
-> "I used file.edit to update checkboxes in my plan as I progressed, rather than rewriting the whole file."
-
-## Source
-
-Inspired by public context engineering documentation:
-https://manus.im/de/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus
+- Save durable notes, code, and findings to files so the active context can carry paths and decisions instead of large raw content.
+- Use targeted edits for checkboxes and status fields instead of rewriting the whole plan file.
+- Keep the workflow provider-neutral: the file plan should work the same from Codex, Claude, Paperclip, OpenRouter-backed agents, or other CLI-capable hosts.

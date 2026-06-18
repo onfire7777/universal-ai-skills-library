@@ -85,7 +85,7 @@ See:
 | `scripts/build-batch.ts` | Generate `batch.json` from prompt variants |
 | `scripts/build-prompt.ts` | Build final prompt from `structured-content.md` |
 | `npm run generate` | Generate the infographic |
-| `./scripts/vendor/compression-runtime/scripts/main.ts` | Compress output for delivery |
+| `../compression-runtime/scripts/main.ts` | Compress output for delivery |
 
 ## Workflow
 
@@ -285,10 +285,10 @@ When the infographic is ready:
 1. **Show the image directly** — do not just print a file path.
 2. Briefly state: layout type, style, aspect ratio.
 3. Ask if the user wants changes (layout, content, style) or is satisfied.
-4. **Auto-compress**: once confirmed, run the bundled compression runtime to produce a webp version.
+4. **Auto-compress**: once confirmed, run the canonical compression runtime to produce a webp version.
 
 ```bash
-${BUN_X} {baseDir}/./scripts/vendor/compression-runtime/scripts/main.ts infographic/topic-slug/infographic.png -f webp -q 85
+${BUN_X} {baseDir}/../compression-runtime/scripts/main.ts infographic/topic-slug/infographic.png -f webp -q 85
 ```
 
 If multiple variants were generated via batch, show all of them and let the user pick the best one.

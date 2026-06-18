@@ -69,6 +69,68 @@ class FixtureBrandingCharacterizationTest(unittest.TestCase):
                 with self.subTest(path=path.name, term=term):
                     self.assertNotIn(term, body)
 
+    def test_non_provider_metadata_does_not_advertise_legacy_roots(self) -> None:
+        cache = json.loads(
+            (
+                ROOT
+                / "skills"
+                / "internet-skill-finder"
+                / "references"
+                / "skills_cache.json"
+            ).read_text(encoding="utf-8")
+        )
+        openui_metadata = json.loads(
+            (
+                ROOT
+                / "skills"
+                / "openui"
+                / "references"
+                / "source-metadata.json"
+            ).read_text(encoding="utf-8")
+        )
+
+        external_skill_names = {
+            skill["name"].lower()
+            for source in cache.values()
+            for skill in source.get("skills", [])
+        }
+        old_root = "Man" + "us"
+
+        self.assertNotIn("manus", external_skill_names)
+        self.assertNotIn(old_root, openui_metadata["integrationPolicy"]["sourceOfTruth"])
+        self.assertIn(
+            "universal AI skill roots",
+            openui_metadata["integrationPolicy"]["sourceOfTruth"],
+        )
+
+    def test_planning_reference_is_provider_neutral(self) -> None:
+        reference = (ROOT / "skills" / "planning-with-files" / "reference.md").read_text(
+            encoding="utf-8"
+        )
+
+        forbidden = [
+            "Building-Man" + "us",
+            "man" + "us.im",
+            "Acquisition price",
+            "Time to $100M revenue",
+        ]
+        for term in forbidden:
+            with self.subTest(term=term):
+                self.assertNotIn(term, reference)
+        self.assertIn("provider-neutral", reference)
+
+    def test_skill_packages_do_not_contain_nested_skill_packages(self) -> None:
+        nested_skill_files = []
+        for top_level_skill in (ROOT / "skills").iterdir():
+            if not top_level_skill.is_dir():
+                continue
+            canonical_skill_file = top_level_skill / "SKILL.md"
+            for skill_file in top_level_skill.rglob("SKILL.md"):
+                if skill_file != canonical_skill_file:
+                    nested_skill_files.append(skill_file.relative_to(ROOT).as_posix())
+
+        self.assertEqual([], nested_skill_files)
+
 
 if __name__ == "__main__":
     unittest.main()

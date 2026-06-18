@@ -2138,14 +2138,6 @@
         "source_url": "https://github.com/sanjay3290/ai-skills/tree/main/skills/deep-research"
       },
       {
-        "name": "manus",
-        "description": "Delegate complex tasks to Manus AI agent for deep research, market analysis, product comparisons, stock analysis, and comprehensive report generation with parallel processing.",
-        "github_url": "https://github.com/sanjay3290/ai-skills/tree/main/skills/manus",
-        "import_url": "https://github.com/sanjay3290/ai-skills/tree/main/skills/manus",
-        "source": "readme",
-        "source_url": "https://github.com/sanjay3290/ai-skills/tree/main/skills/manus"
-      },
-      {
         "name": "paper-search",
         "description": "Search academic papers via OpenAlex (250M+ works, free, no API key needed). Find papers by keyword, look up details by DOI, with sorting and pagination.",
         "github_url": "https://github.com/ykdojo/paper-search",

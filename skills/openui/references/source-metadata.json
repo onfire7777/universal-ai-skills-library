@@ -29,7 +29,7 @@
   },
   "integrationPolicy": {
     "skillName": "openui",
-    "sourceOfTruth": "Use this single openui skill name across OpenSkills, Codex, Claude, Cursor, Gemini, OpenCode, Kiro, Manus, and Open Manus roots.",
+    "sourceOfTruth": "Use this single openui skill name across OpenSkills, Codex, Claude, Cursor, Gemini, OpenCode, Kiro, and other universal AI skill roots.",
     "readmePolicy": "The upstream README, core package READMEs, selected example READMEs, docs README, and benchmark README were read before packaging and are bundled under references/.",
     "freshDocsPolicy": "For current API details, fetch allowlisted first-party openui.com docs from SKILL.md; use bundled references for local/offline validation."
   }

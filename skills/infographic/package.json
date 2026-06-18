@@ -14,7 +14,7 @@
     "build-prompt": "bun scripts/build-prompt.ts",
     "build-batch": "bun scripts/build-batch.ts",
     "generate": "bun ./scripts/vendor/weryai-image/main.ts",
-    "compress": "bun ./scripts/vendor/compression-runtime/scripts/main.ts",
+    "compress": "bun ../compression-runtime/scripts/main.ts",
     "test": "npm --prefix scripts test"
   }
 }
