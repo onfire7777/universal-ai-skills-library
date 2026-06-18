@@ -36,7 +36,7 @@ Use provider or client names only when they identify a real compatibility surfac
 
 - APIs: OpenAI, Anthropic, Claude, Sora, Manus API
 - Clients: Codex, Claude Code, Gemini CLI, Cursor, OpenCode
-- Adapters: Claude Code hooks, Codex review, Manus UI deployer, Lightpanda CDP, MemPalace MCP
+- Adapters: Claude Code hooks, Codex review, hosted project UI deployer, Lightpanda CDP, MemPalace MCP
 - Models: exact model IDs used by scripts or user-facing model benchmarks
 - Model providers: configured OpenAI-compatible HTTP providers such as
   OpenRouter, when they are optional fallbacks behind explicit API-key env vars

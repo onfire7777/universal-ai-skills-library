@@ -28,7 +28,7 @@ Compatibility names remain only where they identify a real platform adapter or p
 ## Rationale
 
 The previous layout worked technically but mixed a universal router with
-Manus-branded names. That violated separation of concerns: the universal core
+provider-specific product names. That violated separation of concerns: the universal core
 and platform adapters were coupled in naming, docs, plugin metadata, and local
 instructions.
 
@@ -67,7 +67,7 @@ universal-ai-skills-library/
 | Repo | `universal-ai-skills-library` | use `SKILL_ROUTER_REPO_DIR` for explicit overrides |
 | Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |
 | API adapter | `manus-api` | N/A, platform-specific by design |
-| MCP task prefix | `UniversalAI-*` | old `Manus-*` tasks are cleanup-only compatibility targets |
+| MCP task prefix | `UniversalAI-*` | old provider-specific tasks are cleanup-only compatibility targets |
 | MCP runtime dir | `C:\ProgramData\universal-ai-mcps` | old `C:\ProgramData\manus-mcps` is historical log/cache data |
 | Local tool dir | `%USERPROFILE%\.universal-ai\tools` | old `%USERPROFILE%\.manus\tools` paths are not required |
 

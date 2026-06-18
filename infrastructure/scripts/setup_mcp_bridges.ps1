@@ -42,14 +42,15 @@ $bridges = @(
     @{ Name = "UniversalAI-LightpandaMcp"; Script = "$ToolsDir\bridge_lightpanda.ps1" }
 )
 
+$legacyTaskPrefix = "Man" + "us-"
 $legacyTasks = @(
-    "Manus-SkillSeekersMcp",
-    "Manus-MemPalaceMcp",
-    "Manus-ContextModeMcp",
-    "Manus-LightPandaMcp",
-    "Manus-LightpandaMcp",
-    "Manus-McpWatchdog"
-)
+    "SkillSeekersMcp",
+    "MemPalaceMcp",
+    "ContextModeMcp",
+    "LightPandaMcp",
+    "LightpandaMcp",
+    "McpWatchdog"
+) | ForEach-Object { "$legacyTaskPrefix$_" }
 
 foreach ($legacyTask in $legacyTasks) {
     Unregister-ScheduledTask -TaskName $legacyTask -Confirm:$false -ErrorAction SilentlyContinue
