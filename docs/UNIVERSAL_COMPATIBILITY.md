@@ -42,7 +42,7 @@ Use provider or client names only when they identify a real compatibility surfac
 - Model providers: configured OpenAI-compatible HTTP providers such as
   OpenRouter, when they are optional fallbacks behind explicit API-key env vars
 
-Retired `.manus\tools` junctions are not required by the universal toolchain.
+Retired provider-specific tool junctions are not required by the universal toolchain.
 Use `%USERPROFILE%\.universal-ai\tools` for local tools.
 
 ## Context Policy
@@ -127,7 +127,7 @@ or load routed skills.
 
 Third-party skill roots under Claude, Codex, Paperclip, OpenClaw, Hermes, and
 other AI roots remain read-only external sources. Retired marketplace roots and
-old `.manus` roots are not auto-discovered; they require an explicit
+old provider-branded roots are not auto-discovered; they require an explicit
 `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` opt-in. This keeps the universal setup
 comprehensive without committing thousands of duplicated upstream skill bodies.
 Promote an external skill into `skills/` only when it is curated, renamed if

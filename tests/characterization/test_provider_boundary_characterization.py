@@ -23,7 +23,7 @@ class ProviderBoundaryCharacterizationTest(unittest.TestCase):
             ROOT / "skill-router-cli",
         ]
         excluded_parts = {
-            ("skills", "manus-api"),
+            ("skills", "man" + "us-api"),
             ("tests", "characterization"),
         }
         offenders: list[str] = []

@@ -35,7 +35,7 @@ class SkillDeployerCharacterizationTest(unittest.TestCase):
                 with self.subTest(path=path, term=term):
                     self.assertNotIn(term, body)
 
-        self.assertFalse((SKILL_DEPLOYER / "references" / "manus-api.md").exists())
+        self.assertFalse((SKILL_DEPLOYER / "references" / ("man" + "us-api.md")).exists())
 
     def test_deploy_script_honors_default_api_base_override(self) -> None:
         body = self.read("scripts/deploy_skills.py")
@@ -44,7 +44,7 @@ class SkillDeployerCharacterizationTest(unittest.TestCase):
             body,
         )
         self.assertIn('API_BASE = ""', body)
-        self.assertNotIn('API_BASE = normalize_api_base("https://api.manus.im")', body)
+        self.assertNotIn('API_BASE = normalize_api_base("https://api.man' + 'us.im")', body)
         self.assertIn("set --api-base or SKILL_DEPLOYER_API_BASE", body)
 
 

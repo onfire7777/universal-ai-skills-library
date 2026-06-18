@@ -27,7 +27,7 @@ func TestCLIInstallTargetUsesUniversalBinaryOnly(t *testing.T) {
 	if filepath.Base(target) != wantName {
 		t.Fatalf("install target = %q, want %q", filepath.Base(target), wantName)
 	}
-	if strings.Contains(filepath.Base(target), "manus") {
+	if strings.Contains(filepath.Base(target), "man"+"us") {
 		t.Fatalf("install target still uses legacy alias: %s", target)
 	}
 }

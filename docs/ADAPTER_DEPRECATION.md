@@ -113,7 +113,7 @@ compact router pointer or an MCP connector instead.
 
 These invariants are **not** part of this deprecation and remain intact:
 
-- **Compatibility roots.** The old `~/.manus/skills` root is no longer part of
+- **Compatibility roots.** Old provider-branded skill roots are no longer part of
   the built-in adapter matrix. Add any retired local root explicitly through
   `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` if it must be searched as a read-only
   external source.

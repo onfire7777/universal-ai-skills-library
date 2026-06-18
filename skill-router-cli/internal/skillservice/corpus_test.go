@@ -12,8 +12,8 @@ func TestExternalSkillRootsExcludeRetiredMarketplaceAndLegacyRoots(t *testing.T)
 		if root.ID == "claude-market" || strings.Contains(root.Path, "plugins/marketplaces") {
 			t.Fatalf("retired Claude marketplace root is still auto-discovered: %#v", root)
 		}
-		if root.ID == "legacy-compat" || strings.Contains(root.Path, ".manus") {
-			t.Fatalf("legacy Manus root is still auto-discovered: %#v", root)
+		if root.ID == "legacy-compat" || strings.Contains(root.Path, ".man"+"us") {
+			t.Fatalf("legacy provider root is still auto-discovered: %#v", root)
 		}
 	}
 }

@@ -22,7 +22,7 @@ Provide one coherent surface for the four skill-router operations — **route**,
 - **Does not exist:** `compose`.
 - The `mcp` command (`cmd/mcp/mcp.go`) is a **bridge process manager** (starts/stops PowerShell MCP bridges); it is *not* an MCP protocol server. `go.mod` has no MCP SDK.
 - **Physical-copy adapters:** `platform.AgentRootSpecs()` enumerates known agent skill roots (`.claude/skills`, `.codex/skills`, `.gemini/skills`, …). `skillsync.Propagate` (via `skill-router sync`) copies the **single** default wrapper skill `universal-ai-skills` into the `DefaultSync` subset of those roots. Full-corpus copy is opt-in (`--full-copy`).
-- **Invariants:** legacy `MANUS_*` path env aliases are retired in favor of `SKILL_ROUTER_*` overrides, retired `.manus/skills` roots require explicit `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` opt-in, and the single registry (`manifest.json` canonical source, CI drift guard) remains authoritative.
+- **Invariants:** legacy provider path env aliases are retired in favor of `SKILL_ROUTER_*` overrides, retired provider-branded skill roots require explicit `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` opt-in, and the single registry (`manifest.json` canonical source, CI drift guard) remains authoritative.
 
 ## 3. Architecture — one engine, two entry points
 
@@ -104,7 +104,7 @@ Today only one wrapper skill is physically copied into the `DefaultSync` roots. 
 1. **Keep `sync` functional** but emit a **deprecation notice**: agents should invoke `skill-router` directly (CLI) or configure the MCP server (`serve`) rather than receive physical copies. No behavior removed in this phase.
 2. **Report:** extend `sync --check` (and/or `doctor`) to list which roots still rely on physical copies vs. which are wired to the CLI/MCP surface (read-only matrix; no mutation).
 3. **Document:** new `docs/ADAPTER_DEPRECATION.md` with per-adapter migration (CLI invocation or MCP server config), and a timeline note that physical-copy propagation is deprecated and slated for removal in a later phase.
-4. **Invariants held:** old `MANUS_*` path env overrides remain retired, retired `.manus` roots require explicit external-root opt-in, and the single registry (`manifest.json` + CI drift guard) is untouched.
+4. **Invariants held:** old provider path env overrides remain retired, retired provider-branded roots require explicit external-root opt-in, and the single registry (`manifest.json` + CI drift guard) is untouched.
 
 ## 8. Testing & compliance
 

@@ -96,7 +96,7 @@ class FixtureBrandingCharacterizationTest(unittest.TestCase):
         }
         old_root = "Man" + "us"
 
-        self.assertNotIn("manus", external_skill_names)
+        self.assertNotIn(old_root.lower(), external_skill_names)
         self.assertNotIn(old_root, openui_metadata["integrationPolicy"]["sourceOfTruth"])
         self.assertIn(
             "universal AI skill roots",

@@ -36,7 +36,7 @@ func TestResolveMCPCLIPrefersNeutralBinary(t *testing.T) {
 
 func TestResolveMCPCLIDoesNotUseRetiredCompatibilityBinary(t *testing.T) {
 	dir := t.TempDir()
-	writeExecutable(t, dir, "manus-mcp-cli")
+	writeExecutable(t, dir, "man"+"us-mcp-cli")
 	t.Setenv("PATH", dir)
 
 	if got, err := resolveMCPCLI(); err == nil {

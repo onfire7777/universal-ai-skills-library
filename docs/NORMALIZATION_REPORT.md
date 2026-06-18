@@ -22,7 +22,7 @@
 ## What was done
 
 1. **Universal naming pass** - default surfaces now use `Universal AI Skills`, `skill-router`, and `universal-ai-config`.
-2. **Compatibility boundary pass** - product names such as Codex, Claude Code, OpenAI, Anthropic, Manus, and Gemini remain only where they identify a real provider, API, model, client, or compatibility adapter.
+2. **Compatibility boundary pass** - product names such as Codex, Claude Code, OpenAI, Anthropic, and Gemini remain only where they identify a real provider, API, model, client, or compatibility adapter.
 3. **Context efficiency pass** - global instructions and plugin manifests are index-only; full skill bodies are loaded on demand.
 4. **Router pass** - `skill-router-cli/` is the canonical CLI source; old executable aliases are retired from the default command surface.
 5. **Full-corpus import pass** - archived local skill roots were merged into `skills/` so the universal repo, not individual AI roots, is the complete source of truth.

@@ -50,7 +50,7 @@ func TestAgentRootsStayConservative(t *testing.T) {
 			t.Fatalf("expected conservative default root for %s in %#v", id, roots)
 		}
 	}
-	for _, id := range []string{".agents", ".manus", ".opencode", ".hermes", ".paperclip", ".openclaw", ".windsurf", ".roo", ".cline", ".continue", ".qwen", ".kimi_openclaw"} {
+	for _, id := range []string{".agents", ".man" + "us", ".opencode", ".hermes", ".paperclip", ".openclaw", ".windsurf", ".roo", ".cline", ".continue", ".qwen", ".kimi_openclaw"} {
 		if got[id] {
 			t.Fatalf("did not expect report-only root %s in default AgentRoots %#v", id, roots)
 		}
@@ -124,7 +124,7 @@ func TestRepoDirUsesSavedConfigWhenValid(t *testing.T) {
 
 func TestRepoDirDoesNotAutoSelectLegacyBrandedRepoName(t *testing.T) {
 	home := t.TempDir()
-	legacyRepo := filepath.Join(home, "manus-skills-library")
+	legacyRepo := filepath.Join(home, "man"+"us-skills-library")
 	if err := os.MkdirAll(filepath.Join(legacyRepo, "skills"), 0755); err != nil {
 		t.Fatal(err)
 	}

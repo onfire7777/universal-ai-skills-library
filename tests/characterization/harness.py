@@ -1,8 +1,9 @@
 """Shared harness for skill-router + registry characterization tests.
 
 These tests pin the *current, pre-refactor* behaviour of the Universal AI
-Skills Library so the in-place consolidation (router decoupling, manus merge,
-registry unification) can be proven not to regress existing behaviour.
+Skills Library so the in-place consolidation (router decoupling, legacy
+provider merge, registry unification) can be proven not to regress existing
+behaviour.
 
 Design goals
 ------------
@@ -35,7 +36,7 @@ from typing import Dict, List, Optional, Tuple
 # --- Fixture --------------------------------------------------------------
 # Characterization tests run the router against a *frozen* fixture skills
 # library, NOT the live ``skills/`` tree, so that Goal 2/3 consolidation edits
-# (manus merge, registry unification) cannot break the routing/lookup/alias
+# (legacy provider merge, registry unification) cannot break the routing/lookup/alias
 # pins. The router is pointed at the fixture via ``SKILL_ROUTER_REPO_DIR`` (the
 # same hook the Go ``configurePreflightTest`` helper uses), and HOME/config are
 # redirected to throwaway dirs so no live *external* skill roots leak in.

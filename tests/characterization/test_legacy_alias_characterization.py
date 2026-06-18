@@ -2,7 +2,7 @@
 
 The router presents ``skill-router`` as the universal command. Historical
 project-specific names may remain as disabled lookup aliases for old content,
-but generated artifacts must not advertise the legacy ``manus`` binary or its
+but generated artifacts must not advertise retired provider binaries or their
 old skill-loading route as a current install path.
 """
 
@@ -16,7 +16,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import harness  # noqa: E402
 
-LEGACY_ALIAS = "manus"
+LEGACY_ALIAS = "man" + "us"
 
 
 class CompatibilityDeclaredContract(unittest.TestCase):

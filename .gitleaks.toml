@@ -25,7 +25,7 @@ paths = [
 
   # --- API/protocol documentation with placeholder Authorization headers & sample tokens ---
   '''skills/api-design/SKILL\.md''',
-  # manus API v2 docs: placeholder curl `Authorization: Bearer` examples (exact files, not a glob)
+  # Provider API v2 docs: placeholder curl `Authorization: Bearer` examples (exact files, not a glob)
   '''skills/manus-api/docs/v2/task-lifecycle\.mdx''',
   '''skills/manus-api/docs/v2/website\.mdx''',
   '''skills/manus-api/docs/v2/webhooks-security\.mdx''',

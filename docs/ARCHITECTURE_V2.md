@@ -22,7 +22,7 @@ Compatibility names remain only where they identify a real platform adapter or p
 
 - `provider-api` is the neutral hosted-provider API adapter; provider-specific
   details belong in optional skills or explicit `--api-base` configuration.
-- Old `.manus` local roots are not built-in adapter roots; use
+- Old provider-branded local roots are not built-in adapter roots; use
   `SKILL_ROUTER_EXTERNAL_SKILL_ROOTS` when a retired root must be searched.
 - Optional MCP bridges use neutral `UniversalAI-*` Windows task names.
 
@@ -66,11 +66,11 @@ universal-ai-skills-library/
 | CLI binary | `skill-router` | old executable aliases are retired |
 | Setup skill | `universal-ai-config` | old setup aliases are retired |
 | Repo | `universal-ai-skills-library` | use `SKILL_ROUTER_REPO_DIR` for explicit overrides |
-| Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |
+| Plugin | `universal-ai-skills` | old provider plugin caches can remain disabled or ignored |
 | API adapter | `provider-api` | provider-specific docs remain opt-in skills only |
 | MCP task prefix | `UniversalAI-*` | old provider-specific tasks are cleanup-only compatibility targets |
-| MCP runtime dir | `C:\ProgramData\universal-ai-mcps` | old `C:\ProgramData\manus-mcps` is historical log/cache data |
-| Local tool dir | `%USERPROFILE%\.universal-ai\tools` | old `%USERPROFILE%\.manus\tools` paths are not required |
+| MCP runtime dir | `C:\ProgramData\universal-ai-mcps` | old provider-specific MCP runtime dirs are historical log/cache data |
+| Local tool dir | `%USERPROFILE%\.universal-ai\tools` | old provider-specific tool paths are not required |
 
 Detailed compatibility rules live in `docs/UNIVERSAL_COMPATIBILITY.md`.
 The repo-owned config connection map lives in
