@@ -8846,7 +8846,7 @@
     {
       "name": "skill-deployer",
       "directory": "skills/skill-deployer",
-      "description": "Manus UI compatibility adapter for deploying skills through the gRPC-web API. Packages skills as zips, uploads/deletes/syncs per-project skill sets, and curates domain-relevant skills using LLM analysis. Use only when filesystem skills must be visible in the Manus UI sidebar or synchronized across Manus projects.",
+      "description": "Hosted project-UI compatibility adapter for deploying skills through a provider gRPC-web API. Packages skills as zips, uploads/deletes/syncs per-project skill sets, and curates domain-relevant skills using LLM analysis. Use only when filesystem skills must be visible in a hosted project UI sidebar or synchronized across hosted projects.",
       "has_scripts": true,
       "scripts": [
         "scripts/curate_for_project.py",

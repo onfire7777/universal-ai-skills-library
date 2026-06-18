@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Manus Skill Deployer — Deploy skills to Manus projects via gRPC-web API.
+Hosted Skill Deployer — deploy skills to provider projects via gRPC-web API.
 
 Usage:
     python3 deploy_skills.py --token TOKEN --project-uid UID [options]
@@ -16,7 +16,7 @@ Commands:
     --package               Package all skills as zips (no upload)
 
 Required:
-    --token TOKEN           JWT session token from Manus browser session
+    --token TOKEN           JWT session token from the provider browser session
     --project-uid UID       Target project UID (not needed with --plan/--package)
 
 Options:
@@ -58,7 +58,7 @@ def normalize_api_base(value):
 
 
 DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "https://api.manus.im")
-API_BASE = normalize_api_base("https://api.manus.im")
+API_BASE = normalize_api_base(DEFAULT_API_BASE)
 HEADERS_TEMPLATE = {
     "Content-Type": "application/json",
     "Connect-Protocol-Version": "1",
@@ -71,7 +71,7 @@ DEFAULT_SKILLS_DIR = (
 
 
 def grpc_call(method, data, token):
-    """Make a gRPC-web call to the Manus API."""
+    """Make a gRPC-web call to the provider API."""
     headers = {**HEADERS_TEMPLATE, "Authorization": f"Bearer {token}"}
     url = f"{API_BASE}/skill.v1.ProjectSkillService/{method}"
     try:
@@ -343,7 +343,7 @@ def deploy_plan(plan_path, zip_dir, token, rate_limit=0.15, dry_run=False, max_r
 def main():
     global API_BASE
 
-    parser = argparse.ArgumentParser(description="Deploy skills to Manus projects via API")
+    parser = argparse.ArgumentParser(description="Deploy skills to hosted provider projects via API")
     parser.add_argument("--token", required=True, help="JWT session token")
     parser.add_argument("--project-uid", help="Target project UID")
     parser.add_argument("--api-base", default=DEFAULT_API_BASE, help="Provider API base URL")

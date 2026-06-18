@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Curate skills for Manus projects using LLM-based relevance analysis.
+Curate skills for hosted provider projects using LLM-based relevance analysis.
 
 Analyzes all available skills and selects the most relevant ones for each
 project based on project context, domain, and task history.
@@ -128,7 +128,7 @@ def select_project_skills(project, catalog, universal_skills, client, max_domain
     # Show ALL universal skills to prevent duplicates
     universal_list = "\n".join([f"  - {s}" for s in universal_skills])
 
-    prompt = f"""Select the {domain_count} most relevant skills for this Manus AI project:
+    prompt = f"""Select the {domain_count} most relevant skills for this hosted AI project:
 
 PROJECT: {project['name']}
 CONTEXT: {project['context']}
@@ -205,7 +205,7 @@ def resolve_names(names, catalog):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Curate skills for Manus projects")
+    parser = argparse.ArgumentParser(description="Curate skills for hosted provider projects")
     parser.add_argument("--projects", required=True, help="Projects JSON file")
     parser.add_argument("--skills-dir", default=DEFAULT_SKILLS_DIR, help="Skills directory")
     parser.add_argument("--catalog", help="Pre-built catalog file (skip directory scan)")

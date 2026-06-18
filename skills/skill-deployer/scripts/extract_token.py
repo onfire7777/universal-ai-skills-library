@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Extract JWT session token from Manus browser session.
+Extract JWT session token from a provider browser session.
 
 This script provides the JavaScript snippet to run in the browser console
 to extract the authentication token needed for API calls.
@@ -30,7 +30,7 @@ def normalize_api_base(value):
 DEFAULT_API_BASE = os.environ.get("SKILL_DEPLOYER_API_BASE", "https://api.manus.im")
 
 JS_SNIPPET = """
-// Run this in the browser console at manus.im (while logged in):
+// Run this in the provider web app browser console while logged in:
 // 1. Open DevTools (F12)
 // 2. Go to Console tab
 // 3. Paste and run:
@@ -55,7 +55,7 @@ JS_SNIPPET = """
             }
         }
     }
-    console.log('No token found. Make sure you are logged in at manus.im');
+    console.log('No token found. Make sure you are logged in to the provider web app');
 })();
 """.strip()
 
@@ -92,7 +92,7 @@ def verify_token(token, api_base=None):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Extract/verify Manus JWT token")
+    parser = argparse.ArgumentParser(description="Extract/verify provider JWT token")
     parser.add_argument("--verify", help="Verify a token")
     parser.add_argument("--api-base", default=DEFAULT_API_BASE, help="Provider API base URL")
     args = parser.parse_args()
@@ -104,10 +104,10 @@ def main():
             parser.error(str(e))
         verify_token(args.verify, api_base)
     else:
-        print("=== Manus JWT Token Extraction ===\n")
-        print("Run this JavaScript in your browser console at manus.im:\n")
+        print("=== Provider JWT Token Extraction ===\n")
+        print("Run this JavaScript in your provider web app browser console:\n")
         print(JS_SNIPPET)
-        print("\n\nAlternatively, Manus can extract it automatically via browser_console_exec:")
+        print("\n\nAlternatively, browser automation can extract it via browser_console_exec:")
         print("  document.cookie.split(';').find(c => c.trim().startsWith('session_id=')).split('=').slice(1).join('=')")
 
 
