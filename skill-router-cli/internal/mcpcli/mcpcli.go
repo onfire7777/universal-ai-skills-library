@@ -12,7 +12,6 @@ import (
 var mcpCLICandidates = []string{
 	"skill-router-mcp-cli",
 	"universal-ai-mcp-cli",
-	"manus-mcp-cli",
 }
 
 func resolveMCPCLI() (string, error) {

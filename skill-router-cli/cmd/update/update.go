@@ -90,20 +90,23 @@ func updateCLI() error {
 	if _, err := os.Stat(filepath.Join(cliDir, "go.mod")); err != nil {
 		return fmt.Errorf("skill-router-cli source not found: %s", cliDir)
 	}
+	primary, err := cliInstallTarget()
+	if err != nil {
+		return err
+	}
+	return runner.RunCommand("go", "build", "-C", cliDir, "-o", primary, ".")
+}
+
+func cliInstallTarget() (string, error) {
 	goBin := filepath.Join(platform.HomeDir(), "go", "bin")
 	if err := os.MkdirAll(goBin, 0755); err != nil {
-		return err
+		return "", err
 	}
 	primary := filepath.Join(goBin, "skill-router")
-	legacy := filepath.Join(goBin, "manus")
 	if runtime.GOOS == "windows" {
 		primary += ".exe"
-		legacy += ".exe"
 	}
-	if err := runner.RunCommand("go", "build", "-C", cliDir, "-o", primary, "."); err != nil {
-		return err
-	}
-	return runner.RunCommand("go", "build", "-C", cliDir, "-o", legacy, ".")
+	return primary, nil
 }
 
 func updateSkillsRepo() error {

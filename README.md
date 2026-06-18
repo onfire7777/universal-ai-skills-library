@@ -77,9 +77,9 @@ Three layers with a clean separation of concerns:
    `docs/build_manifest.json`) in lockstep; drift is impossible and is verified
    in CI. Marketplace JSON outputs are retired and guarded against reappearing.
 
-Compatibility binary aliases, including `manus`, invoke the same `skill-router`
-binary so existing rules and scripts keep working. New workflows should use the
-universal `skill-router` name. See
+The packaged command surface is `skill-router`. Historical binary aliases are
+not installed by default; use explicit opt-in migration shims only for local
+legacy scripts you still control. See
 [docs/ARCHITECTURE-decoupling.md](docs/ARCHITECTURE-decoupling.md) and
 [docs/ARCHITECTURE_V2.md](docs/ARCHITECTURE_V2.md) for detail.
 
@@ -152,8 +152,8 @@ skill-router doctor
 skill-router mcp status
 ```
 
-Compatibility executables remain available for existing local rules and
-scripts. New docs and integrations should use `skill-router`.
+New docs and integrations should use `skill-router`. Historical executable
+aliases are not part of the default install.
 
 ## Automatic Skill Selection
 
@@ -304,7 +304,7 @@ Pop-Location
 Behavioural, registry, and secret-scan gates (run in CI; runnable locally):
 
 ```bash
-# characterization baseline: router routing, registry integrity, compatibility aliases
+# characterization baseline: router routing, registry integrity, retired alias contract
 python3 -m unittest discover -s tests/characterization -p 'test_*.py'
 
 # registry single-source drift guard (every artifact matches skills/)

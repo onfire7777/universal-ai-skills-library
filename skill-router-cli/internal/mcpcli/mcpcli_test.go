@@ -23,7 +23,6 @@ func writeExecutable(t *testing.T, dir, name string) {
 func TestResolveMCPCLIPrefersNeutralBinary(t *testing.T) {
 	dir := t.TempDir()
 	writeExecutable(t, dir, "skill-router-mcp-cli")
-	writeExecutable(t, dir, "manus-mcp-cli")
 	t.Setenv("PATH", dir)
 
 	got, err := resolveMCPCLI()
@@ -35,16 +34,12 @@ func TestResolveMCPCLIPrefersNeutralBinary(t *testing.T) {
 	}
 }
 
-func TestResolveMCPCLIFallsBackToCompatibilityBinary(t *testing.T) {
+func TestResolveMCPCLIDoesNotUseRetiredCompatibilityBinary(t *testing.T) {
 	dir := t.TempDir()
 	writeExecutable(t, dir, "manus-mcp-cli")
 	t.Setenv("PATH", dir)
 
-	got, err := resolveMCPCLI()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got != "manus-mcp-cli" {
-		t.Fatalf("resolveMCPCLI() = %q, want compatibility fallback", got)
+	if got, err := resolveMCPCLI(); err == nil {
+		t.Fatalf("resolveMCPCLI() = %q, want retired compatibility binary ignored", got)
 	}
 }

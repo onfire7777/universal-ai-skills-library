@@ -33,7 +33,7 @@ corpus, and the corpus knows nothing about the router. The **registry
 
 | | Layer A — Binary | Layer B — Corpus / skills |
 |---|---|---|
-| **Ships** | the `skill-router` tool (alias `manus`) | the `skills/<kebab-name>/` content + `manifest.json` |
+| **Ships** | the `skill-router` tool | the `skills/<kebab-name>/` content + `manifest.json` |
 | **Track** | Track B (goreleaser packaging) | today: whole-repo; future: Phase 5 |
 | **Artifact** | per-platform compiled binaries + checksums | git clone / install today; signed per-skill packages later |
 | **Today** | `go build` from source; no release binaries yet | clone the repo / run the installer |
@@ -51,7 +51,7 @@ need without cloning the whole repo.
 ### 2.1 Goal
 
 A user installs the `skill-router` tool with one command, on any common
-platform, and gets a verifiable binary. The `manus` alias works out of the box.
+platform, and gets a verifiable binary.
 
 ### 2.2 Build matrix (target)
 
@@ -83,7 +83,7 @@ The packaged command surface is universal-first:
 
 - `install.sh` (POSIX: darwin + linux) — detects OS/arch, downloads the matching
   archive from GitHub Releases, verifies the SHA-256 against `checksums.txt`,
-  installs `skill-router` + the `manus` alias to a PATH dir.
+  installs `skill-router` to a PATH dir.
 - `install.ps1` (Windows) — same flow via PowerShell; this also lets the
   Windows-only PowerShell CI surface shrink to a thin shim once the Go binary
   owns build+route+serve (plan §8, Maintenance).
@@ -93,8 +93,8 @@ The packaged command surface is universal-first:
 | Channel | How users get it | Pros | Cons | Verified install |
 |---------|------------------|------|------|------------------|
 | **GitHub Releases** | download archive for their platform | canonical source; checksums; no extra infra; works offline after download | manual step unless paired with a script | ✓ via `checksums.txt` |
-| **Homebrew tap** | `brew install --cask onfire7777/tap/skill-router` | great macOS/Linux UX; auto-updates; goreleaser auto-publishes the cask | maintain a tap repo; macOS/Linux only; alias added by installer, not the cask | ✓ Homebrew checksums the archive |
-| **`go install`** | `go install .../skill-router-cli@latest` | trivial for Go devs; always builds from pinned source | requires a Go toolchain; **does not set up the `manus` alias**; no prebuilt binary | source build, not a signed artifact |
+| **Homebrew tap** | `brew install --cask onfire7777/tap/skill-router` | great macOS/Linux UX; auto-updates; goreleaser auto-publishes the cask | maintain a tap repo; macOS/Linux only | ✓ Homebrew checksums the archive |
+| **`go install`** | `go install .../skill-router-cli@latest` | trivial for Go devs; always builds from pinned source | requires a Go toolchain; no prebuilt binary | source build, not a signed artifact |
 | **`curl … \| sh`** | `curl -sSfL …/install.sh \| sh` | one-liner; scriptable in CI/Dockerfiles | piping to a shell is a trust decision; must verify checksum inside the script | ✓ if the script checksums |
 | **npm shim** | `npx skill-router` / `npm i -g` | reaches the JS ecosystem; familiar to MCP-client authors | reintroduces a Node dependency we are explicitly *removing* from the core path (see migration doc); shim only downloads the real binary | ✓ if the shim checksums the download |
 
@@ -104,10 +104,10 @@ The packaged command surface is universal-first:
   driven by goreleaser. Everything else is a convenience layer over it.
 - **Primary UX:** **Homebrew tap** for macOS/Linux (goreleaser publishes the
   formula automatically) and **`install.sh` / `install.ps1`** for the
-  `curl | sh` / PowerShell path. Both must install the `manus` alias and verify
+  `curl | sh` / PowerShell path. Both must install `skill-router` and verify
   checksums.
 - **Secondary:** **`go install`** for Go developers — document that it builds
-  from source and does **not** wire up the `manus` alias.
+  from source.
 - **Avoid as a primary channel:** an **npm shim**. It conflicts with the goal of
   dropping the Node dependency from the build path (`docs/MIGRATION_NODE_TO_GO.md`
   §1). Only consider it as a thin, checksum-verifying downloader if a concrete
@@ -166,20 +166,19 @@ Track A  (build consolidation)    Track B  (binary packaging)      Phase 5 (corp
 Go `skill-router registry build`  goreleaser: darwin/linux/win     per-skill semver
 reaches byte-parity with Node,    × amd64/arm64, checksums,        content-addressed packages
 then retires Node from the        GitHub Releases, install.sh/     signed index (minisign/cosign)
-build path (see                   install.ps1, the `manus`         subset pull + verify (see
-MIGRATION_NODE_TO_GO.md).         alias.                           PHASE_5_DISTRIBUTION_DESIGN.md).
+build path (see                   install.ps1.                     subset pull + verify (see
+MIGRATION_NODE_TO_GO.md).                                          PHASE_5_DISTRIBUTION_DESIGN.md).
         │                                  │                                  │
         ▼                                  ▼                                  ▼
   One Go binary that ──────────▶  is packaged + shipped ──────────▶  and pulls/verifies only
   builds + routes (+ serves)      to users with checksums            the skills a client needs
-  the registry it ships.          and the `manus` alias.             from a signed index.
+  the registry it ships.          to users with checksums            from a signed index.
 ```
 
 - **Track A** makes the *single binary* capable of producing the registry
   (`registry build`) — a prerequisite for shipping one self-contained tool. It is
   gated on byte-parity; until parity is green, Node still owns generation.
-- **Track B** takes that binary and gets it onto users' machines, verifiably,
-  with the `manus` alias intact.
+- **Track B** takes that binary and gets it onto users' machines, verifiably.
 - **Phase 5** changes how the *corpus* the binary routes is distributed — from
   whole-repo to signed, pullable subsets — reusing Track B's signing toolchain.
 
@@ -193,7 +192,7 @@ without cloning a 1812-skill repo.
 
 From `docs/ARCHITECTURE_IMPROVEMENT_PLAN.md` §6 and `STRUCTURE.md` §5:
 
-- **`manus` alias** ships in every binary package (§2.3).
+- **Universal binary surface:** `skill-router` is the default shipped binary.
 - **Exactly one authoritative registry** (`manifest.json`); distribution never
   introduces a second registry.
 - **Deterministic, offline, no-remote-LLM query path** — installed binaries route

@@ -20,7 +20,6 @@ Primary names:
 
 Compatibility names remain only where they identify a real platform adapter or preserve installed clients:
 
-- `manus.exe` remains a compatibility executable alias.
 - `manus-api` remains the Manus API adapter.
 - `.manus` remains an opt-in compatibility root for existing local clients.
 - Optional MCP bridges use neutral `UniversalAI-*` Windows task names.
@@ -62,7 +61,7 @@ universal-ai-skills-library/
 
 | Surface | Primary Name | Compatibility Name |
 |---|---|---|
-| CLI binary | `skill-router` | `manus` |
+| CLI binary | `skill-router` | old executable aliases are retired |
 | Setup skill | `universal-ai-config` | old setup aliases are retired |
 | Repo | `universal-ai-skills-library` | explicit `MANUS_REPO_DIR` override only |
 | Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |

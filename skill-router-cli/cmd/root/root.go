@@ -57,9 +57,7 @@ optional local Universal AI Stack.
 The router keeps 1,812 canonical skills in one repository and loads a single
 matching skill only when a real user prompt needs it. It can also index local
 external skill roots read-only, validate manifests, sync wrapper instructions,
-check optional MCP bridges, and expose local AI stack health.
-
-Compatibility: declared legacy executable aliases can still call the same router.`,
+check optional MCP bridges, and expose local AI stack health.`,
 	Version: Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		bold := color.New(color.Bold, color.FgCyan)
@@ -112,7 +110,6 @@ Compatibility: declared legacy executable aliases can still call the same router
 		fmt.Println("  registry    Build/verify the registry artifacts (Go owner of the build)")
 		fmt.Println()
 		fmt.Println("Use \"skill-router [command] --help\" for more information about a command.")
-		fmt.Println("Compatibility alias: manus")
 	},
 }
 

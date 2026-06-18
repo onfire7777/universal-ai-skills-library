@@ -2,7 +2,7 @@
 
 ## Current Completion State
 
-The Universal AI Skills Library is complete as a working local cross-agent skill stack. The current router release is `skill-router` v2.2.8, with compatibility executable aliases kept only for existing installs. The canonical repo contains 1,812 indexed skills, a validated manifest, compact wrapper skills synced into local AI clients, and adapter docs for Codex, Claude, Hermes, Paperclip, OpenSkills-style roots, and other local AI surfaces.
+The Universal AI Skills Library is a working local cross-agent skill stack. The current router release is `skill-router` v2.2.8, with `skill-router` as the default executable surface. The canonical repo contains 1,812 indexed skills, a validated manifest, compact wrapper skills synced into local AI clients, and adapter docs for Codex, Claude, Hermes, Paperclip, OpenSkills-style roots, and other local AI surfaces.
 
 The architecture is intentionally router-first and CLI-driven. AI clients should not preload or copy the full skill corpus into every prompt. They should keep one compact wrapper/instruction surface and call the router only when a real user prompt needs a skill.
 
@@ -37,7 +37,7 @@ Repo path: `skill-router-cli/`
 Installed binaries:
 
 - `%USERPROFILE%\go\bin\skill-router.exe`
-- declared compatibility aliases such as `%USERPROFILE%\go\bin\manus.exe`
+- historical executable aliases are not part of the default install
 
 The CLI routes prompts, loads skills, searches skills, validates the repo, syncs wrappers, checks local health, manages optional MCP bridge services, and exposes utility command groups for audits, oracle answers, files, GStack, GBrain, Hugging Face, Google Workspace, Gmail, databases, schedules, and related local AI workflows.
 
