@@ -72,6 +72,21 @@ func TestClassifyMode(t *testing.T) {
 	}
 }
 
+func TestRecommendationDoesNotMaskFullCopyWithWrapper(t *testing.T) {
+	row := matrixRow{
+		Adapter:     "skill-root",
+		Exists:      true,
+		Wrapper:     true,
+		SkillFiles:  200,
+		DefaultSync: true,
+	}
+	row.LikelyMode = classifyMode(row)
+
+	if got, want := recommendation(row), "wrapper installed; full copy remains, verify intentional"; got != want {
+		t.Fatalf("recommendation = %q, want %q", got, want)
+	}
+}
+
 func TestCountSkillMarkdown(t *testing.T) {
 	root := t.TempDir()
 	write := func(rel string) {

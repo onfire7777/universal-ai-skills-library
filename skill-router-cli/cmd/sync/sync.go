@@ -560,6 +560,12 @@ func recommendation(row matrixRow) string {
 	if row.ID == "kimi-openclaw" || row.ID == "openclaw-workspace" {
 		return "do not mutate with generic sync"
 	}
+	if row.LikelyMode == "full-copy" {
+		if row.Wrapper {
+			return "wrapper installed; full copy remains, verify intentional"
+		}
+		return "full copy detected; verify intentional"
+	}
 	if row.LikelyMode == "custom+wrapper" {
 		return "wrapper installed; preserve adapter-specific skills"
 	}
@@ -568,9 +574,6 @@ func recommendation(row matrixRow) string {
 	}
 	if row.Wrapper {
 		return "healthy wrapper install"
-	}
-	if row.SkillFiles > 100 {
-		return "full copy detected; verify intentional"
 	}
 	return "consider wrapper install"
 }
