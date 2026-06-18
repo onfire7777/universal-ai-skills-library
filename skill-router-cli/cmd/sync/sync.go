@@ -472,7 +472,10 @@ Paperclip-specific operating rule:
 }
 
 func skipGenericInstalledSync(id string) bool {
-	return id == "opencode-legacy" || strings.Contains(id, "workspace") || strings.Contains(id, "source")
+	return id == "opencode-legacy" ||
+		id == "kimi-openclaw" ||
+		strings.Contains(id, "workspace") ||
+		strings.Contains(id, "source")
 }
 
 func pathExists(path string) bool {

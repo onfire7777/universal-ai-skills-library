@@ -100,6 +100,50 @@ func TestPaperclipCommandInstallsWrapperAndInstructionsOnly(t *testing.T) {
 	}
 }
 
+func TestInstalledWrapperRootsIncludeInstalledReportOnlyRootsAndSkipSpecial(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("SKILL_ROUTER_PAPERCLIP_SKILLS_DIR", "")
+
+	makeRoot := func(rel string) string {
+		t.Helper()
+		root := filepath.Join(home, rel)
+		if err := os.MkdirAll(root, 0755); err != nil {
+			t.Fatal(err)
+		}
+		return root
+	}
+
+	wantRoots := []string{
+		makeRoot(filepath.Join(".agents", "skills")),
+		makeRoot(filepath.Join(".hermes", "skills")),
+		makeRoot(filepath.Join(".paperclip", "skills")),
+		makeRoot(filepath.Join(".openclaw", "skills")),
+	}
+	denyRoots := []string{
+		makeRoot(filepath.Join(".opencode", "skills")),
+		makeRoot(filepath.Join(".hermes", "hermes-agent", "skills")),
+		makeRoot(filepath.Join(".openclaw", "workspace", "skills")),
+		makeRoot(filepath.Join(".kimi_openclaw", "workspace", "skills")),
+	}
+
+	roots := map[string]bool{}
+	for _, root := range installedWrapperRoots() {
+		roots[root] = true
+	}
+	for _, want := range wantRoots {
+		if !roots[want] {
+			t.Fatalf("installedWrapperRoots missing installed wrapper root %s", want)
+		}
+	}
+	for _, deny := range denyRoots {
+		if roots[deny] {
+			t.Fatalf("installedWrapperRoots included special/report-only root %s", deny)
+		}
+	}
+}
+
 func assertWrapperOnly(t *testing.T, root string) {
 	t.Helper()
 	wrapper := filepath.Join(root, "universal-ai-skills", "SKILL.md")
