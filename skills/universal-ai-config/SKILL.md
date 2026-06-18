@@ -1,6 +1,6 @@
 ---
 name: universal-ai-config
-description: Configure and audit the local universal AI skills setup across Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, Manus compatibility surfaces, plugin manifests, optional MCP bridges, and global instruction files. Use when the user asks to organize, consolidate, optimize, rename, or repair the cross-AI skill router configuration.
+description: Configure and audit the local universal AI skills setup across Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, hosted provider compatibility surfaces, plugin manifests, optional MCP bridges, and global instruction files. Use when the user asks to organize, consolidate, optimize, rename, or repair the cross-AI skill router configuration.
 ---
 
 # Universal AI Config
@@ -12,7 +12,7 @@ Use this skill to keep the user's AI stack clean, router-first, universal, and c
 - Universal AI Skills Router source and binaries
 - `skills/` source-of-truth layout
 - universal plugin manifests
-- Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, and Manus compatibility instruction surfaces
+- Codex, ChatGPT, Claude, Claude Code, Claude Cowork, Cursor, Gemini, OpenCode, OpenSkills, Hermes Agent, OpenClaw, Cline, Continue, GitHub Copilot, Kiro, OpenHands, and hosted provider compatibility instruction surfaces
 - optional MCP bridge policy
 - local persistent services and scheduled tasks
 
