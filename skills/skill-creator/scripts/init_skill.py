@@ -195,7 +195,6 @@ def title_case_skill_name(skill_name):
 
 SKILLS_BASE_PATH = Path(
     os.environ.get("SKILL_ROUTER_SKILLS_DIR")
-    or os.environ.get("MANUS_SKILLS_DIR")
     or Path(__file__).resolve().parents[2]
 )
 

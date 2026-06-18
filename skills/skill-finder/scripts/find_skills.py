@@ -26,7 +26,6 @@ from pathlib import Path
 
 SKILLS_DIR = Path(
     os.environ.get("SKILL_ROUTER_SKILLS_DIR")
-    or os.environ.get("MANUS_SKILLS_DIR")
     or Path(__file__).resolve().parents[2]
 )
 INDEX_PATH = Path("/tmp/skill_finder_index.json")

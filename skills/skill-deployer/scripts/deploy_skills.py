@@ -52,7 +52,6 @@ HEADERS_TEMPLATE = {
 MAX_SKILLS_PER_PROJECT = 500
 DEFAULT_SKILLS_DIR = (
     os.environ.get("SKILL_ROUTER_SKILLS_DIR")
-    or os.environ.get("MANUS_SKILLS_DIR")
     or os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 )
 

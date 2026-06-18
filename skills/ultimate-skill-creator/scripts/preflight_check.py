@@ -20,7 +20,6 @@ from pathlib import Path
 
 DEFAULT_SKILLS_DIR = (
     os.environ.get("SKILL_ROUTER_SKILLS_DIR")
-    or os.environ.get("MANUS_SKILLS_DIR")
     or str(Path(__file__).resolve().parents[2])
 )
 

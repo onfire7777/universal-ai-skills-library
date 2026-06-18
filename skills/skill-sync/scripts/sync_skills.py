@@ -37,12 +37,10 @@ from pathlib import Path
 # DBG-003 FIX: Configurable via env vars instead of hardcoded paths
 SKILLS_DIR = Path(
     os.environ.get("SKILL_ROUTER_SKILLS_DIR")
-    or os.environ.get("MANUS_SKILLS_DIR")
     or Path(__file__).resolve().parents[2]
 )
 CACHE_DIR = Path(
     os.environ.get("SKILL_ROUTER_SYNC_CACHE")
-    or os.environ.get("MANUS_SKILL_SYNC_CACHE")
     or (Path.home() / ".skill-sync-cache")
 )
 STATE_FILE = CACHE_DIR / "sync_state.json"

@@ -67,8 +67,8 @@ Paths can be overridden via environment variables or CLI flags:
 
 | Setting | Default | Override |
 |---|---|---|
-| Skills directory | `/home/ubuntu/skills` | `SKILL_ROUTER_SKILLS_DIR`, legacy `MANUS_SKILLS_DIR`, or `--skills-dir` |
-| Cache directory | `/home/ubuntu/.skill-sync-cache` | `SKILL_ROUTER_SYNC_CACHE`, legacy `MANUS_SKILL_SYNC_CACHE`, or `--cache-dir` |
+| Skills directory | `/home/ubuntu/skills` | `SKILL_ROUTER_SKILLS_DIR` or `--skills-dir` |
+| Cache directory | `/home/ubuntu/.skill-sync-cache` | `SKILL_ROUTER_SYNC_CACHE` or `--cache-dir` |
 
 ## After Syncing
 
