@@ -51,7 +51,7 @@ Phase 5 is unbuildable today and unbuildable first. Concretely:
 | Needs from prior phase | Why Phase 5 cannot proceed without it |
 |---|---|
 | **Phase 0** — `skill-router registry build` reproduces `manifest.json` at **byte-parity** under `--check` | Packaging + index generation must be owned by the Go binary so build, package, and sign are one deterministic pipeline. Today the build is owned by the Node generator `scripts/registry/generate-registry.mjs` (4 artifacts; the only `--check` gate). Without Phase 0, there is no Go-side build to hang packaging off, and no proof the migration is behavior-preserving. |
-| **Phase 0** — JSON-Schema frontmatter (`schemas/skill.schema.json`) validates 100% of corpus | `version:` is a new frontmatter field; it needs the schema-gating machinery from Phase 0 to be enforced and backfilled across 1,812 skills. |
+| **Phase 0** — JSON-Schema frontmatter (`schemas/skill.schema.json`) validates 100% of corpus | `version:` is a new frontmatter field; it needs the schema-gating machinery from Phase 0 to be enforced and backfilled across 1,813 skills. |
 | **Phase 2** — `skill-router serve` (MCP) + CLI-as-thin-client; physical-copy sync deprecated | Subset pull only makes sense once the resolution/serve surface exists and `DefaultSync` is on its way out. Pull-on-demand is the *replacement* for the deprecation Phase 2 starts. |
 | **Phase 1/3/4** — routing-index, telemetry, capability DAG | The index's `deps[]` edges are exactly the Phase-4 capability DAG. Without it, "transitive deps" has no source. |
 
@@ -123,7 +123,7 @@ hard-fail at GA). Backfill is one pass of the existing backfill script seeding `
 
 Two pure options and the chosen hybrid:
 
-- **(A) Fully manual semver** — authors hand-edit `version`. *Risk:* humans forget; 1,812 skills
+- **(A) Fully manual semver** — authors hand-edit `version`. *Risk:* humans forget; 1,813 skills
   guarantees drift between "content changed" and "version bumped".
 - **(B) Fully content-hash-driven** — derive the whole version from the package hash. *Problem:* a
   content hash is not ordered, so it cannot express MAJOR vs MINOR vs PATCH *intent* (a breaking
@@ -352,8 +352,8 @@ skills-index.json.cosign.bundle    # cosign keyless bundle (cert + sig + Rekor p
 ```
 
 **We sign the index, not every package.** The index records each package's `content_hash`, so
-one signature transitively covers all 1,812 packages — sign once, verify any subset. This is the
-key scalability decision: per-package signatures would be 1,812 signing ops per release for zero
+one signature transitively covers all 1,813 packages — sign once, verify any subset. This is the
+key scalability decision: per-package signatures would be 1,813 signing ops per release for zero
 added security over a signed index of hashes.
 
 ### 4.3 Key management + rotation
@@ -456,7 +456,7 @@ doesn't match the signed index is never written.
 
 | Option | How | Pros | Cons |
 |---|---|---|---|
-| **(A) GitHub Releases assets** | Each release uploads `skills-index.json`, its signatures, and the `.tar.zst` packages as release assets | Zero new infra; free; integrates natively with the cosign GitHub-OIDC identity; works with existing `gh` CLI auth | 1,812 assets per release is awkward; per-asset download; release-asset API rate limits; no content-addressed CDN semantics |
+| **(A) GitHub Releases assets** | Each release uploads `skills-index.json`, its signatures, and the `.tar.zst` packages as release assets | Zero new infra; free; integrates natively with the cosign GitHub-OIDC identity; works with existing `gh` CLI auth | 1,813 assets per release is awkward; per-asset download; release-asset API rate limits; no content-addressed CDN semantics |
 | **(B) OCI registry (ghcr.io)** | Push packages as OCI artifacts; the index is an OCI image index; cosign signs OCI-natively | First-class cosign support; content-addressable by digest *natively*; pull only the layers you need; mature CDN-backed delivery | Requires OCI tooling on the client; auth for private pulls; a heavier mental model for "it's just skills" |
 | **(C) Static CDN** (e.g. R2/S3 + CDN) | Upload packages to a content-addressed key space `/<sha256>.tar.zst` + index at a stable URL | Dead-simple client (plain HTTPS GET); cacheable; cheap; trivially mirrorable for air-gap | New infra to own + pay for; cosign keyless still works but provenance ties to CI, not the CDN; we manage retention/GC |
 
@@ -545,7 +545,7 @@ install cannot leave a half-written, unverified skill on disk.
 |---|---|---|
 | **Alpha — signing only** | `index build` + `index sign` + `index verify`. Packages produced and signed in CI; published as release assets. No client pull yet. `version` schema-gated as `--warn`. | Index reproducible under `--check`; both signatures verify; reproducibility test (build-twice-equal) green. |
 | **Beta — subset pull** | `pkg pull`/`add`/`ls`/`remove`; resolution + transitive deps; offline cache. Hosted on GitHub Releases (option A). `DefaultSync` marked deprecated in docs (started in Phase 2). | A client pulls + verifies a real subset end-to-end; downgrade protection tested; whole-repo install still works unchanged. |
-| **GA** | `version` schema-gated **required**; package store migrated to ghcr.io OCI (option B); `pkg add` is the documented default for files-on-disk clients; whole-repo install still supported as legacy path. | 100% corpus versioned + validated; OCI publish + pull verified; migration script run over all 1,812 skills. |
+| **GA** | `version` schema-gated **required**; package store migrated to ghcr.io OCI (option B); `pkg add` is the documented default for files-on-disk clients; whole-repo install still supported as legacy path. | 100% corpus versioned + validated; OCI publish + pull verified; migration script run over all 1,813 skills. |
 
 ### 8.2 Backwards-compat with today's whole-repo install
 
@@ -554,7 +554,7 @@ GA and after.** Subset pull is strictly additive. The router reads `manifest.jso
 today; `version`/`deps` are additive fields a pre-Phase-5 reader simply ignores (Go `omitempty` /
 unknown-field tolerance). No flag day.
 
-### 8.3 Migrating the 1,812-skill corpus into versioned packages
+### 8.3 Migrating the 1,813-skill corpus into versioned packages
 
 1. **Backfill** `version: 1.0.0` into every `SKILL.md` lacking one (Phase-0 backfill script; one
    commit, schema-validated).
@@ -621,7 +621,7 @@ replacing it.
   both? Recommendation: derived-from-DAG is authoritative; frontmatter `deps` is an author hint
   the build reconciles against the DAG (mismatch → warn).
 - **OCI vs Releases for beta.** Beta ships on Releases for simplicity; revisit whether to move to
-  OCI earlier if the 1,812-asset-per-release ergonomics prove painful.
+  OCI earlier if the 1,813-asset-per-release ergonomics prove painful.
 - **Changelog gating strictness at GA.** Warn-only (recommended) vs hard-fail on MAJOR-without-
   changelog.
 - **cosign offline story.** Do we bundle Rekor inclusion proofs for offline cosign verification,
@@ -688,6 +688,6 @@ dist/                         # build output (gitignored) — packages + index +
 
 1. **Hybrid semver:** authors declare the bump; CI content-hash-gates it (forgot-to-bump can't merge).
 2. **Hash the uncompressed canonical tar** (sorted, mtime/uid/gid=0, fixed perms); zstd is transport-only.
-3. **Sign the index, not 1,812 packages** — with **both** minisign (offline) and cosign (keyless OIDC).
+3. **Sign the index, not 1,813 packages** — with **both** minisign (offline) and cosign (keyless OIDC).
 4. **Subset pull replaces physical-copy `DefaultSync`**; integrity verified before install; route path stays offline.
 5. **GitHub Releases for alpha/beta → ghcr.io OCI for GA**; TUF deferred; `manifest.json` stays the one source of truth.

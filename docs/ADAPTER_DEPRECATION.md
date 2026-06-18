@@ -22,7 +22,7 @@ This was a bootstrap convenience so a freshly installed local AI client would
 - New clients must be added to the default propagation set to benefit.
 - It pushes filesystem state into ~30 roots instead of exposing one service.
 
-> The full 1,812-skill corpus was **never** copied by default — only the single
+> The full 1,813-skill corpus was **never** copied by default — only the single
 > `universal-ai-skills` wrapper. `--full-copy` corpus propagation is the most
 > strongly discouraged form of this pattern.
 

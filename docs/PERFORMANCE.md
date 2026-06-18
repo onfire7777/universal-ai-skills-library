@@ -51,7 +51,7 @@ bench/compare.py bench/results/before.json bench/results/after.json --out bench/
 |--------|-------:|------:|---|
 | Parse time | 4.78 ms (min 4.36) | 4.03 ms (min 3.77) | −0.75 ms (−15.7%) |
 | Heap alloc / parse | 1.30 MB | 1.27 MB | −38.5 KB (−3.0%) |
-| Skills in manifest | 1,812 (18 core + 1,794 library) | 1,812 (18 + 1,794) | 0 |
+| Skills in manifest | 1,813 (18 core + 1,795 library) | 1,813 (18 + 1,795) | 0 |
 
 ### Size & on-disk footprint
 
@@ -65,7 +65,7 @@ bench/compare.py bench/results/before.json bench/results/after.json --out bench/
 | Tracked file bytes (excl `.git`) | 116.03 MB | 115.29 MB | −734 KB (−0.6%) |
 | JSON files | 1,171 files · 3.72 MB | 1,170 files · 2.94 MB | **−1 file · −774 KB (−20.8%)** |
 | **Font files** | 216 files · 21.65 MB | 216 files · 21.65 MB | 0 (see note) |
-| Skill directories | 1,812 | 1,812 | 0 |
+| Skill directories | 1,813 | 1,813 | 0 |
 | Max RSS (preflight) | 21.79 MB | 21.66 MB | −131 KB (−0.6%) |
 
 (`.git` is excluded from refactor metrics; it grew 59.07 → 60.17 MB from the refactor's own commit history.)

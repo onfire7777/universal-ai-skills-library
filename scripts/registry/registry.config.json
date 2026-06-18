@@ -5,7 +5,7 @@
   "manifest": {
     "version": "2.2.8",
     "generated": "2026-05-15",
-    "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,812-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+    "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,813-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
     "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
     "alias_count": 1917,
     "routing": {
@@ -19,7 +19,7 @@
     "chat-summarizer",
     "context-anchor",
     "file-organizer",
-    "manus-api",
+    "provider-api",
     "universal-ai-config",
     "universal-ai-skills",
     "gstack",

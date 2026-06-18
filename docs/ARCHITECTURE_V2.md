@@ -67,7 +67,7 @@ universal-ai-skills-library/
 | Setup skill | `universal-ai-config` | old setup aliases are retired |
 | Repo | `universal-ai-skills-library` | use `SKILL_ROUTER_REPO_DIR` for explicit overrides |
 | Plugin | `universal-ai-skills` | old `manus` plugin cache can remain disabled or ignored |
-| API adapter | `manus-api` | N/A, platform-specific by design |
+| API adapter | `provider-api` | provider-specific docs remain opt-in skills only |
 | MCP task prefix | `UniversalAI-*` | old provider-specific tasks are cleanup-only compatibility targets |
 | MCP runtime dir | `C:\ProgramData\universal-ai-mcps` | old `C:\ProgramData\manus-mcps` is historical log/cache data |
 | Local tool dir | `%USERPROFILE%\.universal-ai\tools` | old `%USERPROFILE%\.manus\tools` paths are not required |

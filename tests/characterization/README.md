@@ -35,10 +35,10 @@ the location with `CHAR_FIXTURE_DIR=/abs/path`.
 * `baseline/routing_golden.json` — pinned router outcomes (decision + skill;
   scores are diagnostic only and **not** asserted, since scoring internals may
   drift).
-* `baseline/registry_baseline.json` — fingerprint of the live 1,812-skill corpus.
+* `baseline/registry_baseline.json` — fingerprint of the live 1,813-skill corpus.
   The slug set and its SHA-256 were **cross-validated** against Scout 1's
   independent baseline (`~/.bridgespace-scout2-work/baseline_uasl_slugs.txt`,
-  sha256 `f1a5c648…`) — identical sets, 1,812 registered slugs. The gate counts
+  sha256 `f1a5c648…`) — identical sets, 1,813 registered slugs. The gate counts
   *registered* slugs (manifest entries), deliberately excluding the one nested
   vendored `SKILL.md` under `infographic/` that a raw file scan over-counts.
 * `baseline/go_known_failures.json` — hand-curated list of accepted Go failures

@@ -117,7 +117,7 @@ Paperclip and Hermes should use `auto-coding` through `http://127.0.0.1:18100/v1
 
 ## Non-Redundancy Rules
 
-- Keep the full 1,812-skill corpus only under `skills/`.
+- Keep the full 1,813-skill corpus only under `skills/`.
 - Keep compact wrapper skills in AI roots.
 - Keep one local generative model registered by default: `qwen3-coder-30b-a3b-q4`.
 - Keep one local embedding model registered by default: `qwen3-embedding-0.6b-q8`.
@@ -153,7 +153,7 @@ mempalace status
 
 Expected clean state:
 
-- Router manifest validates with 1,812 canonical skills and no duplicates.
+- Router manifest validates with 1,813 canonical skills and no duplicates.
 - All supported adapter roots contain compact universal policy.
 - Hermes gateway, Paperclip, universal router, Qwen coding proxy, and GBrain embedding proxy have one worker each.
 - Context Mode hooks parse without unsupported regex look-around.
