@@ -101,7 +101,7 @@ If the user later asks to switch models, the agent should update `EXTEND.md` in 
 ## 4. Verify
 
 ```bash
-npx -y bun scripts/main.ts --prompt "test" --image ./out/test.png --ar 1:1 --dry-run
+bun scripts/main.ts --prompt "test" --image ./out/test.png --ar 1:1 --dry-run
 ```
 
 Use `--dry-run` first to verify the request body is correct without consuming API quota. If the dry-run looks good, run without `--dry-run` to confirm end-to-end.

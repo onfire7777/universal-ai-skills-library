@@ -3,15 +3,14 @@ name: notebooklm-mcp-cli
 description: Use when working with Google NotebookLM through jacob-bd/notebooklm-mcp-cli: listing or creating notebooks, adding sources, querying notebooks, generating audio or studio artifacts, revising slides, downloading artifacts, sharing notebooks, syncing Drive sources, running cross-notebook queries, configuring the NotebookLM MCP server, or diagnosing NotebookLM CLI authentication. Prefer this over generic Google or MCP skills when the task is specifically about NotebookLM.
 aliases:
   - notebooklm
-  - notebook lm
+  - notebook-lm
   - nlm
-  - notebooklm cli
-  - notebooklm mcp
+  - notebooklm-cli
   - notebooklm-mcp
   - notebooklm-mcp-cli
-  - google notebooklm
-  - notebooklm podcast
-  - notebooklm audio overview
+  - google-notebooklm
+  - notebooklm-podcast
+  - notebooklm-audio-overview
 ---
 
 # NotebookLM MCP CLI

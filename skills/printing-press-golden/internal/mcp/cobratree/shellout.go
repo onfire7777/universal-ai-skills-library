@@ -26,7 +26,11 @@ func shellOutToCLI(cliPath func() (string, error), commandPath []string) server.
 		finalArgs := append([]string{}, prefixArgs...)
 		finalArgs = append(finalArgs, cliArgsFromMCP(args)...)
 		if raw, _ := args["args"].(string); strings.TrimSpace(raw) != "" {
-			finalArgs = append(finalArgs, splitShellArgs(raw)...)
+			rawArgs, err := rawArgsFromMCP(raw)
+			if err != nil {
+				return mcplib.NewToolResultError(err.Error()), nil
+			}
+			finalArgs = append(finalArgs, rawArgs...)
 		}
 		cmd := exec.CommandContext(ctx, lookupPath, finalArgs...)
 		out, err := cmd.CombinedOutput()
@@ -40,7 +44,7 @@ func shellOutToCLI(cliPath func() (string, error), commandPath []string) server.
 func cliArgsFromMCP(args map[string]any) []string {
 	keys := make([]string, 0, len(args))
 	for k := range args {
-		if k != "args" {
+		if k != "args" && !isBlockedMCPFlag(k) {
 			keys = append(keys, k)
 		}
 	}
@@ -75,6 +79,16 @@ func cliArgsFromMCP(args map[string]any) []string {
 		}
 	}
 	return out
+}
+
+func rawArgsFromMCP(raw string) ([]string, error) {
+	tokens := splitShellArgs(raw)
+	for _, token := range tokens {
+		if strings.HasPrefix(token, "-") {
+			return nil, fmt.Errorf("raw CLI flags are not accepted through MCP args; use typed tool parameters instead")
+		}
+	}
+	return tokens, nil
 }
 
 // splitShellArgs whitespace-splits with double-quoted-token preservation.

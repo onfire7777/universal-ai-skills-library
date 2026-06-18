@@ -3,21 +3,19 @@ name: firecrawl
 description: Use when working with firecrawl/firecrawl or the installed Firecrawl CLI: installing, updating, logging in, checking status, searching the web through Firecrawl, scraping pages, interacting with pages, crawling sites, mapping URLs, parsing files, running Firecrawl agent jobs, using Firecrawl SDK/API examples, or configuring optional firecrawl-mcp for an MCP client. Prefer this for Firecrawl hosted API and CLI workflows. Do not use for generic web search when the host AI has native search, or for local Crawl4AI workflows.
 aliases:
   - firecrawl
-  - firecrawl cli
   - firecrawl-cli
-  - firecrawl mcp
   - firecrawl-mcp
-  - firecrawl search
-  - firecrawl scrape
-  - firecrawl crawl
-  - firecrawl map
-  - firecrawl interact
-  - firecrawl agent
-  - firecrawl parse
-  - firecrawl login
-  - firecrawl api
-  - firecrawl sdk
-  - firecrawl/firecrawl
+  - firecrawl-search
+  - firecrawl-scrape
+  - firecrawl-crawl
+  - firecrawl-map
+  - firecrawl-interact
+  - firecrawl-agent
+  - firecrawl-parse
+  - firecrawl-login
+  - firecrawl-api
+  - firecrawl-sdk
+  - firecrawl-repo
 ---
 
 # Firecrawl Universal Adapter

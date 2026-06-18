@@ -21,8 +21,7 @@ dotnet tool install -g roslynator.dotnet.cli
 ```
 
 If `quickdup` is not found:
-- macOS/Linux: `curl -sSL https://raw.githubusercontent.com/asynkron/Asynkron.QuickDup/main/install.sh | bash`
-- From source: `go install github.com/asynkron/Asynkron.QuickDup/cmd/quickdup@latest`
+- Pinned source install: `go install github.com/asynkron/Asynkron.QuickDup/cmd/quickdup@v0.5.2`
 
 ## About
 

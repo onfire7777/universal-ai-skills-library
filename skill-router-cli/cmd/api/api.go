@@ -1,11 +1,14 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -35,11 +38,12 @@ var taskListCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		status, _ := cmd.Flags().GetString("status")
 		limit, _ := cmd.Flags().GetInt("limit")
-		params := fmt.Sprintf("?limit=%d", limit)
+		params := url.Values{}
+		params.Set("limit", strconv.Itoa(limit))
 		if status != "" {
-			params += "&status=" + status
+			params.Set("status", status)
 		}
-		return apiGet("/tasks" + params)
+		return apiGet("/tasks?" + params.Encode())
 	},
 }
 
@@ -49,7 +53,10 @@ var taskCreateCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		desc := strings.Join(args, " ")
-		body := fmt.Sprintf(`{"description": "%s"}`, desc)
+		body, err := jsonBody(map[string]any{"description": desc})
+		if err != nil {
+			return err
+		}
 		return apiPost("/tasks", body)
 	},
 }
@@ -59,7 +66,7 @@ var taskGetCmd = &cobra.Command{
 	Short: "Get task details",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiGet("/tasks/" + args[0])
+		return apiGet("/tasks/" + pathSegment(args[0]))
 	},
 }
 
@@ -68,7 +75,7 @@ var taskStopCmd = &cobra.Command{
 	Short: "Stop a running task",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiPost("/tasks/"+args[0]+"/stop", "")
+		return apiPost("/tasks/"+pathSegment(args[0])+"/stop", nil)
 	},
 }
 
@@ -77,7 +84,7 @@ var taskDeleteCmd = &cobra.Command{
 	Short: "Delete a task",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiDelete("/tasks/" + args[0])
+		return apiDelete("/tasks/" + pathSegment(args[0]))
 	},
 }
 
@@ -86,7 +93,7 @@ var taskMessagesCmd = &cobra.Command{
 	Short: "List messages in a task",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiGet("/tasks/" + args[0] + "/messages")
+		return apiGet("/tasks/" + pathSegment(args[0]) + "/messages")
 	},
 }
 
@@ -96,8 +103,11 @@ var taskSendCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		msg := strings.Join(args[1:], " ")
-		body := fmt.Sprintf(`{"content": "%s"}`, msg)
-		return apiPost("/tasks/"+args[0]+"/messages", body)
+		body, err := jsonBody(map[string]any{"content": msg})
+		if err != nil {
+			return err
+		}
+		return apiPost("/tasks/"+pathSegment(args[0])+"/messages", body)
 	},
 }
 
@@ -121,7 +131,10 @@ var projectCreateCmd = &cobra.Command{
 	Short: "Create a new project",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		body := fmt.Sprintf(`{"name": "%s"}`, args[0])
+		body, err := jsonBody(map[string]any{"name": args[0]})
+		if err != nil {
+			return err
+		}
 		return apiPost("/projects", body)
 	},
 }
@@ -157,7 +170,7 @@ var fileDeleteCmd = &cobra.Command{
 	Short: "Delete a file",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiDelete("/files/" + args[0])
+		return apiDelete("/files/" + pathSegment(args[0]))
 	},
 }
 
@@ -182,7 +195,10 @@ var webhookCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		events, _ := cmd.Flags().GetString("events")
-		body := fmt.Sprintf(`{"url": "%s", "events": ["%s"]}`, args[0], strings.ReplaceAll(events, ",", `","`))
+		body, err := jsonBody(map[string]any{"url": args[0], "events": splitEvents(events)})
+		if err != nil {
+			return err
+		}
 		return apiPost("/webhooks", body)
 	},
 }
@@ -192,7 +208,7 @@ var webhookDeleteCmd = &cobra.Command{
 	Short: "Delete a webhook",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiDelete("/webhooks/" + args[0])
+		return apiDelete("/webhooks/" + pathSegment(args[0]))
 	},
 }
 
@@ -216,7 +232,7 @@ var agentGetCmd = &cobra.Command{
 	Short: "Get agent details",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiGet("/agents/" + args[0])
+		return apiGet("/agents/" + pathSegment(args[0]))
 	},
 }
 
@@ -247,7 +263,7 @@ var websiteStatusCmd = &cobra.Command{
 	Short: "Get website status",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiGet("/websites/" + args[0] + "/status")
+		return apiGet("/websites/" + pathSegment(args[0]) + "/status")
 	},
 }
 
@@ -256,7 +272,7 @@ var websitePublishCmd = &cobra.Command{
 	Short: "Publish a website",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return apiPost("/websites/"+args[0]+"/publish", "")
+		return apiPost("/websites/"+pathSegment(args[0])+"/publish", nil)
 	},
 }
 
@@ -331,6 +347,33 @@ func getAPIKey() string {
 	return ""
 }
 
+func pathSegment(value string) string {
+	return url.PathEscape(value)
+}
+
+func jsonBody(value any) ([]byte, error) {
+	body, err := json.Marshal(value)
+	if err != nil {
+		return nil, fmt.Errorf("encoding JSON body: %w", err)
+	}
+	return body, nil
+}
+
+func splitEvents(events string) []string {
+	if strings.TrimSpace(events) == "" {
+		return nil
+	}
+	parts := strings.Split(events, ",")
+	out := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			out = append(out, part)
+		}
+	}
+	return out
+}
+
 func apiGet(path string) error {
 	key := getAPIKey()
 	if key == "" {
@@ -356,14 +399,14 @@ func apiGet(path string) error {
 	return nil
 }
 
-func apiPost(path, body string) error {
+func apiPost(path string, body []byte) error {
 	key := getAPIKey()
 	if key == "" {
 		return fmt.Errorf("MANUS_API_KEY not set. Get your key from https://manus.im/settings")
 	}
 	var reader io.Reader
-	if body != "" {
-		reader = strings.NewReader(body)
+	if body != nil {
+		reader = bytes.NewReader(body)
 	}
 	req, _ := http.NewRequest("POST", baseURL+path, reader)
 	req.Header.Set("Authorization", "Bearer "+key)

@@ -15,11 +15,11 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"printing-press-golden-pp-cli/internal/cliutil"
+	"printing-press-golden-pp-cli/internal/config"
 	"sort"
 	"strings"
 	"time"
-	"printing-press-golden-pp-cli/internal/cliutil"
-	"printing-press-golden-pp-cli/internal/config"
 )
 
 type Client struct {
@@ -31,8 +31,6 @@ type Client struct {
 	cacheDir   string
 	limiter    *cliutil.AdaptiveLimiter
 }
-
-
 
 // APIError carries HTTP status information for structured exit codes.
 type APIError struct {
@@ -47,7 +45,44 @@ func (e *APIError) Error() string {
 }
 
 func newHTTPClient(timeout time.Duration, jar http.CookieJar) *http.Client {
-	return &http.Client{Timeout: timeout, Jar: jar}
+	return &http.Client{
+		Timeout:       timeout,
+		Jar:           jar,
+		CheckRedirect: dropSensitiveHeadersOnCrossHostRedirect,
+	}
+}
+
+func dropSensitiveHeadersOnCrossHostRedirect(req *http.Request, via []*http.Request) error {
+	if len(via) == 0 {
+		return nil
+	}
+	previous := via[len(via)-1]
+	if previous.URL == nil || req.URL == nil {
+		return nil
+	}
+	if !sameRedirectOrigin(previous.URL, req.URL) {
+		req.Header.Del("X-API-Key")
+		req.Header.Del("Authorization")
+	}
+	return nil
+}
+
+func sameRedirectOrigin(a, b *url.URL) bool {
+	return strings.EqualFold(a.Scheme, b.Scheme) && strings.EqualFold(a.Hostname(), b.Hostname()) && effectivePort(a) == effectivePort(b)
+}
+
+func effectivePort(u *url.URL) string {
+	if port := u.Port(); port != "" {
+		return port
+	}
+	switch strings.ToLower(u.Scheme) {
+	case "http":
+		return "80"
+	case "https":
+		return "443"
+	default:
+		return ""
+	}
 }
 
 func New(cfg *config.Config, timeout time.Duration, rateLimit float64) *Client {
@@ -435,7 +470,6 @@ func sanitizeJSONResponse(body []byte) []byte {
 	}
 	return body
 }
-
 
 // maskToken redacts all but the last 4 characters of a token for safe display.
 func maskToken(token string) string {

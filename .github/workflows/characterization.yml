@@ -111,8 +111,7 @@ jobs:
         continue-on-error: true
         run: node --test scripts/registry/lib/frontmatter.test.mjs scripts/registry/generate-registry.test.mjs
 
-      - name: SKILL.md frontmatter schema (warn — Phase 0 backfill tracker)
-        # Phase 0 (§3.2/§9.1): validate every SKILL.md against schemas/skill.schema.json.
-        # Runs in --warn mode (exit 0) during incremental backfill; prints per-field
-        # coverage so the backfill gap is visible. Flips to --error in a later phase.
-        run: node scripts/registry/validate-schema.mjs
+      - name: SKILL.md frontmatter schema
+        # Validate every SKILL.md against schemas/skill.schema.json and fail closed
+        # when malformed metadata would otherwise enter registry artifacts.
+        run: node scripts/registry/validate-schema.mjs --error

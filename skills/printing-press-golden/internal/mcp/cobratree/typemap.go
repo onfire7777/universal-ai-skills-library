@@ -14,11 +14,19 @@ import (
 
 var positionalPattern = regexp.MustCompile(`(?:^|\s)(?:<[^>]+>|\[[^\]]+\])`)
 
+var blockedMCPFlags = map[string]bool{
+	"config":  true,
+	"deliver": true,
+}
+
 func toolOptionsForFlags(cmd *cobra.Command) []mcplib.ToolOption {
 	var opts []mcplib.ToolOption
 	seen := map[string]bool{}
 	addFlag := func(flag *pflag.Flag) {
 		if flag == nil || flag.Hidden || flag.Deprecated != "" {
+			return
+		}
+		if isBlockedMCPFlag(flag.Name) {
 			return
 		}
 		if seen[flag.Name] {
@@ -30,6 +38,10 @@ func toolOptionsForFlags(cmd *cobra.Command) []mcplib.ToolOption {
 	cmd.InheritedFlags().VisitAll(addFlag)
 	cmd.NonInheritedFlags().VisitAll(addFlag)
 	return opts
+}
+
+func isBlockedMCPFlag(name string) bool {
+	return blockedMCPFlags[name]
 }
 
 func toolOptionForFlag(flag *pflag.Flag) mcplib.ToolOption {

@@ -14,7 +14,7 @@ type CliArgs = {
 
 function printUsage(): void {
   console.log(`Usage:
-  npx -y bun scripts/scaffold.ts --output-dir infographic/topic-slug --topic "Topic name" [options]
+  bun scripts/scaffold.ts --output-dir infographic/topic-slug --topic "Topic name" [options]
 
 Options:
   --output-dir <path>   Target infographic working directory

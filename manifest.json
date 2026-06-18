@@ -8267,6 +8267,7 @@
       "scripts": [
         "scripts/audit-api.js",
         "scripts/audit.js",
+        "scripts/package-lock.json",
         "scripts/package.json"
       ]
     },

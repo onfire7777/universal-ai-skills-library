@@ -31,8 +31,8 @@ baseline: ## Record the baseline: build + vet + test (test failures are expected
 
 # --- Phase 0 (docs/ARCHITECTURE_IMPROVEMENT_PLAN.md) — measurable routing ---
 
-schema: ## Validate SKILL.md frontmatter vs schemas/skill.schema.json (--warn; prints coverage)
-	node scripts/registry/validate-schema.mjs
+schema: ## Validate SKILL.md frontmatter vs schemas/skill.schema.json (strict)
+	node scripts/registry/validate-schema.mjs --error
 
 eval: ## Run the routing eval (P@1 / MRR / Recall@5) over tests/routing-eval/cases.jsonl
 	python3 tests/routing-eval/run_eval.py

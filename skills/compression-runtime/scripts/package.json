@@ -4,6 +4,6 @@
   "type": "module",
   "description": "Utilities for bundled compression runtime",
   "scripts": {
-    "test": "npx -y bun test"
+    "test": "bun test"
   }
 }

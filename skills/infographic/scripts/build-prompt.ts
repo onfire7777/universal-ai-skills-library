@@ -22,7 +22,7 @@ type Section = {
 
 function printUsage(): void {
   console.log(`Usage:
-  npx -y bun scripts/build-prompt.ts --structured-content structured-content.md --output prompts/infographic.md [options]
+  bun scripts/build-prompt.ts --structured-content structured-content.md --output prompts/infographic.md [options]
 
 Options:
   --structured-content <path>  Path to structured-content.md

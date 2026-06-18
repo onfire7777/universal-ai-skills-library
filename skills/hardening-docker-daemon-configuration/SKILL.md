@@ -230,8 +230,11 @@ sudo auditctl -w /var/run/docker.sock -k docker-socket
 ## Rootless Docker
 
 ```bash
-# Install rootless Docker
-curl -fsSL https://get.docker.com/rootless | sh
+# Install rootless Docker from Docker's package-managed rootless extras.
+# Example for Debian/Ubuntu hosts with Docker's apt repository already enabled:
+sudo apt-get update
+sudo apt-get install -y docker-ce-rootless-extras
+dockerd-rootless-setuptool.sh install
 
 # Configure environment
 export PATH=$HOME/bin:$PATH

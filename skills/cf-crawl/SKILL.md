@@ -33,7 +33,19 @@ To load from a `.env` file, parse it line by line looking for `CLOUDFLARE_ACCOUN
 if [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$CLOUDFLARE_API_TOKEN" ]; then
   for envfile in .env .env.local "$HOME/.env"; do
     if [ -f "$envfile" ]; then
-      eval "$(grep -E '^CLOUDFLARE_(ACCOUNT_ID|API_TOKEN)=' "$envfile" | sed 's/^/export /')"
+      while IFS= read -r line || [ -n "$line" ]; do
+        case "$line" in
+          CLOUDFLARE_ACCOUNT_ID=*|CLOUDFLARE_API_TOKEN=*) ;;
+          *) continue ;;
+        esac
+        key="${line%%=*}"
+        value="${line#*=}"
+        case "$value" in
+          \"*\") value="${value#\"}"; value="${value%\"}" ;;
+          \'*\') value="${value#\'}"; value="${value%\'}" ;;
+        esac
+        export "$key=$value"
+      done < "$envfile"
     fi
   done
 fi

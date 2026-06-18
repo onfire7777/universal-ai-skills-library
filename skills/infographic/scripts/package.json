@@ -4,6 +4,6 @@
   "type": "module",
   "description": "Utilities for infographic",
   "scripts": {
-    "test": "npx -y bun test"
+    "test": "bun test"
   }
 }

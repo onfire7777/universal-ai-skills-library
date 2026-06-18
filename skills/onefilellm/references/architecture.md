@@ -77,7 +77,7 @@
  | - Stopword removal                        |                  |                     |
  | - Lowercase conversion                    |                  |                     |
  | - Re.sub()                                |                  |                     |
- | - Nltk.stop_words                         |                  |                     |
+ | - Static/local stopword list              |                  |                     |
  +-------------------------------------------+                  |                     |
                        |                                        |                     |
                        v                                        |                     |
@@ -112,7 +112,7 @@
                                           | - BeautifulSoup                 |
                                           | - PyPDF2                        |
                                           | - Tiktoken                      |
-                                          | - Nltk                          |
+                                          | - Stopword list                 |
                                           | - Nbformat                      |
                                           | - Nbconvert                     |
                                           | - YouTube Transcript API        |
@@ -131,7 +131,7 @@ The tool relies on several external libraries and tools to perform its functions
 - **BeautifulSoup4**: A library for parsing HTML and XML documents. It is used for web scraping tasks.
 - **PyPDF2**: A library for reading and manipulating PDF files.
 - **Tiktoken**: Utilized for encoding text into tokens, essential for LLM input preparation.
-- **NLTK**: The Natural Language Toolkit, used for various NLP tasks such as stopword removal.
+- **Stopword handling**: Upstream OneFileLLM historically used NLTK for stopword removal, but the local reference requirements intentionally omit NLTK until an upstream release fixes CVE-2026-54293 / GHSA-p4gq-832x-fm9v.
 - **Nbformat**: For reading and writing Jupyter Notebook files.
 - **Nbconvert**: Converts Jupyter Notebooks to Python scripts and other formats.
 - **YouTube Transcript API**: Fetches transcripts from YouTube videos.
@@ -149,7 +149,7 @@ onefilellm.py
   |-- BeautifulSoup4
   |-- PyPDF2
   |-- tiktoken
-  |-- nltk
+  |-- stopword handling (NLTK omitted pending fixed upstream release)
   |-- nbformat
   |-- nbconvert
   |-- youtube-transcript-api
@@ -186,7 +186,7 @@ main()
   |   |-- PdfReader (from PyPDF2)
   |-- preprocess_text
   |   |-- re
-  |   |-- stop_words (from nltk.corpus)
+  |   |-- stop_words (static/local list; NLTK omitted pending fixed upstream release)
   |-- get_token_count
         |-- tiktoken
 ```
@@ -422,7 +422,7 @@ main
 |    |
 |    +--- safe_file_read(input_file)
 |    +--- re.sub(pattern, replacement, text)
-|    +--- stop_words.words("english")
+|    +--- static/local English stopword list
 |    +--- open(output_file, "w", encoding="utf-8").write(text.strip())
 |
 +--- get_token_count(text, disallowed_special=[], chunk_size=1000)

@@ -31,10 +31,8 @@ mistune==3.2.1
 multidict==6.7.1
 nbclient==0.10.4
 nbconvert==7.17.1
-nbformat==5.4.0
-nltk==3.9.4
+nbformat==5.10.4
 numpy==2.4.4
--e git+https://github.com/jimmc414/onefilellm.git@99c51a2cbe8cc01c0db037a9f800ca31fae9c2cd#egg=onefilellm
 openpyxl==3.1.5
 packaging==26.2
 pandas==3.0.2

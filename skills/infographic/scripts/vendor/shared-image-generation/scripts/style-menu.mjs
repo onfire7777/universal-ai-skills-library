@@ -48,6 +48,6 @@ for (const s of STYLES) {
 
 console.log("\nExample:");
 console.log("  M=<model-key>");
-console.log("  npx -y bun scripts/main.ts \\");
+console.log("  bun scripts/main.ts \\");
 console.log("    --prompt \"a cat wearing sunglasses, neon city at night\" \\");
 console.log("    --style cinematic --ar 3:4 --image out.png -m \"$M\"");

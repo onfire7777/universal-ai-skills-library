@@ -14,9 +14,7 @@ which quickdup
 ```
 
 If not found, install it:
-- macOS/Linux: `curl -sSL https://raw.githubusercontent.com/asynkron/Asynkron.QuickDup/main/install.sh | bash`
-- Windows: `iwr -useb https://raw.githubusercontent.com/asynkron/Asynkron.QuickDup/main/install.ps1 | iex`
-- From source: `go install github.com/asynkron/Asynkron.QuickDup/cmd/quickdup@latest`
+- Pinned source install: `go install github.com/asynkron/Asynkron.QuickDup/cmd/quickdup@v0.5.2`
 
 ## About QuickDup
 

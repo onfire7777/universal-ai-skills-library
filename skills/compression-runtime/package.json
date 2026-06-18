@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Bundled compression runtime for infographic",
   "scripts": {
-    "compress": "npx -y bun scripts/main.ts",
+    "compress": "bun scripts/main.ts",
     "test": "npm --prefix scripts test"
   }
 }

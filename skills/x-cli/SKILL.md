@@ -3,13 +3,11 @@ name: x-cli
 description: Use when working with sferik/x-cli or the X API from the command line: authorizing X accounts, listing accounts, posting or replying, reading timelines, searching posts or users, streaming X events, managing follows, mutes, blocks, lists, direct messages, trends, places, or diagnosing the local `x` CLI install. Do not use for generic algebra variable "x" or unrelated command-line work.
 aliases:
   - sferik-x-cli
-  - sferik x-cli
-  - x api cli
-  - x command line
-  - twitter cli
-  - twitter command line
+  - x-api-cli
+  - x-command-line
+  - twitter-cli
+  - twitter-command-line
   - xrc
-  - .xrc
   - x-api
 ---
 

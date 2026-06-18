@@ -32,7 +32,7 @@ type PromptMeta = {
 
 function printUsage(): void {
   console.log(`Usage:
-  npx -y bun scripts/build-batch.ts --prompts prompts --output batch.json --model <model> [options]
+  bun scripts/build-batch.ts --prompts prompts --output batch.json --model <model> [options]
 
 Options:
   --prompts <path>       Path to prompts directory
