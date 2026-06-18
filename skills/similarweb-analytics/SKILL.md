@@ -17,7 +17,26 @@ Comprehensive website and domain analysis using SimilarWeb traffic data.
 
 ## API Usage
 
-All APIs use `ApiClient` from `/opt/.manus/.sandbox-runtime`. Common parameters:
+All examples use `ApiClient` from a runtime directory supplied by environment
+configuration. Set `SIMILARWEB_RUNTIME_PATH` or `UNIVERSAL_AI_SANDBOX_RUNTIME`
+to the directory that contains `data_api.py`.
+
+```python
+import os
+import sys
+
+runtime_path = (
+    os.environ.get("SIMILARWEB_RUNTIME_PATH")
+    or os.environ.get("UNIVERSAL_AI_SANDBOX_RUNTIME")
+)
+if not runtime_path:
+    raise RuntimeError("Set SIMILARWEB_RUNTIME_PATH to the directory containing data_api.py")
+
+sys.path.append(runtime_path)
+from data_api import ApiClient
+```
+
+Common parameters:
 - `domain`: Website domain (e.g., "google.com")
 - `start_date`: Start date (YYYY-MM). Max 12 months ago
 - `end_date`: End date (YYYY-MM). Max 12 months ago, default is 1 month ago (most recent complete month)
@@ -30,10 +49,6 @@ All APIs use `ApiClient` from `/opt/.manus/.sandbox-runtime`. Common parameters:
 ### Get Global Rank
 
 ```python
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-from data_api import ApiClient
-
 client = ApiClient()
 result = client.call_api('SimilarWeb/get_global_rank', path_params={'domain': 'amazon.com'})
 ```
@@ -41,10 +56,6 @@ result = client.call_api('SimilarWeb/get_global_rank', path_params={'domain': 'a
 ### Get Website Visits Total
 
 ```python
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-from data_api import ApiClient
-
 client = ApiClient()
 result = client.call_api('SimilarWeb/get_visits_total',
     path_params={'domain': 'amazon.com'},
@@ -54,10 +65,6 @@ result = client.call_api('SimilarWeb/get_visits_total',
 ### Get Unique Visit
 
 ```python
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-from data_api import ApiClient
-
 client = ApiClient()
 result = client.call_api('SimilarWeb/get_unique_visit',
     path_params={'domain': 'amazon.com'},
@@ -67,10 +74,6 @@ result = client.call_api('SimilarWeb/get_unique_visit',
 ### Get Bounce Rate
 
 ```python
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-from data_api import ApiClient
-
 client = ApiClient()
 result = client.call_api('SimilarWeb/get_bounce_rate',
     path_params={'domain': 'amazon.com'},
@@ -82,10 +85,6 @@ result = client.call_api('SimilarWeb/get_bounce_rate',
 Returns breakdown by channel: Organic Search, Paid Search, Direct, Display Ads, Email, Referrals, Social Media.
 
 ```python
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-from data_api import ApiClient
-
 client = ApiClient()
 result = client.call_api('SimilarWeb/get_traffic_sources_desktop',
     path_params={'domain': 'amazon.com'},
@@ -95,10 +94,6 @@ result = client.call_api('SimilarWeb/get_traffic_sources_desktop',
 ### Get Traffic Sources - Mobile
 
 ```python
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-from data_api import ApiClient
-
 client = ApiClient()
 result = client.call_api('SimilarWeb/get_traffic_sources_mobile',
     path_params={'domain': 'amazon.com'},
@@ -113,10 +108,6 @@ Returns traffic share, visits, pages per visit, average time, bounce rate and ra
 - **Date range limit**: max 3 months (unlike other APIs)
 
 ```python
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-from data_api import ApiClient
-
 client = ApiClient()
 result = client.call_api('SimilarWeb/get_total_traffic_by_country',
     path_params={'domain': 'amazon.com'},
