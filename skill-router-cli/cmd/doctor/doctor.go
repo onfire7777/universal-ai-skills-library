@@ -174,7 +174,7 @@ printing-press, GitHub CLI, agent roots, and scheduled tasks.`,
 			name := filepath.Base(filepath.Dir(root))
 			optional(name, func() (string, error) {
 				if _, err := os.Stat(root); err != nil {
-					return "", fmt.Errorf("missing")
+					return "missing; optional physical-copy root", nil
 				}
 				entries, _ := os.ReadDir(root)
 				return fmt.Sprintf("%d skills", len(entries)), nil
