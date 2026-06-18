@@ -18,7 +18,7 @@
 {"id": "exact-shadcn", "prompt": "build this form component with shadcn-ui", "expect": ["shadcn-ui"], "reject": [], "tags": ["exact-name"]}
 {"id": "exact-mermaid", "prompt": "draw a mermaid sequence diagram of this auth flow", "expect": ["mermaid-diagrams"], "reject": [], "tags": ["exact-name"]}
 {"id": "exact-d3", "prompt": "use d3 to make a force-directed graph visualization", "expect": ["d3-visualization"], "reject": [], "tags": ["exact-name"]}
-{"id": "exact-manus-alias", "prompt": "use the manus card creator to make a printable card", "expect": ["printable-cards"], "reject": [], "tags": ["exact-name", "alias"]}
+{"id": "exact-printable-cards", "prompt": "use the printable-cards skill to make a printable card", "expect": ["printable-cards"], "reject": [], "tags": ["exact-name"]}
 # --- Description paraphrase (hard positives; recall-sensitive) ---------------------------------
 {"id": "para-pytest", "prompt": "write pytest fixtures and parametrized tests for a fastapi app", "expect": ["python-testing-patterns"], "reject": [], "tags": ["paraphrase"]}
 {"id": "para-tdd", "prompt": "I want to write a failing test first and then make it pass", "expect": ["test-driven-development"], "reject": [], "tags": ["paraphrase"]}
