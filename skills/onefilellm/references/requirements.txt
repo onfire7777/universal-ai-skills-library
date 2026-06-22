@@ -1,6 +1,6 @@
 requests==2.33.1
 beautifulsoup4==4.11.1
-pypdf==6.13.2
+pypdf==6.13.3
 tiktoken
 nbformat==5.10.4
 nbconvert==7.17.1
