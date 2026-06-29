@@ -5,6 +5,8 @@
 | `characterization.yml` | ubuntu-latest | Builds the Go router once, then runs the Python **characterization suite** (`tests/characterization/`): router routing, registry integrity + no-skill-lost, compatibility aliases, and **no new Go test failures**. |
 | `security.yml` | ubuntu-latest | **gitleaks** secret scan using `.gitleaks.toml` (allowlists Scout 1's 45 known-illustrative findings; fails on future real leaks). |
 | `ci.yml` | windows-latest | Pre-existing: Go build + `go test ./...`, plus the two PowerShell release-audit scripts. |
+| `registry-parity.yml` | ubuntu-latest | Runs on changes to `skills/**`, `scripts/registry/**`, `skill-router-cli/**`, or the registry artifacts. Asserts the Go builder matches the committed `manifest.json` / `docs/build_manifest.json` (`skill-router registry build --check`) **and** is byte-identical to the legacy Node generator (`scripts/registry/parity-check.sh`), then runs the Go registry unit tests. |
+| `release.yml` | ubuntu-latest | Tag-driven (`v*`) / manual dispatch. Re-runs the registry parity gate, then builds and publishes the `skill-router` binary for all target platforms via **goreleaser**, signing checksums with **cosign** (keyless OIDC). |
 
 ## Why two Go-test paths (characterization vs ci.yml)
 
@@ -32,5 +34,7 @@ rather than claiming a successful run.
 
 - Once the consolidated package layout is final (Goals 1–3 merged), reconcile
   `ci.yml` and `characterization.yml` (e.g. promote `go test ./...` to a hard
-  Linux gate now that it is green) and wire Builder 4's registry drift-guard
-  (`node scripts/registry/generate-registry.mjs --check`) into CI.
+  Linux gate now that it is green). The registry drift-guard is now wired as its
+  own workflow (`registry-parity.yml`), which runs the Go owner
+  `skill-router registry build --check` plus the byte-parity oracle
+  `scripts/registry/parity-check.sh`.
