@@ -329,6 +329,7 @@ PowerShell release-audit steps in `ci.yml` run only on the Windows runner — se
 
 ## Documentation
 
+- [**Wiki**](wiki/README.md) — comprehensive, cross-linked guide (start here)
 - [Documentation Hub](docs/README.md)
 - [Quickstart](docs/QUICKSTART.md)
 - [Universal AI Setup](docs/UNIVERSAL_AI_SETUP.md)
