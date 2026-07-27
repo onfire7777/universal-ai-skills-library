@@ -90,20 +90,53 @@ jq -en --arg cap "$MAX_TOTAL_CHARGE_USD" \
   exit 1
 }
 
-printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
-  curl --fail-with-body --silent --show-error \
-  --header @- \
-  --request POST \
-  "https://api.apify.com/v2/actors/xquik~x-follower-scraper/runs?maxTotalChargeUsd=${MAX_TOTAL_CHARGE_USD}" \
-  --header "Content-Type: application/json" \
-  --data-binary @input.json \
-  --output run.json
-
 jq -e '
+  (.maxItems | numbers | select(. > 0 and floor == .)) as $max
+  | if has("maxItemsPerTarget") then
+      .maxItemsPerTarget
+      | numbers
+      | select(. > 0 and floor == . and . <= $max)
+    else
+      true
+    end
+' input.json >/dev/null || {
+  printf 'Set positive integer caps. Keep maxItemsPerTarget within maxItems.\n' >&2
+  exit 1
+}
+
+valid_checkpoint() {
+  jq -e '
   .data
   | (.id | type == "string" and length > 0)
     and (.defaultDatasetId | type == "string" and length > 0)
-' run.json >/dev/null
+  ' "$1" >/dev/null
+}
+
+if [ -e run.json ]; then
+  if valid_checkpoint run.json; then
+    printf 'Existing run.json is authoritative. Recover that run.\n' >&2
+    exit 0
+  fi
+
+  printf 'Invalid run.json exists. Preserve it and investigate before retrying.\n' >&2
+  exit 1
+fi
+
+RUN_TMP=$(mktemp ./run.json.XXXXXX)
+trap 'rm -f "$RUN_TMP"' EXIT HUP INT TERM
+
+printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
+  curl --fail-with-body --silent --show-error \
+    --header @- \
+    --request POST \
+    "https://api.apify.com/v2/actors/xquik~x-follower-scraper/runs?maxTotalChargeUsd=${MAX_TOTAL_CHARGE_USD}" \
+    --header "Content-Type: application/json" \
+    --data-binary @input.json \
+    --output "$RUN_TMP"
+
+valid_checkpoint "$RUN_TMP"
+mv "$RUN_TMP" run.json
+trap - EXIT HUP INT TERM
 ```
 
 The asynchronous response preserves the run and dataset IDs before polling.
@@ -154,7 +187,7 @@ jq -e --slurpfile input input.json '
       if .resultType == "diagnostic" then
         ((.status | type) == "string" and (.status | length) > 0)
         and ((.message | type) == "string" and (.message | length) > 0)
-      else
+      elif .resultType == "profile" then
         ((.id | type) == "string" and (.id | length) > 0)
         and (
           if $dedupe == "merge" then
@@ -168,6 +201,8 @@ jq -e --slurpfile input input.json '
               type == "string" and length > 0)
             and ((.sourceTargetKeys | type) == "array"
               and (.sourceTargetKeys | length) > 0)
+            and all(.sourceTargetKeys[];
+              type == "string" and length > 0)
             and (.overlapCount == (.sourceTargetKeys | length))
           else
             ((.sourceTarget | type) == "string"
@@ -176,6 +211,8 @@ jq -e --slurpfile input input.json '
               and (.sourceRelation | length) > 0)
           end
         )
+      else
+        false
       end
     )
 ' results.json

@@ -87,20 +87,45 @@ jq -en --arg cap "$MAX_TOTAL_CHARGE_USD" \
   exit 1
 }
 
-printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
-  curl --fail-with-body --silent --show-error \
-  --header @- \
-  --request POST \
-  "https://api.apify.com/v2/actors/xquik~x-tweet-scraper/runs?maxTotalChargeUsd=${MAX_TOTAL_CHARGE_USD}" \
-  --header "Content-Type: application/json" \
-  --data-binary @input.json \
-  --output run.json
+jq -e '.maxItems | numbers | select(. > 0 and floor == .)' \
+  input.json >/dev/null || {
+  printf 'input.json must set maxItems to a positive integer.\n' >&2
+  exit 1
+}
 
-jq -e '
+valid_checkpoint() {
+  jq -e '
   .data
   | (.id | type == "string" and length > 0)
     and (.defaultDatasetId | type == "string" and length > 0)
-' run.json >/dev/null
+  ' "$1" >/dev/null
+}
+
+if [ -e run.json ]; then
+  if valid_checkpoint run.json; then
+    printf 'Existing run.json is authoritative. Recover that run.\n' >&2
+    exit 0
+  fi
+
+  printf 'Invalid run.json exists. Preserve it and investigate before retrying.\n' >&2
+  exit 1
+fi
+
+RUN_TMP=$(mktemp ./run.json.XXXXXX)
+trap 'rm -f "$RUN_TMP"' EXIT HUP INT TERM
+
+printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
+  curl --fail-with-body --silent --show-error \
+    --header @- \
+    --request POST \
+    "https://api.apify.com/v2/actors/xquik~x-tweet-scraper/runs?maxTotalChargeUsd=${MAX_TOTAL_CHARGE_USD}" \
+    --header "Content-Type: application/json" \
+    --data-binary @input.json \
+    --output "$RUN_TMP"
+
+valid_checkpoint "$RUN_TMP"
+mv "$RUN_TMP" run.json
+trap - EXIT HUP INT TERM
 ```
 
 The asynchronous response preserves the run and dataset IDs before polling.
@@ -147,20 +172,21 @@ jq -e --slurpfile input input.json '
     and (($max | type) == "number" and $max > 0)
     and (length <= $max)
     and all(.[];
-      if .resultType == "diagnostic" then
+      (.resultType // .result_type // "tweet") as $result_type
+      | if $result_type == "diagnostic" then
         ((.status | type) == "string" and (.status | length) > 0)
         and ((.message | type) == "string" and (.message | length) > 0)
-      elif (.resultType // "tweet") == "tweet" then
+      elif $result_type == "tweet" then
         (((.id // .id_str) | type) == "string"
           and ((.id // .id_str) | length) > 0)
         and (((.text // .full_text) | type) == "string")
-      elif .resultType == "user" then
+      elif $result_type == "user" then
         ((.id | type) == "string" and (.id | length) > 0)
         and ((.username | type) == "string"
           and (.username | length) > 0)
-      elif .resultType == "article" then
-        ((.sourceTweetId | type) == "string"
-          and (.sourceTweetId | length) > 0)
+      elif $result_type == "article" then
+        (((.sourceTweetId // .source_tweet_id) | type) == "string"
+          and ((.sourceTweetId // .source_tweet_id) | length) > 0)
         and ((.article | type) == "object")
       else
         false
