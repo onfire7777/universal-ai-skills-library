@@ -25,6 +25,21 @@ Run **Apify** web scraping Actors and manage datasets directly from Claude Code.
 
 ---
 
+## X Post and Relationship Actors
+
+Use the repository's dedicated skills for X data:
+
+| Need | Actor | Skill |
+|---|---|---|
+| Posts, searches, timelines, threads, replies, quotes, and engagement | [`xquik/x-tweet-scraper`](https://apify.com/xquik/x-tweet-scraper) | `xquik-x-tweet-scraper` |
+| Followers, following, verified followers, lists, and communities | [`xquik/x-follower-scraper`](https://apify.com/xquik/x-follower-scraper) | `xquik-x-follower-scraper` |
+
+Review the live Actor listing before every run. Confirm its current pricing,
+target, and whole-run cap. Get explicit user approval before starting a paid
+run.
+
+---
+
 ## Core Workflows
 
 ### 1. Run an Actor Synchronously and Get Results
