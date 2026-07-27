@@ -10689,6 +10689,16 @@
       ]
     },
     {
+      "name": "xquik-x-follower-scraper",
+      "directory": "skills/xquik-x-follower-scraper",
+      "description": "Run Xquik's Apify X Follower Scraper for followers, following, verified followers, lists, and communities."
+    },
+    {
+      "name": "xquik-x-tweet-scraper",
+      "directory": "skills/xquik-x-tweet-scraper",
+      "description": "Run Xquik's Apify Actor for X posts, searches, timelines, threads, and engagement."
+    },
+    {
       "name": "y-gy-automation",
       "directory": "skills/y-gy-automation",
       "description": "Automate Y Gy tasks via Rube MCP (Composio). Always search tools first for current schemas."
@@ -10849,7 +10859,7 @@
       "description": "Automate Zyte API tasks via Rube MCP (Composio). Always search tools first for current schemas."
     }
   ],
-  "total_skills": 1812,
+  "total_skills": 1814,
   "alias_count": 214,
   "routing": {
     "primary_access": "skill-router skill <name>",
