@@ -75,6 +75,36 @@ Set `APPROVE_PAID_RUN=yes` and `MAX_TOTAL_CHARGE_USD` only after approval.
 
 ```bash
 set -euo pipefail
+
+valid_checkpoint() {
+  jq -e '
+  .data
+  | (.id | type == "string" and length > 0)
+    and (.defaultDatasetId | type == "string" and length > 0)
+  ' "$1" >/dev/null
+}
+
+if [ -e run.json ]; then
+  if valid_checkpoint run.json; then
+    printf 'Existing run.json is authoritative. Recover that run.\n' >&2
+    exit 0
+  fi
+
+  printf 'Invalid run.json exists. Preserve it and investigate before retrying.\n' >&2
+  exit 1
+fi
+
+if [ -e run.pending.json ]; then
+  if valid_checkpoint run.pending.json; then
+    mv run.pending.json run.json
+    printf 'Recovered run.json from the pending checkpoint.\n' >&2
+    exit 0
+  fi
+
+  printf 'Ambiguous run.pending.json exists. Check Apify runs before retrying.\n' >&2
+  exit 1
+fi
+
 : "${APIFY_TOKEN:?Set APIFY_TOKEN in the current shell}"
 : "${APPROVE_PAID_RUN:?Set APPROVE_PAID_RUN=yes after explicit approval}"
 : "${MAX_TOTAL_CHARGE_USD:?Set an approved positive charge cap}"
@@ -104,26 +134,10 @@ jq -e '
   exit 1
 }
 
-valid_checkpoint() {
-  jq -e '
-  .data
-  | (.id | type == "string" and length > 0)
-    and (.defaultDatasetId | type == "string" and length > 0)
-  ' "$1" >/dev/null
-}
-
-if [ -e run.json ]; then
-  if valid_checkpoint run.json; then
-    printf 'Existing run.json is authoritative. Recover that run.\n' >&2
-    exit 0
-  fi
-
-  printf 'Invalid run.json exists. Preserve it and investigate before retrying.\n' >&2
+if ! (set -o noclobber; : >run.pending.json) 2>/dev/null; then
+  printf 'A pending checkpoint already exists. Do not start another run.\n' >&2
   exit 1
 fi
-
-RUN_TMP=$(mktemp ./run.json.XXXXXX)
-trap 'rm -f "$RUN_TMP"' EXIT HUP INT TERM
 
 printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
   curl --fail-with-body --silent --show-error \
@@ -132,15 +146,18 @@ printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
     "https://api.apify.com/v2/actors/xquik~x-follower-scraper/runs?maxTotalChargeUsd=${MAX_TOTAL_CHARGE_USD}" \
     --header "Content-Type: application/json" \
     --data-binary @input.json \
-    --output "$RUN_TMP"
+    --output run.pending.json
 
-valid_checkpoint "$RUN_TMP"
-mv "$RUN_TMP" run.json
-trap - EXIT HUP INT TERM
+valid_checkpoint run.pending.json || {
+  printf 'Run response is ambiguous. Preserve run.pending.json and investigate.\n' >&2
+  exit 1
+}
+mv run.pending.json run.json
 ```
 
 The asynchronous response preserves the run and dataset IDs before polling.
-If the local session stops, do not start a duplicate run.
+Rerun this block after an interruption. It recovers a complete pending
+checkpoint or stops before another paid run.
 
 ## Recover and Download
 
