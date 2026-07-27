@@ -22,7 +22,7 @@ Use this skill for:
 
 - An Apify account
 - An Apify API token
-- `curl` and `jq`
+- `curl`, `jq`, `awk`, and either `sha256sum` or `shasum`
 
 Keep the token in a secret store or the current shell. Never put it in a URL,
 prompt, log, or committed file.
@@ -76,12 +76,64 @@ Set `APPROVE_PAID_RUN=yes` and `MAX_TOTAL_CHARGE_USD` only after approval.
 ```bash
 set -euo pipefail
 
-valid_checkpoint() {
+ACTOR_ID='xquik/x-follower-scraper'
+
+canonical_input() {
+  jq -cS -s '
+    if length == 1 and (.[0] | type == "object") then .[0]
+    else error("input.json must contain exactly one object")
+    end
+  ' input.json
+}
+
+input_digest() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    canonical_input | sha256sum | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then
+    canonical_input | shasum -a 256 | awk '{print $1}'
+  else
+    printf 'Install sha256sum or shasum before starting a run.\n' >&2
+    return 1
+  fi
+}
+
+INPUT_SHA256=$(input_digest)
+
+valid_run_response() {
   jq -e '
   .data
   | (.id | type == "string" and length > 0)
     and (.defaultDatasetId | type == "string" and length > 0)
   ' "$1" >/dev/null
+}
+
+valid_checkpoint() {
+  valid_run_response "$1" &&
+    jq -e \
+      --arg actor "$ACTOR_ID" \
+      --arg digest "$INPUT_SHA256" \
+      '.xquikCheckpoint.actorId == $actor
+        and .xquikCheckpoint.inputSha256 == $digest' \
+      "$1" >/dev/null
+}
+
+pending_input_matches() {
+  local pending_sha=
+  [ -f run.pending.input.sha256 ] &&
+    IFS= read -r pending_sha <run.pending.input.sha256 &&
+    [ "$pending_sha" = "$INPUT_SHA256" ]
+}
+
+bind_checkpoint() {
+  jq \
+    --arg actor "$ACTOR_ID" \
+    --arg digest "$INPUT_SHA256" \
+    '.xquikCheckpoint = {
+      actorId: $actor,
+      inputSha256: $digest
+    }' \
+    "$1" >"$1.bound"
+  mv "$1.bound" "$1"
 }
 
 if [ -e run.json ]; then
@@ -90,19 +142,24 @@ if [ -e run.json ]; then
     exit 0
   fi
 
-  printf 'Invalid run.json exists. Preserve it and investigate before retrying.\n' >&2
+  printf 'Invalid or mismatched run.json exists. Investigate before retrying.\n' >&2
   exit 1
 fi
 
 if [ -e run.pending.json ]; then
-  if valid_checkpoint run.pending.json; then
-    mv run.pending.json run.json
-    printf 'Recovered run.json from the pending checkpoint.\n' >&2
-    exit 0
+  if ! valid_checkpoint run.pending.json; then
+    if valid_run_response run.pending.json && pending_input_matches; then
+      bind_checkpoint run.pending.json
+    else
+      printf 'Pending checkpoint is ambiguous or mismatched. Investigate it.\n' >&2
+      exit 1
+    fi
   fi
 
-  printf 'Ambiguous run.pending.json exists. Check Apify runs before retrying.\n' >&2
-  exit 1
+  mv run.pending.json run.json
+  rm -f run.pending.input.sha256
+  printf 'Recovered run.json from the matching pending checkpoint.\n' >&2
+  exit 0
 fi
 
 : "${APIFY_TOKEN:?Set APIFY_TOKEN in the current shell}"
@@ -138,6 +195,7 @@ if ! (set -o noclobber; : >run.pending.json) 2>/dev/null; then
   printf 'A pending checkpoint already exists. Do not start another run.\n' >&2
   exit 1
 fi
+printf '%s\n' "$INPUT_SHA256" >run.pending.input.sha256
 
 printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
   curl --fail-with-body --silent --show-error \
@@ -148,16 +206,22 @@ printf 'Authorization: Bearer %s\n' "$APIFY_TOKEN" |
     --data-binary @input.json \
     --output run.pending.json
 
-valid_checkpoint run.pending.json || {
+valid_run_response run.pending.json || {
   printf 'Run response is ambiguous. Preserve run.pending.json and investigate.\n' >&2
   exit 1
 }
+
+pending_input_matches
+bind_checkpoint run.pending.json
+valid_checkpoint run.pending.json
 mv run.pending.json run.json
+rm -f run.pending.input.sha256
 ```
 
 The asynchronous response preserves the run and dataset IDs before polling.
 Rerun this block after an interruption. It recovers a complete pending
-checkpoint or stops before another paid run.
+checkpoint only when its Actor and input digest match. Otherwise, it stops
+before another paid run.
 
 ## Recover and Download
 
