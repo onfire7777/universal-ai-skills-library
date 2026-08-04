@@ -70,4 +70,4 @@ wheel==0.47.0
 xlrd==2.0.2
 yarl==1.23.0
 youtube-transcript-api==0.4.1
-yt-dlp==2026.6.9
+yt-dlp==2026.7.4
