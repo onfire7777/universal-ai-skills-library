@@ -80,9 +80,10 @@ homebrew_casks:
     repository:
       owner: onfire7777
       name: homebrew-tap
+      token: '{{ index .Env "HOMEBREW_TAP_GITHUB_TOKEN" }}'
     homepage: "https://github.com/onfire7777/universal-ai-skills-library"
     description: "Universal AI skills router — search, preflight-route, and load skills on demand"
-    skip_upload: auto
+    skip_upload: '{{ if index .Env "HOMEBREW_TAP_GITHUB_TOKEN" }}auto{{ else }}true{{ end }}'
 
 release:
   github:

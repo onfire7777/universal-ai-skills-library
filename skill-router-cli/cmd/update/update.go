@@ -17,73 +17,76 @@ import (
 )
 
 // Cmd is the update command.
-var Cmd = &cobra.Command{
-	Use:   "update [--skills | --cli | --all]",
-	Short: "Self-update router binary, skills repo, and printing-press",
-	Long: `Update the skill-router binaries from the local skills repository,
-pull latest skills from the repository, update printing-press,
-and re-propagate compact wrapper skills to default agent roots.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		skillsOnly, _ := cmd.Flags().GetBool("skills")
-		cliOnly, _ := cmd.Flags().GetBool("cli")
-		all, _ := cmd.Flags().GetBool("all")
-		fullCopy, _ := cmd.Flags().GetBool("full-copy")
+var Cmd = newUpdateCommand(updateOperations{
+	pull:          updateSkillsRepo,
+	build:         updateCLI,
+	sync:          syncUpdatedSkills,
+	printingPress: updatePrintingPress,
+})
 
-		if !skillsOnly && !cliOnly {
-			all = true
-		}
-
-		bold := color.New(color.Bold)
-
-		if all || cliOnly {
-			bold.Println("[1/4] Updating skill-router binaries...")
-			if err := updateCLI(); err != nil {
-				fmt.Printf("  Warning: %v\n", err)
-			} else {
-				fmt.Println("  Done.")
-			}
-		}
-
-		if all || skillsOnly {
-			bold.Println("[2/4] Pulling latest skills from GitHub...")
-			if err := updateSkillsRepo(); err != nil {
-				fmt.Printf("  Warning: %v\n", err)
-			} else {
-				fmt.Println("  Done.")
-			}
-
-			bold.Println("[3/4] Verifying canonical skills source...")
-			if _, err := os.Stat(skillsync.SourceDir()); err != nil {
-				return err
-			}
-			fmt.Println("  Done.")
-
-			bold.Println("[4/4] Propagating wrapper skills to agent roots...")
-			counts, err := skillsync.PropagateToDefaultRoots(fullCopy)
-			for _, root := range platform.AgentRoots() {
-				fmt.Printf("  %-40s [%d skills]\n", root, counts[root])
-			}
-			if err != nil {
-				return err
-			}
-			fmt.Println("  Done.")
-		}
-
-		if all {
-			bold.Println("[Bonus] Updating printing-press...")
-			updatePrintingPress()
-		}
-
-		color.New(color.FgGreen, color.Bold).Println("\nAll updates complete.")
-		return nil
-	},
+type updateOperations struct {
+	pull          func() error
+	build         func() error
+	sync          func(bool) error
+	printingPress func() error
 }
 
-func init() {
-	Cmd.Flags().Bool("skills", false, "Update only skills")
-	Cmd.Flags().Bool("cli", false, "Update only the CLI binary")
-	Cmd.Flags().Bool("all", false, "Update everything (default)")
-	Cmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
+func newUpdateCommand(ops updateOperations) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update [--skills | --cli | --all]",
+		Short: "Self-update router binary, skills repo, and printing-press",
+		Long:  "Pull the skills repository, rebuild the router, sync agent wrappers, and update printing-press.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			skills, _ := cmd.Flags().GetBool("skills")
+			cli, _ := cmd.Flags().GetBool("cli")
+			all, _ := cmd.Flags().GetBool("all")
+			fullCopy, _ := cmd.Flags().GetBool("full-copy")
+			all = all || (!skills && !cli)
+
+			steps := []struct {
+				enabled bool
+				name    string
+				run     func() error
+			}{
+				{all || skills, "Pulling latest skills from GitHub", ops.pull},
+				{all || cli, "Updating skill-router binaries", ops.build},
+				{all || skills, "Syncing skills to agent roots", func() error { return ops.sync(fullCopy) }},
+				{all, "Updating printing-press", ops.printingPress},
+			}
+
+			out := cmd.OutOrStdout()
+			for _, step := range steps {
+				if !step.enabled {
+					continue
+				}
+				fmt.Fprintln(out, step.name+"...")
+				if err := step.run(); err != nil {
+					return fmt.Errorf("%s: %w", step.name, err)
+				}
+				fmt.Fprintln(out, "  Done.")
+			}
+
+			color.New(color.FgGreen, color.Bold).Fprintln(out, "\nAll updates complete.")
+			return nil
+		},
+	}
+	cmd.Flags().Bool("skills", false, "Pull skills and sync agent wrappers")
+	cmd.Flags().Bool("cli", false, "Rebuild the CLI from the current local checkout")
+	cmd.Flags().Bool("all", false, "Update everything (default)")
+	cmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
+	return cmd
+}
+
+func syncUpdatedSkills(fullCopy bool) error {
+	if _, err := os.Stat(skillsync.SourceDir()); err != nil {
+		return err
+	}
+
+	counts, err := skillsync.PropagateToDefaultRoots(fullCopy)
+	for _, root := range platform.AgentRoots() {
+		fmt.Printf("  %-40s [%d skills]\n", root, counts[root])
+	}
+	return err
 }
 
 func updateCLI() error {
@@ -168,11 +171,7 @@ func installCLIToTargets(source string, targets []string) error {
 	successes := 0
 	var failures []string
 	for _, target := range targets {
-		if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
-			failures = append(failures, fmt.Sprintf("%s: %v", target, err))
-			continue
-		}
-		if err := os.WriteFile(target, bin, 0755); err != nil {
+		if err := replaceCLI(target, bin); err != nil {
 			failures = append(failures, fmt.Sprintf("%s: %v", target, err))
 			continue
 		}
@@ -187,6 +186,31 @@ func installCLIToTargets(source string, targets []string) error {
 		return fmt.Errorf("installed %d target(s), but some failed: %s", successes, strings.Join(failures, "; "))
 	}
 	return nil
+}
+
+// Stage the complete binary beside its destination before replacing it.
+func replaceCLI(target string, bin []byte) error {
+	dir := filepath.Dir(target)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+	staged, err := os.CreateTemp(dir, ".skill-router-*")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(staged.Name())
+	defer staged.Close()
+
+	if err := staged.Chmod(0755); err != nil {
+		return err
+	}
+	if _, err := staged.Write(bin); err != nil {
+		return err
+	}
+	if err := staged.Close(); err != nil {
+		return err
+	}
+	return os.Rename(staged.Name(), target)
 }
 
 func pathExists(path string) bool {
@@ -238,12 +262,12 @@ func updateSkillsRepo() error {
 	repoDir := platform.RepoDir()
 	if _, err := os.Stat(filepath.Join(repoDir, ".git")); err != nil {
 		// Clone if not exists
-		return runner.RunCommand("gh", "repo", "clone", "onfire7777/universal-ai-skills-library", repoDir)
+		return runner.RunCommand("git", "clone", "https://github.com/onfire7777/universal-ai-skills-library.git", repoDir)
 	}
 	// Pull latest
 	return runner.RunCommand("git", "-C", repoDir, "pull", "--ff-only")
 }
 
-func updatePrintingPress() {
-	runner.RunCommand("go", "install", "github.com/mvanhorn/cli-printing-press/v4/cmd/printing-press@latest")
+func updatePrintingPress() error {
+	return runner.RunCommand("go", "install", "github.com/mvanhorn/cli-printing-press/v4/cmd/printing-press@latest")
 }
