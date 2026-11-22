@@ -13,11 +13,13 @@ A chat application built with [SvelteKit](https://svelte.dev/docs/kit), [Vercel 
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22.17 or newer
 - [pnpm](https://pnpm.io/)
 - An OpenAI API key
 
 ### Install dependencies
+
+For the original SvelteKit 2 example checkout, copy this reference's `package.json`, `vite.config.ts`, and `tsconfig.json` into the example directory and remove its legacy `svelte.config.js`. The Vite config keeps the original `$lib` imports working. See the [SvelteKit 3 migration guide](https://svelte.dev/docs/kit/migrating-to-sveltekit-3) when updating other parts of the example.
 
 From the monorepo root:
 
