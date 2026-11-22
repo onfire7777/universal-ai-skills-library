@@ -2,7 +2,7 @@
 name: ultimate-skill-creator
 description: >
   The definitive end-to-end pipeline for creating the highest quality portable AI skills. Orchestrates
-  six individual skills in sequence — each run fully, separately, and in its entirety — to produce
+  five development skills and a local verification stage in sequence to produce
   elite, production-grade skills. Use when the user explicitly requests the full pipeline, says
   "ultimate skill", "ultimate skill creator", "ultimate skill creation", "best skill", "best skill
   creator", "full pipeline", "full skill pipeline", or specifically asks for maximum quality skill
@@ -12,7 +12,7 @@ description: >
 
 # Ultimate Skill Creator
 
-Execute a comprehensive six-stage pipeline to create, optimize, triage, connect, debug, and deploy a production-grade portable AI skill. Each stage runs a fully independent skill through its complete workflow — no shortcuts, no combining, no skipping.
+Execute a comprehensive six-stage pipeline to create, optimize, triage, connect, debug, and finalize a production-grade portable AI skill. Run each development skill through its complete workflow, then verify the finished local skill.
 
 ## Pipeline Overview
 
@@ -23,7 +23,7 @@ Execute a comprehensive six-stage pipeline to create, optimize, triage, connect,
 | 3 | `master-skill-orchestrator` | Skill Triage Protocol for domain analysis | Triage documented in `/tmp/triage_$SKILL_NAME.md` |
 | 4 | `skill-connection-map` | Connection Discovery Protocol | Connections documented in `/tmp/connections_$SKILL_NAME.md` |
 | 5 | `skill-debugger` | Deep dual-model debug + fix cycle | No critical/high issues after max 3 cycles |
-| 6 | `skill-sync` | Push to GitHub + local installation | Deployed and verified |
+| 6 | Finalize | Verify the local skill and optionally publish | Local skill verified |
 
 ## Pre-Flight Check
 
@@ -33,7 +33,7 @@ Run the pre-flight script before starting the pipeline:
 python3 /home/ubuntu/skills/ultimate-skill-creator/scripts/preflight_check.py
 ```
 
-This verifies all six required skills are installed, at least one API key is available, and GitHub CLI is authenticated. If it fails, fix the reported errors before proceeding. If it passes with warnings, the pipeline can proceed with limited functionality.
+This verifies the five development skills and checks for an API key. Verify access to a remote only if the user authorizes publishing in Stage 6. If it fails, fix the reported errors before proceeding. If it passes with warnings, the pipeline can proceed with limited functionality.
 
 ## Operational Rules
 
@@ -41,7 +41,7 @@ This verifies all six required skills are installed, at least one API key is ava
 2. **Complete each stage fully** before advancing. Do not skip steps within a skill's workflow.
 3. **Announce each stage transition**: "Starting Stage N: [skill-name] — [purpose]."
 4. **Stage transition checkpoint** — Before starting each new stage, confirm the stage number, skill name, and purpose from the Pipeline Overview table above. Do not re-read the entire SKILL.md unless uncertain about requirements.
-5. **Ask clarifying questions ONLY during Stage 1** (Understand step). Proceed autonomously thereafter.
+5. **Gather creation requirements during Stage 1.** Obtain explicit publishing authorization in Stage 6 if the user requests publication and has yet to approve the destination and files.
 6. **On fatal errors**, inform the user immediately with error context and recovery options.
 7. **Clean up temporary files** after each stage, including on failure.
 8. **Sequential execution only** — Complete each stage fully before starting the next. Do not run stages concurrently.
@@ -154,41 +154,14 @@ Execute the skill-debugger's complete workflow:
 
 ---
 
-## Stage 6: skill-sync — Full Deployment
+## Stage 6: Verify the Local Skill
 
-**Read**: `/home/ubuntu/skills/skill-sync/SKILL.md`
+1. Confirm the finished skill is present in the local skills root and rerun the local validator. The skill created in Stage 1 is already local.
+2. If the user requests publication, confirm the exact repository, target branch, destination path, and files to publish. Show the proposed diff or file list before committing or pushing and wait for approval of that scope. Review the selected files for secrets and private material. Obtain fresh approval if the destination or file set changes.
+3. After approval, use an isolated checkout and stage only the approved skill files. Preserve existing work in the destination and verify the staged diff before committing and pushing to the approved branch.
+4. Remove the temporary triage and connection reports created by this run.
 
-Execute the full deployment. Replace `$SKILL_NAME` with the actual skill name. Verify the name is correct before executing any destructive commands.
-
-1. **Push to GitHub**:
-   ```bash
-   # Ensure repo exists
-   if [ ! -d /tmp/universal-ai-skills-library ]; then
-     gh repo clone onfire7777/universal-ai-skills-library /tmp/universal-ai-skills-library
-   fi
-   cd /tmp/universal-ai-skills-library
-   git pull --rebase || { git rebase --abort; git pull --no-rebase; }
-
-   # Guard against empty skill name
-   SKILL_NAME="the-actual-skill-name"
-   if [ -z "$SKILL_NAME" ]; then echo "ERROR: SKILL_NAME is empty"; exit 1; fi
-
-   # Deploy skill
-   rm -rf "${SKILL_NAME}"
-   cp -r "/home/ubuntu/skills/${SKILL_NAME}" .
-   git add -A "${SKILL_NAME}/"
-   git diff --cached --quiet || git commit -m "feat: ${SKILL_NAME} - created via ultimate-skill-creator pipeline"
-   git push || { echo "ERROR: git push failed"; exit 1; }
-   ```
-   If `git push` fails, report the error to the user with the git error message and suggest manual resolution.
-2. **Run skill-sync** — Verify installation:
-   ```bash
-   python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py
-   ```
-3. **Verify** — Confirm the skill exists at `/home/ubuntu/skills/$SKILL_NAME/SKILL.md`.
-4. **Clean up** — Remove `/tmp/triage_$SKILL_NAME.md` and `/tmp/connections_$SKILL_NAME.md`.
-
-**Exit**: Skill pushed to GitHub and confirmed installed locally.
+**Exit:** The local skill passes validation. If publication was approved, verify the result at the approved destination and report the commit.
 
 ---
 
@@ -206,9 +179,9 @@ After all six stages, deliver to the user:
 | 3 | master-skill-orchestrator | [domains/skills identified] | [insights applied] |
 | 4 | skill-connection-map | [connections discovered] | [improvements made] |
 | 5 | skill-debugger | [issues found/fixed] | [final health] |
-| 6 | skill-sync | [deployed] | [commit ref] |
+| 6 | Finalize | [local validation and optional publication] | [local path or approved commit] |
 
-3. **Key metrics**: Prompt-engineer improvement score, debugger findings resolved, files created, GitHub commit SHA
+3. **Key metrics**: Prompt-engineer improvement score, debugger findings resolved, files created, and the commit SHA if published
 4. **Reflection**: Brief summary of what was learned during the pipeline — what worked well, what was challenging, and any insights for future skill creation
 
 ## Constraints

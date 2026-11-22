@@ -9,44 +9,35 @@ Sync all skills from a GitHub repository into `/home/ubuntu/skills/` with versio
 
 ## Quick Start
 
-Run the sync script:
+Run the script to preview the default repository, `onfire7777/universal-ai-skills-library`.
 
 ```bash
-python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py
+python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --dry-run
 ```
 
-Default repo: `onfire7777/universal-ai-skills-library`. The script handles everything automatically.
+Show the user the repository, full commit SHA, target directory, and skills that would be installed or updated. Let the user inspect the selected changes and wait for approval of that exact sync. Then rerun with the same repository, target, and filters, replacing `--dry-run` with `--apply <commit-sha>`. Review a new preview if the repository has moved on.
 
 ## Commands
 
 ```bash
-# Full sync (clone/pull + install/update all skills)
-python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py
+# Preview selected skills from a different repository
+python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --repo user/repo-name --filter "security,audit"
 
-# Sync from a different repo
-python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --repo user/repo-name
-
-# Preview changes without installing
-python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --dry-run
-
-# Only sync skills matching keywords
-python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --filter "security,audit"
-
-# Force overwrite locally modified skills
+# Preview replacing locally modified skills
 python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --force
 
-# Validate all currently installed skills
+# Validate currently installed skills
 python3 /home/ubuntu/skills/skill-sync/scripts/sync_skills.py --validate-only
 ```
 
 ## How It Works
 
-1. **Clone or pull** the repo into `~/.skill-sync-cache/` (uses `gh` CLI with `git clone` fallback)
+1. **Fetch** the repository's default branch with Git and preview its exact commit
 2. **Discover** all directories containing a valid `SKILL.md` (supports both `repo/skill-name/` and `repo/skills/skill-name/` layouts)
 3. **Compare** each skill's content hash against the last sync state
-4. **Install** new skills, **update** changed skills, **skip** unchanged ones
-5. **Validate** every SKILL.md has proper YAML frontmatter (`name` + `description`)
-6. **Save state** with commit hash and per-skill content hashes for next sync
+4. **Apply** only when the supplied commit matches the previewed source. Install new skills, update changed skills, and skip unchanged ones.
+5. **Validate** that each skill has SKILL.md frontmatter (`name` + `description`)
+6. **Save state** after applying, with the commit hash and per-skill content hashes
 
 ## Change Detection
 
@@ -63,12 +54,14 @@ Sync state is stored at `~/.skill-sync-cache/sync_state.json`. Contains last syn
 
 ## Configuration
 
+Use Git and Python 3.12 or newer. The preview may populate the Git cache. It leaves the skills directory and installation state alone.
+
 Paths can be overridden via environment variables or CLI flags:
 
 | Setting | Default | Override |
 |---|---|---|
 | Skills directory | `/home/ubuntu/skills` | `SKILL_ROUTER_SKILLS_DIR` or `--skills-dir` |
-| Cache directory | `/home/ubuntu/.skill-sync-cache` | `SKILL_ROUTER_SYNC_CACHE` or `--cache-dir` |
+| Cache directory | `~/.skill-sync-cache` | `SKILL_ROUTER_SYNC_CACHE` or `--cache-dir` |
 
 ## After Syncing
 

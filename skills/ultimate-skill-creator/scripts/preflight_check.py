@@ -2,9 +2,8 @@
 """Pre-flight check for the Ultimate Skill Creator pipeline.
 
 Verifies all dependencies are available before starting the pipeline:
-- All 6 required skills are installed
+- The five required development skills are installed
 - At least one AI API key is set
-- GitHub CLI is authenticated
 
 Usage:
     python3 preflight_check.py
@@ -13,7 +12,6 @@ Usage:
 
 import os
 import sys
-import subprocess
 import argparse
 from pathlib import Path
 
@@ -44,7 +42,6 @@ def main():
         "master-skill-orchestrator",
         "skill-connection-map",
         "skill-debugger",
-        "skill-sync",
     ]
 
     print("=" * 60)
@@ -53,7 +50,7 @@ def main():
     print(f"  Skills directory: {skills_dir}")
     print()
 
-    print("  [1/3] Checking required skills...")
+    print("  [1/2] Checking required skills...")
     for skill in required_skills:
         skill_path = os.path.join(skills_dir, skill, "SKILL.md")
         if os.path.isfile(skill_path):
@@ -64,7 +61,7 @@ def main():
 
     # Check 2: API keys
     print()
-    print("  [2/3] Checking API keys...")
+    print("  [2/2] Checking API keys...")
     has_openrouter = bool(os.environ.get("OPENROUTER_API_KEY"))
     has_openai = bool(os.environ.get("OPENAI_API_KEY"))
 
@@ -83,32 +80,6 @@ def main():
     if not has_openrouter and not has_openai:
         errors.append("No API keys set — at least one of OPENROUTER_API_KEY or OPENAI_API_KEY is required")
         print("    FAIL  No API keys available")
-
-    # Check 3: GitHub CLI
-    print()
-    print("  [3/3] Checking GitHub CLI...")
-    try:
-        result = subprocess.run(
-            ["gh", "auth", "status"],
-            capture_output=True,
-            text=True,
-            timeout=15
-        )
-        combined_output = (result.stdout + result.stderr).lower()
-        if result.returncode == 0 and "expired" not in combined_output:
-            print("    OK  gh CLI is authenticated")
-        elif "expired" in combined_output:
-            errors.append("gh CLI token is expired — run 'gh auth refresh' first")
-            print("    FAIL  gh CLI token expired")
-        else:
-            errors.append("gh CLI is not authenticated — run 'gh auth login' first")
-            print("    FAIL  gh CLI not authenticated")
-    except FileNotFoundError:
-        errors.append("gh CLI is not installed")
-        print("    FAIL  gh CLI not found")
-    except subprocess.TimeoutExpired:
-        warnings.append("gh auth status timed out — GitHub access may be unreliable")
-        print("    WARN  gh auth status timed out")
 
     # Summary
     print()

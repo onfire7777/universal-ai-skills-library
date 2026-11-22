@@ -55,7 +55,7 @@ After installing the skill, install the audit dependencies:
 
 ```bash
 cd ~/.claude/skills/roier-seo/scripts
-npm install
+npm ci
 ```
 
 ### Running an Audit
@@ -92,7 +92,6 @@ The audit returns scores (0-100) for five categories:
 | **Accessibility** | WCAG compliance, screen reader support | High |
 | **Best Practices** | Security, modern web standards | Medium |
 | **SEO** | Search engine optimization, crawlability | High |
-| **PWA** | Progressive Web App compliance | Low |
 
 ## Technical SEO fix patterns
 
@@ -451,7 +450,7 @@ Run the audit again to verify improvements.
 
 ## Requirements
 
-- **Node.js 18+**
+- **Node.js 22.19 or newer** for local Lighthouse audits. The PageSpeed API helper supports Node.js 18 or newer.
 - **Chrome/Chromium** browser (for Lighthouse)
 - Audit script dependencies (installed via npm)
 

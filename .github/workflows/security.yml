@@ -23,12 +23,13 @@ jobs:
       GITLEAKS_VERSION: 8.30.1
     steps:
       - name: Check out
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Go
-        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
-          go-version: "1.26.4"
+          go-version-file: skill-router-cli/go.mod
+          cache-dependency-path: skill-router-cli/go.sum
 
       - name: Install gitleaks
         run: |

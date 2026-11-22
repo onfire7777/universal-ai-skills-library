@@ -2,7 +2,7 @@
 """Skill Sync - clone/pull a GitHub skills repo and install portable AI skills.
 
 Handles:
-  - Cloning the repo if not present, pulling if it exists
+  - Fetching and previewing an exact GitHub repository commit
   - Discovering all valid skills (directories containing SKILL.md)
   - Installing new skills and updating changed ones
   - Skipping skills that are already up-to-date
@@ -12,7 +12,8 @@ Handles:
   - Generating a summary report
 
 Usage:
-    python3 sync_skills.py                          # Sync from default repo
+    python3 sync_skills.py                          # Preview the default repo
+    python3 sync_skills.py --apply <commit-sha>     # Install the reviewed commit
     python3 sync_skills.py --repo user/repo-name    # Sync from specific repo
     python3 sync_skills.py --dry-run                # Preview without changes
     python3 sync_skills.py --filter "security,audit" # Only sync matching skills
@@ -29,6 +30,8 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -52,8 +55,8 @@ MAX_HASH_FILE_SIZE = 50 * 1024 * 1024
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
-def run_cmd(cmd: list[str], cwd: str = None, timeout: int = 120) -> tuple[int, str, str]:
-    """Run a shell command and return (returncode, stdout, stderr)."""
+def run_cmd(cmd: list[str], cwd: Path | None = None, timeout: int = 120) -> tuple[int, str, str]:
+    """Run a command and return (returncode, stdout, stderr)."""
     try:
         result = subprocess.run(
             cmd, capture_output=True, text=True, cwd=cwd, timeout=timeout
@@ -69,13 +72,13 @@ def run_cmd(cmd: list[str], cwd: str = None, timeout: int = 120) -> tuple[int, s
 
 def get_repo_dir(repo: str) -> Path:
     """Get the local clone directory for a repo."""
-    # DBG-012 FIX: Validate repo format before using in filesystem path
-    if not re.match(r'^[\w.-]+/[\w.-]+$', repo):
-        print(f"ERROR: Invalid repo format '{repo}'. Expected 'owner/repo-name'.",
-              file=sys.stderr)
-        sys.exit(1)
-    repo_name = repo.split("/")[-1]
-    return CACHE_DIR / repo_name
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9_.-]+", repo):
+        raise ValueError("expected a GitHub repository in owner/name format")
+    owner, name = repo.lower().split("/")
+    if name in {".", "..", ".git"}:
+        raise ValueError("invalid GitHub repository name")
+    return CACHE_DIR / "repos" / owner / name
+
 
 
 def dir_hash(directory: Path) -> str:
@@ -175,95 +178,46 @@ def save_state(state: dict):
 
 # ─── Core Functions ──────────────────────────────────────────────────────────
 
-def clone_or_pull(repo: str) -> tuple[Path, str, bool]:
-    """Clone the repo if not present, or pull latest changes.
-
-    Returns (repo_dir, commit_hash, had_changes).
-
-    DBG-001 FIX: Detects default branch dynamically instead of hardcoding 'origin/main'.
-    DBG-002 FIX: Falls back to git clone if gh CLI is unavailable.
-    """
+def fetch_repo(repo: str) -> tuple[Path, str]:
+    """Fetch the remote default branch without updating an installed skill."""
     repo_dir = get_repo_dir(repo)
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    repo_dir.parent.mkdir(parents=True, exist_ok=True)
+    url = f"https://github.com/{repo}.git"
 
-    if repo_dir.exists() and (repo_dir / ".git").exists():
-        # Get current commit before pull
-        _, old_commit, _ = run_cmd(["git", "rev-parse", "HEAD"], cwd=str(repo_dir))
-
-        # Pull latest
-        print(f"  Pulling latest from {repo}...")
-        code, out, err = run_cmd(["git", "pull", "--ff-only"], cwd=str(repo_dir))
-        if code != 0:
-            # DBG-001 FIX: Detect default branch dynamically
-            print(f"  Fast-forward failed, resetting to origin default branch...")
-            code_f, _, err_f = run_cmd(["git", "fetch", "origin"], cwd=str(repo_dir))
-            if code_f != 0:
-                print(f"  ERROR: Fetch failed: {err_f}", file=sys.stderr)
-                sys.exit(1)
-            # Detect default branch from remote HEAD
-            _, ref_out, _ = run_cmd(
-                ["git", "symbolic-ref", "refs/remotes/origin/HEAD", "--short"],
-                cwd=str(repo_dir)
-            )
-            default_branch = ref_out.strip() if ref_out.strip() else ""
-            # DBG-005 FIX (round 2): If symbolic-ref fails (common with gh clone),
-            # use 'git remote show origin' to detect the default branch
-            if not default_branch:
-                _, show_out, _ = run_cmd(
-                    ["git", "remote", "show", "origin"],
-                    cwd=str(repo_dir), timeout=30
-                )
-                for line in show_out.splitlines():
-                    if "HEAD branch" in line:
-                        branch_name = line.split(":")[-1].strip()
-                        if branch_name and branch_name != "(unknown)":
-                            default_branch = f"origin/{branch_name}"
-                            break
-            if not default_branch:
-                default_branch = "origin/main"  # Final fallback
-            code_r, _, err_r = run_cmd(
-                ["git", "reset", "--hard", default_branch],
-                cwd=str(repo_dir)
-            )
-            if code_r != 0:
-                # Last resort: try origin/master
-                print(f"  Reset to {default_branch} failed, trying origin/master...")
-                code_r2, _, err_r2 = run_cmd(
-                    ["git", "reset", "--hard", "origin/master"],
-                    cwd=str(repo_dir)
-                )
-                if code_r2 != 0:
-                    print(f"  ERROR: Reset failed: {err_r2}", file=sys.stderr)
-                    sys.exit(1)
-
-        # Get new commit
-        _, new_commit, _ = run_cmd(["git", "rev-parse", "HEAD"], cwd=str(repo_dir))
-        had_changes = old_commit != new_commit
-        return repo_dir, new_commit, had_changes
-    else:
-        # Fresh clone
-        if repo_dir.exists():
-            shutil.rmtree(repo_dir)
-        print(f"  Cloning {repo}...")
-
-        # DBG-002 FIX: Try gh first, fall back to git clone
-        code, out, err = run_cmd(
-            ["gh", "repo", "clone", repo, str(repo_dir)],
-            timeout=300
+    if not repo_dir.exists():
+        code, _, err = run_cmd(
+            ["git", "clone", "--bare", url, str(repo_dir)], timeout=300
         )
-        if code != 0:
-            # Fallback to git clone (works without authentication for public repos)
-            print(f"  gh clone failed ({err[:80]}), trying git clone...")
-            code, out, err = run_cmd(
-                ["git", "clone", f"https://github.com/{repo}.git", str(repo_dir)],
-                timeout=300
-            )
-        if code != 0:
-            print(f"  ERROR: Clone failed: {err}", file=sys.stderr)
-            sys.exit(1)
+        if code:
+            raise RuntimeError(f"clone failed: {err}")
 
-        _, commit, _ = run_cmd(["git", "rev-parse", "HEAD"], cwd=str(repo_dir))
-        return repo_dir, commit, True  # Fresh clone always has changes
+    code, origin, _ = run_cmd(["git", "config", "--local", "--get", "remote.origin.url"], cwd=repo_dir)
+    if code or origin.lower() != url.lower():
+        raise RuntimeError(f"cache at {repo_dir} does not belong to {repo}")
+
+    code, _, err = run_cmd(["git", "fetch", "--no-tags", "origin", "HEAD"], cwd=repo_dir)
+    if code:
+        raise RuntimeError(f"fetch failed: {err}")
+    code, commit, err = run_cmd(["git", "rev-parse", "--verify", "FETCH_HEAD^{commit}"], cwd=repo_dir)
+    if code:
+        raise RuntimeError(f"commit lookup failed: {err}")
+    return repo_dir, commit
+
+
+def extract_snapshot(repo_dir: Path, commit: str, work_dir: Path) -> Path:
+    """Extract tracked files from the reviewed Git tree, excluding filesystem links."""
+    archive_path = work_dir / "skills.tar"
+    snapshot = work_dir / "snapshot"
+    code, _, err = run_cmd(
+        ["git", "archive", "--format=tar", f"--output={archive_path}", commit],
+        cwd=repo_dir, timeout=300,
+    )
+    if code:
+        raise RuntimeError(f"snapshot creation failed: {err}")
+    with tarfile.open(archive_path) as archive:
+        members = [entry for entry in archive if entry.isfile() or entry.isdir()]
+        archive.extractall(snapshot, members=members, filter="data")
+    return snapshot
 
 
 def discover_skills(repo_dir: Path) -> list[dict]:
@@ -295,7 +249,7 @@ def discover_skills(repo_dir: Path) -> list[dict]:
     skills_subdir = repo_dir / "skills"
     if skills_subdir.is_dir():
         for entry in sorted(skills_subdir.iterdir()):
-            if entry.is_dir() and not entry.name.startswith("."):
+            if entry.is_dir() and not entry.name.startswith(".") and entry.name not in exclude_dirs:
                 skill_md = entry / "SKILL.md"
                 if skill_md.exists():
                     # Don't duplicate if already found at top level
@@ -404,8 +358,11 @@ def main():
     )
     parser.add_argument("--repo", default=DEFAULT_REPO,
                         help=f"GitHub repo to sync from (default: {DEFAULT_REPO})")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Preview changes without installing/updating")
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument("--dry-run", action="store_true",
+                        help="Preview changes without installing (the default)")
+    action.add_argument("--apply", metavar="COMMIT",
+                        help="Install from the full commit SHA shown by the approved preview")
     parser.add_argument("--force", action="store_true",
                         help="Overwrite locally modified skills")
     parser.add_argument("--filter", default=None,
@@ -419,6 +376,9 @@ def main():
     parser.add_argument("--cache-dir", default=None,
                         help="Override the cache/clone directory")
     args = parser.parse_args()
+    if args.apply and not re.fullmatch(r"[0-9a-f]{40}", args.apply):
+        parser.error("--apply requires the full 40-character commit SHA from the preview")
+    args.dry_run = args.apply is None
 
     # Apply CLI overrides
     global SKILLS_DIR, CACHE_DIR, STATE_FILE
@@ -455,12 +415,24 @@ def main():
         print(f"\n{total - errors}/{total} skills valid, {errors} errors")
         return
 
-    # Step 1: Clone or pull
     print(f"\nRepo: {args.repo}")
-    repo_dir, commit, had_changes = clone_or_pull(args.repo)
-    print(f"  Commit: {commit[:12]}")
-    print(f"  Changes: {'yes' if had_changes else 'no (already up-to-date)'}")
+    try:
+        repo_dir, commit = fetch_repo(args.repo)
+        print(f"  Commit: {commit}")
+        if args.apply and args.apply != commit:
+            parser.exit(1, "ERROR: The source changed. Review a new preview before applying.\n")
 
+        with tempfile.TemporaryDirectory(prefix="skill-sync-", dir=CACHE_DIR) as temp_dir:
+            snapshot = extract_snapshot(repo_dir, commit, Path(temp_dir))
+            sync_snapshot(args, state, snapshot, commit)
+    except (OSError, ValueError, RuntimeError, tarfile.TarError) as exc:
+        parser.exit(1, f"ERROR: {exc}\n")
+
+    if args.dry_run:
+        print(f"\nTo apply after reviewing, rerun with --apply {commit} and the same options.")
+
+
+def sync_snapshot(args: argparse.Namespace, state: dict, repo_dir: Path, commit: str) -> None:
     # Step 2: Discover skills
     print(f"\nDiscovering skills...")
     skills = discover_skills(repo_dir)
@@ -477,7 +449,8 @@ def main():
         return
 
     # Ensure skills directory exists
-    SKILLS_DIR.mkdir(parents=True, exist_ok=True)
+    if not args.dry_run:
+        SKILLS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Step 3: Sync each skill
     # DBG-004 FIX: Wrap in try/finally to save state even on crash
@@ -494,16 +467,16 @@ def main():
                 print(f"  ! {skill['name']}: {status}", file=sys.stderr)
 
             # Categorize
-            if "install" in status:
+            if status in {"installed", "would install"}:
                 results["installed"] += 1
                 icon = "  +"
-            elif "update" in status:
+            elif status in {"updated", "would update"}:
                 results["updated"] += 1
                 icon = "  ↑"
-            elif "invalid" in status:
+            elif status.startswith("invalid"):
                 results["invalid"] += 1
                 icon = "  ✗"
-            elif "skip" in status:
+            elif status.startswith("skip"):
                 results["skipped"] += 1
                 icon = "  ·"
             else:
@@ -513,7 +486,7 @@ def main():
             details.append((skill["name"], status))
 
             # Only print non-skipped for cleaner output (unless few total)
-            if "skip" not in status or len(skills) < 50:
+            if not status.startswith("skip") or len(skills) < 50:
                 print(f"{icon} {skill['name']}: {status}")
     finally:
         # DBG-004 FIX: Always save state, even on crash
@@ -526,8 +499,8 @@ def main():
     # Step 5: Summary
     print(f"\n{'─' * 60}")
     print(f"SUMMARY")
-    print(f"  Installed: {results['installed']}")
-    print(f"  Updated:   {results['updated']}")
+    print(f"  {'Would install' if args.dry_run else 'Installed'}: {results['installed']}")
+    print(f"  {'Would update' if args.dry_run else 'Updated'}: {results['updated']}")
     print(f"  Skipped:   {results['skipped']}")
     print(f"  Invalid:   {results['invalid']}")
     if results["error"]:

@@ -16,13 +16,13 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@sveltejs/adapter-auto": "^4.0.0",
-    "@sveltejs/kit": "^2.0.0",
-    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@sveltejs/adapter-auto": "^9.0.0",
+    "@sveltejs/kit": "^3.4.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tailwindcss/vite": "^4",
-    "svelte": "^5.0.0",
+    "svelte": "^5.59.1",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "vite": "^6.0.0"
+    "typescript": "^6.0.3",
+    "vite": "^8.3.8"
   }
 }

@@ -60,13 +60,11 @@ snapshot:
 signs:
   - id: cosign-keyless
     cmd: cosign
-    signature: "${artifact}.sig"
-    certificate: "${artifact}.pem"
+    signature: "${artifact}.sigstore.json"
     args:
       - sign-blob
       - "--yes"
-      - "--output-signature=${artifact}.sig"
-      - "--output-certificate=${artifact}.pem"
+      - "--bundle=${signature}"
       - "${artifact}"
     artifacts: checksum
     output: true
