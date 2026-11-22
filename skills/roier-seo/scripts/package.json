@@ -4,13 +4,13 @@
   "description": "Roier SEO Skill - Lighthouse audit scripts",
   "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.19.0"
   },
   "scripts": {
     "audit": "node audit.js"
   },
   "dependencies": {
     "chrome-launcher": "^1.2.1",
-    "lighthouse": "12.6.1"
+    "lighthouse": "13.6.0"
   }
 }

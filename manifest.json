@@ -154,7 +154,7 @@
     {
       "name": "ultimate-skill-creator",
       "directory": "skills/ultimate-skill-creator",
-      "description": "The definitive end-to-end pipeline for creating the highest quality portable AI skills. Orchestrates six individual skills in sequence — each run fully, separately, and in its entirety — to produce elite, production-grade skills. Use when the user explicitly requests the full pipeline, says \"ultimate skill\", \"ultimate skill creator\", \"ultimate skill creation\", \"best skill\", \"best skill creator\", \"full pipeline\", \"full skill pipeline\", or specifically asks for maximum quality skill creation with all optimization stages. For simple skill creation without the full pipeline, use skill-creator instead.",
+      "description": "The definitive end-to-end pipeline for creating the highest quality portable AI skills. Orchestrates five development skills and a local verification stage in sequence to produce elite, production-grade skills. Use when the user explicitly requests the full pipeline, says \"ultimate skill\", \"ultimate skill creator\", \"ultimate skill creation\", \"best skill\", \"best skill creator\", \"full pipeline\", \"full skill pipeline\", or specifically asks for maximum quality skill creation with all optimization stages. For simple skill creation without the full pipeline, use skill-creator instead.",
       "has_scripts": true,
       "scripts": [
         "scripts/preflight_check.py"
