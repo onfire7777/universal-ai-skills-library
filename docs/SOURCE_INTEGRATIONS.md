@@ -89,7 +89,7 @@ upstream install and any required login remain part of its setup.
 ## Non-Redundancy Rules
 
 - Keep the full canonical skill corpus only in `skills/`.
-- Keep AI-client roots to compact wrappers and instruction files.
+- Use compact wrappers and instruction files by default. Install complete selected bundles when a client needs native skill discovery.
 - Keep external source repos external: GBrain stays in `%USERPROFILE%\gbrain`;
   GStack/GSkills stay in `%USERPROFILE%\.gstack\gstack`.
 - Keep MemPalace data in `%USERPROFILE%\.mempalace\palace`.

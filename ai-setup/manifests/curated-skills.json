@@ -43,7 +43,7 @@
     ]
   },
   "securityRules": [
-    "Do not copy full skill bodies into local AI roots.",
+    "Use compact wrappers by default. Install a complete selected bundle when a client needs native skill discovery.",
     "Do not commit secrets, API keys, OAuth session files, logs, or generated state.",
     "Keep hosted-agent adapters compact and instruction-only unless an explicit MCP/API bridge is configured.",
     "Run skill-router skills validate-manifest after corpus changes."
