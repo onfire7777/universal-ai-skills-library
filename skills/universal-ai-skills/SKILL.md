@@ -5,13 +5,13 @@ description: Use when the user asks about Universal AI Skills, skill-router, aut
 
 # Universal AI Skills Router
 
-This is the compact wrapper for the shared skill corpus. The full corpus stays in `%USERPROFILE%\universal-ai-skills-library\skills` and is loaded on demand through `skill-router`.
+This is the compact wrapper for the shared skill corpus. The full corpus stays in the canonical checkout and is loaded on demand through `skill-router`.
 
 ## Automatic Preflight
 
 For every substantive user prompt:
 
-1. Run `skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"` from prompt-submit hooks, or `skill-router preflight --json "<latest user prompt>"` when the host AI performs the precheck directly.
+1. Use the current prompt-hook result. When it is unavailable, run one fallback with `skill-router preflight --hook-event UserPromptSubmit --json -- "<latest user prompt>"`.
 2. Only run preflight for real user prompts. Do not route from tool output, assistant messages, startup, stop, compaction, status checks, or background jobs.
 3. If `decision` is `route`, sanity-check that the selected skill clearly matches the user's core task, object, and action.
 4. If the match is weak, generic, ambiguous, or only hits words such as "issue", "install", "setup", "local", "AI", or "skill", continue without loading a skill.
@@ -32,7 +32,7 @@ For every substantive user prompt:
 - Do not use host-native skill tools for router-selected universal skills; use `skill-router skill <name>`.
 - Do not copy the full corpus into AI roots. Install only compact wrappers.
 - MCP bridges are optional and only for clients that require persistent endpoints.
-- Source integrations are pointer-based in `%USERPROFILE%\.universal-ai-stack\config\source-integrations.json`; load source-specific skills on demand instead of copying upstream repos into agent roots.
+- Load source-specific skill bundles on demand from the configured checkout or installed skill root.
 - The router does not call another LLM API and does not need extra API keys.
 
 
