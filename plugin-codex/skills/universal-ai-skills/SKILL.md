@@ -13,3 +13,10 @@ description: Compact Codex plugin wrapper for the Universal AI Skills Router. Us
 - If `decision` is `ambiguous`, `host_ai_review.required` is true, or the match only hits generic words such as "issue", "install", "setup", "local", "AI", or "skill", continue without loading a skill unless one candidate is clearly correct.
 - Search unknown skills with `skill-router skill search <query> --limit 10`.
 - Keep this wrapper compact. Do not copy or paste the full skills corpus into plugin context.
+
+
+## Native CLIs and Complete Bundles
+
+- Use an installed CLI directly or run `skill-router cli <executable> -- <arguments>` to pass its full native commands and flags through.
+- Read a skill's references, scripts, and assets using the base directory printed by `skill-router skill <name>`. Use `skill-router skills bundle <name>` to list the package and `skill-router skills path <name> <relative-file>` to resolve one file.
+- For native skill discovery, install the complete selected skill with `skill-router skills install <name> --target <agent-skills-dir>`.

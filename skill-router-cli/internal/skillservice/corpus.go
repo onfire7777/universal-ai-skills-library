@@ -111,8 +111,9 @@ func skillMarkdownFromDirectory(directory string) (string, error) {
 	}
 	repo := platform.RepoDir()
 	candidates := []string{filepath.Join(repo, clean, "SKILL.md")}
-	if !strings.HasPrefix(clean, "skills"+string(os.PathSeparator)) && clean != "skills" {
-		candidates = append([]string{filepath.Join(repoSkillsDir(), clean, "SKILL.md")}, candidates...)
+	if clean != "skills" {
+		relative := strings.TrimPrefix(clean, "skills"+string(os.PathSeparator))
+		candidates = append([]string{filepath.Join(repoSkillsDir(), relative, "SKILL.md")}, candidates...)
 	}
 	for _, candidate := range candidates {
 		if _, err := os.Stat(candidate); err == nil {

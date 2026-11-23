@@ -18,7 +18,7 @@ var DefaultWrapperSkills = []string{"universal-ai-skills"}
 
 // SourceDir returns the canonical repository skill source directory.
 func SourceDir() string {
-	return filepath.Join(platform.RepoDir(), "skills")
+	return platform.SkillSourceDir()
 }
 
 // PropagateToDefaultRoots copies wrapper skills to conservative default roots.
@@ -54,6 +54,50 @@ func Propagate(sourceDir string, roots []string, fullCopy bool) (map[string]int,
 		}
 	}
 	return counts, errors.Join(errs...)
+}
+
+// InstallBundle installs a complete bundle as a new skill directory.
+func InstallBundle(sourceDir, targetRoot string) (string, error) {
+	targetRoot, err := filepath.Abs(targetRoot)
+	if err != nil {
+		return "", err
+	}
+	targetRoot, err = resolveProspectivePath(targetRoot)
+	if err != nil {
+		return "", err
+	}
+	destination := filepath.Join(targetRoot, filepath.Base(sourceDir))
+	if pathsOverlap(sourceDir, destination) {
+		return "", fmt.Errorf("destination %s overlaps the skill source", destination)
+	}
+	if _, err := os.Lstat(destination); err == nil {
+		return "", fmt.Errorf("skill already exists at %s", destination)
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return "", err
+	}
+	root, err := os.OpenRoot(sourceDir)
+	if err != nil {
+		return "", err
+	}
+	defer root.Close()
+	if err := os.MkdirAll(targetRoot, 0755); err != nil {
+		return "", err
+	}
+	staged, err := os.MkdirTemp(targetRoot, ".skill-install-*")
+	if err != nil {
+		return "", err
+	}
+	defer os.RemoveAll(staged)
+	if err := os.CopyFS(staged, root.FS()); err != nil {
+		return "", err
+	}
+	if err := os.Chmod(staged, 0755); err != nil {
+		return "", err
+	}
+	if err := os.Rename(staged, destination); err != nil {
+		return "", err
+	}
+	return destination, nil
 }
 
 func skillNames(sourceDir string, fullCopy bool) ([]string, error) {
@@ -166,6 +210,20 @@ func comparablePathVariants(path string) []string {
 		}
 	}
 	return variants
+}
+
+// Resolve symlinks in existing ancestors of a path that will be created.
+func resolveProspectivePath(path string) (string, error) {
+	resolved, err := filepath.EvalSymlinks(path)
+	parent := filepath.Dir(path)
+	if err == nil || !errors.Is(err, os.ErrNotExist) || parent == path {
+		return resolved, err
+	}
+	resolved, err = resolveProspectivePath(parent)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(resolved, filepath.Base(path)), nil
 }
 
 func sameOrNestedPath(base, target string) bool {

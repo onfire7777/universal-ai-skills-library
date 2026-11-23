@@ -13,7 +13,15 @@ A small `universal-ai-skills` skill is installed into an agent root. The wrapper
 ```bash
 skill-router skill search <query>
 skill-router skill <name>
+skill-router skills bundle <name>
+skill-router skills path <name> <relative-file>
+skill-router cli <executable> -- <native-arguments>
 ```
+
+The complete package stays in its original directory. Read references and assets
+and run scripts relative to the bundle directory. The native CLI path forwards
+every argument and terminal stream to the installed executable. Use the
+upstream CLI's own installation and sign-in flow where required.
 
 Use this for most agents. It keeps always-loaded context small and avoids copying 1,812 canonical skills into every client.
 
@@ -21,7 +29,15 @@ Use this for most agents. It keeps always-loaded context small and avoids copyin
 
 Only a chosen skill or small set of skills is installed physically into a target agent root.
 
-Use this when an agent cannot call the router directly or when a workflow needs a self-contained skill bundle.
+Use this when an agent discovers skills from its own root or a workflow needs a
+self-contained bundle. For example:
+
+```bash
+skill-router skills install skill-creator --target ~/.codex/skills
+```
+
+This installs the entry point and bundled files as a new skill directory. The
+command reports a collision if that skill already exists in the target.
 
 ## 3. Full-copy install — dangerous / explicit
 

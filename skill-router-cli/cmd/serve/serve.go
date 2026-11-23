@@ -1,7 +1,6 @@
 // Package serve is the thin stdio MCP server for the skill-router engine. It
 // speaks newline-delimited JSON-RPC 2.0 over stdin/stdout (hand-rolled on the
-// stdlib, no MCP SDK) and advertises exactly four tools — route, search_skills,
-// load_skill, compose — each dispatched straight to internal/skillservice. No
+// stdlib, no MCP SDK) and dispatches its tools straight to internal/skillservice. No
 // routing logic lives here: this file is a protocol adapter over the shared
 // engine, the same engine the CLI (cmd/skills) calls.
 package serve
@@ -40,8 +39,7 @@ type rpcErr struct {
 	Message string `json:"message"`
 }
 
-// toolDefs is the MCP tools/list payload. The four tools map one-to-one onto the
-// engine verbs; their input schemas mirror the engine request shapes.
+// toolDefs defines the MCP tools/list payload.
 func toolDefs() []map[string]any {
 	strProp := func(desc string) map[string]any {
 		return map[string]any{"type": "string", "description": desc}
@@ -51,7 +49,9 @@ func toolDefs() []map[string]any {
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"prompt": strProp("user prompt")}, "required": []string{"prompt"}}},
 		{"name": "search_skills", "description": "Search skills by name/description.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"query": strProp("search query")}, "required": []string{"query"}}},
-		{"name": "load_skill", "description": "Return one skill's SKILL.md.",
+		{"name": "load_skill", "description": "Return a complete SKILL.md or an individual UTF-8 file from the same bundle.",
+			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"name": strProp("skill name"), "file": strProp("optional path relative to the bundle directory")}, "required": []string{"name"}}},
+		{"name": "skill_bundle", "description": "List the original directory and the files in a skill bundle.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"name": strProp("skill name")}, "required": []string{"name"}}},
 		{"name": "compose", "description": "Assemble a working set of skills for a task, or (pipeline) a multi-step capability DAG.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{
@@ -85,7 +85,16 @@ func callTool(name string, args map[string]any) (string, error) {
 			return "", err
 		}
 		return jsonText(r)
+	case "skill_bundle":
+		bundle, err := skillservice.ListBundle(s("name"))
+		if err != nil {
+			return "", err
+		}
+		return jsonText(bundle)
 	case "load_skill":
+		if file := s("file"); file != "" {
+			return skillservice.ReadBundleText(s("name"), file)
+		}
 		r, err := skillservice.Load(s("name"))
 		if err != nil {
 			return "", err
@@ -184,7 +193,7 @@ func Serve(in io.Reader, out io.Writer) error {
 // It is distinct from the `mcp` command, which manages external MCP *bridges*.
 var Cmd = &cobra.Command{
 	Use:   "serve",
-	Short: "Run the skill-router MCP server (stdio JSON-RPC): route, search_skills, load_skill, compose",
+	Short: "Run the skill-router MCP server (stdio JSON-RPC): route, search_skills, load_skill, skill_bundle, compose",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return Serve(os.Stdin, os.Stdout)
 	},
