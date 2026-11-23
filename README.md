@@ -146,6 +146,10 @@ skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt
 skill-router preflight --json "<latest user prompt>"
 skill-router skill <name>
 skill-router skill search <query>
+skill-router skills bundle <name>
+skill-router skills path <name> references/guide.md
+skill-router skills install <name> --target <agent-skills-dir>
+skill-router cli <executable> -- <native-arguments>
 skill-router route "<prompt>"
 skill-router route --explain "<prompt>"
 skill-router skills validate-manifest
@@ -162,6 +166,23 @@ skill-router mcp status
 
 New docs and integrations should use `skill-router`. Historical executable
 aliases are not part of the default install.
+
+## Native CLIs and complete skill bundles
+
+Run an upstream CLI directly or use `skill-router cli <executable> -- <arguments>`.
+The router preserves the native argument list, working directory, environment,
+terminal streams, and exit status. Use the executable on PATH or give its path.
+Provider installs and authentication follow each CLI's own setup.
+
+`skill-router skill <name>` returns the entire entry point and its base directory.
+Use that directory for bundled references, scripts, and assets. `skills bundle <name>`
+lists the package, `skills path <name> <relative-file>` locates an asset, and
+`skills install <name> --target <agent-skills-dir>` installs the full package for
+native skill discovery without overwriting an existing skill. Explicit
+`--full-copy` remains available for offline exports.
+
+MCP clients can use `skill_bundle` to list a package and `load_skill` with an
+optional relative `file` to read an individual UTF-8 asset up to 512 KiB.
 
 ## Automatic Skill Selection
 

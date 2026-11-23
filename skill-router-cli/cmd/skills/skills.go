@@ -1,6 +1,7 @@
 package skills
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -30,8 +31,8 @@ var Cmd = &cobra.Command{
 The source of truth is repo-local skills/. Agents should call:
   skill-router skill <name>
 
-That prints only the requested SKILL.md instead of injecting the full library
-into always-loaded context. Local Claude/Codex/agent skill roots are searched
+That prints the full SKILL.md and its original directory. Use skills bundle to
+list its files, skills path to locate an asset, or skills install for native discovery. Local Claude/Codex/agent skill roots are searched
 read-only after the canonical library, so unique installed skills stay available
 without duplicating thousands of third-party skill bodies in the repo.`,
 	Args: cobra.MaximumNArgs(1),
@@ -66,14 +67,63 @@ var loadSkillCmd = &cobra.Command{
 	},
 }
 
+var pathCmd = &cobra.Command{
+	Use:   "path <skill-name> [relative-file]",
+	Short: "Print the absolute path to a skill file",
+	Args:  cobra.RangeArgs(1, 2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		file := "SKILL.md"
+		if len(args) == 2 {
+			file = args[1]
+		}
+		path, err := skillservice.BundleFile(args[0], file)
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(cmd.OutOrStdout(), path)
+		return err
+	},
+}
+
+var bundleCmd = &cobra.Command{
+	Use:   "bundle <skill-name>",
+	Short: "List the original skill bundle and all its files as JSON",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		bundle, err := skillservice.ListBundle(args[0])
+		if err != nil {
+			return err
+		}
+		enc := json.NewEncoder(cmd.OutOrStdout())
+		enc.SetIndent("", "  ")
+		return enc.Encode(bundle)
+	},
+}
+
 var installCmd = &cobra.Command{
-	Use:   "install [--target DIR]",
-	Short: "Install wrapper skills to a target skills directory",
+	Use:   "install [skill-name] [--target DIR]",
+	Short: "Install one complete skill bundle or the default wrapper",
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		target, _ := cmd.Flags().GetString("target")
 		fullCopy, _ := cmd.Flags().GetBool("full-copy")
 		if target == "" {
 			target = platform.SkillsDir()
+		}
+		if len(args) == 1 {
+			if fullCopy {
+				return fmt.Errorf("choose one skill or --full-copy")
+			}
+			source, err := skillservice.BundleDirectory(args[0])
+			if err != nil {
+				return err
+			}
+			destination, err := skillsync.InstallBundle(source, target)
+			if err != nil {
+				return err
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), destination)
+			return nil
 		}
 		return installSkills(target, fullCopy)
 	},
@@ -445,6 +495,7 @@ func init() {
 	composeCmd.Flags().Bool("allow-external", false, "Pipeline mode: inline third-party external skill bodies")
 
 	Cmd.AddCommand(readCmd)
+	Cmd.AddCommand(pathCmd, bundleCmd)
 	Cmd.AddCommand(loadSkillCmd)
 	Cmd.AddCommand(installCmd)
 	Cmd.AddCommand(syncCmd)

@@ -9,6 +9,7 @@ import (
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/api"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/audit"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/chat"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/cli"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/config"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/context"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/cmd/crawl4ai"
@@ -45,7 +46,7 @@ import (
 
 // Version is the CLI version. It is a var (not const) so release builds can
 // stamp it via -ldflags "-X .../cmd/root.Version=<tag>".
-var Version = "2.2.9"
+var Version = "2.3.0"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -68,7 +69,8 @@ check optional MCP bridges, and expose local AI stack health.`,
 		fmt.Println("  auto        Compatibility wrapper for older automatic-routing rules")
 		fmt.Println("  route       Pick and load the best skill for a prompt")
 		fmt.Println("  skill       Load one skill on demand: skill-router skill <name>")
-		fmt.Println("  skills      Manage canonical and local external AI skills on demand")
+		fmt.Println("  skills      Load and inspect complete skill bundles on demand")
+		fmt.Println("  cli         Run an installed native CLI with all its arguments")
 		fmt.Println("  mcp         Control MCP bridge infrastructure (start, stop, status, logs)")
 		fmt.Println("  audit       Run security and code audit workflows")
 		fmt.Println("  oracle      Query multiple AI models and get merged answers")
@@ -126,6 +128,7 @@ func init() {
 
 	// Core
 	rootCmd.AddCommand(skills.Cmd)
+	rootCmd.AddCommand(cli.Cmd)
 	rootCmd.AddCommand(skills.PreflightCmd)
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)

@@ -78,10 +78,18 @@ The installer copies repo-owned templates into `%USERPROFILE%\.universal-ai-stac
 expands path placeholders, creates local secrets if needed, and syncs compact AI
 adapter instructions. It does not publish or commit the user's machine state.
 
+## Using a full upstream CLI
+
+Run the installed executable directly or use `skill-router cli <executable> -- <arguments>`.
+The executable receives its native subcommands and flags. This works for
+tools on PATH and for explicit executable paths, including runtimes in a venv.
+Source integration registration makes the workflow discoverable. The
+upstream install and any required login remain part of its setup.
+
 ## Non-Redundancy Rules
 
 - Keep the full canonical skill corpus only in `skills/`.
-- Keep AI-client roots to compact wrappers and instruction files.
+- Use compact wrappers and instruction files by default. Install complete selected bundles when a client needs native skill discovery.
 - Keep external source repos external: GBrain stays in `%USERPROFILE%\gbrain`;
   GStack/GSkills stay in `%USERPROFILE%\.gstack\gstack`.
 - Keep MemPalace data in `%USERPROFILE%\.mempalace\palace`.
