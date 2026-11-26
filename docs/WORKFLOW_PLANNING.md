@@ -6,7 +6,7 @@ Existing `skill-router skills compose --pipeline` and MCP `compose` with `pipeli
 
 ## Identify the requirements
 
-A natural prompt works directly from the CLI.
+A natural prompt works directly from the CLI. When a particular command is required, name it explicitly, for example “run `git worktree list`.” The planner checks eligible source sections for the requested operation and named flags. Related setup advice can leave an operation unresolved. Use the reported gap to decide whether the task needs another source.
 
 ```sh
 skill-router skills workflow plan -- 'Refresh the SaaS dashboard so it matches our existing brand and makes common tasks easier for keyboard users' > plan.json

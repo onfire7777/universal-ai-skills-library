@@ -26,6 +26,10 @@ func TestOperationsDistinguishToolSubcommandFromTopic(t *testing.T) {
 	if len(quoted) != 1 || !quoted[0].supportedBy("`vcs branch add feature`") || quoted[0].supportedBy("`vcs branch list`") {
 		t.Fatal("lost explicit nested command")
 	}
+	flagged := requestedOperations("", WorkflowRequirement{Text: "Run `pkg publish --dry-run`."})
+	if len(flagged) != 1 || !flagged[0].supportedBy("pkg publish --dry-run") || flagged[0].supportedBy("pkg publish live; other tool --dry-run") || flagged[0].supportedBy("pkg publish --dry-run-elsewhere") {
+		t.Fatal("a materially different invocation was credited with the requested flag")
+	}
 	chain := requestedOperations("", WorkflowRequirement{Text: "Run `vcs branch list` and `repo status`."})
 	if len(chain) != 2 || chain[1].tool != "repo" {
 		t.Fatalf("coordinated explicit command lost: %#v", chain)

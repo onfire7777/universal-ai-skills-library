@@ -110,7 +110,7 @@ func TestWorkflowGroundsSourceDescriptionOnlyAtEntrypoint(t *testing.T) {
 		{Skill: "table-guide", File: "SKILL.md", Title: "Overview", Purpose: "Read the guide", Role: "workflow"},
 		{Skill: "table-guide", File: "SKILL.md", Title: "Operations", Purpose: "Create a table", Role: "workflow"},
 	}}
-	idx := WorkflowIndex{Bundles: []WorkflowBundle{b}, search: &workflowSearchIndex{terms: [][]string{{"overview", "operations"}}}}
+	idx := WorkflowIndex{Bundles: []WorkflowBundle{b}, search: &workflowSearchIndex{terms: [][]string{{"overview", "operations"}}, bodies: [][]string{{"Read the guide", "Create a table"}}}}
 	hits := idx.Search("quincunx operations", "", 0)
 	if len(hits) != 2 {
 		t.Fatal(hits)
