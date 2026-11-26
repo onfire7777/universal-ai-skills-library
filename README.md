@@ -204,8 +204,18 @@ real user-submitted prompt:
 2. For a single requirement, load a clearly matching skill with `skill-router skill <name>`.
 3. For multiple deliverables, constraints or checks, call `workflow_plan` or
    `skill-router skills workflow plan` and name each requirement separately.
+   Include details that change the method, such as the target platform, file
+   format and required checks. The planner gives source lines for matched
+   details and keeps requested independent passes.
 4. Load a stage when beginning its work. Record the contribution and its actual
-   evidence, then review coverage. See [Workflow planning](docs/WORKFLOW_PLANNING.md).
+   evidence, then review coverage against each named acceptance check.
+   [Workflow planning and examples](docs/WORKFLOW_PLANNING.md)
+
+The [workflow evaluation suite](tests/workflow-eval/breadth) measures whether
+plain-language requests, separated requirements and detailed platform or
+format constraints find the right source sections across 24 scenarios.
+[Execution fixtures](tests/workflow-eval/execution) exercise complementary
+skills through the CLI and MCP using actual documents, data and Python tests.
 
 Do not run automatic skill loading from tool hooks, session-start hooks, stop
 hooks, compaction/resume hooks, assistant messages, tool outputs, status checks,

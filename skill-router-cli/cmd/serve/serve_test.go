@@ -398,3 +398,16 @@ func TestComposePipelineNamedPassesAndInlineBodies(t *testing.T) {
 		t.Fatalf("--load returned no skill content: %s", text)
 	}
 }
+
+func TestWorkflowToolAnnotationsDescribeReadOnlyLocalPlanning(t *testing.T) {
+	for _, tool := range toolDefs() {
+		name := tool["name"].(string)
+		if _, ok := workflowCalls[name]; !ok {
+			continue
+		}
+		annotations, ok := tool["annotations"].(map[string]any)
+		if !ok || annotations["readOnlyHint"] != true || annotations["destructiveHint"] != false || annotations["openWorldHint"] != false {
+			t.Fatalf("%s annotations: %v", name, annotations)
+		}
+	}
+}

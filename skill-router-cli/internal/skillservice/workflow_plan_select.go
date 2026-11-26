@@ -65,10 +65,12 @@ func workflowSourceHeld(data []byte) bool {
 // "router" on their own also describe unrelated subjects.
 var skillTooling = regexp.MustCompile(`(?i)\b(?:skill[- ](?:router|routing|registry|catalog|discovery)|route to (?:a |an )?skill)\b`)
 
+var workAssessment = regexp.MustCompile(`(?i)\b(?:quality criteria|scoring (?:criteria|scales|rubrics)|acceptance (?:criteria|thresholds)|verification commands|code reviews?|pull requests?)\b`)
+
 var ordinaryTask = regexp.MustCompile(`(?i)\b(format|summarize|translate|edit|design|redesign|illustrate|visualize|explain|teach|proofread|calculate|reconcile|compare|review|measure|optimize|organize|analyse|analyze|diagnose|write|simplify|speed up|document|build|extract|validate)\b`)
 
 func workflowIntentAllowed(s string) bool {
-	return (workflowDomain.MatchString(s) || skillTooling.MatchString(s) || ordinaryTask.MatchString(s)) && !workflowOutOfScope(s)
+	return (workflowDomain.MatchString(s) || skillTooling.MatchString(s) || workAssessment.MatchString(s) || ordinaryTask.MatchString(s)) && !workflowOutOfScope(s)
 }
 func workflowRequestHeld(prompt string, reqs []WorkflowRequirement) bool {
 	if workflowOutOfScope(prompt) {
@@ -77,6 +79,16 @@ func workflowRequestHeld(prompt string, reqs []WorkflowRequirement) bool {
 	for _, r := range reqs {
 		if workflowOutOfScope(r.Text + " " + strings.Join(r.Skills, " ")) {
 			return true
+		}
+		for _, facet := range r.Facets {
+			if facet.Kind != "exclude" && workflowOutOfScope(strings.Join(facet.AnyOf, " ")) {
+				return true
+			}
+		}
+		for _, check := range r.Checks {
+			if workflowOutOfScope(check.Text) {
+				return true
+			}
 		}
 		for _, el := range r.Elements {
 			if workflowOutOfScope(strings.ReplaceAll(el.Skill, "-", " ")) {
@@ -135,7 +147,19 @@ func workflowBundleEligible(b *WorkflowBundle) bool {
 		return true
 	}
 	metadata := b.Description + " " + b.SourceDescription
-	return skillTooling.MatchString(metadata)
+	if skillTooling.MatchString(metadata) || workAssessment.MatchString(metadata) {
+		return true
+	}
+	// Catalog summaries sometimes describe a general method. Its own
+	// applicability section can still explicitly designate supported work.
+	if ordinaryTask.MatchString(b.SourceDescription) {
+		for _, e := range b.Elements {
+			if e.File == "SKILL.md" && e.Origins.AppliesWhen == "section text" && workflowDomain.MatchString(e.AppliesWhen) && !workflowOutOfScope(e.AppliesWhen) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // The requirement is the unit of retrieval. Search supporting files as well

@@ -27,6 +27,8 @@ type WorkflowElementRef struct {
 	Digest    string `json:"digest"`
 }
 type WorkflowRequirement struct {
+	Facets    []WorkflowFacet      `json:"facets,omitempty"`
+	Checks    []WorkflowCheck      `json:"checks,omitempty"`
 	Selection string               `json:"selection,omitempty"`
 	Elements  []WorkflowElementRef `json:"elements,omitempty"`
 	ID        string               `json:"id"`
@@ -42,25 +44,26 @@ type WorkflowPlan struct {
 	Gaps    []string            `json:"gaps,omitempty"`
 }
 type WorkflowStage struct {
-	Requirement   WorkflowRequirement    `json:"requirement"`
-	Contributions []WorkflowContribution `json:"contributions"`
-	Gaps          []string               `json:"gaps,omitempty"`
+	FacetCoverage []WorkflowFacetCoverage `json:"facetCoverage,omitempty"`
+	Requirement   WorkflowRequirement     `json:"requirement"`
+	Contributions []WorkflowContribution  `json:"contributions"`
+	Gaps          []string                `json:"gaps,omitempty"`
 }
 type WorkflowContribution struct {
-	Reason        string            `json:"reason"`
-	BlockedReason string            `json:"blockedReason,omitempty"`
-	Source        SkillSource       `json:"source"`
-	Requested     bool              `json:"requested,omitempty"`
-	Reuses        map[string]string `json:"reuses,omitempty"`
-	ID            string            `json:"id"`
-	Skill         string            `json:"skill"`
-	Revision      string            `json:"revision"`
-	Status        string            `json:"status"`
-	Method        string            `json:"method"`
-	Elements      []WorkflowElement `json:"elements"`
+	Grounding     []WorkflowFacetSource `json:"grounding,omitempty"`
+	Reason        string                `json:"reason"`
+	BlockedReason string                `json:"blockedReason,omitempty"`
+	Source        SkillSource           `json:"source"`
+	Requested     bool                  `json:"requested,omitempty"`
+	Reuses        map[string]string     `json:"reuses,omitempty"`
+	ID            string                `json:"id"`
+	Skill         string                `json:"skill"`
+	Revision      string                `json:"revision"`
+	Status        string                `json:"status"`
+	Method        string                `json:"method"`
+	Elements      []WorkflowElement     `json:"elements"`
 }
 
-var actionClauses = regexp.MustCompile(`(?i)\s+(?:and|while|also|so that|so it)\s+(use|review|verify|validate|check|test|write|edit|fix|improve|build|create|publish|export|render|format|generate|compare|convert|analyze|analyse|summarize|summarise|add|deliver|reconcile|describe|organize|transform|restore|resolve|translate|visualize|map|save|audit|document|chart|clean|matches|makes|preserve|ensure)\b`)
 var requiredReference = regexp.MustCompile(`(?i)\b(always read|must read|read first|required reading|mandatory reference)\b`)
 var interfaceWords = regexp.MustCompile(`(?i)\b(dashboard|web|app|page|screen|user interface|user flow|users|focus|tab order|navigation|accessibility|form|menu|controls)\b`)
 var fixingTest = regexp.MustCompile(`(?i)\b(failing test|test failure|broken test|fix|write|implement|create)\b`)
@@ -72,7 +75,7 @@ var explicitName = regexp.MustCompile("(?i)(?:\\$|(?:use|using|apply|invoke|load
 var requirementID = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$`)
 
 func naturalRequirements(prompt string) []WorkflowRequirement {
-	parts := segmentPrompt(actionClauses.ReplaceAllString(prompt, "\n$1"))
+	parts := workflowClauses(prompt)
 	var result []WorkflowRequirement
 	// Context supplied by the user is an input to implementation. An accessibility
 	// constraint also calls for a separate observable check after the edit.
@@ -110,6 +113,7 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 		result = append(result, WorkflowRequirement{Text: text, Kind: "verification"})
 	}
 	previousWork := ""
+	previousContext := ""
 	var prerequisites []string
 	explicitSequence := segmentPrompt(prompt)
 	for i := range result {
@@ -119,7 +123,8 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 			prerequisites = append(prerequisites, r.ID)
 			continue
 		}
-		depends := r.Kind == "verification" || outputReference.MatchString(r.Text)
+		refersBack := refersToPriorResult(r.Text)
+		depends := r.Kind == "verification" || outputReference.MatchString(r.Text) || refersBack
 		for _, step := range explicitSequence[min(1, len(explicitSequence)):] {
 			first := strings.Fields(step)
 			if len(first) > 0 && strings.HasPrefix(strings.ToLower(r.Text), strings.ToLower(strings.Join(first[:min(3, len(first))], " "))) {
@@ -132,8 +137,12 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 		} else {
 			r.DependsOn = slices.Clone(prerequisites)
 		}
+		if previousWork != "" && depends && (refersBack || r.Kind == "verification") && previousContext != "" && workflowContext(r.Text) == "" {
+			r.Text += " (context: " + previousContext + ")"
+		}
 		if r.Kind != "verification" {
 			previousWork = r.ID
+			previousContext = workflowContext(r.Text)
 		}
 	}
 	return result
@@ -170,6 +179,12 @@ func normalizeRequirements(req WorkflowPlanRequest) ([]WorkflowRequirement, erro
 		}
 		if r.Selection == "explicit" && len(r.Skills) == 0 && len(r.Elements) == 0 {
 			return nil, fmt.Errorf("%s explicit selection requires skills or section locators", r.ID)
+		}
+		if err := validateWorkflowFacets(r.Facets); err != nil {
+			return nil, fmt.Errorf("%s: %w", r.ID, err)
+		}
+		if err := validateWorkflowChecks(*r); err != nil {
+			return nil, err
 		}
 		if strings.TrimSpace(r.Text) == "" {
 			return nil, fmt.Errorf("%s has no requirement text", r.ID)
@@ -252,8 +267,14 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 	taken := make(map[string]*WorkflowBundle)
 	previousActions := make(map[string]string)
 	states := make(map[string]WorkflowStage)
+	var promptClauses []WorkflowRequirement
+	if len(plan.Request.Requirements) > 0 {
+		promptClauses = naturalRequirements(plan.Prompt)
+	}
 	for _, r := range requirements {
-		stage := WorkflowStage{Requirement: r, Contributions: []WorkflowContribution{}}
+		facets, inheritedGaps := inheritWorkflowFacets(r, states)
+		r.Facets = facets
+		stage := WorkflowStage{Requirement: r, Contributions: []WorkflowContribution{}, Gaps: inheritedGaps}
 		var blockedDeps []string
 		for _, d := range r.DependsOn {
 			if len(states[d].Gaps) > 0 {
@@ -262,7 +283,10 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 			}
 		}
 		names := requestedSkills(r, lookup)
-		methods := selectMethods(index, r, names, lookup, eligible)
+		scoped := retrievalRequirement(promptClauses, r)
+		methods := selectMethods(index, scoped, names, lookup, eligible)
+		methods = discoverAuthoredProcedures(index, plan.Request.Prompt, scoped, methods, lookup, eligible)
+		methods = discoverTaskDetails(index, scoped, methods, lookup, eligible)
 		pinned := make(map[string][]WorkflowElement)
 		for _, ref := range r.Elements {
 			b := lookup[strings.ToLower(ref.Skill)]
@@ -324,6 +348,13 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 				stage.Gaps = append(stage.Gaps, "Requested skill is unavailable for this workflow: "+n)
 			}
 		}
+		if len(r.Facets) > 0 {
+			var excluded []string
+			methods, excluded = methodsForFacets(index, r, methods, lookup, eligible)
+			stage.Gaps = append(stage.Gaps, excluded...)
+		}
+		methods, operationGaps := groundWorkflowOperations(index, plan.Request.Prompt, r, methods, lookup, eligible)
+		stage.Gaps = append(stage.Gaps, operationGaps...)
 		requestedPasses := map[string]int{}
 		for _, m := range methods {
 			if m.Requested {
@@ -380,6 +411,14 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 		}
 		if len(stage.Contributions) == 0 && len(stage.Gaps) == 0 {
 			stage.Gaps = append(stage.Gaps, "No relevant indexed skill element covers this requirement.")
+		}
+		if len(r.Facets) > 0 {
+			stage.FacetCoverage = workflowFacetCoverage(index, stage)
+			for _, c := range stage.FacetCoverage {
+				if !c.Satisfied {
+					stage.Gaps = append(stage.Gaps, "No eligible source covers facet "+c.Facet.ID+" ("+strings.Join(c.Facet.AnyOf, ", ")+")")
+				}
+			}
 		}
 		states[r.ID] = stage
 		plan.Stages = append(plan.Stages, stage)

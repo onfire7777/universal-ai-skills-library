@@ -27,6 +27,32 @@ For precise coverage, the host agent identifies deliverables and constraints, sp
 
 Run `skill-router skills workflow plan --request request.json > plan.json`, or send the same object to the MCP tool `workflow_plan`. Use the optional `available` array for tools and runtimes whose availability the host has established. An empty array records a known empty inventory. When a dependency produces a gap, verify the prerequisite, include the confirmed value in a revised request and plan again. Hosts can request kinds `deliverable`, `constraint`, `prerequisite` and `verification`.
 
+### Specify what the source must cover
+
+Keep the original request in `prompt`. Extract the details that would change the workflow, such as a keyboard test on an Android phone, a native Word template, or a request to preserve duplicate payment records. Define each detail under `facets`. An `anyOf` array gives alternative source phrases for **one** detail. Give independent details separate IDs. Use the same facets in `workflow_search` to inspect individual sections.
+
+For example, a requirement to edit and check an existing Word report can describe the file format, permitted editing approach and two separate acceptance criteria.
+
+```json
+{
+  "id": "word",
+  "kind": "deliverable",
+  "text": "Edit the existing Word template and verify its exception table and retained styles",
+  "facets": [
+    {"id":"format","kind":"format","anyOf":["DOCX","Word document"],"carry":true},
+    {"id":"edit-template","kind":"action","anyOf":["edit an existing document","word/document.xml"]}
+  ],
+  "checks": [
+    {"id":"rows","text":"Reopen the file and compare every exception row with the expected amounts","evidenceKind":"test"},
+    {"id":"styles","text":"Compare the template styles before and after editing","evidenceKind":"test"}
+  ]
+}
+```
+
+Facet kinds are `object`, `action`, `platform`, `format`, `check` and `exclude`. An `exclude` facet rules out sections that mention a conflicting alternative. For constraints that apply to later stages, use `carry:true` and connect those stages with `dependsOn`. Inspect each stage’s `facetCoverage`: matches cite a contribution, the indexed section, source line and matching phrase. If a required facet lacks a match, inspect the source or refine the requirement before applying it.
+
+An acceptance check specifies what the agent will demonstrate in the project. Give each distinct outcome a check ID and an `evidenceKind` of `test`, `artifact` or `decision`. A source facet of kind `check` can find a verification technique. The corresponding acceptance check still requires an observation from performing the work.
+
 ## Refine a requirement
 
 When a contribution misses the project context or an important check is uncovered, search specific sections for that requirement. Keep the original task in `prompt` and the narrower intent in `query`.
@@ -70,6 +96,14 @@ Maintain an array of records as work progresses. Use status `applied`, `verified
 | `decision` | Project rule or recorded design decision | The specific choice the agent made and where it applied |
 | `artifact` | Path and location of the change | What the agent produced or inspected |
 | `test` | Test command, run or output file | What happened and the outcome `passed` or `failed` |
+
+When a requirement declares acceptance checks, include their IDs in each observation’s `checks` list. An observation can address several related checks when its reference and result genuinely cover all of them. A failed test or a missing check keeps that criterion open. For example:
+
+```json
+{"kind":"test","checks":["rows"],"reference":"verify-report rows reconciliation.docx","observation":"Reopened the Word file and matched all three exception rows, including currency deltas.","outcome":"passed"}
+```
+
+Inspect `stages[].checks` in the review result for each criterion’s status and evidence. In this example the style comparison remains open until its observed result is recorded.
 
 Skipped and blocked records require a reason. Verification requires an observed passing check. A planned check or a load receipt alone leaves the verification outstanding. The router evaluates the evidence supplied by the host. The host performs the task and runs the checks.
 

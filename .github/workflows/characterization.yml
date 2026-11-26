@@ -71,6 +71,14 @@ jobs:
       - name: Check multi-skill requirement coverage against the live corpus
         run: python3 tests/workflow-eval/run.py
 
+      - name: Verify specific source coverage across workflow families
+        run: |
+          python3 -m unittest discover -s tests/workflow-eval/breadth
+          python3 tests/workflow-eval/breadth/evaluate.py --gate --output "$RUNNER_TEMP/workflow-breadth.json"
+
+      - name: Verify data, document and software workflows against real outputs
+        run: python3 tests/workflow-eval/execution/run.py
+
       - name: Verify dashboard workflow evidence with real keyboard input
         run: node tests/workflow-eval/dashboard_e2e.mjs
 

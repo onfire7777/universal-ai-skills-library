@@ -36,13 +36,15 @@ func TestWorkflowSchemaListsServiceKeysAndEnums(t *testing.T) {
 	}
 	plan, review := byName["workflow_plan"], byName["workflow_review"]
 	r := plan.Properties["requirements"].Items
+	f, c := r.Properties["facets"].Items, r.Properties["checks"].Items
 	rec := review.Properties["records"].Items
 	e := rec.Properties["evidence"].Items
 	for _, tc := range []struct {
 		schema      *property
 		serviceType any
 	}{
-		{plan, skillservice.WorkflowPlanRequest{}}, {r, skillservice.WorkflowRequirement{}},
+		{byName["workflow_search"], skillservice.WorkflowSearchRequest{}}, {byName["workflow_search"].Properties["facets"].Items, skillservice.WorkflowFacet{}},
+		{plan, skillservice.WorkflowPlanRequest{}}, {f, skillservice.WorkflowFacet{}}, {c, skillservice.WorkflowCheck{}}, {r, skillservice.WorkflowRequirement{}},
 		{r.Properties["elements"].Items, skillservice.WorkflowElementRef{}},
 		{review, skillservice.WorkflowReviewRequest{}}, {rec, skillservice.WorkflowRecord{}}, {e, skillservice.WorkflowEvidence{}},
 	} {
@@ -66,6 +68,8 @@ func TestWorkflowSchemaListsServiceKeysAndEnums(t *testing.T) {
 		want []string
 	}{
 		{r.Properties["kind"], []string{"deliverable", "prerequisite", "constraint", "verification"}},
+		{f.Properties["kind"], []string{"object", "action", "platform", "format", "check", "exclude"}},
+		{c.Properties["evidenceKind"], []string{"decision", "artifact", "test"}},
 		{r.Properties["selection"], []string{"discover", "explicit"}},
 		{rec.Properties["status"], []string{"applied", "verified", "skipped", "blocked"}},
 		{e.Properties["kind"], []string{"decision", "artifact", "test"}},
@@ -105,6 +109,36 @@ func TestWorkflowPlanMCPAcceptsDiscoverAndAllRequirementKinds(t *testing.T) {
 	for i, stage := range plan.Stages {
 		if stage.Requirement.Kind != kinds[i] || stage.Requirement.Selection != "discover" {
 			t.Fatalf("incorrect stage requirement: %+v", stage.Requirement)
+		}
+	}
+}
+
+func TestWorkflowSearchMCPGroundsSpecificFacetInSource(t *testing.T) {
+	for _, term := range []string{"Pinned test fixture", "spreadsheet formula"} {
+		request := map[string]any{
+			"prompt": "Organize the project files", "query": "file organizer", "skill": "file-organizer",
+			"facets": []any{map[string]any{"id": "technique", "kind": "action", "anyOf": []string{term}}},
+		}
+		body, err := json.Marshal(map[string]any{"jsonrpc": "2.0", "method": "tools/call", "id": 1,
+			"params": map[string]any{"name": "workflow_search", "arguments": request}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		response := run(t, string(body))[0]["result"].(map[string]any)
+		data := response["content"].([]any)[0].(map[string]any)["text"].(string)
+		if response["isError"] == true {
+			t.Fatal(data)
+		}
+		var result skillservice.WorkflowSearchResult
+		if err := json.Unmarshal([]byte(data), &result); err != nil {
+			t.Fatal(err)
+		}
+		if term == "spreadsheet formula" {
+			if result.Total != 0 || result.Reason == "" {
+				t.Fatalf("uncovered facet needs a reason; got %+v", result)
+			}
+		} else if result.Total == 0 || len(result.Hits[0].FacetMatches) != 1 || result.Hits[0].FacetMatches[0].Term != term {
+			t.Fatalf("missing indexed source for %q: %+v", term, result)
 		}
 	}
 }

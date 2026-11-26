@@ -7,11 +7,12 @@ import (
 )
 
 type WorkflowSearchRequest struct {
-	Prompt string `json:"prompt"`
-	Query  string `json:"query"`
-	Skill  string `json:"skill,omitempty"`
-	Offset int    `json:"offset,omitempty"`
-	Limit  int    `json:"limit,omitempty"`
+	Facets []WorkflowFacet `json:"facets,omitempty"`
+	Prompt string          `json:"prompt"`
+	Query  string          `json:"query"`
+	Skill  string          `json:"skill,omitempty"`
+	Offset int             `json:"offset,omitempty"`
+	Limit  int             `json:"limit,omitempty"`
 }
 
 type WorkflowSearchResult struct {
@@ -36,7 +37,17 @@ func SearchWorkflowElements(req WorkflowSearchRequest) (WorkflowSearchResult, er
 	if out.Limit == 0 {
 		out.Limit = 10
 	}
-	r := WorkflowRequirement{Text: req.Query, Skills: []string{req.Skill}}
+	if err := validateWorkflowFacets(req.Facets); err != nil {
+		return out, err
+	}
+	matchers := compileFacetMatchers(req.Facets)
+	nPositive := 0
+	for _, m := range matchers {
+		if m.facet.Kind != "exclude" {
+			nPositive++
+		}
+	}
+	r := WorkflowRequirement{Text: req.Query, Skills: []string{req.Skill}, Facets: req.Facets}
 	if workflowRequestHeld(req.Prompt, []WorkflowRequirement{r}) {
 		out.Reason = "This task has no eligible automatic workflow."
 		return out, nil
@@ -68,7 +79,7 @@ func SearchWorkflowElements(req WorkflowSearchRequest) (WorkflowSearchResult, er
 		out.Reason = "The requested skill is unavailable for this task."
 		return out, nil
 	}
-	for _, hit := range idx.Search(req.Query, canonical, 0) {
+	for _, hit := range idx.Search(facetQuery(req.Query, req.Facets), canonical, 0) {
 		e := hit.Element
 		if !allowed[e.Skill] || !usefulElement(e) {
 			continue
@@ -77,10 +88,20 @@ func SearchWorkflowElements(req WorkflowSearchRequest) (WorkflowSearchResult, er
 		if workflowOutOfScope(strings.ReplaceAll(visible, "-", " ")) {
 			continue
 		}
+		if len(matchers) > 0 {
+			matches, excluded := sourceFacets(matchers, e, hit.body, hit.vocabulary)
+			if excluded != "" || len(matches) < nPositive {
+				continue
+			}
+			hit.FacetMatches = matches
+		}
 		if out.Total >= out.Offset && len(out.Hits) < out.Limit {
 			out.Hits = append(out.Hits, hit)
 		}
 		out.Total++
+	}
+	if len(matchers) > 0 && out.Total == 0 {
+		out.Reason = "No eligible source section satisfies the requested facets."
 	}
 	return out, nil
 }

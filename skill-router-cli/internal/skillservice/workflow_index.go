@@ -84,13 +84,15 @@ type WorkflowIndex struct {
 }
 
 type WorkflowHit struct {
-	vocabulary string          // source-backed terms for planner grounding, never emitted to clients
-	Element    WorkflowElement `json:"element"`
-	Score      float64         `json:"score"`
+	FacetMatches []WorkflowFacetSource `json:"facetMatches,omitempty"`
+	body         string                // exact source used internally for phrase grounding
+	vocabulary   string                // source-backed terms for planner grounding, never emitted to clients
+	Element      WorkflowElement       `json:"element"`
+	Score        float64               `json:"score"`
 }
 
 // Bump when section interpretation or tokenization changes.
-const workflowCacheVersion = "workflow-index-v3"
+const workflowCacheVersion = "workflow-index-v4"
 const workflowParserRevision = "2026-11-section-digest-structured-eligibility"
 
 // The MCP process can reuse one immutable index after rechecking all source
@@ -103,6 +105,7 @@ var workflowSnapshot struct {
 
 type workflowCacheEntry struct {
 	Bundle WorkflowBundle
+	Bodies []string // exact text of each indexed section, kept outside JSON responses
 	Terms  []string // one space-delimited set of indexed words per element
 }
 
@@ -148,7 +151,7 @@ func BuildWorkflowIndex() (*WorkflowIndex, error) {
 	previousEntries := map[string]workflowCacheEntry{}
 	if previous != nil {
 		for i, b := range previous.Bundles {
-			previousEntries[b.Skill] = workflowCacheEntry{b, previous.search.terms[i]}
+			previousEntries[b.Skill] = workflowCacheEntry{Bundle: b, Terms: previous.search.terms[i], Bodies: previous.search.bodies[i]}
 		}
 	}
 
@@ -174,13 +177,14 @@ func BuildWorkflowIndex() (*WorkflowIndex, error) {
 	}
 	close(jobs)
 	wg.Wait()
-	index := &WorkflowIndex{Bundles: make([]WorkflowBundle, len(skills)), search: &workflowSearchIndex{terms: make([][]string, len(skills))}}
+	index := &WorkflowIndex{Bundles: make([]WorkflowBundle, len(skills)), search: &workflowSearchIndex{terms: make([][]string, len(skills)), bodies: make([][]string, len(skills))}}
 	for i, r := range results {
 		if r.err != nil {
 			return nil, fmt.Errorf("index skill %q: %w", skills[i].Name, r.err)
 		}
 		index.Bundles[i] = r.entry.Bundle
 		index.search.terms[i] = r.entry.Terms
+		index.search.bodies[i] = r.entry.Bodies
 		index.Stats.Bundles++
 		index.Stats.Files += r.files
 		index.Stats.Elements += len(r.entry.Bundle.Elements)
@@ -283,9 +287,10 @@ func indexWorkflowBundle(root *os.Root, s manifestSkill, cache string, previous 
 		if !result.Bundle.AutomaticHold && utf8.Valid(f.content) && bytes.IndexByte(f.content, 0) < 0 && workflowSourceHeld(f.content) {
 			result.Bundle.AutomaticHold = true
 		}
-		e, terms := extractWorkflowFile(&b, f, known)
+		e, terms, bodies := extractWorkflowFile(&b, f, known)
 		result.Bundle.Elements = append(result.Bundle.Elements, e...)
 		result.Terms = append(result.Terms, terms...)
+		result.Bodies = append(result.Bodies, bodies...)
 	}
 	if cache != "" {
 		writeWorkflowCache(cacheFile, result)
@@ -304,7 +309,7 @@ func cachedWorkflowBundle(file, revision string) (workflowCacheEntry, bool) {
 	if _, err = io.ReadFull(f, header); err != nil || !bytes.Equal(header, []byte(revision+"\n")) {
 		return c, false
 	}
-	if err = gob.NewDecoder(f).Decode(&c); err != nil || c.Bundle.Revision != revision || len(c.Bundle.Elements) != len(c.Terms) {
+	if err = gob.NewDecoder(f).Decode(&c); err != nil || c.Bundle.Revision != revision || len(c.Bundle.Elements) != len(c.Terms) || len(c.Bodies) != len(c.Terms) {
 		return workflowCacheEntry{}, false
 	}
 	return c, true
