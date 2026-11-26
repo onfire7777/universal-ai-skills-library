@@ -172,15 +172,24 @@ func includeDirectObjectives(idx *WorkflowIndex, r WorkflowRequirement, methods 
 		if !eligible[b.Skill] || (!objective.names(b.Skill) && !namesDeclaredFormat(r.Text, b)) || !scopedToTask(b, r.Text) {
 			continue
 		}
-		if slices.ContainsFunc(methods, func(c WorkflowContribution) bool { return c.Skill == b.Skill }) {
-			continue
-		}
 		method := contribution(idx, b, r, nil)
 		if len(method.Elements) == 0 || !slices.ContainsFunc(method.Elements, func(e WorkflowElement) bool { return applicableElement(e, r) && len(idx.sourceText(e)) > 0 }) {
 			continue
 		}
-		method.Reason = "Provides the canonical procedure for the requested " + b.Skill
-		methods = append(methods, method)
+		// A prior stage or a secondary search can identify the right bundle
+		// while selecting instructions for a different operation. Always add
+		// the canonical product owner's sources for the current requirement.
+		present := false
+		for j := range methods {
+			if methods[j].Skill == b.Skill {
+				addSourceElements(&methods[j], method.Elements)
+				present = true
+			}
+		}
+		if !present {
+			method.Reason = "Provides the canonical procedure for the requested " + b.Skill
+			methods = append(methods, method)
+		}
 	}
 	return methods
 }

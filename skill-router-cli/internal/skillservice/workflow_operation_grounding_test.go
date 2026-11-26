@@ -93,3 +93,63 @@ func TestPlanOperationsRecoverOnlySupportedSections(t *testing.T) {
 		t.Fatal("explicit selection escaped its named source or lost its gap")
 	}
 }
+
+func TestExplicitNestedCommandPaths(t *testing.T) {
+	for _, tc := range []struct{ request, documented, sibling string }{
+		{"git worktree prune", "git worktree prune --verbose", "git worktree list"},
+		{"quartz realm cache expire-older", "quartz realm cache expire-older", "quartz realm cache renew"},
+		{"pkg release channel promote --dry-run", "pkg release channel promote --dry-run", "pkg release channel publish --dry-run"},
+		{"quartz render ./staging.yaml", "quartz render ./dev.yaml", "quartz inspect ./staging.yaml"},
+		{"quartz frobnicate alice", "quartz frobnicate <name>", "quartz frobnicate bob"},
+		{"quartz realm prune", "quartz realm prune", "quartz realm <subcommand>"},
+		{"git checkout feature", "git checkout main", "git switch feature"},
+	} {
+		t.Run(tc.request, func(t *testing.T) {
+			ops := requestedOperations("", WorkflowRequirement{Text: "Run `" + tc.request + "`."})
+			if len(ops) != 1 || !ops[0].supportedBy(tc.documented) || ops[0].supportedBy(tc.sibling) {
+				t.Fatalf("request %q must match %q and reject %q", tc.request, tc.documented, tc.sibling)
+			}
+		})
+	}
+}
+
+func TestWorkflowNestedSiblingLeavesActionUnresolved(t *testing.T) {
+	dir := planningFixture(t)
+	path := filepath.Join(dir, "editor", "SKILL.md")
+	original, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request := WorkflowPlanRequest{Prompt: "Run `git worktree prune` to clean up the repository.", Requirements: []WorkflowRequirement{{ID: "cleanup", Text: "Run `git worktree prune` to clean up the repository."}}}
+	for _, test := range []struct {
+		source        string
+		shouldHaveGap bool
+	}{
+		{"git worktree list", true}, {"git worktree prune", false},
+	} {
+		content := string(original) + "\n## Repository maintenance\nRun `" + test.source + "` for this worktree.\n"
+		if err := os.WriteFile(path, []byte(content), 0600); err != nil {
+			t.Fatal(err)
+		}
+		plan, err := PlanWorkflow(request)
+		if err != nil {
+			t.Fatal(err)
+		}
+		stage := plan.Stages[0]
+		if test.shouldHaveGap {
+			if len(stage.Contributions) != 0 || !strings.Contains(strings.Join(stage.Gaps, " "), "worktree prune") {
+				t.Fatalf("sibling procedure filled the request: %+v", stage)
+			}
+		} else if len(stage.Gaps) != 0 || len(stage.Contributions) != 1 || stage.Contributions[0].Skill != "editor" {
+			t.Fatalf("documented literal command was not recovered: %+v", stage)
+		}
+	}
+}
+
+func TestExplicitCommandsPreserveAdjacentSkillRequest(t *testing.T) {
+	req := WorkflowRequirement{Text: "Run `git worktree prune` and `tool group refresh`, then load `editor`."}
+	known := map[string]*WorkflowBundle{"git": {Skill: "git"}, "editor": {Skill: "editor"}}
+	if names := requestedSkills(req, known); !slices.Equal(names, []string{"editor"}) {
+		t.Fatalf("command names mixed with real skill requests: %v", names)
+	}
+}

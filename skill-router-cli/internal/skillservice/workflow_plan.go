@@ -484,7 +484,11 @@ func requestedSkills(r WorkflowRequirement, lookup map[string]*WorkflowBundle) [
 	var names []string
 	// Interpret direct invocations, backticks, and explicitly joined skill names.
 	// Plain words in task descriptions remain retrieval signals.
+	commands := commandInvocations(r.Text)
 	for _, match := range explicitName.FindAllStringSubmatchIndex(r.Text, -1) {
+		if slices.ContainsFunc(commands, func(command []int) bool { return match[2] >= command[0] && match[3] <= command[1] }) {
+			continue
+		}
 		n := strings.ToLower(r.Text[match[2]:match[3]])
 		if lookup[n] == nil {
 			spelling := r.Text[match[0]:match[1]]

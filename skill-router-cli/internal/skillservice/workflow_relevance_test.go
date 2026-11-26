@@ -94,3 +94,31 @@ func TestWorkflowRejectsWrongExecutionMediumForADeclaredFormat(t *testing.T) {
 		t.Fatal("dropped requested browser checks")
 	}
 }
+func TestExistingArtifactOwnerStillRetrievesTheCurrentProcedure(t *testing.T) {
+	planningFixture(t)
+	idx, err := BuildWorkflowIndex()
+	if err != nil {
+		t.Fatal(err)
+	}
+	req := WorkflowRequirement{Text: "Use the editor to edit the document in place", Kind: "deliverable"}
+	eligible := map[string]bool{"editor": true}
+	hits := idx.Search("sentence case", "editor", 1)
+	if len(hits) != 1 {
+		t.Fatal("missing source fixture")
+	}
+	prior := WorkflowContribution{Skill: "editor", Elements: []WorkflowElement{hits[0].Element}}
+	got := includeDirectObjectives(idx, req, []WorkflowContribution{prior}, eligible)
+	if len(got) != 1 || !slices.ContainsFunc(got[0].Elements, func(e WorkflowElement) bool { return e.File == "SKILL.md" && e.Title == "Workflow" }) {
+		t.Fatal("an existing owner hid the method for the current operation")
+	}
+	count := len(got[0].Elements)
+	again := includeDirectObjectives(idx, req, got, eligible)
+	if count != len(again[0].Elements) {
+		t.Fatal("repeated discovery duplicated source elements")
+	}
+	req.Selection = "explicit"
+	exact := includeDirectObjectives(idx, req, []WorkflowContribution{prior}, eligible)
+	if len(exact[0].Elements) != 1 {
+		t.Fatal("expanded explicitly pinned source")
+	}
+}
