@@ -33,6 +33,7 @@ jobs:
           # keeps working if the router is reorganised. The module's own
           # go.mod still pins the language version at build time.
           go-version: stable
+          cache-dependency-path: "**/go.sum"
 
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
@@ -102,6 +103,7 @@ jobs:
         uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version: stable
+          cache-dependency-path: "**/go.sum"
 
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
