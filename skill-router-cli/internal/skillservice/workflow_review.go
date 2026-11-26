@@ -178,7 +178,12 @@ func reviewCurrentWorkflow(req WorkflowReviewRequest) (WorkflowReview, error) {
 		for _, c := range stage.Contributions {
 			requirements[c.ID] = stage.Requirement
 			for _, e := range c.Elements {
-				state.Elements = append(state.Elements, WorkflowElementReview{Contribution: c.ID, Element: workflowElementAddress(e), Status: "pending"})
+				element := WorkflowElementReview{Contribution: c.ID, Element: workflowElementAddress(e), Status: "pending"}
+				if c.Optional && c.Status == "blocked" {
+					element.Status = "skipped"
+					element.Reason = c.BlockedReason
+				}
+				state.Elements = append(state.Elements, element)
 			}
 		}
 		for j := range state.Elements {

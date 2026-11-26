@@ -219,6 +219,7 @@ def verify_facet_quotes(stage, repo):
 def score(case, mode, plan, repo):
     results = {r["id"]: {"status": "missing", "evidence": []} for r in case["requirements"]}
     contributions = []
+    source_revisions = {}
     section_count = credited_sections = satisfied_facets = facet_count = 0
     supported_stages = set()
     stages = plan.get("stages") or []
@@ -240,6 +241,10 @@ def score(case, mode, plan, repo):
             provenances = []
             for e in c["elements"]:
                 text = selected_source(repo, c, e)
+                pointer = f"{c['skill']}/{e['file']}"
+                prior = source_revisions.setdefault(pointer, e["digest"])
+                if prior != e["digest"]:
+                    raise ValueError(f"Conflicting content revisions in one plan: {pointer}")
                 section_count += 1
                 element_checks = []
                 for r in applicable:
@@ -275,7 +280,7 @@ def score(case, mode, plan, repo):
     no_gap = all(result["status"] in ("supported", "declared-gap") for result in results.values())
     executable = bool(stages) and not plan.get("gaps") and not any(s.get("gaps") for s in stages)
     return {"id": case["id"], "family": case["family"], "mode": mode, "requirements": results,
-            "contributions": contributions, "supported": supported, "positiveCovered": positive, "needed": needed,
+            "contributions": contributions, "sourceRevisions": source_revisions, "supported": supported, "positiveCovered": positive, "needed": needed,
             "expectedGaps": len(results) - needed, "declaredGaps": gap_count,
             "gapCorrect": sum(results[r['id']]['status'] in ('supported', 'declared-gap')
                               for r in case['requirements'] if r.get('expected') == 'gap'),

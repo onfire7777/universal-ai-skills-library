@@ -54,6 +54,7 @@ type WorkflowContribution struct {
 	Reason        string                `json:"reason"`
 	BlockedReason string                `json:"blockedReason,omitempty"`
 	Source        SkillSource           `json:"source"`
+	Optional      bool                  `json:"optional,omitempty"`
 	Requested     bool                  `json:"requested,omitempty"`
 	Reuses        map[string]string     `json:"reuses,omitempty"`
 	ID            string                `json:"id"`
@@ -101,7 +102,14 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 			}
 			continue
 		}
-		result = append(result, WorkflowRequirement{Text: p, Kind: kind})
+		// A stated teaching, coaching or facilitation objective and the user's
+		// immediate method describe one task. The method can establish coverage
+		// for the objective without inventing a previous artifact.
+		if len(result) > 0 && refinesGuidedObjective(result[len(result)-1].Text, p) && result[len(result)-1].Kind == "deliverable" && kind == "deliverable" {
+			result[len(result)-1].Text += ". " + p
+		} else {
+			result = append(result, WorkflowRequirement{Text: p, Kind: kind})
+		}
 	}
 	if keyboardWords.MatchString(prompt) && interfaceWords.MatchString(prompt) { // retain named passes in structured requests or text
 		text := "Test keyboard navigation, interactions and visible focus order for the requested tasks"
@@ -267,6 +275,7 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 	taken := make(map[string]*WorkflowBundle)
 	previousActions := make(map[string]string)
 	states := make(map[string]WorkflowStage)
+	procedureContext := procedureDiscovery{prompt: plan.Request.Prompt}
 	var promptClauses []WorkflowRequirement
 	if len(plan.Request.Requirements) > 0 {
 		promptClauses = naturalRequirements(plan.Prompt)
@@ -285,7 +294,7 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 		names := requestedSkills(r, lookup)
 		scoped := retrievalRequirement(promptClauses, r)
 		methods := selectMethods(index, scoped, names, lookup, eligible)
-		methods = discoverAuthoredProcedures(index, plan.Request.Prompt, scoped, methods, lookup, eligible)
+		methods = discoverAuthoredProcedures(index, &procedureContext, scoped, methods, lookup, eligible)
 		methods = discoverTaskDetails(index, scoped, methods, lookup, eligible)
 		pinned := make(map[string][]WorkflowElement)
 		for _, ref := range r.Elements {
@@ -367,9 +376,7 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 		for _, m := range methods {
 			b := lookup[m.Skill]
 			reason := incompatibility(b, taken, plan.Request.Available)
-			if reason != "" {
-				stage.Gaps = append(stage.Gaps, reason)
-			}
+
 			deps := make([]string, 0, len(r.DependsOn))
 			for _, d := range r.DependsOn {
 				for _, c := range states[d].Contributions {
@@ -412,6 +419,7 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 			}
 			stage.Contributions = append(stage.Contributions, m)
 		}
+		stage.accountBlockedMethods(index, plan.Prompt)
 		if len(stage.Contributions) == 0 && len(stage.Gaps) == 0 {
 			stage.Gaps = append(stage.Gaps, "No relevant indexed skill element covers this requirement.")
 		}

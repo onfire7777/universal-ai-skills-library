@@ -101,3 +101,98 @@ func TestWorkflowAssessmentMetadataAndHolds(t *testing.T) {
 		}
 	}
 }
+func TestWorkflowRecognizesNewAuthoredTechniquesAndUnknownExaminedSubjects(t *testing.T) {
+	for _, title := range []string{"Technique 2: inverted outline", "Method — field observation"} {
+		e := WorkflowElement{Title: title, Origins: WorkflowOrigins{Title: "heading"}, StartLine: 4, EndLine: 9}
+		if !slices.ContainsFunc(workflowTechniques(WorkflowRequirement{}, e), func(s string) bool { return strings.Contains(title, s) }) {
+			t.Fatalf("missing authored technique %q", title)
+		}
+	}
+	dir := planningFixture(t)
+	// This editor contains an incidental color example. A diagnostic request
+	// about a previously unseen phenomenon cannot use the example as a method.
+	if err := os.WriteFile(filepath.Join(dir, "editor", "references", "example.md"), []byte("# Color report\nInspect the clay swatch and write an outline describing cracks.\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	idx, err := BuildWorkflowIndex()
+	if err != nil {
+		t.Fatal(err)
+	}
+	idx.Search("clay swatch", "", 1)
+	lookup := map[string]*WorkflowBundle{}
+	for i, b := range idx.Bundles {
+		lookup[b.Skill] = &idx.Bundles[i]
+	}
+	method := WorkflowContribution{Skill: "editor"}
+	missing := WorkflowRequirement{Text: "Diagnose clay zargolite from a swatch"}
+	if got := declaredExaminedSubject(idx, missing, []WorkflowContribution{method}, lookup); len(got) != 0 {
+		t.Fatal("incidental object established an unknown diagnostic specialty")
+	}
+	named := method
+	named.Requested = true
+	if len(declaredExaminedSubject(idx, missing, []WorkflowContribution{named}, lookup)) != 1 {
+		t.Fatal("explicit pass disappeared")
+	}
+	ordinary := WorkflowRequirement{Text: "Investigate document zargolite in the report"}
+	if len(declaredExaminedSubject(idx, ordinary, []WorkflowContribution{method}, lookup)) != 1 {
+		t.Fatal("ordinary known work on unfamiliar content was lost")
+	}
+}
+func TestExclusionHeadingCannotVerifyTheOmittedObservable(t *testing.T) {
+	e := WorkflowElement{Title: "Ignore Loudness in short effects", Purpose: "Use a peak meter for the short sound", StartLine: 2, EndLine: 9}
+	if applicableElement(e, WorkflowRequirement{Text: "Measure integrated loudness"}) {
+		t.Fatal("selected an instruction that contradicts the requested check")
+	}
+	if !applicableElement(e, WorkflowRequirement{Text: "Ignore loudness in the short effect"}) {
+		t.Fatal("removed the explicitly requested omission")
+	}
+}
+func TestReleasedAssessmentSkillsCanBePlannedAndHydrated(t *testing.T) {
+	root := filepath.Join("..", "..", "..")
+	raw, err := os.ReadFile(filepath.Join(root, "manifest.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var catalog skillManifest
+	if err = json.Unmarshal(raw, &catalog); err != nil {
+		t.Fatal(err)
+	}
+	dir := planningFixture(t)
+	var actual skillManifest
+	queries := map[string]string{"evaluation-rubrics": "acceptance thresholds scoring scales", "verification-before-completion": "run verification commands read the output"}
+	for _, b := range append(catalog.CoreSkills, catalog.LibrarySkills...) {
+		if _, ok := queries[b.Name]; !ok {
+			continue
+		}
+		actual.CoreSkills = append(actual.CoreSkills, b)
+		if err := os.CopyFS(filepath.Join(dir, b.Name), os.DirFS(filepath.Join(root, b.Directory))); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(actual.CoreSkills) != 2 {
+		t.Fatal("release catalog lacks expected assessment method")
+	}
+	raw, err = json.Marshal(actual)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.WriteFile(filepath.Join(filepath.Dir(dir), "manifest.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	for name, text := range queries {
+		prompt := "Verify the document deliverable using explicit quality criteria"
+		search, err := SearchWorkflowElements(WorkflowSearchRequest{Prompt: prompt, Query: text, Skill: name})
+		if err != nil || search.Total == 0 {
+			t.Fatalf("%s source search failed %v %s", name, err, search.Reason)
+		}
+		r := WorkflowRequirement{ID: "verification", Text: text, Kind: "verification", Skills: []string{name}, Selection: "explicit"}
+		plan, err := PlanWorkflow(WorkflowPlanRequest{Prompt: prompt, Requirements: []WorkflowRequirement{r}})
+		if err != nil || len(plan.Gaps) != 0 {
+			t.Fatalf("%s explicit pass failed %v %v", name, err, plan.Gaps)
+		}
+		loaded, err := LoadWorkflowStage(plan, r.ID)
+		if err != nil || len(loaded.Contributions) != 1 || loaded.Contributions[0].Receipt == "" {
+			t.Fatalf("%s load failed: %v", name, err)
+		}
+	}
+}

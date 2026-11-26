@@ -19,6 +19,14 @@ var sentenceBoundary = regexp.MustCompile(`[.!?]\s+(?:[A-Z]|[0-9]+[.)]\s)`)
 
 // These verbs qualify an existing item when they open a follow-up without
 // naming a different platform or artifact.
+var guidedObjective = regexp.MustCompile(`(?i)^(?:please\s+)?(?:tutor|teach|coach|guide|mentor|help|advise|train|facilitate|instruct|support)\b`)
+var methodLead = regexp.MustCompile(`(?i)^(?:use|apply|using|do this by|start by|begin by|work through)\b`)
+var guidedMethod = regexp.MustCompile(`(?i)\b(?:questions?|examples?|demonstrations?|feedback|discussion|practice|prompts?|exercises?|case stud(?:y|ies))\b`)
+
+func refinesGuidedObjective(objective, method string) bool {
+	return guidedObjective.MatchString(objective) && methodLead.MatchString(method) && (resultPronoun.MatchString(method) || guidedMethod.MatchString(method) || len(sharedTerms(methodTerms(objective), method)) >= 2)
+}
+
 var followupAction = regexp.MustCompile(`(?i)^(?:show|include|exclude|omit|group|rate|confirm|inspect|parameterize|label|highlight|annotate|measure)\b`)
 var resultPronoun = regexp.MustCompile(`(?i)\b(it|its|them|their|those|these|both assets|each page|every page|the result(?:s|ing)?|the output|the artifact)\b`)
 var parallelDeliverables = regexp.MustCompile(`(?i)^(include|provide|create|deliver|supply|generate|produce|export|inspect|verify)\s+(.+?)\s+and\s+((?:an?|one|another|each|the)\s+.+)$`)

@@ -403,7 +403,17 @@ func platformSupported(in, task string) bool {
 	}
 	return true
 }
+
+var excludedSubject = regexp.MustCompile(`(?i)\b(?:ignore|skip|discard|avoid|do not use|never apply)\s+(?:the\s+)?([a-zA-Z0-9_.-]+)`)
+
 func applicableElement(e WorkflowElement, r WorkflowRequirement) bool {
+	// Instructions to omit an observable cannot verify that observable.
+	// A request to omit it can still use the author's exclusion method.
+	for _, match := range excludedSubject.FindAllStringSubmatch(e.Title, -1) {
+		if slices.Contains(workflowWords(r.Text), strings.ToLower(match[1])) && !slices.ContainsFunc(excludedSubject.FindAllStringSubmatch(r.Text, -1), func(other []string) bool { return strings.EqualFold(other[1], match[1]) }) {
+			return false
+		}
+	}
 	if !usefulElement(e) || !platformSupported(e.File+" "+e.Title, r.Text) || !languagesAgree(e.Title, r.Text) {
 		return false
 	}
@@ -834,7 +844,7 @@ func workflowTechniques(r WorkflowRequirement, e WorkflowElement) []string {
 	}
 	scope := e.Title + " " + e.Purpose
 	var names []string
-	if e.EndLine > e.StartLine && e.Origins.Title == "heading" {
+	if e.EndLine > e.StartLine && strings.HasSuffix(e.Origins.Title, "heading") {
 		if match := declaredTechnique.FindStringSubmatch(e.Title); len(match) > 1 {
 			names = append(names, strings.ToLower(strings.TrimSpace(match[1])))
 		}

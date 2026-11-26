@@ -129,7 +129,7 @@ func procedureBundleGrounding(idx *WorkflowIndex, words []procedureWord) []float
 	var total float64
 	for _, w := range words {
 		counts := map[int]int{}
-		for _, term := range objectForms(w.word) {
+		for _, term := range procedureForms(w.word) {
 			for _, post := range idx.search.postings[term] {
 				d := idx.search.docs[post.doc]
 				if post.weight >= 2 {
@@ -232,20 +232,39 @@ func procedureElements(idx *WorkflowIndex, b *WorkflowBundle, req WorkflowRequir
 	slices.SortStableFunc(options, func(a, b procedureEvidence) int { return cmp.Compare(b.score, a.score) })
 	return options, best
 }
-func discoverAuthoredProcedures(idx *WorkflowIndex, prompt string, r WorkflowRequirement, methods []WorkflowContribution, lookup map[string]*WorkflowBundle, eligible map[string]bool) []WorkflowContribution {
+
+// Share only the original request's scoring context between its stages.
+// User phrases are released at the end of each request.
+type procedureDiscovery struct {
+	prompt        string
+	words         []procedureWord
+	body, phrases []float64
+	cache         map[string][]int
+}
+
+func discoverAuthoredProcedures(idx *WorkflowIndex, task *procedureDiscovery, r WorkflowRequirement, methods []WorkflowContribution, lookup map[string]*WorkflowBundle, eligible map[string]bool) []WorkflowContribution {
 	if r.Selection == "explicit" || r.Kind == "verification" && slices.ContainsFunc(methods, func(c WorkflowContribution) bool { return c.Requested }) {
 		return methods
 	}
 	idx.search.once.Do(func() { idx.search.build(idx.Bundles) })
 	local := facetQuery(r.Text, r.Facets)
-	scope := procedureScope{procedureWords(idx, local), procedureWords(idx, prompt)}
+	prompt := task.prompt
+	if task.cache == nil {
+		task.cache = map[string][]int{}
+		task.words = procedureWords(idx, prompt)
+		task.body = procedureBundleGrounding(idx, task.words)
+		task.phrases = procedurePhraseGrounding(idx, task.cache, prompt)
+	}
+	scope := procedureScope{procedureWords(idx, local), task.words}
 	if len(scope.local) < 2 {
 		return methods
 	}
 	var domains []programCandidate
 	maxFit := 0.
 	localBody := procedureBundleGrounding(idx, scope.local)
-	globalBody := procedureBundleGrounding(idx, scope.original)
+	globalBody := task.body
+	localPhrases := procedurePhraseGrounding(idx, task.cache, local)
+	globalPhrases := task.phrases
 	for i, b := range idx.Bundles {
 		if !eligible[b.Skill] || !scopedToTask(&b, local+" "+prompt) {
 			continue
@@ -253,7 +272,7 @@ func discoverAuthoredProcedures(idx *WorkflowIndex, prompt string, r WorkflowReq
 		p := idx.search.profiles[i]
 		fit, n := procedureFit(p, scope.local)
 		shared, global := procedureFit(p, scope.original)
-		score := fit + .52*shared + .85*localBody[i] + .72*globalBody[i]
+		score := fit + .52*shared + .85*localBody[i] + .72*globalBody[i] + .90*localPhrases[i] + .6*globalPhrases[i]
 		if n == 0 && localBody[i] < .49 || global == 0 && globalBody[i] < .51 || score < 1.00 {
 			continue
 		}
@@ -307,6 +326,22 @@ func discoverAuthoredProcedures(idx *WorkflowIndex, prompt string, r WorkflowReq
 		if !kept[e.SectionDigest] {
 			chosen = append(chosen, e)
 			kept[e.SectionDigest] = true
+		}
+	}
+	// Deliver the canonical steps of a compact authored workflow when
+	// its actual instruction sections ground multiple aspects of the task.
+	// Restrict this to implementation stages, and keep platform/language
+	// applicability for each sibling. Search can select only individual
+	// sections, but dropping the rest of the author's sequence is lossy.
+	if r.Kind == "deliverable" && anchor.element.File == "SKILL.md" && (anchor.sequential != "" || creationIntent.MatchString(r.Text)) {
+		for _, e := range lookup[c.skill].Elements {
+			if e.File == "SKILL.md" && procedureSequence.MatchString(e.Title) && !kept[e.SectionDigest] && applicableElement(e, material) && len(idx.sourceText(e)) > 48 {
+				if anchor.sequential != "" && e.File+"@"+strings.Join(e.Context, "/") != anchor.sequential {
+					continue
+				}
+				chosen = append(chosen, e)
+				kept[e.SectionDigest] = true
+			}
 		}
 	}
 	if len(chosen) == 0 {

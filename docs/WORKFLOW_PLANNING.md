@@ -27,6 +27,8 @@ For precise coverage, the host agent identifies deliverables and constraints, sp
 
 Run `skill-router skills workflow plan --request request.json > plan.json`, or send the same object to the MCP tool `workflow_plan`. Use the optional `available` array for tools and runtimes whose availability the host has established. An empty array records a known empty inventory. When a dependency produces a gap, verify the prerequisite, include the confirmed value in a revised request and plan again. Hosts can request kinds `deliverable`, `constraint`, `prerequisite` and `verification`.
 
+If an unrequested connector is unavailable and another applicable source can do the work, the plan records the connector as a blocked optional contribution. Its reason remains visible in review. A named pass, a required source detail or a command that depends on the unavailable provider stays outstanding.
+
 ### Specify what the source must cover
 
 Keep the original request in `prompt`. Extract the details that would change the workflow, such as a keyboard test on an Android phone, a native Word template, or a request to preserve duplicate payment records. Define each detail under `facets`. An `anyOf` array gives alternative source phrases for **one** detail. Give independent details separate IDs. Use the same facets in `workflow_search` to inspect individual sections.

@@ -113,7 +113,7 @@ func compileFacetMatchers(facets []WorkflowFacet) []facetMatcher {
 }
 func facetWord(r rune) bool { return unicode.IsLetter(r) || unicode.IsNumber(r) || r == '_' }
 
-var negativeScope = regexp.MustCompile(`(?i)(?:\b(?:do not (?:use|apply|support)|not (?:intended|suitable|recommended|supported|for)|avoid(?:\s+using)?|outside (?:the )?scope|unsupported (?:formats?|platforms?)|incompatible with|must not use)\b)[^.!?;\n]{0,90}$`)
+var negativeScope = regexp.MustCompile(`(?i)(?:\b(?:do not (?:use|apply|support)|not (?:intended|suitable|recommended|supported|for)|avoid(?:\s+using)?|(?:ignore|skip|discard)|outside (?:the )?scope|unsupported (?:formats?|platforms?)|incompatible with|must not use)\b)[^.!?;\n]{0,90}$`)
 
 // Point to the line that actually contains a phrase. An inherited header,
 // filename, catalog blurb or incidental substring does not earn source coverage.
