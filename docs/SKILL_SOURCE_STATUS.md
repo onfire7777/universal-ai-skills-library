@@ -8,9 +8,9 @@ upstream folder in their `.openskills.json` files.
 
 | Result | Bundles |
 | --- | ---: |
-| Refreshed from upstream | 61 |
+| Refreshed from upstream | 62 |
 | Upstream files unchanged since import or already present locally | 847 |
-| Deliberately retained while upstream changes need a compatibility review | 25 |
+| Deliberately retained while upstream changes need a compatibility review | 24 |
 | Recorded source lacked a matching current skill folder | 17 |
 | No recorded GitHub import to compare | 845 |
 
@@ -19,14 +19,13 @@ accepts all 1,795 canonical bundles. It checks paths, script inventory, and
 duplicate instruction bodies. Bundles without a matching upstream snapshot
 remain maintained in this repository.
 
-## Retained variants
+## Upstream changes and retained variants
 
 Open Design now publishes some formerly generic templates as specific,
 example-driven decks. The generic versions remain available for existing users.
 Three generated Printing Press fixture bundles retain their checked-in contract.
-Impeccable's upstream update introduces a standalone launcher and replaces
-multiple runtime assets. Its existing bundle remains available while those
-runtime changes need separate verification.
+Impeccable v4.11.0 uses the upstream standalone launcher and its
+version-pinned engine checksums.
 
 | Source | Refreshed | Retained changed | No matching folder |
 | --- | ---: | ---: | ---: |
@@ -40,7 +39,7 @@ runtime changes need separate verification.
 | [mvanhorn/cli-printing-press](https://github.com/mvanhorn/cli-printing-press) | 8 | 3 | 1 |
 | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | 6 | 0 | 0 |
 | [nexu-io/open-design](https://github.com/nexu-io/open-design) | 27 | 21 | 2 |
-| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | 0 | 1 | 0 |
+| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | 1 | 0 | 0 |
 
 The [source integration guide](SOURCE_INTEGRATIONS.md) covers optional
 runtime tools and provider authentication.

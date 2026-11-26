@@ -133,7 +133,7 @@ func init() {
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)
 	rootCmd.AddCommand(mcp.Cmd)
-	rootCmd.AddCommand(serve.Cmd)
+	rootCmd.AddCommand(serve.NewCommand(Version))
 	rootCmd.AddCommand(audit.Cmd)
 	rootCmd.AddCommand(oracle.Cmd)
 	rootCmd.AddCommand(print.Cmd)

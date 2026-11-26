@@ -1,95 +1,136 @@
-> **Additional context needed**: what the interface is trying to accomplish.
+### Purpose
 
-### Gather Assessments
+Resolve one stable target, run two independent assessments, synthesize a design critique, persist a snapshot, and ask the user what to improve next. The chat response is the primary deliverable; the snapshot is an archive of that run.
 
-Launch two independent assessments. **Neither may see the other's output.** This isolation is what makes the combined score honest. Running both in one head silently anchors them to each other; do not shortcut it for cost, speed, or context-size reasons.
+### Hard Invariants
 
-Delegate each assessment to a separate sub-agent (Claude Code's `Agent` tool, Codex's subagent spawning, etc.). Each returns structured findings as text. Do NOT output findings to the user yet.
+- Assessment A (design review) and Assessment B (detector/browser evidence) are both required, except on a native platform (see Assessment Orchestration).
+- Assessment A and B MUST run as two isolated sub-agents whenever a sub-agent/Task tool is exposed. Running them inline in this context is "possible" but is NOT permitted; it is a degraded run. Inline is allowed ONLY when no sub-agent tool exists (or the user declined, on harnesses that ask). Native platforms run A alone (see Assessment Orchestration).
+- If you degrade for any reason, the report's first line MUST be a banner: `⚠️ DEGRADED: single-context (<reason>)`. A silent degraded critique is a failed critique.
+- Assessment A must finish before detector findings enter the parent synthesis context. Detector output is deterministic, but it still anchors judgment.
+- A skipped detector is a failed critique run unless `impeccable detect` is missing or crashes after a real attempt, or the platform is native (see Assessment Orchestration).
+- Viewable targets require browser inspection when available.
+- Any local server started only for critique visualization must run in the background, have a recorded stop method, and be stopped before final reporting unless the user asks to keep it.
+- Do not claim a user-visible overlay exists unless script injection succeeded and the detector ran in the page.
+- The question is the LAST thing in the response. Write the entire report out first, then ask; nothing follows the question. Prose emitted after a structured question is withheld until the user answers it, so a report written after the question reads as if the critique never ran.
+- A run that ends with neither the targeted questions nor a literal `Questions skipped: <reason>` line is an incomplete run. The report is not the finish; the close is.
 
-Fall back to sequential in-head work only if the environment genuinely cannot spawn sub-agents.
+### Setup
 
-**Tab isolation**: When browser automation is available, each assessment MUST create its own new tab. Never reuse an existing tab, even if one is already open at the correct URL. This prevents the two assessments from interfering with each other's page state.
+1. **Resolve the target** to a concrete file path or URL. Prefer a source path over a dev-server URL when both identify the same surface; ports drift, paths do not.
+   - "the homepage" -> `site/pages/index.astro` or `index.html`
+   - "the settings modal" -> the primary component file
+   - "this page" -> the current URL or source file
+2. **Confirm the target slugs cleanly**:
+   ```bash
+   .agents/skills/impeccable/scripts/impeccable critique-storage slug "<resolved-path-or-url>"
+   ```
+   Every later command also accepts the resolved target directly and derives the same slug internally; never hand-write a slug. If this exits non-zero, skip persistence and trend for this run, but continue the critique.
+3. **Read `.impeccable/critique/ignore.md`** if it exists. Drop matching findings silently; it is the only prior-run input critique consumes.
 
-#### Assessment A: LLM Design Review
+### Assessment Orchestration
 
-Read the relevant source files (HTML, CSS, JS/TS) and, if browser automation is available, visually inspect the live page. **Create a new tab** for this; do not reuse existing tabs. After navigation, label the tab by setting the document title:
-```javascript
-document.title = '[LLM] ' + document.title;
-```
-Think like a design director. Evaluate:
+**Native platforms** (`ios` / `android` / `adaptive`): Assessment B does not apply, because `impeccable detect` and the browser overlay read only web markup. Run Assessment A alone in this context and skip both sub-agent gates below, the Codex permission question included: with no B there is nothing to isolate A from, so this is the complete native method and carries no degraded banner. Do not run `impeccable detect` on native source; its empty result reads as clean.
 
-**AI Slop Detection (CRITICAL)**: Does this look like every other AI-generated interface? Review against ALL **DON'T** guidelines from the parent impeccable skill (already loaded in this context). Check for AI color palette, gradient text, dark glows, glassmorphism, hero metric layouts, identical card grids, generic fonts, and all other tells. **The test**: If someone said "AI made this," would you believe them immediately?
+Delegate Assessment A and Assessment B to separate sub-agents. They must not see each other's output. Do not show findings to the user until synthesis.
 
-**Holistic Design Review**: visual hierarchy (eye flow, primary action clarity), information architecture (structure, grouping, cognitive load), emotional resonance (does it match brand and audience?), discoverability (are interactive elements obvious?), composition (balance, whitespace, rhythm), typography (hierarchy, readability, font choices), color (purposeful use, cohesion, accessibility), states & edge cases (empty, loading, error, success), microcopy (clarity, tone, helpfulness).
+Sub-agent gate (all harnesses):
+- Unless a harness-specific gate below overrides this, spawn A and B as two isolated, parallel sub-agents whenever a sub-agent/Task tool is exposed. This is the default and is mandatory; do not run them inline because it is faster.
+- Desktop apps (see **Desktop apps** under Assessment B) are the one exception to parallel: both sub-agents would drive the app's single window at once. Seed the window, spawn A, wait until it has finished and put the window back, then spawn B. They are still two isolated sub-agents, so this is not the degraded path.
+- "Unavailable" means exactly one thing: no sub-agent/Task tool is exposed in this session (or, on harnesses that ask, the user declined). It does not mean inconvenient.
+- If and only if sub-agents are unavailable, fall back sequentially: read [critique-rubric.md](critique-rubric.md) now, finish and record Assessment A, then run Assessment B, then synthesize, and emit the degraded banner.
+- Whichever path you take, declare it in the report header (see Report header provenance). Skipping sub-agents without the banner is the most common failure of this command.
 
-**Cognitive Load** (consult [cognitive-load](cognitive-load.md)):
-- Run the 8-item cognitive load checklist. Report failure count: 0-1 = low (good), 2-3 = moderate, 4+ = critical.
-- Count visible options at each decision point. If >4, flag it.
-- Check for progressive disclosure: is complexity revealed only when needed?
+Codex sub-agent gate (overrides the default above; Codex's permission model requires asking before spawning):
+- Asking is the normal path, not a degradation. Approving and spawning is the dual-agent path; do not emit the degraded banner just for asking.
+- If `spawn_agent` is exposed and the user explicitly allowed sub-agents, delegation, or parallel agent work, spawn A and B immediately (for a desktop app, A first and B once A has finished, as the default gate above says).
+- If `spawn_agent` is exposed but the user did not explicitly allow sub-agents, ask exactly once: "Impeccable critique is designed to run two independent sub-agents for an unanchored assessment. May I use sub-agents for this critique?" Then stop until the user answers.
+- If allowed, spawn A and B (in sequence for a desktop app). If declined, run sequentially and lead the report with `⚠️ DEGRADED: single-context (sub-agents declined by user)`.
+- If `spawn_agent` is not exposed, do not ask; run sequentially and lead with `⚠️ DEGRADED: single-context (spawn_agent unavailable in this session)`.
+- If spawning fails after permission, run sequentially and lead with `⚠️ DEGRADED: single-context (sub-agent spawn failed: <exact error>)`.
+Running sequentially is the fallback above, rubric read first.
+Prefer `fork_context: false` with self-contained prompts containing cwd, target, live URL, references, product context, and output contract. If using `fork_context: true`, omit `agent_type`, `model`, and `reasoning_effort`.
 
-**Emotional Journey**:
-- What emotion does this interface evoke? Is that intentional?
-- **Peak-end rule**: Is the most intense moment positive? Does the experience end well?
-- **Emotional valleys**: Check for anxiety spikes at high-stakes moments (payment, delete, commit). Are there design interventions (progress indicators, reassurance copy, undo options)?
+**Read-only or delegated run.** When this critique runs where it cannot spawn agents, write inside the reviewed repository, or ask anyone (a delegated subagent, CI, a headless call), run it this way rather than improvising (native platforms keep their own path above, which has no banner): read [critique-rubric.md](critique-rubric.md), then Assessment A inline, led by `⚠️ DEGRADED: single-context (delegated read-only run)`; Assessment B as `detect --json` on the sources plus `detect --json <url> --viewport <WxH>` at each target viewport (390x844 for phone), with no live-server or overlay; no Persist the Snapshot, said in Run Notes; and `Questions skipped: delegated run` in place of Ask the User.
 
-**Nielsen's Heuristics** (consult [heuristics-scoring](heuristics-scoring.md)):
-Score each of the 10 heuristics 0-4. This scoring will be presented in the report.
+If browser automation is available, each assessment creates its own new tab. Never reuse an existing tab, even if it is already at the right URL. Desktop apps are the exception (see **Desktop apps** under Assessment B).
 
-Return structured findings covering: AI slop verdict, heuristic scores, cognitive load assessment, what's working (2-3 items), priority issues (3-5 with what/why/fix), minor observations, and provocative questions.
+### Assessment A: Design Review
 
-#### Assessment B: Automated Detection
+Read relevant source files and visually inspect the live page when browser automation is available. Think like a design director.
 
-Run the bundled deterministic detector, which flags 27 specific patterns (AI slop tells + general design quality).
+Evaluate:
+- **Design specificity**: Is the composition, interaction, and visual language grounded in this product, or could an unrelated product use it unchanged? Make this judgment before seeing detector output.
+- **Holistic design**: hierarchy, IA, emotional fit, discoverability, composition, typography, color, accessibility, states, copy, and edge cases.
+- **Cognitive load**: consult the Cognitive Load Assessment in [critique-rubric.md](critique-rubric.md); report checklist failures and decision points with >4 visible options.
+- **Emotional journey**: peak-end rule, emotional valleys, reassurance at high-stakes moments.
+- **Nielsen heuristics**: consult the Heuristics Scoring Guide in [critique-rubric.md](critique-rubric.md); score all 10 heuristics 0-4, marking any heuristic the mode-applicability rule allows as `n/a` instead of forcing a number.
 
-**CLI scan**:
+- **Persona red flags**: select personas with the Selecting Personas table in [critique-rubric.md](critique-rubric.md), plus 1-2 project-specific ones from PRODUCT.md's `## Users` when it has one, and walk each through the primary action.
+
+Read critique-rubric.md as part of Assessment A. When a sub-agent runs A, give it the file's path so it reads the rubric itself, and the parent does not load it. When A runs in this context (native critiques, or the single-context fallback), read the rubric here before scoring.
+
+Return: design-specificity verdict, heuristic scores, cognitive load, emotional journey, 2-3 strengths, 3-5 priority issues, persona red flags, minor observations, and provocative questions.
+
+### Assessment B: Detector + Browser Evidence
+
+Run the bundled detector and browser visualization evidence. On web, Assessment B is mandatory and must remain isolated from Assessment A until both are complete.
+
+CLI scan:
 ```bash
-npx impeccable --json [--fast] [target]
+.agents/skills/impeccable/scripts/impeccable detect --json [target]
 ```
 
-- Pass HTML/JSX/TSX/Vue/Svelte files or directories as `[target]` (anything with markup). Do not pass CSS-only files.
-- For URLs, skip the CLI scan (it requires Puppeteer). Use browser visualization instead.
-- For large directories (200+ scannable files), use `--fast` (regex-only, skips jsdom)
-- For 500+ files, narrow scope or ask the user
-- Exit code 0 = clean, 2 = findings
+- Pass markup files/directories as `[target]`; do not pass CSS-only files.
+- For URLs, skip CLI scan and use browser visualization.
+- For very large trees (500+ scannable files), narrow scope or ask.
+- Exit code 0 = no findings; 2 = findings. Report an empty result with what was scanned (files, URLs, viewports), never as clean: the detector does not judge layout.
+- If the detector entrypoint is missing or fails to load, report deterministic scan unavailable and continue with browser/manual review.
 
-**Browser visualization**: **required** when browser automation tools are available AND the target is a viewable page. The `[Human]` overlay tab is the user-facing deliverable; the critique is incomplete without it. Skip only if the target is not a viewable page (CSS-only file, non-browser target).
+Browser visualization is required for a viewable target when browser automation is available. Use a localhost dev/static URL for local files; avoid `file://` unless the available browser explicitly supports this workflow. Overlay flow:
 
-The overlay is a **visual aid for the user**. It highlights issues directly in their browser. Do NOT scroll through the page to screenshot overlays. Instead, read the console output to get the results programmatically.
+1. Create a fresh tab and navigate. Prefer the harness's native/browser-canvas screenshot path before hand-rolling a Playwright/Puppeteer script; only fall back to a custom script when no native browser tool is exposed.
+2. Preflight mutable injection by setting `document.title` and appending a `<script>` tag. Read-only evaluate APIs do not count.
+3. If mutation is unavailable, skip live server, browser presentation, and injection; report fallback signal.
+4. If mutation is available, start `.agents/skills/impeccable/scripts/impeccable live-server --background`, present the browser if supported, label `[Human]`, scroll top, inject `http://localhost:PORT/detect.js`, wait 2-3 seconds, read `impeccable` console messages, then run `.agents/skills/impeccable/scripts/impeccable live-server stop --keep-inject`. The overlay went in through the browser, so the project's HTML has no script tag to strip; a bare `stop` also runs `live-inject --remove` against the project's entry file, an edit a read-only critique should not make.
+5. For multi-view targets, inject on 3-5 representative pages.
 
-1. **Start the live detection server**:
-   ```bash
-   npx impeccable live &
-   ```
-   Note the port printed to stdout (auto-assigned). Use `--port=PORT` to fix it.
-2. **Create a new tab** and navigate to the page (use dev server URL for local files, or direct URL). Do not reuse existing tabs.
-3. **Label the tab** via `javascript_tool` so the user can distinguish it:
-   ```javascript
-   document.title = '[Human] ' + document.title;
-   ```
-4. **Scroll to top** to ensure the page is scrolled to the very top before injection
-5. **Inject** via `javascript_tool` (replace PORT with the port from step 1):
-   ```javascript
-   const s = document.createElement('script'); s.src = 'http://localhost:PORT/detect.js'; document.head.appendChild(s);
-   ```
-6. Wait 2-3 seconds for the detector to render overlays
-7. **Read results from console** using `read_console_messages` with pattern `impeccable`. The detector logs all findings with the `[impeccable]` prefix. Do NOT scroll through the page to take screenshots of the overlays.
-8. **Cleanup**: Stop the live server when done:
-   ```bash
-   npx impeccable live stop
-   ```
+**Desktop apps** (Electron, NW.js, CEF, WebView2): there is no URL to open, so Assessment B attaches to the running app instead.
 
-For multi-view targets, inject on 3-5 representative pages. If injection fails, continue with CLI results only.
+1. Launch the app with a local DevTools port: `--remote-debugging-port=9222` (Electron, NW.js, CEF), or `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9222` for WebView2. Keep the port on 127.0.0.1 and never expose it beyond this machine; prefer a test profile and test data.
+2. Seed the state under review (route, open panel, theme, data). The scan reads the window as it stands. Keep the window on screen: a minimized or hidden window scans without the pixel contrast reads.
+3. Run `.agents/skills/impeccable/scripts/impeccable detect --cdp 9222 --target <part of the page URL or title> --json`. It returns the same JSON as a URL scan and leaves the page as found. With several pages open it fails and lists them; rerun with a `--target` that names one.
+4. Take screenshots through the harness's CDP tooling (`Page.captureScreenshot` on the same target). Skip the live-server overlay: there is no `[Human]` tab.
 
-Return: CLI findings (JSON), browser console findings (if applicable), and any false positives noted.
+The app has one window, so the assessments take turns in it instead of opening tabs (A, then B; see the sub-agent gate), and each must leave it as found: put back any route, scroll, theme, or panel it changed. Tauri on macOS (WKWebView) and on Linux (WebKitGTK) expose no CDP: run Assessment A and the source scan only, and say so in Run Notes.
+
+Codex Browser note: Use the Browser skill. Do not spend a Browser attempt on `file://`. Only call `visibility.set(true)` after mutable script injection is confirmed for the `[Human]` overlay path; verify with `get()`. Use `tab.dev.logs({ filter: "impeccable" })` for console results. Its Playwright `evaluate(...)` surface is read-only; do not rely on it for mutation.
+
+Return: CLI findings JSON/counts, browser console findings if applicable, false positives, and skipped/failed browser steps with concrete reasons.
+
+After Assessment B returns usable CLI findings, reuse them. Do not rerun `impeccable detect` in the parent unless Assessment B failed, was truncated, or omitted count, rule names, or file locations.
+
+Codex failure accounting: final Run Notes must include target slug, ignore list, assessment independence, CLI detector, browser visibility, overlay injection, live-server cleanup, temp-file cleanup, and any fallback signal used. Do not run repo status checks, late API spelunking, or unrelated verification after the report is assembled.
 
 ### Generate Combined Critique Report
 
-Synthesize both assessments into a single report. Do NOT simply concatenate. Weave the findings together, noting where the LLM review and detector agree, where the detector caught issues the LLM missed, and where detector findings are false positives.
+Synthesize both assessments into a single report. Do not simply concatenate. Weave the findings together, noting where the LLM review and detector agree, where the detector caught issues the LLM missed, and where detector findings are false positives.
+
+The chat response is the primary user-facing deliverable. Present the full structured critique below in chat; do not replace it with a summary and a link. The persisted snapshot is an archive of that run.
+
+Codex final-answer note: `$impeccable critique` produces a report artifact, so the final chat response should intentionally exceed the usual concise close-out style. Do not title the final response "Critique Summary" unless the user explicitly asked for a summary.
 
 Structure your feedback as a design director would:
 
+#### Report header provenance
+
+The report's first line MUST declare how the assessments were run, so a degraded run is never silent:
+- Dual-agent: `Method: dual-agent (A: <agent-id> · B: <agent-id>)`
+- Degraded: `⚠️ DEGRADED: single-context (<reason, e.g. no sub-agent tool exposed>)`
+- Native: `Method: design review only (detector not applicable, native platform)`
+
 #### Design Health Score
-> *Consult [heuristics-scoring](heuristics-scoring.md)*
+> *Use Assessment A's scores; the bands are under [Scoring the report](#scoring-the-report) below.*
 
 Present the Nielsen's 10 heuristics scores as a table:
 
@@ -105,19 +146,23 @@ Present the Nielsen's 10 heuristics scores as a table:
 | 8 | Aesthetic and Minimalist Design | ? | |
 | 9 | Error Recovery | ? | |
 | 10 | Help and Documentation | ? | |
-| **Total** | | **??/40** | **[Rating band]** |
+| **Total** | | **??/[applicable max]** | **[Rating band]** |
 
-Be honest with scores. A 4 means genuinely excellent. Most real interfaces score 20-32.
+The applicable maximum is 4 times the number of heuristics you actually scored: **/40** when all ten apply, **/32** when two are `n/a`. Never print `/40` over a partial set.
 
-#### Anti-Patterns Verdict
+Be honest with scores. A 4 means genuinely excellent. Most real interfaces score 20-32 out of 40.
 
-**Start here.** Does this look AI-generated?
+**Mode applicability**: heuristics 7 (Flexibility and Efficiency) and 10 (Help and Documentation) may be scored `n/a` on Persuade and Experience surfaces (landing pages, campaigns, portfolios, bodies of work), as may any other heuristic that genuinely cannot apply to the surface under review. Write `n/a` in the Score cell with a one-line reason, and renormalize the total to the applicable maximum (e.g. **24/32** when two heuristics are n/a) so the rating band stays proportional. The persisted snapshot must record the applicable maximum and which heuristics were scored n/a.
 
-**LLM assessment**: Your own evaluation of AI slop tells. Cover overall aesthetic feel, layout sameness, generic composition, missed opportunities for personality.
+#### Design Specificity Verdict
 
-**Deterministic scan**: Summarize what the automated detector found, with counts and file locations. Note any additional issues the detector caught that you missed, and flag any false positives.
+**Start here.** Does the result feel authored for this product, or category-interchangeable?
 
-**Visual overlays** (if browser was used): Tell the user that overlays are now visible in the **[Human]** tab in their browser, highlighting the detected issues. Summarize what the console output reported.
+**LLM assessment**: Your unanchored evaluation of design specificity. Cover overall coherence, structural sameness, category-interchangeable choices, and missed opportunities for product character.
+
+**Deterministic scan**: Summarize what the automated detector found, with counts and file locations. Note any additional issues the detector caught that you missed, and flag any false positives. On a native platform, write `not applicable (native platform)` instead.
+
+**Visual overlays** (if injection succeeded): Tell the user that overlays are now visible in the **[Human]** tab in their browser, highlighting the detected issues. Summarize what the console output reported. If browser visualization was attempted but injection failed, say that no reliable user-visible overlay is available and report the fallback signal instead.
 
 #### Overall Impression
 A brief gut reaction: what works, what doesn't, and the single biggest opportunity.
@@ -128,16 +173,16 @@ Highlight 2-3 things done well. Be specific about why they work.
 #### Priority Issues
 The 3-5 most impactful design problems, ordered by importance.
 
-For each issue, tag with **P0-P3 severity** (consult [heuristics-scoring](heuristics-scoring.md) for severity definitions):
+For each issue, tag with **P0-P3 severity** (see [Issue Severity below](#issue-severity-p0p3) for definitions):
 - **[P?] What**: Name the problem clearly
 - **Why it matters**: How this hurts users or undermines goals
 - **Fix**: What to do about it (be concrete)
 - **Suggested command**: Which command could address this (from: $impeccable adapt, $impeccable animate, $impeccable audit, $impeccable bolder, $impeccable clarify, $impeccable colorize, $impeccable critique, $impeccable delight, $impeccable distill, $impeccable document, $impeccable harden, $impeccable layout, $impeccable onboard, $impeccable optimize, $impeccable overdrive, $impeccable polish, $impeccable quieter, $impeccable shape, $impeccable typeset)
 
 #### Persona Red Flags
-> *Consult [personas](personas.md)*
+> *Use Assessment A's persona red flags; it selected the personas from [critique-rubric.md](critique-rubric.md).*
 
-Auto-select 2-3 personas most relevant to this interface type (use the selection table in the reference). If `AGENTS.md` contains a `## Design Context` section from `impeccable teach`, also generate 1-2 project-specific personas from the audience/brand info.
+Assessment A selected 2-3 personas most relevant to this interface type (the selection table in critique-rubric.md). If PRODUCT.md has a `## Users` section, also generate 1-2 project-specific personas from it and from `## Brand Commitments`.
 
 For each selected persona, walk through the primary user action and list specific red flags found:
 
@@ -156,6 +201,11 @@ Provocative questions that might unlock better solutions:
 - "Does this need to feel this complex?"
 - "What would a confident version of this look like?"
 
+#### Run Notes
+Keep this compact. Include status for target slug, ignore list, assessment independence, CLI detector, browser visibility, overlay injection, live server cleanup, and temp-file cleanup. For failed or skipped steps, give the concrete observed reason and the fallback signal used. In the final chat response, also include snapshot write and trend read status after persistence has run.
+
+Codex Run Notes are final-chat only. Do not include this section in the persisted snapshot body, because persistence, trend read, and temp cleanup happen after the snapshot write and would otherwise archive stale status such as "pending after persistence."
+
 **Remember**:
 - Be direct. Vague feedback wastes everyone's time.
 - Be specific. "The submit button," not "some elements."
@@ -164,11 +214,61 @@ Provocative questions that might unlock better solutions:
 - Prioritize ruthlessly. If everything is important, nothing is.
 - Don't soften criticism. Developers need honest feedback to ship great design.
 
+### Deliver the Report
+
+Write the full report into the chat response now, before any persistence work. This is the deliverable; everything below it is bookkeeping.
+
+Do this first because the alternative is the most common way this command fails: the report gets composed once, straight into the persistence heredoc, and the run ends with a perfect archive nobody has read. Composing it into a file is not delivering it. If the report exists only in `.impeccable/critique/`, the run produced nothing.
+
+Persistence is not the end of the run. After it, the response continues with the trend line and the close.
+
+### Persist the Snapshot
+
+Once the report above is finalized, write it to `.impeccable/critique/` so the user can refer back, and so `$impeccable polish` can pick up the priority issues without a copy-paste.
+
+Skip this step if the Setup slug was null (vague or root-level target), and say why in one line of the close: "Not saved: critique one page, component or file to keep its history."
+
+1. **Write the body to a temp file** so you can pipe it to the helper. Use the full critique report (heuristic table, design-specificity verdict, priority issues, persona red flags, minor observations, and questions), but stop before the "Ask the User" / "Recommended Actions" sections that come later.
+
+   Copy the delivered report for later commands to read. If you are composing it for the first time in this heredoc, you skipped Deliver the Report; go back and send it.
+
+   Codex: exclude Run Notes from the temp body file (see Run Notes above).
+
+2. **Pass the structured metadata** through `IMPECCABLE_CRITIQUE_META` (JSON), then run the write command:
+   ```bash
+   IMPECCABLE_CRITIQUE_META='{"target":"<user phrasing>","title":"<page title, or empty>","url":"<http(s) URL you viewed, or empty>","pr":"<PR number checked out, or empty>","heuristics":[{"n":<1-10>,"score":<0-4>}],"total_score":<n>,"max_score":<n>,"na_heuristics":"<comma-separated numbers, or empty>","p0_count":<n>,"p1_count":<n>,"p2_count":<n>,"p3_count":<n>}' \
+     .agents/skills/impeccable/scripts/impeccable critique-storage write "<resolved target>" <body-file>
+   ```
+   Use the observed `<title>` or first h1 for `title`; omit N/A heuristics. `max_score` is the table’s applicable maximum (40 if all apply), distinguishing renormalized totals. For local files the helper records an exact content fingerprint, so polish detects later edits without Git or timestamps. The helper prints the absolute saved path, sometimes followed by a line (`Saved to Impeccable: <link>`, `Not saved to Impeccable: <reason>` or `Keep this critique's history: impeccable login`); put that line in the close word for word, also from detect (JSON `savedTo`: `Saved to Impeccable: <url>`). Leave that file on disk. Polish closes it; this run does not. `REPORTS OFF:` instead means the project opted out of saved reports: skip the trend read and carry on.
+
+3. **Delete the temp body file** after the write attempt completes, whether the write succeeded or failed. If deletion fails, mention `temp-file cleanup failed: <reason>` briefly in the final output, but do not block the critique.
+
+4. **Read the trend** for context:
+   ```bash
+   .agents/skills/impeccable/scripts/impeccable critique-storage trend "<resolved target>" 5
+   ```
+   This returns a JSON array of the last 5 frontmatter entries (including the one you just wrote).
+
+5. **Append a single line to the user-visible output**, after the report and before the questions:
+
+   > **Trend for `<slug>` (last 5 runs): 24 → 28 → 32 → 29 → 32 (out of 40)**
+   > Wrote `.impeccable/critique/<filename>`.
+
+   Read `max_score` on each trend entry. When every entry shares one maximum, state it once as above. When they differ, print each score with its own denominator (`24/32 → 30/40`) and note that the runs scored different heuristic sets, so the line is not a like-for-like comparison. Treat a missing `max_score` on an older entry as 40.
+
+   If this is the first run for the slug, the trend is just one score; say so: "First run for this target, no trend yet."
+
+6. **Close the run.** Go to Ask the User below and emit the questions, or the `Questions skipped: <reason>` line when the count allows it. The run is not complete until you do. Persistence is bookkeeping and cleanup is not an ending; stopping here leaves the user with a report and no way forward, and leaves `$impeccable polish` with no priorities to inherit.
+
+This is fire-and-forget. Do not show the user the helper's JSON output; only the human-readable trend line, the written path, and the helper's Impeccable line. Failures here should not block the rest of the flow; print the error and move on.
+
 ### Ask the User
 
-**After presenting findings**, use targeted questions based on what was actually found. STOP and use Codex's structured user-input/question tool when available; if unavailable, ask directly in chat to clarify what you cannot infer. These answers will shape the action plan.
+**After presenting findings**, use targeted questions based on what was actually found. Ask with Codex's structured user-input/question tool when available, or directly in chat if it is not, and wait for the answer before continuing. These answers will shape the action plan.
 
-Ask questions along these lines (adapt to the specific findings; do NOT ask generic questions):
+Ask in the same message that carries the report, with the report written out first and the question last. Do not split the two across turns: a turn that ends on the report is a turn that ends, and the questions never arrive. Order within the message is what matters, because prose emitted after a structured question is withheld until the user answers.
+
+Ask questions along these lines (adapt to the specific findings; do not ask generic questions):
 
 1. **Priority direction**: Based on the issues found, ask which category matters most to the user right now. For example: "I found problems with visual hierarchy, color usage, and information overload. Which area should we tackle first?" Offer the top 2-3 issue categories as options.
 
@@ -182,7 +282,9 @@ Ask questions along these lines (adapt to the specific findings; do NOT ask gene
 - Every question must reference specific findings from the report. Never ask generic "who is your audience?" questions.
 - Keep it to 2-4 questions maximum. Respect the user's time.
 - Offer concrete options, not open-ended prompts.
-- If findings are straightforward (e.g., only 1-2 clear issues), skip questions and go directly to Recommended Actions.
+- Skipping is allowed only when the report listed **fewer than 3 Priority Issues**, or on a read-only or delegated run. Count them; do not judge the findings "straightforward" by feel. At 3 or more on an interactive run, the questions are required.
+
+**Final-question gate.** The user-visible response must either include the targeted questions or carry the literal line `Questions skipped: <reason>` naming the count or the delegated run that permitted the skip. Each question must include 2-3 concrete answer options tied to the actual critique findings. Do not end with only open-ended questions, and do not end with neither: stopping after the report, having asked nothing and printed no skip line, is the most common way this command fails.
 
 ### Recommended Actions
 
@@ -211,3 +313,40 @@ After presenting the summary, tell the user:
 > You can ask me to run these one at a time, all at once, or in any order you prefer.
 >
 > Re-run `$impeccable critique` after fixes to see your score improve.
+
+---
+
+## Reference Material
+
+Assessment A scores against [critique-rubric.md](critique-rubric.md): the cognitive load checklist, the heuristic scoring guide, and the personas. The report uses the bands and severities below.
+
+### Scoring the report
+
+#### Score Summary
+
+**Total possible**: 40 points (10 heuristics × 4 max)
+
+| Score Range | Rating | What It Means |
+|-------------|--------|---------------|
+| 36–40 | Excellent | Minor polish only; ship it |
+| 28–35 | Good | Address weak areas, solid foundation |
+| 20–27 | Acceptable | Significant improvements needed before users are happy |
+| 12–19 | Poor | Major UX overhaul required; core experience broken |
+| 0–11 | Critical | Redesign needed; unusable in current state |
+
+When heuristics were scored `n/a`, the maximum is lower than 40; read the band off the percentage instead of the raw number (90%+ Excellent, 70%+ Good, 50%+ Acceptable, 30%+ Poor, below that Critical). 24/32 is 75%, so Good.
+
+---
+
+#### Issue Severity (P0–P3)
+
+Tag each individual issue found during scoring with a priority level:
+
+| Priority | Name | Description | Action |
+|----------|------|-------------|--------|
+| **P0** | Blocking | Prevents task completion entirely | Fix immediately; this is a showstopper |
+| **P1** | Major | Causes significant difficulty or confusion | Fix before release |
+| **P2** | Minor | Annoyance, but workaround exists | Fix in next pass |
+| **P3** | Polish | Nice-to-fix, no real user impact | Fix if time permits |
+
+**Tip**: If you're unsure between two levels, ask: "Would a user contact support about this?" If yes, it's at least P1.

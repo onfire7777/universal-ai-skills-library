@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -25,7 +26,7 @@ func run(t *testing.T, lines ...string) []map[string]any {
 	t.Setenv("SKILL_ROUTER_CONFIG_DIR", t.TempDir())
 	in := strings.NewReader(strings.Join(lines, "\n") + "\n")
 	var out bytes.Buffer
-	if err := Serve(in, &out); err != nil {
+	if err := Serve(in, &out, "test-version"); err != nil {
 		t.Fatalf("Serve: %v", err)
 	}
 	var msgs []map[string]any
@@ -211,5 +212,100 @@ func TestNotificationsGetNoResponse(t *testing.T) {
 	}
 	if int(msgs[1]["id"].(float64)) != 2 {
 		t.Fatalf("second response should be for id=2, got id=%v", msgs[1]["id"])
+	}
+}
+
+func TestStatelessDiscoveryAndTools(t *testing.T) {
+	const meta = `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}`
+	messages := run(t,
+		`{"jsonrpc":"2.0","id":"discover","method":"server/discover","params":{`+meta+`}}`,
+		`{"jsonrpc":"2.0","id":"list","method":"tools/list","params":{`+meta+`}}`,
+		`{"jsonrpc":"2.0","id":"bundle","method":"tools/call","params":{`+meta+`,"name":"skill_bundle","arguments":{"name":"crawl4ai"}}}`,
+	)
+	if len(messages) != 3 {
+		t.Fatalf("expected three replies, got %v", messages)
+	}
+	results := map[string]map[string]any{}
+	for _, msg := range messages {
+		id := msg["id"].(string)
+		res, ok := msg["result"].(map[string]any)
+		if !ok || res["resultType"] != "complete" {
+			t.Fatalf("expected a modern result for %s, got %v", id, msg)
+		}
+		server := res["_meta"].(map[string]any)[serverInfoKey].(map[string]any)
+		if server["name"] != "skill-router" || server["version"] != "test-version" {
+			t.Fatalf("unexpected server identification: %v", server)
+		}
+		results[id] = res
+	}
+	discovery := results["discover"]
+	versions := discovery["supportedVersions"].([]any)
+	if versions[0] != currentProtocolVersion || !slices.Contains(versions, any("2024-11-05")) {
+		t.Fatalf("bad discovery versions: %v", versions)
+	}
+	if discovery["capabilities"].(map[string]any)["tools"] == nil {
+		t.Fatalf("discovery did not advertise tools: %v", discovery)
+	}
+	if tools := results["list"]["tools"].([]any); len(tools) != 5 {
+		t.Fatalf("expected five tools, got %v", tools)
+	}
+	content := results["bundle"]["content"].([]any)[0].(map[string]any)["text"].(string)
+	if !strings.Contains(content, "SKILL.md") {
+		t.Fatalf("expected bundle paths, got %q", content)
+	}
+}
+
+func TestProtocolMetadataIsValidatedPerRequest(t *testing.T) {
+	messages := run(t,
+		`{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2099-01-01","io.modelcontextprotocol/clientCapabilities":{}}}}`,
+		`{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}}}`,
+		`{"jsonrpc":"2.0","id":3,"method":"ping","params":{"_meta":{"io.modelcontextprotocol/clientCapabilities":{}}}}`,
+		`{"jsonrpc":"2.0","id":4,"method":"initialize","params":{"protocolVersion":"2025-11-25"}}`,
+		`{"jsonrpc":"2.0","id":5,"method":"tools/list"}`,
+	)
+	if len(messages) != 5 {
+		t.Fatalf("expected five replies, got %v", messages)
+	}
+	for i, expected := range []float64{-32022, -32602, -32602} {
+		if err := messages[i]["error"].(map[string]any); err["code"] != expected {
+			t.Fatalf("wrong metadata error: %v", err)
+		}
+	}
+	unsupported := messages[0]["error"].(map[string]any)["data"].(map[string]any)
+	if unsupported["requested"] != "2099-01-01" || unsupported["supported"].([]any)[0] != currentProtocolVersion {
+		t.Fatalf("wrong version negotiation details: %v", unsupported)
+	}
+	legacy := messages[3]["result"].(map[string]any)
+	if legacy["protocolVersion"] != "2025-11-25" || legacy["serverInfo"].(map[string]any)["version"] != "test-version" {
+		t.Fatalf("unexpected legacy initialize result: %v", legacy)
+	}
+	if result := messages[4]["result"].(map[string]any); result["resultType"] != nil {
+		t.Fatalf("legacy result contains modern metadata: %v", result)
+	}
+}
+
+func TestStatelessToolErrorsUseProtocolAndExecutionResults(t *testing.T) {
+	const meta = `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}`
+	messages := run(t,
+		`{"jsonrpc":"2.0","id":"unknown","method":"tools/call","params":{`+meta+`,"name":"absent"}}`,
+		`{"jsonrpc":"2.0","id":"missing-skill","method":"tools/call","params":{`+meta+`,"name":"load_skill","arguments":{"name":"nonexistent"}}}`,
+	)
+	if len(messages) != 2 {
+		t.Fatalf("expected two replies, got %v", messages)
+	}
+	for _, msg := range messages {
+		switch msg["id"] {
+		case "unknown":
+			if msg["error"].(map[string]any)["code"] != float64(-32602) {
+				t.Fatalf("expected protocol error, got %v", msg)
+			}
+		case "missing-skill":
+			result := msg["result"].(map[string]any)
+			if result["isError"] != true || result["resultType"] != "complete" {
+				t.Fatalf("expected tool execution error, got %v", msg)
+			}
+		default:
+			t.Fatalf("unexpected message: %v", msg)
+		}
 	}
 }

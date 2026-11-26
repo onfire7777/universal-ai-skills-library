@@ -5,5 +5,6 @@
   "repoUrl": "https://github.com/lightpanda-io/browser",
   "companionRepoUrl": "https://github.com/lightpanda-io/agent-skill",
   "selfContained": true,
-  "installedAt": "2026-05-06T00:00:00Z"
+  "installedAt": "2026-05-06T00:00:00Z",
+  "upstreamMissing": true
 }

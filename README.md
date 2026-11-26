@@ -181,10 +181,17 @@ lists the package, `skills path <name> <relative-file>` locates an asset, and
 native skill discovery without overwriting an existing skill. Explicit
 `--full-copy` remains available for offline exports.
 
-MCP clients can use `skill_bundle` to list a package and `load_skill` with an
-optional relative `file` to read an individual UTF-8 asset up to 512 KiB.
-Previous skill names from consolidated bundles continue to resolve as aliases.
-See [compatibility aliases](docs/compatibility_aliases.json) for the mappings.
+Run `skill-router serve` to expose the skills library as an MCP server over stdio.
+It supports stateless MCP `2026-07-28` discovery and legacy initialization-based
+clients. MCP clients can use `skill_bundle` to list a package and `load_skill`
+with an optional relative `file` to read an individual UTF-8 asset up to 512 KiB.
+Use `skill-router skills source <name>` to find the latest public source of
+a skill. Imported skills link to the upstream default branch via GitHub `HEAD`.
+Skills maintained here or removed upstream link to this library's `main`.
+The result also identifies the reviewed library copy. MCP includes the same
+links in `skill_bundle` responses. Loading a skill uses the local reviewed bundle.
+Previous names from consolidated bundles continue to resolve as
+[compatibility aliases](docs/compatibility_aliases.json).
 
 ## Automatic Skill Selection
 

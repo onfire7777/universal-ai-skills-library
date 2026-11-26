@@ -8,17 +8,28 @@ package serve
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
+	"sync"
 
 	"github.com/spf13/cobra"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillservice"
 )
 
-const protocolVersion = "2024-11-05"
+const (
+	currentProtocolVersion = "2026-07-28"
+	protocolVersionKey     = "io.modelcontextprotocol/protocolVersion"
+	clientCapabilitiesKey  = "io.modelcontextprotocol/clientCapabilities"
+	clientInfoKey          = "io.modelcontextprotocol/clientInfo"
+	serverInfoKey          = "io.modelcontextprotocol/serverInfo"
+)
+
+var legacyProtocolVersions = []string{"2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"}
 
 type rpcReq struct {
 	JSONRPC string          `json:"jsonrpc"`
@@ -37,6 +48,7 @@ type rpcResp struct {
 type rpcErr struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // toolDefs defines the MCP tools/list payload.
@@ -58,7 +70,7 @@ func toolDefs() []map[string]any {
 				"prompt":   strProp("task prompt"),
 				"full":     map[string]any{"type": "boolean", "description": "include concatenated bodies (working-set mode)"},
 				"pipeline": map[string]any{"type": "boolean", "description": "decompose a multi-step prompt into an ordered capability DAG (plan §3.6)"},
-			}}},
+			}, "required": []string{"prompt"}}},
 	}
 }
 
@@ -119,82 +131,229 @@ func callTool(name string, args map[string]any) (string, error) {
 	}
 }
 
-// Serve runs the stdio JSON-RPC loop until EOF. It is exported so the conformance
-// test can drive it over an in-process pipe.
-func Serve(in io.Reader, out io.Writer) error {
+// Serve runs the MCP stdio transport until EOF.
+func Serve(in io.Reader, out io.Writer, version string) error {
 	sc := bufio.NewScanner(in)
 	sc.Buffer(make([]byte, 1024*1024), 4*1024*1024)
 	enc := json.NewEncoder(out)
-	write := func(resp rpcResp) error { resp.JSONRPC = "2.0"; return enc.Encode(resp) }
+	var mu sync.Mutex
+	var workers sync.WaitGroup
+	var writeErr error
+	pending := map[string]bool{}
+	write := func(resp *rpcResp) {
+		if writeErr == nil {
+			writeErr = enc.Encode(resp)
+		}
+	}
+	send := func(resp *rpcResp) {
+		mu.Lock()
+		defer mu.Unlock()
+		write(resp)
+	}
 
+	const maxPendingToolCalls = 16
 	for sc.Scan() {
 		line := strings.TrimSpace(sc.Text())
 		if line == "" {
 			continue
 		}
-		var req rpcReq
-		if err := json.Unmarshal([]byte(line), &req); err != nil {
-			// D1: parse error always responds with id:null per JSON-RPC 2.0 §5.1
-			_ = write(rpcResp{ID: json.RawMessage("null"), Error: &rpcErr{Code: -32700, Message: "parse error"}})
+		req, params, modern, resp := parseRequest(line)
+		if resp != nil {
+			send(resp)
 			continue
 		}
-		// D2: requests without an id are notifications — never respond to them
-		hasID := len(req.ID) > 0 && string(req.ID) != "null"
-		switch req.Method {
-		case "initialize":
-			if hasID {
-				_ = write(rpcResp{ID: req.ID, Result: map[string]any{
-					"protocolVersion": protocolVersion,
-					"capabilities":    map[string]any{"tools": map[string]any{}},
-					"serverInfo":      map[string]any{"name": "skill-router", "version": "0.1.0"},
-				}})
+		if req.Method == "notifications/cancelled" && !hasRequestID(req.ID) {
+			mu.Lock()
+			if id := string(params["requestId"]); pending[id] {
+				pending[id] = false
 			}
-		case "notifications/initialized":
-			// notification: no response
-		case "ping":
-			if hasID {
-				_ = write(rpcResp{ID: req.ID, Result: map[string]any{}})
-			}
-		case "tools/list":
-			if hasID {
-				_ = write(rpcResp{ID: req.ID, Result: map[string]any{"tools": toolDefs()}})
-			}
-		case "tools/call":
-			var p struct {
-				Name      string         `json:"name"`
-				Arguments map[string]any `json:"arguments"`
-			}
-			_ = json.Unmarshal(req.Params, &p)
-			text, err := callTool(p.Name, p.Arguments)
-			if err != nil {
-				if hasID {
-					_ = write(rpcResp{ID: req.ID, Result: map[string]any{
-						"isError": true,
-						"content": []map[string]any{{"type": "text", "text": err.Error()}},
-					}})
-				}
-				continue
-			}
-			if hasID {
-				_ = write(rpcResp{ID: req.ID, Result: map[string]any{
-					"content": []map[string]any{{"type": "text", "text": text}},
-				}})
-			}
-		default:
-			if hasID {
-				_ = write(rpcResp{ID: req.ID, Error: &rpcErr{Code: -32601, Message: "method not found: " + req.Method}})
-			}
+			mu.Unlock()
+			continue
 		}
+		if !hasRequestID(req.ID) {
+			continue
+		}
+		if !modern || req.Method != "tools/call" {
+			send(handleRequest(req, params, version, modern))
+			continue
+		}
+		id := string(req.ID)
+		mu.Lock()
+		_, duplicate := pending[id]
+		if duplicate || len(pending) >= maxPendingToolCalls {
+			write(&rpcResp{JSONRPC: "2.0", ID: req.ID, Error: &rpcErr{Code: -32000, Message: "Duplicate request ID or too many pending tool calls"}})
+			mu.Unlock()
+			continue
+		}
+		pending[id] = true
+		mu.Unlock()
+		workers.Go(func() {
+			result := handleRequest(req, params, version, modern)
+			mu.Lock()
+			defer mu.Unlock()
+			if pending[id] {
+				write(result)
+			}
+			delete(pending, id)
+		})
 	}
-	return sc.Err()
+	workers.Wait()
+	return errors.Join(sc.Err(), writeErr)
 }
 
-// Cmd is the `serve` cobra command: the skill-router MCP server (stdio JSON-RPC).
-// It is distinct from the `mcp` command, which manages external MCP *bridges*.
-var Cmd = &cobra.Command{
-	Use:   "serve",
-	Short: "Run the skill-router MCP server (stdio JSON-RPC): route, search_skills, load_skill, skill_bundle, compose",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return Serve(os.Stdin, os.Stdout)
-	},
+func hasRequestID(id json.RawMessage) bool {
+	return len(id) > 0 && string(id) != "null"
+}
+
+func parseRequest(line string) (rpcReq, map[string]json.RawMessage, bool, *rpcResp) {
+	resp := &rpcResp{JSONRPC: "2.0", ID: json.RawMessage("null")}
+	var req rpcReq
+	if !json.Valid([]byte(line)) {
+		resp.Error = &rpcErr{Code: -32700, Message: "Parse error"}
+		return req, nil, false, resp
+	}
+	if err := json.Unmarshal([]byte(line), &req); err != nil || req.JSONRPC != "2.0" || req.Method == "" {
+		resp.Error = &rpcErr{Code: -32600, Message: "Invalid request"}
+		return req, nil, false, resp
+	}
+	resp.ID = req.ID
+	var params map[string]json.RawMessage
+	if len(req.Params) > 0 && (json.Unmarshal(req.Params, &params) != nil || params == nil) {
+		if !hasRequestID(req.ID) {
+			return req, nil, false, nil
+		}
+		resp.Error = &rpcErr{Code: -32602, Message: "Request parameters must be an object"}
+		return req, nil, false, resp
+	}
+	if !hasRequestID(req.ID) {
+		return req, params, false, nil
+	}
+	modern, err := validateProtocolMetadata(req.Method, params["_meta"])
+	if err != nil {
+		resp.Error = err
+		return req, nil, false, resp
+	}
+	return req, params, modern, nil
+}
+
+func handleRequest(req rpcReq, params map[string]json.RawMessage, version string, modern bool) *rpcResp {
+	resp := &rpcResp{JSONRPC: "2.0", ID: req.ID}
+	result, err := requestResult(req.Method, params, version, modern)
+	if err != nil {
+		resp.Error = err
+		return resp
+	}
+	if modern {
+		result["resultType"] = "complete"
+		result["_meta"] = map[string]any{serverInfoKey: serverInfo(version)}
+	}
+	resp.Result = result
+	return resp
+}
+
+// An explicit metadata field identifies a stateless request even on a process
+// that has previously handled a legacy initialize. Legacy clients omit it.
+func validateProtocolMetadata(method string, raw json.RawMessage) (bool, *rpcErr) {
+	var meta map[string]json.RawMessage
+	if len(raw) > 0 {
+		if err := json.Unmarshal(raw, &meta); err != nil || meta == nil {
+			return false, &rpcErr{Code: -32602, Message: "Request _meta must be an object"}
+		}
+	}
+	if method != "server/discover" && meta[protocolVersionKey] == nil &&
+		meta[clientCapabilitiesKey] == nil && meta[clientInfoKey] == nil {
+		return false, nil
+	}
+	var requested string
+	if json.Unmarshal(meta[protocolVersionKey], &requested) != nil || requested == "" {
+		return true, &rpcErr{Code: -32602, Message: "MCP protocol version metadata is required"}
+	}
+	var capabilities map[string]json.RawMessage
+	if json.Unmarshal(meta[clientCapabilitiesKey], &capabilities) != nil || capabilities == nil {
+		return true, &rpcErr{Code: -32602, Message: "MCP client capabilities metadata must be an object"}
+	}
+	if requested != currentProtocolVersion {
+		return true, &rpcErr{Code: -32022, Message: "Unsupported protocol version", Data: map[string]any{
+			"requested": requested,
+			"supported": supportedProtocolVersions(),
+		}}
+	}
+	return true, nil
+}
+
+func supportedProtocolVersions() []string {
+	return append([]string{currentProtocolVersion}, legacyProtocolVersions...)
+}
+
+func serverInfo(version string) map[string]any {
+	return map[string]any{"name": "skill-router", "version": version}
+}
+
+func requestResult(method string, params map[string]json.RawMessage, version string, modern bool) (map[string]any, *rpcErr) {
+	capabilities := map[string]any{"tools": map[string]any{}}
+	switch method {
+	case "server/discover":
+		return map[string]any{"supportedVersions": supportedProtocolVersions(), "capabilities": capabilities}, nil
+	case "initialize":
+		if modern {
+			return nil, &rpcErr{Code: -32601, Message: "Use server/discover for stateless MCP"}
+		}
+		var selected string
+		if raw, ok := params["protocolVersion"]; ok && json.Unmarshal(raw, &selected) != nil {
+			return nil, &rpcErr{Code: -32602, Message: "Protocol version must be a string"}
+		}
+		if !slices.Contains(legacyProtocolVersions, selected) {
+			selected = legacyProtocolVersions[0]
+		}
+		return map[string]any{
+			"protocolVersion": selected,
+			"capabilities":    capabilities,
+			"serverInfo":      serverInfo(version),
+		}, nil
+	case "ping":
+		return map[string]any{}, nil
+	case "tools/list":
+		return map[string]any{"tools": toolDefs()}, nil
+	case "tools/call":
+		return toolResult(params, modern)
+	default:
+		return nil, &rpcErr{Code: -32601, Message: "Method not found: " + method}
+	}
+}
+
+func toolResult(params map[string]json.RawMessage, modern bool) (map[string]any, *rpcErr) {
+	var name string
+	var arguments map[string]any
+	var text string
+	var err error
+	if json.Unmarshal(params["name"], &name) != nil || strings.TrimSpace(name) == "" {
+		err = fmt.Errorf("tool name is required")
+	} else if raw, ok := params["arguments"]; ok && (json.Unmarshal(raw, &arguments) != nil || arguments == nil) {
+		err = fmt.Errorf("tool arguments must be an object")
+	} else if modern && !slices.ContainsFunc(toolDefs(), func(def map[string]any) bool { return def["name"] == name }) {
+		err = fmt.Errorf("unknown tool: %s", name)
+	} else {
+		text, err = callTool(name, arguments)
+		if err != nil {
+			return map[string]any{"isError": true, "content": []map[string]any{{"type": "text", "text": err.Error()}}}, nil
+		}
+	}
+	if err != nil {
+		if modern {
+			return nil, &rpcErr{Code: -32602, Message: err.Error()}
+		}
+		return map[string]any{"isError": true, "content": []map[string]any{{"type": "text", "text": err.Error()}}}, nil
+	}
+	return map[string]any{"content": []map[string]any{{"type": "text", "text": text}}}, nil
+}
+
+// NewCommand exposes the router's MCP server and reports the released binary version.
+func NewCommand(version string) *cobra.Command {
+	return &cobra.Command{
+		Use:   "serve",
+		Short: "Run the skill-router MCP server over stdio",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return Serve(os.Stdin, os.Stdout, version)
+		},
+	}
 }

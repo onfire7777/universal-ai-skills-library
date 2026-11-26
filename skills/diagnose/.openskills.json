@@ -3,5 +3,6 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\engineering\\diagnose",
-  "installedAt": "2026-05-07T21:49:01.637Z"
+  "installedAt": "2026-05-07T21:49:01.637Z",
+  "upstreamMissing": true
 }

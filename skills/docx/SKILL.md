@@ -89,4 +89,4 @@ The script writes `comments.xml`, `commentsExtended.xml`, `commentsIds.xml`, `co
 
 ## Dependencies
 
-`docx` (npm, preinstalled — install only if `require('docx')` fails) · `pandoc` · LibreOffice (`soffice`) · `pdftoppm` (Poppler)
+`docx` (npm) · `pandoc` · LibreOffice (`soffice`) · `pdftoppm` (Poppler). The office validation scripts require the Python packages `defusedxml` and `lxml`.

@@ -3,5 +3,6 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\deprecated\\request-refactor-plan",
-  "installedAt": "2026-05-07T22:09:02.137Z"
+  "installedAt": "2026-05-07T22:09:02.137Z",
+  "upstreamMissing": true
 }
