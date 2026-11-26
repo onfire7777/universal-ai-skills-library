@@ -1,6 +1,6 @@
 ---
 name: causal-inference-root-cause
-description: Use when investigating why something happened and need to distinguish correlation from causation, identify root causes vs symptoms, test competing hypotheses, control for confounding variables, or design experiments to validate causal claims. Invoke when debugging systems, analyzing failures, researching health outcomes, evaluating policy impacts, or when user mentions root cause, causal chain, confounding, spurious correlation, or asks "why did this really happen?"
+description: "Apply causal inference to observational data and experiments. Use for counterfactual reasoning, confounding effects, causal graphs and DAGs, interventions, treatment effects, and causal claims in scientific or policy research."
 license: Unspecified
 ---
 # Causal Inference & Root Cause Analysis

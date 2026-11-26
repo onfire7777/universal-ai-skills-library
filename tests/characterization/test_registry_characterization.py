@@ -5,10 +5,8 @@ Two complementary layers:
 1. **Fixture manifest lookup** — pins ``validate-manifest`` output against the
    frozen fixture (stable regardless of live-tree edits).
 2. **Live-corpus guards** — run against the real ``manifest.json`` and are
-   deliberately *monotonic*: they tolerate the Goal 2 consolidation ADDING
-   skills, but fail if the refactor ever LOSES an existing skill, relocates one,
-   introduces a duplicate, or breaks structural integrity. This is the safety
-   net for "consolidate without regressing", not an exact snapshot.
+   preserve every baseline skill name and directory. Intentional consolidations
+   must be recorded and keep their legacy names working as aliases.
 """
 
 from __future__ import annotations
@@ -54,6 +52,14 @@ class LiveRegistryGuards(unittest.TestCase):
         cls.manifest = harness.load_manifest()
         cls.pairs = harness.manifest_skill_pairs(cls.manifest)
         cls.current = dict(cls.pairs)  # name -> directory
+        build = harness.load_json(os.path.join(harness.repo_root(), "docs", "build_manifest.json"))
+        cls.migrations = {
+            entry["legacy_directory"]: entry["canonical_directory"]
+            for entry in build["merged_legacy_directories"]
+            if entry["preserved_variant"] is False
+        }
+        sections = cls.manifest["core_skills"] + cls.manifest["library_skills"]
+        cls.aliases = {skill["name"]: skill.get("aliases", []) for skill in sections}
 
     def test_no_duplicate_skill_ids(self):
         names = [name for name, _ in self.pairs]
@@ -62,7 +68,7 @@ class LiveRegistryGuards(unittest.TestCase):
 
     def test_no_existing_skill_is_lost(self):
         baseline_names = {name for name, _ in self.baseline["skills"]}
-        missing = sorted(baseline_names - set(self.current))
+        missing = sorted(baseline_names - self.current.keys() - self.migrations.keys())
         self.assertEqual(
             missing, [],
             f"{len(missing)} baseline skill(s) disappeared from the registry "
@@ -82,9 +88,29 @@ class LiveRegistryGuards(unittest.TestCase):
 
     def test_corpus_is_superset_of_baseline(self):
         self.assertGreaterEqual(
-            len(self.current), self.baseline["counts"]["total"],
+            len(self.current.keys() | self.migrations.keys()), self.baseline["counts"]["total"],
             "live corpus shrank below the baseline total",
         )
+
+    def test_merged_names_resolve_complete_canonical_bundles(self):
+        try:
+            harness.router_binary()
+        except harness.RouterUnavailable as exc:
+            raise unittest.SkipTest(str(exc)) from exc
+        repo = harness.repo_root()
+        for old, canonical in self.migrations.items():
+            with self.subTest(old=old, canonical=canonical):
+                self.assertNotIn(old, self.current)
+                self.assertIn(canonical, self.current)
+                self.assertEqual([canonical], [
+                    name for name, aliases in self.aliases.items() if old in aliases
+                ])
+                proc = harness.run_router(["skills", "path", old], cwd=repo)
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                self.assertEqual(
+                    os.path.normcase(os.path.realpath(proc.stdout.strip())),
+                    os.path.normcase(os.path.realpath(os.path.join(repo, self.current[canonical], "SKILL.md"))),
+                )
 
     def test_live_validate_manifest_structural_integrity(self):
         try:
@@ -96,6 +122,7 @@ class LiveRegistryGuards(unittest.TestCase):
         self.assertFalse(vm.get("duplicateNames"), vm.get("duplicateNames"))
         self.assertFalse(vm.get("duplicateDirs"), vm.get("duplicateDirs"))
         self.assertFalse(vm.get("missingSkillMd"), vm.get("missingSkillMd"))
+        self.assertFalse(vm.get("duplicateContent"), vm.get("duplicateContent"))
 
     def test_representative_live_manifest_skills_load_through_cli(self):
         try:

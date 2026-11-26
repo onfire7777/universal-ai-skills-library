@@ -21,7 +21,7 @@
 {"id": "exact-printable-cards", "prompt": "use the printable-cards skill to make a printable card", "expect": ["printable-cards"], "reject": [], "tags": ["exact-name"]}
 # --- Description paraphrase (hard positives; recall-sensitive) ---------------------------------
 {"id": "para-pytest", "prompt": "write pytest fixtures and parametrized tests for a fastapi app", "expect": ["python-testing-patterns"], "reject": [], "tags": ["paraphrase"]}
-{"id": "para-tdd", "prompt": "I want to write a failing test first and then make it pass", "expect": ["test-driven-development"], "reject": [], "tags": ["paraphrase"]}
+{"id": "para-tdd", "prompt": "I want to write a failing test first and then make it pass", "expect": ["test-driven-development"], "reject": [], "tags": ["paraphrase"], "required": true}
 {"id": "para-typesafety", "prompt": "add type hints and make this python module pass mypy strict", "expect": ["python-type-safety"], "reject": [], "tags": ["paraphrase"]}
 {"id": "para-pgdesign", "prompt": "design normalized postgres tables for a multi-tenant SaaS", "expect": ["postgresql-table-design"], "reject": [], "tags": ["paraphrase"]}
 {"id": "para-sqli", "prompt": "check whether this login form is vulnerable to SQL injection", "expect": ["sql-injection-testing"], "reject": [], "tags": ["paraphrase"]}
@@ -70,3 +70,14 @@
 # --- Characterization parity prompts (pinned by tests/characterization) ------------------------
 {"id": "char-universal-setup", "prompt": "make sure the universal AI tools are cleanly and universally installed, not redundant, and everything is updated on GitHub and across the AI services on my computer", "expect": ["universal-ai-config", "universal-ai-setup"], "reject": [], "tags": ["characterization"]}
 {"id": "char-calendar", "prompt": "schedule a meeting on my google calendar for tomorrow at 3pm", "expect": ["googlecalendar-automation"], "reject": [], "tags": ["paraphrase"]}
+
+# --- Skill overlap regressions --------------------------------------------------------------
+{"id": "overlap-failing-test", "prompt": "Find the root cause of this failing test", "expect": ["debug-root-cause"], "reject": ["causal-inference-root-cause"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-playwright", "prompt": "Use Playwright to test my local web app", "expect": ["webapp-testing"], "reject": ["crawl4ai"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-playwright-checkout", "prompt": "Use Playwright to click buttons and verify the checkout page", "expect": ["webapp-testing"], "reject": ["crawl4ai"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-causal-inference", "prompt": "Find confounding effects using a causal DAG in observational data", "expect": ["causal-inference-root-cause"], "reject": ["debug-root-cause"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-crawl4ai", "prompt": "Use the crwl CLI to extract data from a website", "expect": ["crawl4ai"], "reject": ["webapp-testing"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-review", "prompt": "Review this pull request for bugs before merging", "expect": ["code-review"], "reject": ["requesting-code-review"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-delegate-review", "prompt": "Delegate code review to an independent reviewer", "expect": ["requesting-code-review"], "reject": ["code-review"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-compress-pdf", "prompt": "Compress this PDF file", "expect": ["pdf"], "reject": ["caveman-compress"], "tags": ["skill-overlap"], "required": true}
+{"id": "overlap-compress-memory", "prompt": "Compress this memory file", "expect": ["caveman-compress"], "reject": ["pdf"], "tags": ["skill-overlap"], "required": true}

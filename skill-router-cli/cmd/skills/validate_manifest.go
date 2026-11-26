@@ -2,7 +2,6 @@ package skills
 
 import (
 	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/platform"
+	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/registry"
 	"github.com/onfire7777/universal-ai-skills-library/skill-router-cli/internal/skillservice"
 )
 
@@ -48,7 +48,7 @@ var validateManifestCmd = &cobra.Command{
 		fmt.Printf("Manifest: %d core + %d library = %d skills\n", result.CoreSkills, result.LibrarySkills, result.TotalSkills)
 		printValidationList("Duplicate names", result.DuplicateNames)
 		printValidationList("Duplicate directories", result.DuplicateDirs)
-		printValidationList("Duplicate SKILL.md content", result.DuplicateContent)
+		printValidationList("Duplicate SKILL.md instruction bodies", result.DuplicateContent)
 		printValidationList("Unsafe directories", result.UnsafeDirs)
 		printValidationList("Missing SKILL.md", result.MissingSkillMD)
 		printValidationList("Missing script files", result.MissingScriptFiles)
@@ -82,7 +82,7 @@ func validateManifest() (manifestValidation, error) {
 	nameSeen := map[string]bool{}
 	dirSeen := map[string]bool{}
 	manifestDirs := map[string]bool{}
-	contentHashes := map[string][]string{}
+	contentHashes := map[[sha256.Size]byte][]string{}
 	for _, skill := range all {
 		name := strings.ToLower(strings.TrimSpace(skill.Name))
 		dir := filepath.ToSlash(filepath.Clean(skill.Directory))
@@ -106,8 +106,8 @@ func validateManifest() (manifestValidation, error) {
 		if _, err := os.Stat(skillPath); err != nil {
 			result.MissingSkillMD = append(result.MissingSkillMD, skill.Directory)
 		} else if data, err := os.ReadFile(skillPath); err == nil {
-			sum := sha256.Sum256(data)
-			contentHashes[hex.EncodeToString(sum[:])] = append(contentHashes[hex.EncodeToString(sum[:])], skill.Name)
+			sum := sha256.Sum256([]byte(registry.SkillBody(string(data))))
+			contentHashes[sum] = append(contentHashes[sum], skill.Name)
 		}
 		skillDir := filepath.Dir(skillPath)
 		actualScripts, err := listSkillScripts(skillDir)

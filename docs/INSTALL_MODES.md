@@ -23,7 +23,7 @@ and run scripts relative to the bundle directory. The native CLI path forwards
 every argument and terminal stream to the installed executable. Use the
 upstream CLI's own installation and sign-in flow where required.
 
-Use this for most agents. It keeps always-loaded context small and avoids copying 1,812 canonical skills into every client.
+Use this for most agents. It keeps always-loaded context small and avoids copying 1,795 canonical skills into every client.
 
 ## 2. Selected-skill install — explicit
 

@@ -1,7 +1,7 @@
 {
-  "version": "2.2.8",
-  "generated": "2026-05-15",
-  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,812-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+  "version": "2.3.1",
+  "generated": "2026-11-25",
+  "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
   "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
   "core_skills": [
     {
@@ -498,7 +498,10 @@
     {
       "name": "algorithmic-art",
       "directory": "skills/algorithmic-art",
-      "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations."
+      "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.",
+      "aliases": [
+        "claude-native-algorithmic-art"
+      ]
     },
     {
       "name": "alignment-values-north-star",
@@ -791,17 +794,6 @@
       "name": "article-writing",
       "directory": "skills/article-writing",
       "description": "Write articles, guides, blog posts, tutorials, newsletter issues, and other long-form content in a distinctive voice derived from supplied examples or brand guidance. Use when the user wants polished written content longer than a paragraph, especially when voice consistency, structure, and credibility matter."
-    },
-    {
-      "name": "artifacts-builder",
-      "directory": "skills/artifacts-builder",
-      "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/bundle-artifact.sh",
-        "scripts/init-artifact.sh",
-        "scripts/shadcn-components.tar.gz"
-      ]
     },
     {
       "name": "artisan",
@@ -1246,7 +1238,10 @@
     {
       "name": "brand-guidelines",
       "directory": "skills/brand-guidelines",
-      "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply."
+      "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.",
+      "aliases": [
+        "claude-native-brand-guidelines"
+      ]
     },
     {
       "name": "brand-narrative",
@@ -1579,7 +1574,10 @@
     {
       "name": "canvas-design",
       "directory": "skills/canvas-design",
-      "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations."
+      "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.",
+      "aliases": [
+        "claude-native-canvas-design"
+      ]
     },
     {
       "name": "capsule-crm-automation",
@@ -1623,7 +1621,13 @@
     {
       "name": "causal-inference-root-cause",
       "directory": "skills/causal-inference-root-cause",
-      "description": "Use when investigating why something happened and need to distinguish correlation from causation, identify root causes vs symptoms, test competing hypotheses, control for confounding variables, or design experiments to validate causal claims. Invoke when debugging systems, analyzing failures, researching health outcomes, evaluating policy impacts, or when user mentions root cause, causal chain, confounding, spurious correlation, or asks \"why did this really happen?"
+      "description": "Apply causal inference to observational data and experiments. Use for counterfactual reasoning, confounding effects, causal graphs and DAGs, interventions, treatment effects, and causal claims in scientific or policy research.",
+      "aliases": [
+        "causal inference",
+        "causal DAG",
+        "confounding effects",
+        "treatment effects"
+      ]
     },
     {
       "name": "cavecrew",
@@ -1644,6 +1648,10 @@
       "name": "caveman-compress",
       "directory": "skills/caveman-compress",
       "description": "Compress natural language memory files (CLAUDE.md, todos, preferences) into caveman format to save input tokens. Preserves all technical substance, code, URLs, and structure. Compressed version overwrites the original file. Human-readable backup saved as FILE.original.md. Trigger: /caveman:compress FILEPATH or \"compress memory file\"",
+      "aliases": [
+        "compress",
+        "compress memory file"
+      ],
       "has_scripts": true,
       "scripts": [
         "scripts/__init__.py",
@@ -1798,55 +1806,6 @@
       ]
     },
     {
-      "name": "ckmdesign",
-      "directory": "skills/ckmdesign",
-      "description": "Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/cip/core.py",
-        "scripts/cip/generate.py",
-        "scripts/cip/render-html.py",
-        "scripts/cip/search.py",
-        "scripts/icon/generate.py",
-        "scripts/logo/core.py",
-        "scripts/logo/generate.py",
-        "scripts/logo/search.py"
-      ]
-    },
-    {
-      "name": "ckmdesign-system",
-      "directory": "skills/ckmdesign-system",
-      "description": "Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/embed-tokens.cjs",
-        "scripts/fetch-background.py",
-        "scripts/generate-slide.py",
-        "scripts/generate-tokens.cjs",
-        "scripts/html-token-validator.py",
-        "scripts/search-slides.py",
-        "scripts/slide-token-validator.py",
-        "scripts/slide_search_core.py",
-        "scripts/validate-tokens.cjs"
-      ]
-    },
-    {
-      "name": "ckmui-styling",
-      "directory": "skills/ckmui-styling",
-      "description": "Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/.coverage",
-        "scripts/requirements.txt",
-        "scripts/shadcn_add.py",
-        "scripts/tailwind_config_gen.py",
-        "scripts/tests/coverage-ui.json",
-        "scripts/tests/requirements.txt",
-        "scripts/tests/test_shadcn_add.py",
-        "scripts/tests/test_tailwind_config_gen.py"
-      ]
-    },
-    {
       "name": "claid-ai-automation",
       "directory": "skills/claid-ai-automation",
       "description": "Automate Claid AI tasks via Rube MCP (Composio). Always search tools first for current schemas."
@@ -1871,193 +1830,9 @@
       "description": "Build apps with the Claude API or Anthropic SDK. TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`/`claude_agent_sdk`, or user asks to use Claude API, Anthropic SDKs, or Agent SDK. DO NOT TRIGGER when: code imports `openai`/other AI SDK, general programming, or ML/data-science tasks."
     },
     {
-      "name": "claude-native-algorithmic-art",
-      "directory": "skills/claude-native-algorithmic-art",
-      "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations."
-    },
-    {
-      "name": "claude-native-brand-guidelines",
-      "directory": "skills/claude-native-brand-guidelines",
-      "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply."
-    },
-    {
-      "name": "claude-native-canvas-design",
-      "directory": "skills/claude-native-canvas-design",
-      "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations."
-    },
-    {
       "name": "claude-native-claude-api",
       "directory": "skills/claude-native-claude-api",
       "description": "Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements). TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project. SKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML."
-    },
-    {
-      "name": "claude-native-code-review",
-      "directory": "skills/claude-native-code-review",
-      "description": "Adversarial code review — find what will break in production, not what looks wrong in theory. Covers correctness, security, failure modes, performance, and maintainability. Use when reviewing PRs, auditing code quality, or before merging. Triggers on: 'review this code', 'code review', 'check this PR', 'is this code good', 'review before merge', 'look over this code'."
-    },
-    {
-      "name": "claude-native-docx",
-      "directory": "skills/claude-native-docx",
-      "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/__init__.py",
-        "scripts/accept_changes.py",
-        "scripts/comment.py",
-        "scripts/office/helpers/__init__.py",
-        "scripts/office/helpers/merge_runs.py",
-        "scripts/office/helpers/simplify_redlines.py",
-        "scripts/office/pack.py",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
-        "scripts/office/schemas/mce/mc.xsd",
-        "scripts/office/schemas/microsoft/wml-2010.xsd",
-        "scripts/office/schemas/microsoft/wml-2012.xsd",
-        "scripts/office/schemas/microsoft/wml-2018.xsd",
-        "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
-        "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
-        "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
-        "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
-        "scripts/office/soffice.py",
-        "scripts/office/unpack.py",
-        "scripts/office/validate.py",
-        "scripts/office/validators/__init__.py",
-        "scripts/office/validators/base.py",
-        "scripts/office/validators/docx.py",
-        "scripts/office/validators/pptx.py",
-        "scripts/office/validators/redlining.py",
-        "scripts/templates/comments.xml",
-        "scripts/templates/commentsExtended.xml",
-        "scripts/templates/commentsExtensible.xml",
-        "scripts/templates/commentsIds.xml",
-        "scripts/templates/people.xml"
-      ]
-    },
-    {
-      "name": "claude-native-mcp-builder",
-      "directory": "skills/claude-native-mcp-builder",
-      "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/connections.py",
-        "scripts/evaluation.py",
-        "scripts/example_evaluation.xml",
-        "scripts/requirements.txt"
-      ]
-    },
-    {
-      "name": "claude-native-theme-factory",
-      "directory": "skills/claude-native-theme-factory",
-      "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly."
-    },
-    {
-      "name": "claude-native-web-artifacts-builder",
-      "directory": "skills/claude-native-web-artifacts-builder",
-      "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/bundle-artifact.sh",
-        "scripts/init-artifact.sh",
-        "scripts/shadcn-components.tar.gz"
-      ]
-    },
-    {
-      "name": "claude-native-webapp-testing",
-      "directory": "skills/claude-native-webapp-testing",
-      "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/with_server.py"
-      ]
-    },
-    {
-      "name": "claude-native-xlsx",
-      "directory": "skills/claude-native-xlsx",
-      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \\\"the xlsx in my downloads\\\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/office/helpers/__init__.py",
-        "scripts/office/helpers/merge_runs.py",
-        "scripts/office/helpers/simplify_redlines.py",
-        "scripts/office/pack.py",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
-        "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
-        "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
-        "scripts/office/schemas/mce/mc.xsd",
-        "scripts/office/schemas/microsoft/wml-2010.xsd",
-        "scripts/office/schemas/microsoft/wml-2012.xsd",
-        "scripts/office/schemas/microsoft/wml-2018.xsd",
-        "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
-        "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
-        "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
-        "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
-        "scripts/office/soffice.py",
-        "scripts/office/unpack.py",
-        "scripts/office/validate.py",
-        "scripts/office/validators/__init__.py",
-        "scripts/office/validators/base.py",
-        "scripts/office/validators/docx.py",
-        "scripts/office/validators/pptx.py",
-        "scripts/office/validators/redlining.py",
-        "scripts/recalc.py"
-      ]
     },
     {
       "name": "clay",
@@ -2163,7 +1938,13 @@
     {
       "name": "code-review",
       "directory": "skills/code-review",
-      "description": "Adversarial code review — find what will break in production, not what looks wrong in theory. Covers correctness, security, failure modes, performance, and maintainability. Use when reviewing PRs, auditing code quality, or before merging. Triggers on: 'review this code', 'code review', 'check this PR', 'is this code good', 'review before merge', 'look over this code'."
+      "description": "Adversarial code review — find what will break in production, not what looks wrong in theory. Covers correctness, security, failure modes, performance, and maintainability. Use when reviewing PRs, auditing code quality, or before merging. Triggers on: 'review this code', 'code review', 'check this PR', 'is this code good', 'review before merge', 'look over this code'.",
+      "aliases": [
+        "claude-native-code-review",
+        "review pull request",
+        "review PR diff",
+        "review code for bugs"
+      ]
     },
     {
       "name": "code-review-excellence",
@@ -2311,21 +2092,6 @@
       "name": "composio-search-automation",
       "directory": "skills/composio-search-automation",
       "description": "Automate Composio Search tasks via Rube MCP (Composio). Always search tools first for current schemas."
-    },
-    {
-      "name": "compress",
-      "directory": "skills/compress",
-      "description": "Compress natural language memory files (CLAUDE.md, todos, preferences) into caveman format to save input tokens. Preserves all technical substance, code, URLs, and structure. Compressed version overwrites the original file. Human-readable backup saved as FILE.original.md. Trigger: /caveman:compress FILEPATH or \"compress memory file\"",
-      "has_scripts": true,
-      "scripts": [
-        "scripts/__init__.py",
-        "scripts/__main__.py",
-        "scripts/benchmark.py",
-        "scripts/cli.py",
-        "scripts/compress.py",
-        "scripts/detect.py",
-        "scripts/validate.py"
-      ]
     },
     {
       "name": "compression-runtime",
@@ -2643,7 +2409,7 @@
     {
       "name": "crawl4ai",
       "directory": "skills/crawl4ai",
-      "description": "Use when working with unclecode/crawl4ai or the local Crawl4AI stack: installing, updating, setting up, diagnosing, or using the `crwl` CLI for LLM-ready web crawling, scraping, Markdown extraction, JSON extraction, deep crawling, browser profiles, CDP browser control, screenshots/PDF/MHTML export, or Python `AsyncWebCrawler` workflows. Prefer this for deterministic local web-to-Markdown and crawler workflows. Do not use for generic web search when the host AI has native search.",
+      "description": "Install or operate the Crawl4AI runtime, crwl CLI, or Python AsyncWebCrawler. Crawl websites, scrape pages into LLM-ready Markdown, perform JSON extraction and deep crawling, and manage crawler profiles or CDP for extraction.",
       "aliases": [
         "crawl4ai",
         "crawl 4 ai",
@@ -2847,7 +2613,19 @@
     {
       "name": "debug-root-cause",
       "directory": "skills/debug-root-cause",
-      "description": "Systematic root-cause debugging — reproduce, isolate, hypothesize, fix the actual cause not symptoms. Use when something is broken, behaving unexpectedly, or when a bug needs methodical investigation. Triggers on: 'debug this', 'why is this broken', 'this isn't working', 'find the bug', 'root cause', 'troubleshoot', 'figure out why', 'diagnose this error'."
+      "description": "Investigate a failing test, test failure, crash, exception, or software bug. Reproduce the failure, isolate the failing code, test hypotheses, and verify the fix with a regression test. Use to find the root cause of unexpected software behavior.",
+      "aliases": [
+        "debug failing test",
+        "root cause failing test",
+        "debug test failure",
+        "diagnose failing test",
+        "test failing",
+        "failing unit test",
+        "unit test failure",
+        "flaky integration test",
+        "flaky test investigation",
+        "unit test failing"
+      ]
     },
     {
       "name": "debugging-code",
@@ -2960,7 +2738,8 @@
       "description": "Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.",
       "aliases": [
         "ckm-design",
-        "ckm:design"
+        "ckm:design",
+        "ckmdesign"
       ],
       "has_scripts": true,
       "scripts": [
@@ -3059,7 +2838,8 @@
       "description": "Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.",
       "aliases": [
         "ckm-design-system",
-        "ckm:design-system"
+        "ckm:design-system",
+        "ckmdesign-system"
       ],
       "has_scripts": true,
       "scripts": [
@@ -3355,6 +3135,9 @@
       "name": "docx",
       "directory": "skills/docx",
       "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files). Triggers include: any mention of ''Word doc'', ''word document'', ''.docx'', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a ''report'', ''memo'', ''letter'', ''template'', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
+      "aliases": [
+        "claude-native-docx"
+      ],
       "has_scripts": true,
       "scripts": [
         "scripts/__init__.py",
@@ -6445,6 +6228,9 @@
       "name": "mcp-builder",
       "directory": "skills/mcp-builder",
       "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
+      "aliases": [
+        "claude-native-mcp-builder"
+      ],
       "has_scripts": true,
       "scripts": [
         "scripts/connections.py",
@@ -8116,7 +7902,12 @@
     {
       "name": "requesting-code-review",
       "directory": "skills/requesting-code-review",
-      "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements"
+      "description": "Request or delegate a code review to a separate reviewer. Prepare a review brief, gather the relevant diff and commit range, and hand the work to an independent reviewer.",
+      "aliases": [
+        "request code review",
+        "dispatch code reviewer",
+        "delegate code review"
+      ]
     },
     {
       "name": "research-claim-map",
@@ -8298,12 +8089,10 @@
     {
       "name": "saas-landing",
       "directory": "skills/saas-landing",
-      "description": "Single-page SaaS landing with hero, features, social proof, pricing, and CTA. Respects the active DESIGN.md color/typography/layout tokens. Trigger keywords: \"saas landing\", \"marketing page\", \"product landing\"."
-    },
-    {
-      "name": "saas-landing-skill",
-      "directory": "skills/saas-landing-skill",
-      "description": "Single-page SaaS landing with hero, features, social proof, pricing, and CTA. Respects the active DESIGN.md color/typography/layout tokens. Trigger keywords: \"saas landing\", \"marketing page\", \"product landing\"."
+      "description": "Single-page SaaS landing with hero, features, social proof, pricing, and CTA. Respects the active DESIGN.md color/typography/layout tokens. Trigger keywords: \"saas landing\", \"marketing page\", \"product landing\".",
+      "aliases": [
+        "saas-landing-skill"
+      ]
     },
     {
       "name": "saas-revenue-growth-metrics",
@@ -9433,12 +9222,10 @@
     {
       "name": "template",
       "directory": "skills/template",
-      "description": "Replace with description of the skill and when Claude should use it."
-    },
-    {
-      "name": "template-skill",
-      "directory": "skills/template-skill",
-      "description": "Replace with description of the skill and when Claude should use it."
+      "description": "Replace with description of the skill and when Claude should use it.",
+      "aliases": [
+        "template-skill"
+      ]
     },
     {
       "name": "templated-automation",
@@ -9458,7 +9245,12 @@
     {
       "name": "test-driven-development",
       "directory": "skills/test-driven-development",
-      "description": "Use when implementing any feature or bugfix, before writing implementation code"
+      "description": "Use when implementing any feature or bugfix, before writing implementation code",
+      "aliases": [
+        "write failing test first",
+        "write test first",
+        "red green refactor"
+      ]
     },
     {
       "name": "testrunner",
@@ -9503,7 +9295,10 @@
     {
       "name": "theme-factory",
       "directory": "skills/theme-factory",
-      "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly."
+      "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.",
+      "aliases": [
+        "claude-native-theme-factory"
+      ]
     },
     {
       "name": "think-tank",
@@ -10011,7 +9806,8 @@
       "description": "Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.",
       "aliases": [
         "ckm-ui-styling",
-        "ckm:ui-styling"
+        "ckm:ui-styling",
+        "ckmui-styling"
       ],
       "has_scripts": true,
       "scripts": [
@@ -10358,6 +10154,10 @@
       "name": "web-artifacts-builder",
       "directory": "skills/web-artifacts-builder",
       "description": "Suite of tools for creating elaborate, multi-component single-file HTML artifacts for compatible artifact renderers, including claude.ai. Uses React, Tailwind CSS, and shadcn/ui. Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
+      "aliases": [
+        "artifacts-builder",
+        "claude-native-web-artifacts-builder"
+      ],
       "has_scripts": true,
       "scripts": [
         "scripts/bundle-artifact.sh",
@@ -10437,7 +10237,14 @@
     {
       "name": "webapp-testing",
       "directory": "skills/webapp-testing",
-      "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
+      "description": "Test a local web app with Playwright. Run browser tests against a development server, verify frontend interactions, capture screenshots and console logs, and debug UI test failures. Use Playwright to click buttons, fill forms, and verify checkout pages or other user flows.",
+      "aliases": [
+        "claude-native-webapp-testing",
+        "playwright testing",
+        "test local web app",
+        "playwright end-to-end tests",
+        "playwright browser tests"
+      ],
       "has_scripts": true,
       "scripts": [
         "scripts/with_server.py"
@@ -10632,6 +10439,9 @@
       "name": "xlsx",
       "directory": "skills/xlsx",
       "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
+      "aliases": [
+        "claude-native-xlsx"
+      ],
       "has_scripts": true,
       "scripts": [
         "scripts/office/helpers/__init__.py",
@@ -10849,8 +10659,8 @@
       "description": "Automate Zyte API tasks via Rube MCP (Composio). Always search tools first for current schemas."
     }
   ],
-  "total_skills": 1812,
-  "alias_count": 214,
+  "total_skills": 1795,
+  "alias_count": 259,
   "routing": {
     "primary_access": "skill-router skill <name>",
     "compatibility_access": [],

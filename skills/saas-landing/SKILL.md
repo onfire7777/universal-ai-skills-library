@@ -109,7 +109,7 @@ Write only `index.html`. Do not generate a separate CSS file, JS file, or README
 This is a minimal but complete skill. Structure:
 
 ```
-saas-landing-skill/
+saas-landing/
 ├── SKILL.md    ← you are here
 └── assets/
     └── base.html    (optional starter template; this skill doesn't use one)
