@@ -23,7 +23,7 @@ type procedureScope struct{ local, original []procedureWord }
 
 var procedureSequence = regexp.MustCompile("(?i)^(?:step|phase|stage) [0-9]+|^[0-9]+[.)] ")
 var procedureReference = regexp.MustCompile("(?i)^(?:references?|resources?|related skills?|sources?|when to (?:use|apply)|overview|trigger(?:s| guidance)?)$")
-var sourceInstruction = regexp.MustCompile("(?im)(?:^```[^\u0060\n]|^ *[0-9]+[.)] +|^ *[-*] +|^ *[|].+[|]|^ *(?:run|set|choose|compare|calculate|measure|inspect|use|select|copy|enter|save) )")
+var sourceInstruction = regexp.MustCompile("(?im)(?:^(?:```|~~~)[^\u0060~\n]|^ *[0-9]+[.)] +|^ *[-*] +|^ *[|].+[|]|^ *(?:run|set|choose|compare|calculate|measure|inspect|use|select|copy|enter|save|add|connect|export|render) )")
 var termCamel = regexp.MustCompile("([a-z])([A-Z])")
 
 func procedureTerm(s string) string {
@@ -60,6 +60,33 @@ func procedureVocabulary(text string) string {
 	slices.Sort(keys)
 	return " " + strings.Join(keys, " ") + " "
 }
+
+// A source often enumerates unsupported formats in the same description
+// as its intended use. Keep its original metadata for display and content
+// holds, but exclude explicitly negative scope from retrieval evidence.
+var negativeApplicability = regexp.MustCompile(`(?i)\b(?:(?:do not|don't|never|must not|should not) (?:use|trigger|apply|select)|not (?:suitable|intended|recommended) for|not for|outside (?:its |the )?scope)\b`)
+var applicabilityBoundary = regexp.MustCompile(`(?i)[.!?](?:\s|$)|;\s*|[\r\n]+|,\s*but\s+(?:use|apply|select)\b`)
+
+func positiveDescription(s string) string {
+	if !negativeApplicability.MatchString(s) {
+		return s
+	}
+	var out strings.Builder
+	for {
+		start := negativeApplicability.FindStringIndex(s)
+		if start == nil {
+			out.WriteString(s)
+			return out.String()
+		}
+		out.WriteString(s[:start[0]])
+		out.WriteString(" ")
+		end := applicabilityBoundary.FindStringIndex(s[start[1]:])
+		if end == nil {
+			return out.String()
+		}
+		s = s[start[1]+end[1]:]
+	}
+}
 func newProcedureProfile(b *WorkflowBundle) procedureProfile {
 	var headings []string
 	for _, e := range b.Elements {
@@ -67,7 +94,7 @@ func newProcedureProfile(b *WorkflowBundle) procedureProfile {
 			headings = append(headings, e.Title)
 		}
 	}
-	metadata := b.Description + " " + b.SourceDescription + " " + strings.Join(b.Capabilities, " ")
+	metadata := positiveDescription(b.Description) + " " + positiveDescription(b.SourceDescription) + " " + strings.Join(b.Capabilities, " ")
 	var named []string
 	for i, raw := range taskToken.FindAllString(metadata, -1) {
 		if technicalSpelling(raw) || i > 0 && strings.IndexFunc(raw, unicode.IsUpper) >= 0 {
@@ -340,22 +367,6 @@ func discoverAuthoredProcedures(idx *WorkflowIndex, task *procedureDiscovery, r 
 		if !kept[e.SectionDigest] {
 			chosen = append(chosen, e)
 			kept[e.SectionDigest] = true
-		}
-	}
-	// Deliver the canonical steps of a compact authored workflow when
-	// its actual instruction sections ground multiple aspects of the task.
-	// Restrict this to implementation stages, and keep platform/language
-	// applicability for each sibling. Search can select only individual
-	// sections, but dropping the rest of the author's sequence is lossy.
-	if r.Kind == "deliverable" && anchor.element.File == "SKILL.md" && (anchor.sequential != "" || creationIntent.MatchString(r.Text)) {
-		for _, e := range lookup[c.skill].Elements {
-			if e.File == "SKILL.md" && procedureSequence.MatchString(e.Title) && !kept[e.SectionDigest] && applicableElement(e, material) && len(idx.sourceText(e)) > 48 {
-				if anchor.sequential != "" && e.File+"@"+strings.Join(e.Context, "/") != anchor.sequential {
-					continue
-				}
-				chosen = append(chosen, e)
-				kept[e.SectionDigest] = true
-			}
 		}
 	}
 	if len(chosen) == 0 {

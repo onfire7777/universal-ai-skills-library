@@ -24,13 +24,24 @@ func relevantWorkflowMethods(idx *WorkflowIndex, r WorkflowRequirement, methods 
 		total += t.weight
 	}
 	matchers := compileFacetMatchers(r.Facets)
+	var formats []*WorkflowBundle
+	for _, c := range methods {
+		if b := lookup[c.Skill]; namesDeclaredFormat(r.Text, b) {
+			formats = append(formats, b)
+		}
+	}
+	incompatible := make([]bool, len(methods))
 	ranks := make([]methodRelevance, len(methods))
 	best := 0.0
 	for i, c := range methods {
+		incompatible[i] = !c.Requested && sourceRequiresDifferentMedium(idx, r, lookup[c.Skill], c, formats)
+		if incompatible[i] {
+			continue
+		}
 		ranks[i] = methodSourceRelevance(idx, lookup[c.Skill], c, terms, total, matchers)
 		best = max(best, ranks[i].score)
 	}
-	if best < .45 {
+	if best < .45 && !slices.Contains(incompatible, true) {
 		return methods
 	}
 	objective := directObjectiveOf(r.Text)
@@ -38,7 +49,7 @@ func relevantWorkflowMethods(idx *WorkflowIndex, r WorkflowRequirement, methods 
 	covered := map[string]bool{}
 	for i, c := range methods {
 		rank := ranks[i]
-		keep[i] = c.Requested || objective.names(c.Skill) || rank.score >= best*.60
+		keep[i] = !incompatible[i] && (c.Requested || objective.names(c.Skill) || namesDeclaredFormat(r.Text, lookup[c.Skill]) || rank.score >= best*.60)
 		if keep[i] {
 			for key := range rank.details {
 				covered[key] = true
@@ -49,7 +60,7 @@ func relevantWorkflowMethods(idx *WorkflowIndex, r WorkflowRequirement, methods 
 	// A generic shared term such as "document" is insufficient.
 	winners := map[string]int{}
 	for i, rank := range ranks {
-		if keep[i] {
+		if keep[i] || incompatible[i] {
 			continue
 		}
 		for key, mandatory := range rank.details {
@@ -158,7 +169,7 @@ func includeDirectObjectives(idx *WorkflowIndex, r WorkflowRequirement, methods 
 	}
 	for i := range idx.Bundles {
 		b := &idx.Bundles[i]
-		if !eligible[b.Skill] || !objective.names(b.Skill) || !scopedToTask(b, r.Text) {
+		if !eligible[b.Skill] || (!objective.names(b.Skill) && !namesDeclaredFormat(r.Text, b)) || !scopedToTask(b, r.Text) {
 			continue
 		}
 		if slices.ContainsFunc(methods, func(c WorkflowContribution) bool { return c.Skill == b.Skill }) {
@@ -172,4 +183,72 @@ func includeDirectObjectives(idx *WorkflowIndex, r WorkflowRequirement, methods 
 		methods = append(methods, method)
 	}
 	return methods
+}
+
+// Resolve a product name only when its canonical source explicitly associates
+// that product's files with this bundle's own extension. Mentions of other
+// supported inputs and ordinary words in prose are insufficient.
+var namedFileFormat = regexp.MustCompile(`\b([[:upper:]][[:alnum:]-]+)\s+([[:alpha:]-]+)\s*\(\s*\.([[:alnum:]]+)\b`)
+
+func namesDeclaredFormat(text string, b *WorkflowBundle) bool {
+	if b == nil || len(b.Skill) > 12 || !strings.Contains(b.SourceDescription, "."+b.Skill) {
+		return false
+	}
+	words := strings.FieldsFunc(text, workflowSeparator)
+	lower := " " + strings.Join(workflowWords(text), " ") + " "
+	for _, m := range namedFileFormat.FindAllStringSubmatch(positiveDescription(b.SourceDescription), -1) {
+		if !strings.EqualFold(m[3], b.Skill) {
+			continue
+		}
+		if slices.Contains(words, m[1]) {
+			return true
+		}
+		noun := strings.TrimSuffix(strings.ToLower(m[2]), "s")
+		prefix := " " + strings.ToLower(m[1]) + " " + noun
+		if strings.Contains(lower, prefix+" ") || strings.Contains(lower, prefix+"s ") {
+			return true
+		}
+	}
+	return false
+}
+
+// A screenshot at each browser viewport, for instance, cannot verify the
+// pages of a specified office document. Require both the author's scope and
+// the proposed procedure to imply a different execution medium.
+var methodMedia = []struct{ scope, procedure *regexp.Regexp }{
+	{regexp.MustCompile(`(?i)\b(frontend interfaces?|web interfaces?|websites?|web applications?|web pages?)\b`), regexp.MustCompile(`(?i)\b(viewports?|DOM elements?|browser console|browser screenshots?|responsive breakpoint|CSS selectors?)\b`)},
+	{regexp.MustCompile(`(?i)\b(mobile apps?|mobile applications?|iOS screens?|Android apps?)\b`), regexp.MustCompile(`(?i)\b(device simulator|Android emulator|iOS Simulator|touch targets?|navigation controller)\b`)},
+	{regexp.MustCompile(`(?i)\b(game audio|sound effects?|audio production)\b`), regexp.MustCompile(`(?i)\b(loudness|sample rate|audio channels?|sound banks?)\b`)},
+}
+
+func sourceRequiresDifferentMedium(idx *WorkflowIndex, r WorkflowRequirement, b *WorkflowBundle, c WorkflowContribution, formats []*WorkflowBundle) bool {
+	if b == nil || len(formats) == 0 {
+		return false
+	}
+	for _, owner := range formats {
+		if owner == b {
+			return false
+		}
+	}
+	for _, medium := range methodMedia {
+		if !medium.scope.MatchString(positiveDescription(b.SourceDescription)) || medium.scope.MatchString(r.Text) || medium.procedure.MatchString(r.Text) {
+			continue
+		}
+		requires := false
+		for _, e := range c.Elements {
+			body := idx.sourceText(e)
+			for _, owner := range formats {
+				if strings.Contains(strings.ToLower(body), "."+strings.ToLower(owner.Skill)) {
+					return false
+				}
+			}
+			if medium.procedure.MatchString(body) {
+				requires = true
+			}
+		}
+		if requires {
+			return true
+		}
+	}
+	return false
 }

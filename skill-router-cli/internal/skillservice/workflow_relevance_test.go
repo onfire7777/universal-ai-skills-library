@@ -67,3 +67,30 @@ func TestWorkflowRecoversNamedArtifactOwnerFromCorpus(t *testing.T) {
 		t.Fatal("changed exact user selection")
 	}
 }
+
+func TestDeclaredFileFormatGroundsTheCanonicalOwner(t *testing.T) {
+	b := &WorkflowBundle{Skill: "qbx", SourceDescription: "Edit Quartz workbooks (.qbx files) and import other documents."}
+	if !namesDeclaredFormat("Check the formulas in the Quartz tables", b) || !namesDeclaredFormat("Export the quartz workbook", b) || namesDeclaredFormat("Explain quartz mineral properties", b) {
+		t.Fatal("misread product or file type")
+	}
+	b.Skill = "importers"
+	if namesDeclaredFormat("Export the Quartz workbook", b) {
+		t.Fatal("input mention treated as an owner")
+	}
+}
+
+func TestWorkflowRejectsWrongExecutionMediumForADeclaredFormat(t *testing.T) {
+	web := WorkflowBundle{Skill: "ui-review", SourceDescription: "Inspect frontend interfaces."}
+	office := WorkflowBundle{Skill: "qbx", SourceDescription: "Edit Quartz workbooks (.qbx files)."}
+	el := WorkflowElement{Skill: web.Skill, File: "review.md", StartLine: 1, EndLine: 4, Title: "Visual checks"}
+	web.Elements = []WorkflowElement{el}
+	body := "Capture browser screenshots for each viewport. Compare the navigation elements."
+	idx := &WorkflowIndex{Bundles: []WorkflowBundle{web}, search: &workflowSearchIndex{bodies: [][]string{{body}}, terms: [][]string{{workflowVocabulary(body)}}}}
+	c := WorkflowContribution{Skill: web.Skill, Elements: []WorkflowElement{el}}
+	if !sourceRequiresDifferentMedium(idx, WorkflowRequirement{Text: "Inspect the Quartz workbook pages"}, &web, c, []*WorkflowBundle{&office}) {
+		t.Fatal("retained a browser-only execution step for a workbook")
+	}
+	if sourceRequiresDifferentMedium(idx, WorkflowRequirement{Text: "Inspect the website viewports and the Quartz workbook pages"}, &web, c, []*WorkflowBundle{&office}) {
+		t.Fatal("dropped requested browser checks")
+	}
+}

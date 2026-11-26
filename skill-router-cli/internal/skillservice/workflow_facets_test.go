@@ -201,3 +201,51 @@ func TestWorkflowGeneralPlatformCoversNamedDevices(t *testing.T) {
 		t.Fatal("generic OS and device-specific scope were conflated")
 	}
 }
+func TestWorkflowIndexesPositiveDeclaredScope(t *testing.T) {
+	b := WorkflowBundle{Skill: "rpt", SourceDescription: "Edit Acme reports (.rpt files). Do not use for Sample reports (.rpt files) or Word tables; apply to House summaries."}
+	src := positiveDescription(b.SourceDescription)
+	if !strings.Contains(src, ".rpt files") || strings.Contains(src, "Word") || strings.Contains(src, "Sample") || !strings.Contains(src, "House summaries") {
+		t.Fatal(src)
+	}
+	if namesDeclaredFormat("Sample report", &b) || !namesDeclaredFormat("Acme reports", &b) {
+		t.Fatal("negative scope incorrectly resolved a file product")
+	}
+	if strings.Contains(newProcedureProfile(&b).scope, " word ") {
+		t.Fatal("negative applicability entered ranking profile")
+	}
+}
+func TestAuthoredPackagingStepsAndProducerContinuation(t *testing.T) {
+	dir := planningFixture(t)
+	entry := filepath.Join(dir, "editor", "SKILL.md")
+	source := "# Sheet editor\nPackage supplied artwork as tiles for display.\n## Workflow\n### Step 1: Inspect the artwork\nReview the colors and boundary of each illustration.\n### Step 2: Export the set\nGenerate two sizes and provide the tile manifest.\n### Step 3: Connect the tiles\nAdd the assets to the page template.\n\n~~~html\n<link rel='tile' href='tiles.png'>\n~~~\n"
+	if err := os.WriteFile(entry, []byte(source), 0600); err != nil {
+		t.Fatal(err)
+	}
+	idx, err := BuildWorkflowIndex()
+	if err != nil {
+		t.Fatal(err)
+	}
+	idx.Search("artwork", "", 1)
+	lookup := map[string]*WorkflowBundle{}
+	for i, b := range idx.Bundles {
+		lookup[b.Skill] = &idx.Bundles[i]
+	}
+	b := lookup["editor"]
+	j := slices.IndexFunc(b.Elements, func(e WorkflowElement) bool { return strings.Contains(e.Title, "Step 1") })
+	first := WorkflowRequirement{Text: "Package artwork for web display", Kind: "deliverable"}
+	methods := []WorkflowContribution{{Skill: "editor", Status: "planned", Elements: []WorkflowElement{b.Elements[j]}}}
+	completeAuthoredWorkflow(idx, first, methods, lookup)
+	if len(methods[0].Elements) != 3 {
+		t.Fatalf("ordered package steps missing: %d", len(methods[0].Elements))
+	}
+	next := WorkflowRequirement{Text: "Show the HTML for both assets", Kind: "deliverable", DependsOn: []string{"build"}}
+	states := map[string]WorkflowStage{"build": {Requirement: first, Contributions: methods}}
+	follow := producerContinuations(idx, next, nil, lookup, states)
+	if len(follow) != 1 || !slices.ContainsFunc(follow[0].Elements, func(e WorkflowElement) bool { return strings.Contains(e.Title, "Step 3") }) {
+		t.Fatalf("source implementation from producer missing: %d methods", len(follow))
+	}
+	next.DependsOn = nil
+	if got := producerContinuations(idx, next, nil, lookup, states); len(got) > 0 {
+		t.Fatal("producer leaked into independent stage")
+	}
+}

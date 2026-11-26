@@ -149,8 +149,9 @@ func (s *workflowSearchIndex) build(bundles []WorkflowBundle) {
 			// Bundle descriptions help locate the entry point. Giving
 			// every sibling section the description would invent coverage.
 			if e.File == "SKILL.md" && (j == 0 || b.Elements[j-1].File != e.File) {
-				add(workflowWords(b.Description+" "+b.SourceDescription), 2)
-				s.docs[id].vocabulary = workflowVocabulary(s.terms[i][j] + " " + b.SourceDescription)
+				authored := positiveDescription(b.SourceDescription)
+				add(workflowWords(positiveDescription(b.Description)+" "+authored), 2)
+				s.docs[id].vocabulary = workflowVocabulary(s.terms[i][j] + " " + authored)
 			}
 			for word, w := range weights {
 				s.postings[word] = append(s.postings[word], workflowPosting{id, w})
