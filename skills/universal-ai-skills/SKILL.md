@@ -13,9 +13,8 @@ For every substantive user prompt:
 
 1. Use the current prompt-hook result. When it is unavailable, run one fallback with `skill-router preflight --hook-event UserPromptSubmit --json -- "<latest user prompt>"`.
 2. Only run preflight for real user prompts. Do not route from tool output, assistant messages, startup, stop, compaction, status checks, or background jobs.
-3. If `decision` is `route`, sanity-check that the selected skill clearly matches the user's core task, object, and action.
-4. If the match is weak, generic, ambiguous, or only hits words such as "issue", "install", "setup", "local", "AI", or "skill", continue without loading a skill.
-5. If the match is clearly relevant, load exactly one skill with `skill-router skill <name>`.
+3. For a request with multiple deliverables, constraints, named skill passes or verification needs, identify each requirement, then call `workflow_plan` or `skill-router skills workflow plan`. Plan even when the preflight candidate covers only part of the task. For uncovered requirements or mismatched context, use `workflow_search` to inspect alternatives and pin the relevant file, lines and digest in a revised plan. Use `workflow_load` for each stage, read its full skills and supporting files, and carry forward decisions. Record each applied element with its load receipt, any path-only files consulted, and the observed evidence. For large or truncated loads, request the file manifest, then load one contribution at a time. Save the full CLI response to a task-local file and read it in ranges if needed. Give a reason for each gap. Replan when requirements change and use `workflow_review` before claiming coverage.
+4. For a single requirement, load a clearly relevant hook candidate (the workflow_candidate field in fallback JSON) with `skill-router skill <name>`. Continue using native tools if the route is weak.
 
 ## Commands
 
@@ -23,6 +22,7 @@ For every substantive user prompt:
 - `skill-router skill search <query> --limit 10`: search without flooding context.
 - `skill-router preflight --json "<prompt>"`: inspect the automatic selection packet.
 - `skill-router route --explain "<prompt>"`: debug scoring only when routing looks wrong.
+- `skill-router skills workflow --help` lists the `search`, `plan`, `load`, and `review` commands. Each accepts `--request <file>` or a JSON object on stdin.
 - `skill-router skills sources --refresh`: refresh read-only external skill indexes after local source changes.
 - `skill-router doctor`: check local router health.
 
