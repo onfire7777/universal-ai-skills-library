@@ -1,6 +1,6 @@
 {
   "name": "universal-ai-skills",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load skills on demand without duplicating the corpus.",
   "author": {
     "name": "onfire7777",

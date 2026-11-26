@@ -54,18 +54,19 @@ type WorkflowOrigins struct {
 }
 
 type WorkflowBundle struct {
-	AutomaticHold bool              `json:"automaticHold,omitempty"`
-	Skill         string            `json:"skill"`
-	Description   string            `json:"description"`
-	Revision      string            `json:"revision"`
-	Version       string            `json:"version,omitempty"`
-	Aliases       []string          `json:"aliases,omitempty"`
-	Capabilities  []string          `json:"capabilities,omitempty"`
-	Requires      []string          `json:"requires,omitempty"`
-	Conflicts     []string          `json:"conflicts,omitempty"`
-	Supersedes    []string          `json:"supersedes,omitempty"`
-	Source        SkillSource       `json:"source"`
-	Elements      []WorkflowElement `json:"elements"`
+	AutomaticHold     bool              `json:"automaticHold,omitempty"`
+	Skill             string            `json:"skill"`
+	Description       string            `json:"description"`                 // curated manifest description
+	SourceDescription string            `json:"sourceDescription,omitempty"` // authored SKILL.md frontmatter
+	Revision          string            `json:"revision"`
+	Version           string            `json:"version,omitempty"`
+	Aliases           []string          `json:"aliases,omitempty"`
+	Capabilities      []string          `json:"capabilities,omitempty"`
+	Requires          []string          `json:"requires,omitempty"`
+	Conflicts         []string          `json:"conflicts,omitempty"`
+	Supersedes        []string          `json:"supersedes,omitempty"`
+	Source            SkillSource       `json:"source"`
+	Elements          []WorkflowElement `json:"elements"`
 }
 
 type WorkflowIndexStats struct {
@@ -89,7 +90,7 @@ type WorkflowHit struct {
 }
 
 // Bump when section interpretation or tokenization changes.
-const workflowCacheVersion = "workflow-index-v2"
+const workflowCacheVersion = "workflow-index-v3"
 const workflowParserRevision = "2026-11-section-digest-structured-eligibility"
 
 // The MCP process can reuse one immutable index after rechecking all source
