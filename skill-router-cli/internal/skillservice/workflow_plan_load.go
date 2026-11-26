@@ -89,7 +89,7 @@ func loadEligibleWorkflowBody(prompt, name string) (string, error) {
 			}
 		}
 	}
-	if found == nil || !workflowIntentAllowed(strings.ReplaceAll(name, "-", " ")+" "+found.Description) {
+	if found == nil {
 		return "", fmt.Errorf("%s: %w", name, errWorkflowLoadIneligible)
 	}
 	root, err := openWorkflowBundle(name)
@@ -102,6 +102,12 @@ func loadEligibleWorkflowBody(prompt, name string) (string, error) {
 		return "", err
 	}
 	if !utf8.Valid(data) || workflowSourceHeld(data) {
+		return "", fmt.Errorf("%s: %w", name, errWorkflowLoadIneligible)
+	}
+	meta := WorkflowBundle{Skill: name, Description: found.Description}
+	readWorkflowFrontmatter(data, &meta)
+	catalogTopic := strings.ReplaceAll(name, "-", " ") + " " + found.Description
+	if workflowOutOfScope(meta.SourceDescription) || (!workflowIntentAllowed(catalogTopic) && !workflowBundleEligible(&meta)) {
 		return "", fmt.Errorf("%s: %w", name, errWorkflowLoadIneligible)
 	}
 	return string(data), nil

@@ -48,6 +48,10 @@ func readWorkflowFrontmatter(data []byte, b *WorkflowBundle) {
 	for i := 0; i+1 < len(n.Content); i += 2 {
 		v := n.Content[i+1]
 		switch n.Content[i].Value {
+		case "description":
+			if v.Kind == yaml.ScalarNode && v.Tag == "!!str" {
+				b.SourceDescription = strings.Join(strings.Fields(v.Value), " ")
+			}
 		case "version":
 			if v.Kind == yaml.ScalarNode {
 				b.Version = v.Value

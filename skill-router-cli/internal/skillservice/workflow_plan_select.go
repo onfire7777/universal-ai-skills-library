@@ -61,10 +61,14 @@ func workflowSourceHeld(data []byte) bool {
 	return false
 }
 
+// A skill router or registry is maintenance tooling. The words "skill" and
+// "router" on their own also describe unrelated subjects.
+var skillTooling = regexp.MustCompile(`(?i)\b(?:skill[- ](?:router|routing|registry|catalog|discovery)|route to (?:a |an )?skill)\b`)
+
 var ordinaryTask = regexp.MustCompile(`(?i)\b(format|summarize|translate|edit|design|redesign|illustrate|visualize|explain|teach|proofread|calculate|reconcile|compare|review|measure|optimize|organize|analyse|analyze|diagnose|write|simplify|speed up|document|build|extract|validate)\b`)
 
 func workflowIntentAllowed(s string) bool {
-	return (workflowDomain.MatchString(s) || ordinaryTask.MatchString(s)) && !workflowOutOfScope(s)
+	return (workflowDomain.MatchString(s) || skillTooling.MatchString(s) || ordinaryTask.MatchString(s)) && !workflowOutOfScope(s)
 }
 func workflowRequestHeld(prompt string, reqs []WorkflowRequirement) bool {
 	if workflowOutOfScope(prompt) {
@@ -124,7 +128,14 @@ func workflowIndexGroundsTask(idx *WorkflowIndex, prompt string, reqs []Workflow
 }
 func workflowBundleEligible(b *WorkflowBundle) bool {
 	topic := strings.ReplaceAll(b.Skill, "-", " ") + " " + b.Description
-	return !b.AutomaticHold && workflowDomain.MatchString(topic) && !workflowOutOfScope(topic)
+	if b.AutomaticHold || workflowOutOfScope(topic) || workflowOutOfScope(b.SourceDescription) {
+		return false
+	}
+	if workflowDomain.MatchString(topic) || workflowDomain.MatchString(b.SourceDescription) {
+		return true
+	}
+	metadata := b.Description + " " + b.SourceDescription
+	return skillTooling.MatchString(metadata)
 }
 
 // The requirement is the unit of retrieval. Search supporting files as well

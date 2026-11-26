@@ -46,7 +46,7 @@ import (
 
 // Version is the CLI version. It is a var (not const) so release builds can
 // stamp it via -ldflags "-X .../cmd/root.Version=<tag>".
-var Version = "2.4.0"
+var Version = "2.4.1"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
