@@ -111,7 +111,7 @@ type workflowSection struct {
 	summary       string
 }
 
-func extractWorkflowFile(b *WorkflowBundle, f indexedBundleFile, known map[string]bool) ([]WorkflowElement, []string) {
+func extractWorkflowFile(b *WorkflowBundle, f indexedBundleFile, known map[string]bool) ([]WorkflowElement, []string, []string) {
 	role := workflowFileRole(f.path)
 	base := WorkflowElement{Skill: b.Skill, File: f.path, Digest: f.digest, Role: role, AppliesWhen: b.Description, Requires: b.Requires}
 	base.Origins = WorkflowOrigins{Role: "inferred from path", AppliesWhen: "bundle description"}
@@ -125,7 +125,7 @@ func extractWorkflowFile(b *WorkflowBundle, f indexedBundleFile, known map[strin
 		base.Purpose = base.Title
 		base.Origins.Title = "filename"
 		base.Origins.Purpose = "inferred from filename"
-		return []WorkflowElement{base}, []string{workflowVocabulary(f.path)}
+		return []WorkflowElement{base}, []string{workflowVocabulary(f.path)}, []string{""}
 	}
 	lines := strings.Split(string(f.content), "\n")
 	if len(lines) > 1 && lines[len(lines)-1] == "" {
@@ -134,6 +134,7 @@ func extractWorkflowFile(b *WorkflowBundle, f indexedBundleFile, known map[strin
 	sections := splitWorkflowSections(f.path, lines)
 	el := make([]WorkflowElement, 0, len(sections))
 	terms := make([]string, 0, len(sections))
+	bodies := make([]string, 0, len(sections))
 	for i, sec := range sections {
 		stop := len(lines)
 		if i+1 < len(sections) {
@@ -157,7 +158,7 @@ func extractWorkflowFile(b *WorkflowBundle, f indexedBundleFile, known map[strin
 		roleHint := strings.ToLower(sec.title)
 		if sec.origin == "heading" || sec.origin == "setext heading" {
 			switch {
-			case strings.Contains(roleHint, "when to use") || strings.Contains(roleHint, "applicability"):
+			case strings.Contains(roleHint, "when to use") || strings.Contains(roleHint, "when to apply") || strings.Contains(roleHint, "applicability"):
 				if s := workflowDetails(chunk); len(s) > 0 {
 					e.AppliesWhen = strings.Join(s, " ")
 					e.Origins.AppliesWhen = "section text"
@@ -193,8 +194,9 @@ func extractWorkflowFile(b *WorkflowBundle, f indexedBundleFile, known map[strin
 		e.References = workflowReferences(f.path, body, known)
 		el = append(el, e)
 		terms = append(terms, workflowVocabulary(body))
+		bodies = append(bodies, body)
 	}
-	return el, terms
+	return el, terms, bodies
 }
 
 func workflowFileRole(file string) string {

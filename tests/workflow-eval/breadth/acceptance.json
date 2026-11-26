@@ -1,0 +1,7 @@
+{
+  "modes": {
+    "natural": {"positiveCovered": 33, "groundedFamilies": 16, "groundedPrecision": 0.5, "gapCorrect": 2, "deepComplete": 2},
+    "structured": {"positiveCovered": 36, "groundedFamilies": 16, "groundedPrecision": 0.5, "gapCorrect": 2, "deepComplete": 2},
+    "faceted": {"positiveCovered": 39, "groundedFamilies": 16, "groundedPrecision": 0.5, "gapCorrect": 2, "deepComplete": 2}
+  }
+}

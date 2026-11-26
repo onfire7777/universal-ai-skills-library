@@ -12,10 +12,11 @@ import (
 )
 
 type WorkflowEvidence struct {
-	Kind        string `json:"kind"`
-	Reference   string `json:"reference"`
-	Observation string `json:"observation"`
-	Outcome     string `json:"outcome,omitempty"`
+	Kind        string   `json:"kind"`
+	Reference   string   `json:"reference"`
+	Observation string   `json:"observation"`
+	Outcome     string   `json:"outcome,omitempty"`
+	Checks      []string `json:"checks,omitempty"`
 }
 
 type WorkflowRecord struct {
@@ -48,6 +49,7 @@ type WorkflowStageReview struct {
 	ID       string                  `json:"id"`
 	Complete bool                    `json:"complete"`
 	Elements []WorkflowElementReview `json:"elements"`
+	Checks   []WorkflowCheckReview   `json:"checks,omitempty"`
 	Gaps     []string                `json:"gaps,omitempty"`
 }
 
@@ -169,12 +171,19 @@ func ReviewWorkflow(req WorkflowReviewRequest) (WorkflowReview, error) {
 
 func reviewCurrentWorkflow(req WorkflowReviewRequest) (WorkflowReview, error) {
 	index := make(map[string]map[string]*WorkflowElementReview)
+	requirements := make(map[string]WorkflowRequirement)
 	review := WorkflowReview{Gaps: slices.Clone(req.Plan.Gaps), Complete: len(req.Plan.Stages) > 0 && len(req.Plan.Gaps) == 0}
 	for _, stage := range req.Plan.Stages {
 		state := WorkflowStageReview{ID: stage.Requirement.ID, Gaps: slices.Clone(stage.Gaps)}
 		for _, c := range stage.Contributions {
+			requirements[c.ID] = stage.Requirement
 			for _, e := range c.Elements {
-				state.Elements = append(state.Elements, WorkflowElementReview{Contribution: c.ID, Element: workflowElementAddress(e), Status: "pending"})
+				element := WorkflowElementReview{Contribution: c.ID, Element: workflowElementAddress(e), Status: "pending"}
+				if c.Optional && c.Status == "blocked" {
+					element.Status = "skipped"
+					element.Reason = c.BlockedReason
+				}
+				state.Elements = append(state.Elements, element)
 			}
 		}
 		for j := range state.Elements {
@@ -200,6 +209,9 @@ func reviewCurrentWorkflow(req WorkflowReviewRequest) (WorkflowReview, error) {
 		if err := validateWorkflowRecord(r); err != nil {
 			return WorkflowReview{}, fmt.Errorf("contribution %s: %w", r.Contribution, err)
 		}
+		if err := validateCheckClaims(requirements[r.Contribution].Checks, r.Evidence); err != nil {
+			return WorkflowReview{}, fmt.Errorf("contribution %s: %w", r.Contribution, err)
+		}
 		if len(r.Elements) == 0 {
 			if len(elements) != 1 {
 				return WorkflowReview{}, fmt.Errorf("contribution %s: identify each element to which the evidence applies", r.Contribution)
@@ -219,7 +231,7 @@ func reviewCurrentWorkflow(req WorkflowReviewRequest) (WorkflowReview, error) {
 	}
 
 	completed := make(map[string]bool)
-	reviewEvidence := make(map[WorkflowEvidence]string)
+	reviewEvidence := make(map[workflowObservation]string)
 	for i, stage := range req.Plan.Stages {
 		state := &review.Stages[i]
 		applied := make(map[string]bool)
@@ -257,10 +269,11 @@ func reviewCurrentWorkflow(req WorkflowReviewRequest) (WorkflowReview, error) {
 						if observation.Kind != "test" {
 							continue
 						}
-						if owner, ok := reviewEvidence[observation]; ok && owner != e.Contribution {
+						key := observationKey(observation)
+						if owner, ok := reviewEvidence[key]; ok && owner != e.Contribution {
 							state.Gaps = append(state.Gaps, "independent reviews need separately observed checks: "+observation.Reference)
 						} else {
-							reviewEvidence[observation] = e.Contribution
+							reviewEvidence[key] = e.Contribution
 						}
 					}
 				}
@@ -283,6 +296,7 @@ func reviewCurrentWorkflow(req WorkflowReviewRequest) (WorkflowReview, error) {
 				state.Gaps = append(state.Gaps, "prerequisite is incomplete: "+id)
 			}
 		}
+		state.reconcileChecks(stage.Requirement.Checks)
 		state.Complete = len(state.Gaps) == 0
 		completed[state.ID] = state.Complete
 		review.Complete = review.Complete && state.Complete

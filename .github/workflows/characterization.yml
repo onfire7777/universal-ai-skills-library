@@ -33,6 +33,7 @@ jobs:
           # keeps working if the router is reorganised. The module's own
           # go.mod still pins the language version at build time.
           go-version: stable
+          cache-dependency-path: "**/go.sum"
 
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
@@ -71,6 +72,23 @@ jobs:
       - name: Check multi-skill requirement coverage against the live corpus
         run: python3 tests/workflow-eval/run.py
 
+      - name: Verify specific source coverage across workflow families
+        run: |
+          python3 -m unittest discover -s tests/workflow-eval/breadth
+          python3 tests/workflow-eval/breadth/evaluate.py --gate --output "$RUNNER_TEMP/workflow-breadth.json"
+
+      - name: Save workflow source coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: workflow-source-coverage
+          path: ${{ runner.temp }}/workflow-breadth.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Verify data, document and software workflows against real outputs
+        run: python3 tests/workflow-eval/execution/run.py
+
       - name: Verify dashboard workflow evidence with real keyboard input
         run: node tests/workflow-eval/dashboard_e2e.mjs
 
@@ -85,6 +103,7 @@ jobs:
         uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version: stable
+          cache-dependency-path: "**/go.sum"
 
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0

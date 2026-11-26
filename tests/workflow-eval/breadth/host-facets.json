@@ -1,0 +1,1195 @@
+{
+  "favicon": {
+    "ico": [
+      {
+        "id": "ico-format-1",
+        "kind": "format",
+        "anyOf": [
+          "browser icon",
+          "favicon"
+        ]
+      },
+      {
+        "id": "ico-platform-2",
+        "kind": "platform",
+        "anyOf": [
+          "browser tabs",
+          "browser"
+        ]
+      }
+    ],
+    "touch": [
+      {
+        "id": "touch-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "iPhone",
+          "iOS"
+        ]
+      },
+      {
+        "id": "touch-object-2",
+        "kind": "object",
+        "anyOf": [
+          "home screen icon",
+          "touch icon"
+        ]
+      }
+    ],
+    "links": [
+      {
+        "id": "links-format-1",
+        "kind": "format",
+        "anyOf": [
+          "HTML"
+        ]
+      },
+      {
+        "id": "links-object-2",
+        "kind": "object",
+        "anyOf": [
+          "icon",
+          "favicon"
+        ]
+      }
+    ]
+  },
+  "diagram": {
+    "messages": [
+      {
+        "id": "messages-format-1",
+        "kind": "format",
+        "anyOf": [
+          "Mermaid"
+        ]
+      },
+      {
+        "id": "messages-object-2",
+        "kind": "object",
+        "anyOf": [
+          "sequence",
+          "messages"
+        ]
+      }
+    ],
+    "branches": [
+      {
+        "id": "branches-action-1",
+        "kind": "action",
+        "anyOf": [
+          "branch",
+          "alternative"
+        ]
+      },
+      {
+        "id": "branches-object-2",
+        "kind": "object",
+        "anyOf": [
+          "sequence",
+          "messages"
+        ]
+      }
+    ]
+  },
+  "video": {
+    "trim": [
+      {
+        "id": "trim-object-1",
+        "kind": "object",
+        "anyOf": [
+          "video",
+          "clip"
+        ]
+      },
+      {
+        "id": "trim-action-2",
+        "kind": "action",
+        "anyOf": [
+          "trim",
+          "cut"
+        ]
+      }
+    ],
+    "audio": [
+      {
+        "id": "audio-object-1",
+        "kind": "object",
+        "anyOf": [
+          "audio",
+          "sound"
+        ]
+      },
+      {
+        "id": "audio-check-2",
+        "kind": "check",
+        "anyOf": [
+          "LUFS",
+          "loudness"
+        ]
+      }
+    ]
+  },
+  "word": {
+    "break": [
+      {
+        "id": "break-format-1",
+        "kind": "format",
+        "anyOf": [
+          "Word",
+          "DOCX"
+        ]
+      },
+      {
+        "id": "break-object-2",
+        "kind": "object",
+        "anyOf": [
+          "page break",
+          "chapter break"
+        ]
+      }
+    ],
+    "table": [
+      {
+        "id": "table-format-1",
+        "kind": "format",
+        "anyOf": [
+          "Word",
+          "DOCX"
+        ]
+      },
+      {
+        "id": "table-object-2",
+        "kind": "object",
+        "anyOf": [
+          "table"
+        ]
+      },
+      {
+        "id": "table-action-3",
+        "kind": "action",
+        "anyOf": [
+          "width",
+          "fixed width"
+        ]
+      }
+    ],
+    "render": [
+      {
+        "id": "render-format-1",
+        "kind": "format",
+        "anyOf": [
+          "Word",
+          "DOCX"
+        ]
+      },
+      {
+        "id": "render-action-2",
+        "kind": "action",
+        "anyOf": [
+          "render",
+          "convert"
+        ]
+      },
+      {
+        "id": "render-check-3",
+        "kind": "check",
+        "anyOf": [
+          "inspect",
+          "visual"
+        ]
+      }
+    ]
+  },
+  "slides": {
+    "notes": [
+      {
+        "id": "notes-format-1",
+        "kind": "format",
+        "anyOf": [
+          "PowerPoint",
+          "PPTX"
+        ]
+      },
+      {
+        "id": "notes-object-2",
+        "kind": "object",
+        "anyOf": [
+          "speaker notes",
+          "slide notes"
+        ]
+      }
+    ],
+    "inspect": [
+      {
+        "id": "inspect-object-1",
+        "kind": "object",
+        "anyOf": [
+          "slides",
+          "slide"
+        ]
+      },
+      {
+        "id": "inspect-action-2",
+        "kind": "action",
+        "anyOf": [
+          "thumbnails",
+          "thumbnail"
+        ]
+      },
+      {
+        "id": "inspect-check-3",
+        "kind": "check",
+        "anyOf": [
+          "overlap",
+          "layout"
+        ]
+      }
+    ]
+  },
+  "paired": {
+    "test": [
+      {
+        "id": "test-object-1",
+        "kind": "object",
+        "anyOf": [
+          "paired",
+          "matched"
+        ]
+      },
+      {
+        "id": "test-action-2",
+        "kind": "action",
+        "anyOf": [
+          "nonparametric",
+          "non-parametric"
+        ]
+      }
+    ],
+    "effect": [
+      {
+        "id": "effect-object-1",
+        "kind": "object",
+        "anyOf": [
+          "effect size",
+          "effect estimate"
+        ]
+      },
+      {
+        "id": "effect-check-2",
+        "kind": "check",
+        "anyOf": [
+          "confidence interval",
+          "interval estimate"
+        ]
+      }
+    ]
+  },
+  "pagination": {
+    "cursor": [
+      {
+        "id": "cursor-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "PostgreSQL",
+          "Postgres"
+        ]
+      },
+      {
+        "id": "cursor-action-2",
+        "kind": "action",
+        "anyOf": [
+          "keyset",
+          "cursor based pagination",
+          "cursor"
+        ]
+      }
+    ],
+    "plan": [
+      {
+        "id": "plan-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "PostgreSQL",
+          "Postgres"
+        ]
+      },
+      {
+        "id": "plan-check-2",
+        "kind": "check",
+        "anyOf": [
+          "EXPLAIN ANALYZE",
+          "analyze plan"
+        ]
+      }
+    ]
+  },
+  "pytest": {
+    "env": [
+      {
+        "id": "env-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "Python",
+          "pytest"
+        ]
+      },
+      {
+        "id": "env-object-2",
+        "kind": "object",
+        "anyOf": [
+          "environment variable",
+          "environment variables"
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "id": "cases-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "pytest"
+        ]
+      },
+      {
+        "id": "cases-action-2",
+        "kind": "action",
+        "anyOf": [
+          "parameterize",
+          "parametrize",
+          "parameterized"
+        ]
+      }
+    ]
+  },
+  "git-notes": {
+    "range": [
+      {
+        "id": "range-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "Git"
+        ]
+      },
+      {
+        "id": "range-object-2",
+        "kind": "object",
+        "anyOf": [
+          "commits",
+          "commit history"
+        ]
+      },
+      {
+        "id": "range-action-3",
+        "kind": "action",
+        "anyOf": [
+          "between tags",
+          "range",
+          "since"
+        ]
+      }
+    ],
+    "group": [
+      {
+        "id": "group-object-1",
+        "kind": "object",
+        "anyOf": [
+          "release notes",
+          "changelog"
+        ]
+      },
+      {
+        "id": "group-action-2",
+        "kind": "action",
+        "anyOf": [
+          "group",
+          "categorize",
+          "category"
+        ]
+      }
+    ]
+  },
+  "ios": {
+    "type": [
+      {
+        "id": "type-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "iOS",
+          "iPhone"
+        ]
+      },
+      {
+        "id": "type-object-2",
+        "kind": "object",
+        "anyOf": [
+          "Dynamic Type"
+        ]
+      }
+    ],
+    "reader": [
+      {
+        "id": "reader-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "VoiceOver"
+        ]
+      },
+      {
+        "id": "reader-object-2",
+        "kind": "object",
+        "anyOf": [
+          "label",
+          "description"
+        ]
+      }
+    ]
+  },
+  "unit-economics": {
+    "margin": [
+      {
+        "id": "margin-object-1",
+        "kind": "object",
+        "anyOf": [
+          "gross margin"
+        ]
+      },
+      {
+        "id": "margin-action-2",
+        "kind": "action",
+        "anyOf": [
+          "COGS",
+          "cost of goods"
+        ]
+      }
+    ],
+    "payback": [
+      {
+        "id": "payback-object-1",
+        "kind": "object",
+        "anyOf": [
+          "payback"
+        ]
+      },
+      {
+        "id": "payback-action-2",
+        "kind": "action",
+        "anyOf": [
+          "ARPU",
+          "revenue per user"
+        ]
+      }
+    ]
+  },
+  "roadmap": {
+    "rank": [
+      {
+        "id": "rank-object-1",
+        "kind": "object",
+        "anyOf": [
+          "backlog",
+          "prioritization",
+          "roadmap"
+        ]
+      },
+      {
+        "id": "rank-action-2",
+        "kind": "action",
+        "anyOf": [
+          "reach",
+          "effort"
+        ]
+      }
+    ],
+    "uncertainty": [
+      {
+        "id": "uncertainty-object-1",
+        "kind": "object",
+        "anyOf": [
+          "confidence"
+        ]
+      },
+      {
+        "id": "uncertainty-action-2",
+        "kind": "action",
+        "anyOf": [
+          "estimate",
+          "score",
+          "priority"
+        ]
+      }
+    ]
+  },
+  "tutoring": {
+    "diagnose": [
+      {
+        "id": "diagnose-object-1",
+        "kind": "object",
+        "anyOf": [
+          "misconception",
+          "mental model"
+        ]
+      },
+      {
+        "id": "diagnose-action-2",
+        "kind": "action",
+        "anyOf": [
+          "question",
+          "prompt"
+        ]
+      }
+    ],
+    "fade": [
+      {
+        "id": "fade-object-1",
+        "kind": "object",
+        "anyOf": [
+          "worked examples",
+          "worked example"
+        ]
+      },
+      {
+        "id": "fade-action-2",
+        "kind": "action",
+        "anyOf": [
+          "fade",
+          "fading",
+          "independent practice"
+        ]
+      }
+    ]
+  },
+  "workshop": {
+    "diverge": [
+      {
+        "id": "diverge-object-1",
+        "kind": "object",
+        "anyOf": [
+          "ideas",
+          "brainstorming"
+        ]
+      },
+      {
+        "id": "diverge-action-2",
+        "kind": "action",
+        "anyOf": [
+          "silent",
+          "individually"
+        ]
+      }
+    ],
+    "cluster": [
+      {
+        "id": "cluster-object-1",
+        "kind": "object",
+        "anyOf": [
+          "ideas",
+          "notes"
+        ]
+      },
+      {
+        "id": "cluster-action-2",
+        "kind": "action",
+        "anyOf": [
+          "cluster",
+          "group",
+          "affinity"
+        ]
+      }
+    ],
+    "vote": [
+      {
+        "id": "vote-object-1",
+        "kind": "object",
+        "anyOf": [
+          "ideas",
+          "shortlist"
+        ]
+      },
+      {
+        "id": "vote-action-2",
+        "kind": "action",
+        "anyOf": [
+          "dot voting",
+          "dot vote"
+        ]
+      }
+    ]
+  },
+  "evidence": {
+    "opposing": [
+      {
+        "id": "opposing-object-1",
+        "kind": "object",
+        "anyOf": [
+          "claims",
+          "evidence"
+        ]
+      },
+      {
+        "id": "opposing-action-2",
+        "kind": "action",
+        "anyOf": [
+          "contradict",
+          "conflict",
+          "opposing"
+        ]
+      }
+    ],
+    "quality": [
+      {
+        "id": "quality-object-1",
+        "kind": "object",
+        "anyOf": [
+          "evidence",
+          "sources"
+        ]
+      },
+      {
+        "id": "quality-check-2",
+        "kind": "check",
+        "anyOf": [
+          "quality",
+          "strength",
+          "credibility"
+        ]
+      }
+    ]
+  },
+  "email-layout": {
+    "layout": [
+      {
+        "id": "layout-format-1",
+        "kind": "format",
+        "anyOf": [
+          "HTML email",
+          "email"
+        ]
+      },
+      {
+        "id": "layout-action-2",
+        "kind": "action",
+        "anyOf": [
+          "single column",
+          "one column"
+        ]
+      }
+    ],
+    "cta": [
+      {
+        "id": "cta-object-1",
+        "kind": "object",
+        "anyOf": [
+          "call to action",
+          "CTA"
+        ]
+      },
+      {
+        "id": "cta-object-2",
+        "kind": "object",
+        "anyOf": [
+          "unsubscribe"
+        ]
+      }
+    ]
+  },
+  "browser-game": {
+    "state": [
+      {
+        "id": "state-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "canvas",
+          "browser"
+        ]
+      },
+      {
+        "id": "state-object-2",
+        "kind": "object",
+        "anyOf": [
+          "game state",
+          "state"
+        ]
+      },
+      {
+        "id": "state-format-3",
+        "kind": "format",
+        "anyOf": [
+          "text",
+          "JSON"
+        ]
+      }
+    ],
+    "clock": [
+      {
+        "id": "clock-object-1",
+        "kind": "object",
+        "anyOf": [
+          "game",
+          "simulation"
+        ]
+      },
+      {
+        "id": "clock-check-2",
+        "kind": "check",
+        "anyOf": [
+          "deterministic",
+          "fixed time"
+        ]
+      }
+    ]
+  },
+  "invoice-archive": {
+    "extract": [
+      {
+        "id": "extract-object-1",
+        "kind": "object",
+        "anyOf": [
+          "invoice",
+          "receipt"
+        ]
+      },
+      {
+        "id": "extract-action-2",
+        "kind": "action",
+        "anyOf": [
+          "vendor",
+          "merchant"
+        ]
+      },
+      {
+        "id": "extract-action-3",
+        "kind": "action",
+        "anyOf": [
+          "date"
+        ]
+      }
+    ],
+    "rename": [
+      {
+        "id": "rename-format-1",
+        "kind": "format",
+        "anyOf": [
+          "PDF"
+        ]
+      },
+      {
+        "id": "rename-action-2",
+        "kind": "action",
+        "anyOf": [
+          "rename",
+          "filename"
+        ]
+      },
+      {
+        "id": "rename-object-3",
+        "kind": "object",
+        "anyOf": [
+          "vendor",
+          "merchant"
+        ]
+      }
+    ]
+  },
+  "helm-gap": {
+    "helm": [
+      {
+        "id": "helm-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "Kubernetes"
+        ]
+      },
+      {
+        "id": "helm-object-2",
+        "kind": "object",
+        "anyOf": [
+          "Helm chart",
+          "chart"
+        ]
+      },
+      {
+        "id": "helm-action-3",
+        "kind": "action",
+        "anyOf": [
+          "lint"
+        ]
+      },
+      {
+        "id": "helm-action-4",
+        "kind": "action",
+        "anyOf": [
+          "render",
+          "template"
+        ]
+      }
+    ]
+  },
+  "ceramic-gap": {
+    "crazing": [
+      {
+        "id": "crazing-object-1",
+        "kind": "object",
+        "anyOf": [
+          "ceramic glaze",
+          "glaze"
+        ]
+      },
+      {
+        "id": "crazing-check-2",
+        "kind": "check",
+        "anyOf": [
+          "crazing"
+        ]
+      },
+      {
+        "id": "crazing-action-3",
+        "kind": "action",
+        "anyOf": [
+          "thermal expansion",
+          "expansion coefficient"
+        ]
+      }
+    ]
+  },
+  "identity-delivery": {
+    "extract": [
+      {
+        "id": "extract-object-1",
+        "kind": "object",
+        "anyOf": [
+          "brand guidelines",
+          "brand context"
+        ]
+      },
+      {
+        "id": "extract-action-2",
+        "kind": "action",
+        "anyOf": [
+          "extract",
+          "palette"
+        ]
+      }
+    ],
+    "tokens": [
+      {
+        "id": "tokens-format-1",
+        "kind": "format",
+        "anyOf": [
+          "CSS"
+        ]
+      },
+      {
+        "id": "tokens-object-2",
+        "kind": "object",
+        "anyOf": [
+          "semantic tokens",
+          "tokens"
+        ]
+      },
+      {
+        "id": "tokens-object-3",
+        "kind": "object",
+        "anyOf": [
+          "components",
+          "component"
+        ]
+      }
+    ],
+    "contrast": [
+      {
+        "id": "contrast-object-1",
+        "kind": "object",
+        "anyOf": [
+          "text contrast",
+          "contrast"
+        ]
+      },
+      {
+        "id": "contrast-check-2",
+        "kind": "check",
+        "anyOf": [
+          "background",
+          "foreground"
+        ]
+      }
+    ],
+    "apple": [
+      {
+        "id": "apple-format-1",
+        "kind": "format",
+        "anyOf": [
+          "HTML"
+        ]
+      },
+      {
+        "id": "apple-object-2",
+        "kind": "object",
+        "anyOf": [
+          "Apple touch icon",
+          "touch icon"
+        ]
+      }
+    ]
+  },
+  "worktree-release": {
+    "isolate": [
+      {
+        "id": "isolate-platform-1",
+        "kind": "platform",
+        "anyOf": [
+          "Git"
+        ]
+      },
+      {
+        "id": "isolate-object-2",
+        "kind": "object",
+        "anyOf": [
+          "worktree",
+          "worktrees"
+        ]
+      },
+      {
+        "id": "isolate-action-3",
+        "kind": "action",
+        "anyOf": [
+          "new branch",
+          "branch"
+        ]
+      }
+    ],
+    "baseline": [
+      {
+        "id": "baseline-object-1",
+        "kind": "object",
+        "anyOf": [
+          "worktree",
+          "branch"
+        ]
+      },
+      {
+        "id": "baseline-check-2",
+        "kind": "check",
+        "anyOf": [
+          "baseline",
+          "clean tests"
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "id": "notes-object-1",
+        "kind": "object",
+        "anyOf": [
+          "release notes",
+          "changelog"
+        ]
+      },
+      {
+        "id": "notes-action-2",
+        "kind": "action",
+        "anyOf": [
+          "commits",
+          "commit history"
+        ]
+      }
+    ],
+    "rollback": [
+      {
+        "id": "rollback-object-1",
+        "kind": "object",
+        "anyOf": [
+          "blue-green",
+          "blue green"
+        ]
+      },
+      {
+        "id": "rollback-action-2",
+        "kind": "action",
+        "anyOf": [
+          "rollback",
+          "roll back"
+        ]
+      }
+    ]
+  },
+  "interview-readout": {
+    "guide": [
+      {
+        "id": "guide-object-1",
+        "kind": "object",
+        "anyOf": [
+          "interviews",
+          "interview guide"
+        ]
+      },
+      {
+        "id": "guide-action-2",
+        "kind": "action",
+        "anyOf": [
+          "open-ended",
+          "open questions"
+        ]
+      }
+    ],
+    "themes": [
+      {
+        "id": "themes-object-1",
+        "kind": "object",
+        "anyOf": [
+          "interviews",
+          "responses"
+        ]
+      },
+      {
+        "id": "themes-action-2",
+        "kind": "action",
+        "anyOf": [
+          "coding",
+          "code",
+          "themes"
+        ]
+      }
+    ],
+    "counter": [
+      {
+        "id": "counter-object-1",
+        "kind": "object",
+        "anyOf": [
+          "themes",
+          "hypothesis"
+        ]
+      },
+      {
+        "id": "counter-check-2",
+        "kind": "check",
+        "anyOf": [
+          "disconfirming",
+          "contradictory",
+          "contradict"
+        ]
+      }
+    ],
+    "deck": [
+      {
+        "id": "deck-format-1",
+        "kind": "format",
+        "anyOf": [
+          "PowerPoint",
+          "slide deck",
+          "presentation"
+        ]
+      },
+      {
+        "id": "deck-object-2",
+        "kind": "object",
+        "anyOf": [
+          "speaker notes",
+          "slide notes"
+        ]
+      }
+    ]
+  },
+  "receipt-report": {
+    "metadata": [
+      {
+        "id": "metadata-object-1",
+        "kind": "object",
+        "anyOf": [
+          "receipt",
+          "invoice"
+        ]
+      },
+      {
+        "id": "metadata-action-2",
+        "kind": "action",
+        "anyOf": [
+          "vendor",
+          "merchant"
+        ]
+      },
+      {
+        "id": "metadata-action-3",
+        "kind": "action",
+        "anyOf": [
+          "date"
+        ]
+      }
+    ],
+    "filing": [
+      {
+        "id": "filing-format-1",
+        "kind": "format",
+        "anyOf": [
+          "PDF"
+        ]
+      },
+      {
+        "id": "filing-action-2",
+        "kind": "action",
+        "anyOf": [
+          "rename",
+          "filename"
+        ]
+      },
+      {
+        "id": "filing-object-3",
+        "kind": "object",
+        "anyOf": [
+          "receipt",
+          "invoice"
+        ]
+      }
+    ],
+    "report": [
+      {
+        "id": "report-format-1",
+        "kind": "format",
+        "anyOf": [
+          "Word",
+          "DOCX"
+        ]
+      },
+      {
+        "id": "report-object-2",
+        "kind": "object",
+        "anyOf": [
+          "table"
+        ]
+      },
+      {
+        "id": "report-action-3",
+        "kind": "action",
+        "anyOf": [
+          "width",
+          "fixed width"
+        ]
+      }
+    ],
+    "render": [
+      {
+        "id": "render-object-1",
+        "kind": "object",
+        "anyOf": [
+          "Word",
+          "DOCX"
+        ]
+      },
+      {
+        "id": "render-action-2",
+        "kind": "action",
+        "anyOf": [
+          "render",
+          "convert"
+        ]
+      },
+      {
+        "id": "render-check-3",
+        "kind": "check",
+        "anyOf": [
+          "inspect",
+          "visual"
+        ]
+      }
+    ]
+  }
+}

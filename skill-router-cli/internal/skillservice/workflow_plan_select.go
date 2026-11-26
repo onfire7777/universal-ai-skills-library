@@ -65,10 +65,12 @@ func workflowSourceHeld(data []byte) bool {
 // "router" on their own also describe unrelated subjects.
 var skillTooling = regexp.MustCompile(`(?i)\b(?:skill[- ](?:router|routing|registry|catalog|discovery)|route to (?:a |an )?skill)\b`)
 
+var workAssessment = regexp.MustCompile(`(?i)\b(?:quality criteria|scoring (?:criteria|scales|rubrics)|acceptance (?:criteria|thresholds)|verification commands|code reviews?|pull requests?)\b`)
+
 var ordinaryTask = regexp.MustCompile(`(?i)\b(format|summarize|translate|edit|design|redesign|illustrate|visualize|explain|teach|proofread|calculate|reconcile|compare|review|measure|optimize|organize|analyse|analyze|diagnose|write|simplify|speed up|document|build|extract|validate)\b`)
 
 func workflowIntentAllowed(s string) bool {
-	return (workflowDomain.MatchString(s) || skillTooling.MatchString(s) || ordinaryTask.MatchString(s)) && !workflowOutOfScope(s)
+	return (workflowDomain.MatchString(s) || skillTooling.MatchString(s) || workAssessment.MatchString(s) || ordinaryTask.MatchString(s)) && !workflowOutOfScope(s)
 }
 func workflowRequestHeld(prompt string, reqs []WorkflowRequirement) bool {
 	if workflowOutOfScope(prompt) {
@@ -77,6 +79,16 @@ func workflowRequestHeld(prompt string, reqs []WorkflowRequirement) bool {
 	for _, r := range reqs {
 		if workflowOutOfScope(r.Text + " " + strings.Join(r.Skills, " ")) {
 			return true
+		}
+		for _, facet := range r.Facets {
+			if facet.Kind != "exclude" && workflowOutOfScope(strings.Join(facet.AnyOf, " ")) {
+				return true
+			}
+		}
+		for _, check := range r.Checks {
+			if workflowOutOfScope(check.Text) {
+				return true
+			}
 		}
 		for _, el := range r.Elements {
 			if workflowOutOfScope(strings.ReplaceAll(el.Skill, "-", " ")) {
@@ -135,7 +147,19 @@ func workflowBundleEligible(b *WorkflowBundle) bool {
 		return true
 	}
 	metadata := b.Description + " " + b.SourceDescription
-	return skillTooling.MatchString(metadata)
+	if skillTooling.MatchString(metadata) || workAssessment.MatchString(metadata) {
+		return true
+	}
+	// Catalog summaries sometimes describe a general method. Its own
+	// applicability section can still explicitly designate supported work.
+	if ordinaryTask.MatchString(b.SourceDescription) {
+		for _, e := range b.Elements {
+			if e.File == "SKILL.md" && e.Origins.AppliesWhen == "section text" && workflowDomain.MatchString(e.AppliesWhen) && !workflowOutOfScope(e.AppliesWhen) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // The requirement is the unit of retrieval. Search supporting files as well
@@ -321,6 +345,7 @@ var sourceBrand = regexp.MustCompile(`(?i)\b([a-z][a-z0-9.-]+)[’']s (?:officia
 var taskWorkflowHeading = regexp.MustCompile(`(?i)^(?:workflow|execution|method|implementation|how to design|heuristic evaluation|decision tree|procedure|quick start|steps|process|manual testing checklist)$`)
 var uxTask = regexp.MustCompile(`(?i)\b(usability|common tasks|user flows?|friction|task completion)\b`)
 
+var iosDevice = regexp.MustCompile(`(?i)\b(?:iphone|ipad)\b`)
 var scopedPlatform = regexp.MustCompile(`(?i)\b(ios|iphone|ipad|swiftui|uikit|android|jetpack|salesforce|shopify|wordpress|kubernetes|terraform|figma|storybook|unity|unreal)\b`)
 var diagnoseIntent = regexp.MustCompile(`(?i)\b(find (?:out )?why|determine why|root cause|diagnos(?:e|is)|investigate|debug|why.{1,30}(?:fails?|broke|crash))\b`)
 var languageName = regexp.MustCompile(`(?i)\b(python|pytest|typescript|jest|javascript|js|junit|java|golang|swift|rust|ruby|rspec|php|csharp|kotlin)\b`)
@@ -373,13 +398,26 @@ var docTopic = regexp.MustCompile(`(?i)\b(word (?:document|report|file)|microsof
 
 func platformSupported(in, task string) bool {
 	for _, p := range scopedPlatform.FindAllString(strings.ReplaceAll(strings.ReplaceAll(in, "-", " "), "_", " "), -1) {
+		if strings.EqualFold(p, "ios") && iosDevice.MatchString(task) {
+			continue
+		}
 		if !strings.Contains(strings.ToLower(task), strings.ToLower(p)) {
 			return false
 		}
 	}
 	return true
 }
+
+var excludedSubject = regexp.MustCompile(`(?i)\b(?:ignore|skip|discard|avoid|do not use|never apply)\s+(?:the\s+)?([a-zA-Z0-9_.-]+)`)
+
 func applicableElement(e WorkflowElement, r WorkflowRequirement) bool {
+	// Instructions to omit an observable cannot verify that observable.
+	// A request to omit it can still use the author's exclusion method.
+	for _, match := range excludedSubject.FindAllStringSubmatch(e.Title, -1) {
+		if slices.Contains(workflowWords(r.Text), strings.ToLower(match[1])) && !slices.ContainsFunc(excludedSubject.FindAllStringSubmatch(r.Text, -1), func(other []string) bool { return strings.EqualFold(other[1], match[1]) }) {
+			return false
+		}
+	}
 	if !usefulElement(e) || !platformSupported(e.File+" "+e.Title, r.Text) || !languagesAgree(e.Title, r.Text) {
 		return false
 	}
@@ -799,6 +837,10 @@ var productionTechniques = []struct {
 	{"validation", regexp.MustCompile(`(?i)\b(validate|validation|verify|audit|reconcil(?:e|iation))\b`)},
 }
 
+// A source can declare a domain-specific technique the router has never
+// encountered. Require a substantive section with an authored method label.
+var declaredTechnique = regexp.MustCompile(`(?i)^(?:method|technique|approach|test strategy|verification method|analysis method|pattern)(?:\s+[0-9]+)?\s*[:–—-]\s*([^:.;|]{3,80})$`)
+
 func workflowTechniques(r WorkflowRequirement, e WorkflowElement) []string {
 	rules := productionTechniques
 	if r.Kind == "verification" {
@@ -806,6 +848,11 @@ func workflowTechniques(r WorkflowRequirement, e WorkflowElement) []string {
 	}
 	scope := e.Title + " " + e.Purpose
 	var names []string
+	if e.EndLine > e.StartLine && strings.HasSuffix(e.Origins.Title, "heading") {
+		if match := declaredTechnique.FindStringSubmatch(e.Title); len(match) > 1 {
+			names = append(names, strings.ToLower(strings.TrimSpace(match[1])))
+		}
+	}
 	for _, rule := range rules {
 		if rule.source.MatchString(scope) {
 			names = append(names, rule.name)

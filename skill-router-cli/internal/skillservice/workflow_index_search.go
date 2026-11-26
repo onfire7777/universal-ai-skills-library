@@ -10,13 +10,19 @@ import (
 )
 
 type workflowSearchIndex struct {
-	once     sync.Once
-	terms    [][]string
-	docs     []workflowDoc
-	postings map[string][]workflowPosting
+	once      sync.Once
+	profiles  []procedureProfile
+	bodies    [][]string
+	positions map[string]map[string]int
+	terms     [][]string
+	docs      []workflowDoc
+	postings  map[string][]workflowPosting
 }
 
-type workflowDoc struct{ bundle, element int }
+type workflowDoc struct {
+	bundle, element int
+	vocabulary      string
+}
 type workflowPosting struct {
 	doc    int
 	weight uint8
@@ -107,17 +113,21 @@ func (idx *WorkflowIndex) Search(query, skill string, limit int) []WorkflowHit {
 	hits := make([]WorkflowHit, len(ranked))
 	for i, r := range ranked {
 		d := s.docs[r.id]
-		hits[i] = WorkflowHit{Element: idx.Bundles[d.bundle].Elements[d.element], Score: r.score, vocabulary: s.terms[d.bundle][d.element]}
+		hits[i] = WorkflowHit{Element: idx.Bundles[d.bundle].Elements[d.element], Score: r.score, vocabulary: d.vocabulary, body: s.bodies[d.bundle][d.element]}
 	}
 	return hits
 }
 
 func (s *workflowSearchIndex) build(bundles []WorkflowBundle) {
 	s.postings = map[string][]workflowPosting{}
+	s.positions = make(map[string]map[string]int, len(bundles))
 	for i, b := range bundles {
+		s.profiles = append(s.profiles, newProcedureProfile(&b))
+		s.positions[b.Skill] = map[string]int{}
 		for j, e := range b.Elements {
+			s.positions[b.Skill][workflowElementAddress(e)] = len(s.docs)
 			id := len(s.docs)
-			s.docs = append(s.docs, workflowDoc{i, j})
+			s.docs = append(s.docs, workflowDoc{bundle: i, element: j, vocabulary: s.terms[i][j]})
 			weights := map[string]uint8{}
 			add := func(words []string, w uint8) {
 				for _, word := range words {
@@ -139,13 +149,27 @@ func (s *workflowSearchIndex) build(bundles []WorkflowBundle) {
 			// Bundle descriptions help locate the entry point. Giving
 			// every sibling section the description would invent coverage.
 			if e.File == "SKILL.md" && (j == 0 || b.Elements[j-1].File != e.File) {
-				add(workflowWords(b.Description+" "+b.SourceDescription), 2)
-				// Preserve source-only anchors for the same entry point in planning.
-				s.terms[i][j] = workflowVocabulary(s.terms[i][j] + " " + b.SourceDescription)
+				authored := positiveDescription(b.SourceDescription)
+				add(workflowWords(positiveDescription(b.Description)+" "+authored), 2)
+				s.docs[id].vocabulary = workflowVocabulary(s.terms[i][j] + " " + authored)
 			}
 			for word, w := range weights {
 				s.postings[word] = append(s.postings[word], workflowPosting{id, w})
 			}
 		}
 	}
+}
+
+func (idx *WorkflowIndex) sourceText(e WorkflowElement) string {
+	s := idx.search
+	if s == nil {
+		return ""
+	}
+	s.once.Do(func() { s.build(idx.Bundles) })
+	id, ok := s.positions[e.Skill][workflowElementAddress(e)]
+	if !ok {
+		return ""
+	}
+	d := s.docs[id]
+	return s.bodies[d.bundle][d.element]
 }

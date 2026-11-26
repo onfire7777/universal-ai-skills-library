@@ -56,6 +56,11 @@ func toolDefs() []map[string]any {
 	strProp := func(desc string) map[string]any {
 		return map[string]any{"type": "string", "description": desc}
 	}
+	workflows := workflowTools()
+	for _, tool := range workflows {
+		// These tools inspect the local catalog and supplied evidence. They do not run workflow actions.
+		tool["annotations"] = map[string]any{"readOnlyHint": true, "destructiveHint": false, "openWorldHint": false}
+	}
 	return append([]map[string]any{
 		{"name": "route", "description": "Route a prompt to the single best-matching skill.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"prompt": strProp("user prompt")}, "required": []string{"prompt"}}},
@@ -74,7 +79,7 @@ func toolDefs() []map[string]any {
 				"budget":   map[string]any{"type": "integer", "minimum": 0, "description": "token budget for inline pipeline bodies"},
 				"pipeline": map[string]any{"type": "boolean", "description": "decompose a multi-step prompt into an ordered capability DAG (plan §3.6)"},
 			}, "anyOf": []map[string]any{{"required": []string{"prompt"}}, {"required": []string{"skills"}}}}},
-	}, workflowTools()...)
+	}, workflows...)
 }
 
 func jsonText(v any) (string, error) {

@@ -54,7 +54,7 @@ func codexHookResult(in io.Reader, out io.Writer) error {
 	}
 	hint := "no clear canonical skill matched."
 	if skillservice.RecommendWorkflowPlan(event.Prompt) {
-		hint = "plan this multi-part request with workflow_plan or skill-router skills workflow plan. Identify each deliverable, constraint, independent review and verification requirement."
+		hint = "plan this multi-part request with workflow_plan or skill-router skills workflow plan. Keep the original prompt, identify each deliverable and independent review, and use source facets for specific platform, format and action requirements. Give each acceptance check an ID and link its observed evidence."
 	} else {
 		route, err := skillservice.Route(event.Prompt, skillservice.RouteOptions{HookEvent: userPromptEvent})
 		switch {

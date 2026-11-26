@@ -1,0 +1,967 @@
+{
+  "sourceCommit": "f67232bdbd8e195b9c753dfb8bb6d9f37c8ada89",
+  "suiteSHA256": "6d7d9056e83eff003c628354e63812570e5b1c9eebcc495baf40b638c5a69d97",
+  "identity": {
+    "binarySHA256": "5237f4f80965e0bbb19f93006e773011c5b1f14affd7559d66549f4f9a4c1c2a",
+    "routerVersion": "skill-router version 2.4.1",
+    "manifestSHA256": "a601c1aed81e747fd20a56e651fee67cf975a4474b2acca99a78a84d279509d0"
+  },
+  "modes": {
+    "natural": {
+      "positiveCovered": 26,
+      "needed": 55,
+      "gapCorrect": 1,
+      "expectedGaps": 2,
+      "credited": 23,
+      "count": 44,
+      "nearMisses": 0,
+      "creditedElements": 38,
+      "elements": 96,
+      "allCriteria": 6,
+      "facetsSatisfied": 0,
+      "facetsReported": 0,
+      "cases": 24,
+      "singleFamilies": 18,
+      "groundedFamilies": 11,
+      "deepComplete": 0,
+      "deepCases": 4
+    },
+    "structured": {
+      "positiveCovered": 36,
+      "needed": 55,
+      "gapCorrect": 1,
+      "expectedGaps": 2,
+      "credited": 43,
+      "count": 72,
+      "nearMisses": 0,
+      "creditedElements": 65,
+      "elements": 153,
+      "allCriteria": 9,
+      "facetsSatisfied": 0,
+      "facetsReported": 0,
+      "cases": 24,
+      "singleFamilies": 18,
+      "groundedFamilies": 15,
+      "deepComplete": 2,
+      "deepCases": 4
+    }
+  },
+  "cases": [
+    {
+      "id": "favicon",
+      "mode": "natural",
+      "requirements": {
+        "ico": {
+          "status": "missing"
+        },
+        "touch": {
+          "status": "missing"
+        },
+        "links": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 3,
+      "uncreditedSkills": [
+        "gamified-app",
+        "html-ppt-course-module",
+        "mobile-app"
+      ]
+    },
+    {
+      "id": "favicon",
+      "mode": "structured",
+      "requirements": {
+        "ico": {
+          "status": "missing"
+        },
+        "touch": {
+          "status": "missing"
+        },
+        "links": {
+          "status": "supported",
+          "source": "favicon-gen/references/format-guide.md:310"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 5,
+      "uncreditedSkills": [
+        "favicon-gen",
+        "icon-set-generator",
+        "imagegen-frontend-mobile",
+        "impeccable"
+      ]
+    },
+    {
+      "id": "diagram",
+      "mode": "natural",
+      "requirements": {
+        "messages": {
+          "status": "missing"
+        },
+        "branches": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 1,
+      "uncreditedSkills": [
+        "draw-io"
+      ]
+    },
+    {
+      "id": "diagram",
+      "mode": "structured",
+      "requirements": {
+        "messages": {
+          "status": "missing"
+        },
+        "branches": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "mermaid-diagrams",
+        "typescript-e2e-testing"
+      ]
+    },
+    {
+      "id": "video",
+      "mode": "natural",
+      "requirements": {
+        "trim": {
+          "status": "missing"
+        },
+        "audio": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "discovery-interviews-surveys",
+        "tone"
+      ]
+    },
+    {
+      "id": "video",
+      "mode": "structured",
+      "requirements": {
+        "trim": {
+          "status": "supported",
+          "source": "video-editing/SKILL.md:78"
+        },
+        "audio": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "tone"
+      ]
+    },
+    {
+      "id": "word",
+      "mode": "natural",
+      "requirements": {
+        "break": {
+          "status": "missing"
+        },
+        "table": {
+          "status": "missing"
+        },
+        "render": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "typescript-expert",
+        "ux-audit"
+      ]
+    },
+    {
+      "id": "word",
+      "mode": "structured",
+      "requirements": {
+        "break": {
+          "status": "supported",
+          "source": "docx/SKILL.md:29"
+        },
+        "table": {
+          "status": "supported",
+          "source": "docx/SKILL.md:23"
+        },
+        "render": {
+          "status": "supported",
+          "source": "impeccable/reference/new-work.md:103"
+        }
+      },
+      "creditedContributions": 3,
+      "selectedContributions": 5,
+      "uncreditedSkills": [
+        "develop-web-game",
+        "ui-audit"
+      ]
+    },
+    {
+      "id": "slides",
+      "mode": "natural",
+      "requirements": {
+        "notes": {
+          "status": "supported",
+          "source": "html-ppt-pitch-deck/example.html:154"
+        },
+        "inspect": {
+          "status": "supported",
+          "source": "design/references/social-photos-design.md:215"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 4,
+      "uncreditedSkills": [
+        "develop-web-game",
+        "googleslides-automation"
+      ]
+    },
+    {
+      "id": "slides",
+      "mode": "structured",
+      "requirements": {
+        "notes": {
+          "status": "missing"
+        },
+        "inspect": {
+          "status": "supported",
+          "source": "design/references/social-photos-design.md:215"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "communication-storytelling"
+      ]
+    },
+    {
+      "id": "paired",
+      "mode": "natural",
+      "requirements": {
+        "test": {
+          "status": "missing"
+        },
+        "effect": {
+          "status": "supported",
+          "source": "statistical-analysis/references/reporting_standards.md:413"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "data-analyst-engine"
+      ]
+    },
+    {
+      "id": "paired",
+      "mode": "structured",
+      "requirements": {
+        "test": {
+          "status": "missing"
+        },
+        "effect": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "chain-estimation-decision-storytelling",
+        "kill-criteria-exit-ramps"
+      ]
+    },
+    {
+      "id": "pagination",
+      "mode": "natural",
+      "requirements": {
+        "cursor": {
+          "status": "supported",
+          "source": "supabase-postgres-best-practices/AGENTS.md:1148"
+        },
+        "plan": {
+          "status": "supported",
+          "source": "sql-optimization-patterns/SKILL.md:23"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 3,
+      "uncreditedSkills": [
+        "tuner"
+      ]
+    },
+    {
+      "id": "pagination",
+      "mode": "structured",
+      "requirements": {
+        "cursor": {
+          "status": "missing"
+        },
+        "plan": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "caveman-compress",
+        "mobile-design"
+      ]
+    },
+    {
+      "id": "pytest",
+      "mode": "natural",
+      "requirements": {
+        "env": {
+          "status": "missing"
+        },
+        "cases": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 0,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "pytest",
+      "mode": "structured",
+      "requirements": {
+        "env": {
+          "status": "supported",
+          "source": "python-testing-patterns/SKILL.md:420"
+        },
+        "cases": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 1,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "git-notes",
+      "mode": "natural",
+      "requirements": {
+        "range": {
+          "status": "supported",
+          "source": "multi-repo-git-ops/SKILL.md:307"
+        },
+        "group": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 3,
+      "uncreditedSkills": [
+        "tlc-spec-driven"
+      ]
+    },
+    {
+      "id": "git-notes",
+      "mode": "structured",
+      "requirements": {
+        "range": {
+          "status": "supported",
+          "source": "harvest/references/report-templates.md:130"
+        },
+        "group": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 3,
+      "uncreditedSkills": [
+        "inspired-product"
+      ]
+    },
+    {
+      "id": "ios",
+      "mode": "natural",
+      "requirements": {
+        "type": {
+          "status": "supported",
+          "source": "ios-hig-design/SKILL.md:59"
+        },
+        "reader": {
+          "status": "supported",
+          "source": "impeccable/reference/critique-rubric.md:383"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 2,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "ios",
+      "mode": "structured",
+      "requirements": {
+        "type": {
+          "status": "supported",
+          "source": "ios-hig-design/SKILL.md:198"
+        },
+        "reader": {
+          "status": "supported",
+          "source": "uiux-design-review/SKILL.md:148"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 2,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "unit-economics",
+      "mode": "natural",
+      "requirements": {
+        "margin": {
+          "status": "supported",
+          "source": "saas-economics-efficiency-metrics/SKILL.md:176"
+        },
+        "payback": {
+          "status": "supported",
+          "source": "acquisition-channel-advisor/SKILL.md:133"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 2,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "unit-economics",
+      "mode": "structured",
+      "requirements": {
+        "margin": {
+          "status": "missing"
+        },
+        "payback": {
+          "status": "supported",
+          "source": "acquisition-channel-advisor/SKILL.md:133"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 4,
+      "uncreditedSkills": [
+        "predictable-revenue",
+        "saas-economics-efficiency-metrics",
+        "saas-revenue-growth-metrics"
+      ]
+    },
+    {
+      "id": "roadmap",
+      "mode": "natural",
+      "requirements": {
+        "rank": {
+          "status": "supported",
+          "source": "prioritization-advisor/SKILL.md:192"
+        },
+        "uncertainty": {
+          "status": "supported",
+          "source": "prioritization-advisor/SKILL.md:200"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 1,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "roadmap",
+      "mode": "structured",
+      "requirements": {
+        "rank": {
+          "status": "supported",
+          "source": "prioritization-advisor/SKILL.md:192"
+        },
+        "uncertainty": {
+          "status": "supported",
+          "source": "prioritization-advisor/SKILL.md:318"
+        }
+      },
+      "creditedContributions": 3,
+      "selectedContributions": 3,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "tutoring",
+      "mode": "natural",
+      "requirements": {
+        "diagnose": {
+          "status": "missing"
+        },
+        "fade": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 1,
+      "uncreditedSkills": [
+        "jobs-to-be-done"
+      ]
+    },
+    {
+      "id": "tutoring",
+      "mode": "structured",
+      "requirements": {
+        "diagnose": {
+          "status": "supported",
+          "source": "socratic-teaching-scaffolds/resources/evaluators/rubric_socratic_teaching_scaffolds.json:144"
+        },
+        "fade": {
+          "status": "supported",
+          "source": "socratic-teaching-scaffolds/SKILL.md:137"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 2,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "workshop",
+      "mode": "natural",
+      "requirements": {
+        "diverge": {
+          "status": "supported",
+          "source": "facilitation-patterns/SKILL.md:115"
+        },
+        "cluster": {
+          "status": "supported",
+          "source": "facilitation-patterns/SKILL.md:115"
+        },
+        "vote": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 1,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "workshop",
+      "mode": "structured",
+      "requirements": {
+        "diverge": {
+          "status": "missing"
+        },
+        "cluster": {
+          "status": "supported",
+          "source": "brainstorm-diverge-converge/resources/template.md:189"
+        },
+        "vote": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 3,
+      "uncreditedSkills": [
+        "brainstorm-diverge-converge"
+      ]
+    },
+    {
+      "id": "evidence",
+      "mode": "natural",
+      "requirements": {
+        "opposing": {
+          "status": "supported",
+          "source": "causal-inference-root-cause/resources/template.md:68"
+        },
+        "quality": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 1,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "evidence",
+      "mode": "structured",
+      "requirements": {
+        "opposing": {
+          "status": "supported",
+          "source": "environmental-scanning-foresight/resources/methodology.md:120"
+        },
+        "quality": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 3,
+      "uncreditedSkills": [
+        "retrieval-search-orchestration",
+        "scientific-critical-thinking"
+      ]
+    },
+    {
+      "id": "email-layout",
+      "mode": "natural",
+      "requirements": {
+        "layout": {
+          "status": "missing"
+        },
+        "cta": {
+          "status": "supported",
+          "source": "email-marketing/SKILL.md:57"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 1,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "email-layout",
+      "mode": "structured",
+      "requirements": {
+        "layout": {
+          "status": "supported",
+          "source": "pptx-html-fidelity-audit/SKILL.md:81"
+        },
+        "cta": {
+          "status": "supported",
+          "source": "email-marketing/SKILL.md:57"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 3,
+      "uncreditedSkills": [
+        "email-marketing"
+      ]
+    },
+    {
+      "id": "browser-game",
+      "mode": "natural",
+      "requirements": {
+        "state": {
+          "status": "missing"
+        },
+        "clock": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "canvas-design",
+        "typescript-unit-testing"
+      ]
+    },
+    {
+      "id": "browser-game",
+      "mode": "structured",
+      "requirements": {
+        "state": {
+          "status": "missing"
+        },
+        "clock": {
+          "status": "supported",
+          "source": "develop-web-game/SKILL.md:27"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "tone"
+      ]
+    },
+    {
+      "id": "invoice-archive",
+      "mode": "natural",
+      "requirements": {
+        "extract": {
+          "status": "supported",
+          "source": "invoice-organizer/SKILL.md:82"
+        },
+        "rename": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 1,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "invoice-archive",
+      "mode": "structured",
+      "requirements": {
+        "extract": {
+          "status": "supported",
+          "source": "invoice-organizer/SKILL.md:82"
+        },
+        "rename": {
+          "status": "supported",
+          "source": "invoice-organizer/SKILL.md:23"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 2,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "helm-gap",
+      "mode": "natural",
+      "requirements": {
+        "helm": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "implementing-mtls-for-zero-trust-services",
+        "release-it"
+      ]
+    },
+    {
+      "id": "helm-gap",
+      "mode": "structured",
+      "requirements": {
+        "helm": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 1,
+      "uncreditedSkills": [
+        "performance-testing"
+      ]
+    },
+    {
+      "id": "ceramic-gap",
+      "mode": "natural",
+      "requirements": {
+        "crazing": {
+          "status": "declared-gap"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 0,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "ceramic-gap",
+      "mode": "structured",
+      "requirements": {
+        "crazing": {
+          "status": "declared-gap"
+        }
+      },
+      "creditedContributions": 0,
+      "selectedContributions": 0,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "identity-delivery",
+      "mode": "natural",
+      "requirements": {
+        "extract": {
+          "status": "missing"
+        },
+        "tokens": {
+          "status": "supported",
+          "source": "design-system-starter/SKILL.md:588"
+        },
+        "contrast": {
+          "status": "supported",
+          "source": "design-system-starter/checklists/design-system-checklist.md:20"
+        },
+        "apple": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 4,
+      "uncreditedSkills": [
+        "brand",
+        "brand-analyzer"
+      ]
+    },
+    {
+      "id": "identity-delivery",
+      "mode": "structured",
+      "requirements": {
+        "extract": {
+          "status": "missing"
+        },
+        "tokens": {
+          "status": "supported",
+          "source": "design-system/SKILL.md:32"
+        },
+        "contrast": {
+          "status": "supported",
+          "source": "openclaw-color-palette/SKILL.md:101"
+        },
+        "apple": {
+          "status": "supported",
+          "source": "favicon-gen/SKILL.md:79"
+        }
+      },
+      "creditedContributions": 4,
+      "selectedContributions": 7,
+      "uncreditedSkills": [
+        "banner-design",
+        "color-palette",
+        "design"
+      ]
+    },
+    {
+      "id": "worktree-release",
+      "mode": "natural",
+      "requirements": {
+        "isolate": {
+          "status": "missing"
+        },
+        "baseline": {
+          "status": "supported",
+          "source": "using-git-worktrees/SKILL.md:120"
+        },
+        "notes": {
+          "status": "missing"
+        },
+        "rollback": {
+          "status": "supported",
+          "source": "release-it/SKILL.md:111"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 2,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "worktree-release",
+      "mode": "structured",
+      "requirements": {
+        "isolate": {
+          "status": "supported",
+          "source": "using-git-worktrees/SKILL.md:89"
+        },
+        "baseline": {
+          "status": "supported",
+          "source": "using-git-worktrees/SKILL.md:120"
+        },
+        "notes": {
+          "status": "supported",
+          "source": "harvest/references/report-templates.md:134"
+        },
+        "rollback": {
+          "status": "supported",
+          "source": "deployment-pipeline-design/SKILL.md:127"
+        }
+      },
+      "creditedContributions": 6,
+      "selectedContributions": 7,
+      "uncreditedSkills": [
+        "role-switch"
+      ]
+    },
+    {
+      "id": "interview-readout",
+      "mode": "natural",
+      "requirements": {
+        "guide": {
+          "status": "supported",
+          "source": "discovery-interviews-surveys/resources/evaluators/rubric_discovery_interviews_surveys.json:16"
+        },
+        "themes": {
+          "status": "supported",
+          "source": "discovery-interviews-surveys/resources/evaluators/rubric_discovery_interviews_surveys.json:54"
+        },
+        "counter": {
+          "status": "missing"
+        },
+        "deck": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 1,
+      "selectedContributions": 2,
+      "uncreditedSkills": [
+        "html-ppt-weekly-report"
+      ]
+    },
+    {
+      "id": "interview-readout",
+      "mode": "structured",
+      "requirements": {
+        "guide": {
+          "status": "supported",
+          "source": "discovery-interviews-surveys/resources/template.md:38"
+        },
+        "themes": {
+          "status": "supported",
+          "source": "discovery-interviews-surveys/resources/methodology.md:56"
+        },
+        "counter": {
+          "status": "supported",
+          "source": "deep-research-scholarly-analysis-engine/SKILL.md:165"
+        },
+        "deck": {
+          "status": "missing"
+        }
+      },
+      "creditedContributions": 3,
+      "selectedContributions": 4,
+      "uncreditedSkills": [
+        "html-ppt-weekly-report"
+      ]
+    },
+    {
+      "id": "receipt-report",
+      "mode": "natural",
+      "requirements": {
+        "metadata": {
+          "status": "supported",
+          "source": "invoice-organizer/SKILL.md:82"
+        },
+        "filing": {
+          "status": "supported",
+          "source": "invoice-organizer/SKILL.md:113"
+        },
+        "report": {
+          "status": "missing"
+        },
+        "render": {
+          "status": "supported",
+          "source": "impeccable/agents/impeccable_motion_reviewer.toml:1"
+        }
+      },
+      "creditedContributions": 2,
+      "selectedContributions": 2,
+      "uncreditedSkills": []
+    },
+    {
+      "id": "receipt-report",
+      "mode": "structured",
+      "requirements": {
+        "metadata": {
+          "status": "supported",
+          "source": "invoice-organizer/SKILL.md:82"
+        },
+        "filing": {
+          "status": "supported",
+          "source": "invoice-organizer/SKILL.md:113"
+        },
+        "report": {
+          "status": "supported",
+          "source": "docx/SKILL.md:23"
+        },
+        "render": {
+          "status": "supported",
+          "source": "impeccable/agents/impeccable_motion_reviewer.toml:1"
+        }
+      },
+      "creditedContributions": 5,
+      "selectedContributions": 5,
+      "uncreditedSkills": []
+    }
+  ]
+}

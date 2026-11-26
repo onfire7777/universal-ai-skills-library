@@ -1,0 +1,1036 @@
+[
+  {
+    "id": "favicon",
+    "family": "Brand assets",
+    "prompt": "Package our logo for browser tabs and iPhone home screens, then show the HTML needed to connect both assets.",
+    "requirements": [
+      {
+        "id": "ico",
+        "kind": "deliverable",
+        "text": "Generate a browser-tab favicon package from the logo.",
+        "stage": "browser|favicon|tab",
+        "source": [
+          [
+            "favicon\\.ico",
+            "16.{0,5}16|32.{0,5}32|multi.?size"
+          ]
+        ],
+        "witness": "favicon-gen/SKILL.md"
+      },
+      {
+        "id": "touch",
+        "kind": "deliverable",
+        "text": "Provide the iPhone home-screen icon at the required resolution.",
+        "stage": "iphone|home.screen|touch",
+        "source": [
+          [
+            "apple.touch|iOS",
+            "180.{0,5}180"
+          ]
+        ],
+        "witness": "favicon-gen/SKILL.md"
+      },
+      {
+        "id": "links",
+        "kind": "deliverable",
+        "text": "Wire the browser and Apple touch icons into the page head.",
+        "stage": "html|connect|link|page head",
+        "source": [
+          [
+            "<link",
+            "apple-touch-icon"
+          ]
+        ],
+        "witness": "favicon-gen/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Logo concept without browser or iOS icon output",
+      "candidate": "brand-analyzer|logo-design"
+    }
+  },
+  {
+    "id": "diagram",
+    "family": "Architecture communication",
+    "prompt": "Draw a Mermaid sequence for placing an order through a storefront and billing service. Show success and declined payment as separate branches.",
+    "requirements": [
+      {
+        "id": "messages",
+        "kind": "deliverable",
+        "text": "Draw the chronological messages between the storefront and billing service.",
+        "stage": "mermaid|sequence|message",
+        "source": [
+          [
+            "sequenceDiagram",
+            "participant|actor",
+            "->>"
+          ]
+        ],
+        "witness": "mermaid-diagrams/SKILL.md"
+      },
+      {
+        "id": "branches",
+        "kind": "deliverable",
+        "text": "Show success versus declined payment inside the sequence.",
+        "stage": "success|declin|branch",
+        "source": [
+          [
+            "\\balt\\b",
+            "\\belse\\b",
+            "\\bend\\b"
+          ]
+        ],
+        "witness": "mermaid-diagrams/references/sequence-diagrams.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Flowchart or class diagram in place of a sequence",
+      "candidate": "class diagram|flowchart"
+    }
+  },
+  {
+    "id": "video",
+    "family": "Video postproduction",
+    "prompt": "Trim the interview to the selected start and end times without re-encoding, then normalize the interview audio to -16 LUFS.",
+    "requirements": [
+      {
+        "id": "trim",
+        "kind": "deliverable",
+        "text": "Cut the selected time range without recompressing the video.",
+        "stage": "trim|cut|start.{0,25}end",
+        "source": [
+          [
+            "ffmpeg",
+            "\\s-ss\\s",
+            "-c(?:\\:v)? copy"
+          ]
+        ],
+        "witness": "video-editing/SKILL.md"
+      },
+      {
+        "id": "audio",
+        "kind": "deliverable",
+        "text": "Set interview audio integrated loudness to -16 LUFS.",
+        "stage": "audio|loudness|lufs",
+        "source": [
+          [
+            "ffmpeg",
+            "loudnorm.{0,35}-16"
+          ]
+        ],
+        "witness": "video-editing/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Transcription or publishing without video cutting or audio processing",
+      "candidate": "transcrib|podcast marketing"
+    }
+  },
+  {
+    "id": "word",
+    "family": "Word document production",
+    "prompt": "Create a Word handbook with a page break between chapters and fixed-width tables, then render it and inspect every page for clipped text.",
+    "requirements": [
+      {
+        "id": "break",
+        "kind": "deliverable",
+        "text": "Insert explicit chapter breaks in the Word document.",
+        "stage": "page break|chapter",
+        "source": [
+          [
+            "PageBreak",
+            "Paragraph"
+          ],
+          [
+            "page_break|w:br",
+            "page"
+          ]
+        ],
+        "witness": "docx/SKILL.md"
+      },
+      {
+        "id": "table",
+        "kind": "deliverable",
+        "text": "Use stable widths for the Word tables and their cells.",
+        "stage": "width|tables?",
+        "source": [
+          [
+            "columnWidths|tblGrid",
+            "cell|tcW",
+            "DXA|twip"
+          ]
+        ],
+        "witness": "docx/SKILL.md"
+      },
+      {
+        "id": "render",
+        "kind": "verification",
+        "text": "Render the finished document and visually inspect the pages.",
+        "stage": "render|inspect|clip",
+        "source": [
+          [
+            "render|convert",
+            "png|pdf|page image",
+            "inspect|look|visual|review"
+          ]
+        ],
+        "witness": "docx/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Plain text guides without Word layout controls",
+      "candidate": "markdown|plain text"
+    }
+  },
+  {
+    "id": "slides",
+    "family": "Slide production",
+    "prompt": "Update the speaker notes in an existing PowerPoint deck, then render the slides as thumbnails and inspect for overlapping text.",
+    "requirements": [
+      {
+        "id": "notes",
+        "kind": "deliverable",
+        "text": "Edit notes for the relevant slide while retaining the PowerPoint deck.",
+        "stage": "speaker|notes",
+        "source": [
+          [
+            "notesSlide|speaker notes",
+            "\\.xml|addNotes|\\.notes"
+          ]
+        ],
+        "witness": "pptx/SKILL.md"
+      },
+      {
+        "id": "inspect",
+        "kind": "verification",
+        "text": "Inspect rendered slide thumbnails for layout overlap.",
+        "stage": "thumbnail|overlap|inspect",
+        "source": [
+          [
+            "thumbnail|render.{0,25}slides?",
+            "overlap|layout|clipp"
+          ]
+        ],
+        "witness": "pptx/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "HTML slides without editable PowerPoint speaker notes",
+      "candidate": "html-ppt|frontend-slides"
+    }
+  },
+  {
+    "id": "paired",
+    "family": "Statistical inference",
+    "prompt": "Compare skewed before-and-after scores from the same people with a paired nonparametric test, then report the size of the effect and its confidence interval.",
+    "requirements": [
+      {
+        "id": "test",
+        "kind": "deliverable",
+        "text": "Choose the matched-pair nonparametric test for skewed measurements.",
+        "stage": "paired|skew|same people",
+        "source": [
+          [
+            "wilcoxon.{0,35}signed.rank|signed.rank.{0,35}wilcoxon",
+            "paired|match|within.subject"
+          ]
+        ],
+        "witness": "statistical-analysis/SKILL.md"
+      },
+      {
+        "id": "effect",
+        "kind": "deliverable",
+        "text": "Report the effect estimate together with an interval quantifying its uncertainty.",
+        "stage": "effect|confidence|interval",
+        "source": [
+          [
+            "effect size|effect estimate",
+            "confidence interval|bootstrap interval"
+          ]
+        ],
+        "witness": "statistical-analysis/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Independent-samples tests used for matched observations",
+      "candidate": "independent samples|Mann.Whitney"
+    }
+  },
+  {
+    "id": "pagination",
+    "family": "Database performance",
+    "prompt": "Replace deep OFFSET pages in a PostgreSQL activity feed with keyset pagination, then compare the actual query plans using EXPLAIN ANALYZE.",
+    "requirements": [
+      {
+        "id": "cursor",
+        "kind": "deliverable",
+        "text": "Use a stable key or cursor to seek to the next page without a large OFFSET.",
+        "stage": "offset|keyset|cursor|paging|pagination",
+        "source": [
+          [
+            "cursor.based|keyset|seek pagination",
+            "\\bWHERE\\b|index|last.seen"
+          ]
+        ],
+        "witness": "sql-optimization-patterns/SKILL.md"
+      },
+      {
+        "id": "plan",
+        "kind": "verification",
+        "text": "Inspect PostgreSQL EXPLAIN ANALYZE output from the original and rewritten queries.",
+        "stage": "explain|actual query plan|compar",
+        "source": [
+          [
+            "EXPLAIN\\s+(?:\\([^)]*\\)\\s*)?ANALYZE|EXPLAIN\\s*\\(ANALYZE",
+            "actual|timing|execution|before|after"
+          ]
+        ],
+        "witness": "sql-optimization-patterns/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Offset-only or vendor connector setup",
+      "candidate": "offset.limit|automation"
+    }
+  },
+  {
+    "id": "pytest",
+    "family": "Software testing",
+    "prompt": "Test a Python configuration reader under both missing and overridden environment variables. Isolate the process environment and parameterize the cases with pytest.",
+    "requirements": [
+      {
+        "id": "env",
+        "kind": "deliverable",
+        "text": "Temporarily set and remove environment variables inside isolated Python tests.",
+        "stage": "environment|variables|isolate",
+        "source": [
+          [
+            "monkeypatch\\.(?:setenv|delenv)",
+            "test_|pytest"
+          ],
+          [
+            "patch\\.dict",
+            "os\\.environ"
+          ]
+        ],
+        "witness": "python-testing-patterns/SKILL.md"
+      },
+      {
+        "id": "cases",
+        "kind": "deliverable",
+        "text": "Parameterize the expected outcomes in pytest.",
+        "stage": "parameteri[sz]|cases|pytest",
+        "source": [
+          [
+            "pytest\\.mark\\.parametrize",
+            "expected|input|test_"
+          ]
+        ],
+        "witness": "python-testing-patterns/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "JavaScript test runners used in place of Python fixtures",
+      "candidate": "jest|vitest|typescript-unit"
+    }
+  },
+  {
+    "id": "git-notes",
+    "family": "Release communication",
+    "prompt": "Turn Git commits between two release tags into customer-facing release notes. Group enhancements and fixes separately and omit implementation-only chores.",
+    "requirements": [
+      {
+        "id": "range",
+        "kind": "deliverable",
+        "text": "Collect commits for the release range from version control.",
+        "stage": "git|tag|commit|range",
+        "source": [
+          [
+            "commits?|git log",
+            "tag|range|since|version"
+          ]
+        ],
+        "witness": "changelog-generator/SKILL.md"
+      },
+      {
+        "id": "group",
+        "kind": "deliverable",
+        "text": "Translate technical changes and organize fixes and new features for customers.",
+        "stage": "customer|group|fix|chores",
+        "source": [
+          [
+            "features?|enhancements?",
+            "fixes|bug fixes",
+            "user.friendly|customer|jargon|filters?|technical"
+          ]
+        ],
+        "witness": "changelog-generator/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Commit-message rewriting without release history or categorization",
+      "candidate": "caveman-commit"
+    }
+  },
+  {
+    "id": "ios",
+    "family": "Mobile accessibility",
+    "prompt": "Make an iOS settings screen work at the largest Dynamic Type size, and ensure that VoiceOver announces meaningful labels for icon-only controls.",
+    "requirements": [
+      {
+        "id": "type",
+        "kind": "deliverable",
+        "text": "Support the largest Dynamic Type sizes in the iOS settings layout.",
+        "stage": "dynamic type|largest|font size",
+        "source": [
+          [
+            "Dynamic Type|ScaledMetric",
+            "largest|accessibility size|scale|scalab"
+          ]
+        ],
+        "witness": "ios-hig-design/SKILL.md"
+      },
+      {
+        "id": "reader",
+        "kind": "verification",
+        "text": "Check that VoiceOver exposes meaningful control labels or descriptions.",
+        "stage": "voiceover|icon.only|label",
+        "source": [
+          [
+            "VoiceOver|accessibilityLabel",
+            "label|description|announce"
+          ]
+        ],
+        "witness": "ios-hig-design/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Android-only screen-reader or font guidance",
+      "candidate": "talkback|android"
+    }
+  },
+  {
+    "id": "unit-economics",
+    "family": "Business analytics",
+    "prompt": "From our SaaS unit economics calculate gross margin using revenue and COGS, then calculate customer acquisition payback in months using monthly ARPU and margin.",
+    "requirements": [
+      {
+        "id": "margin",
+        "kind": "deliverable",
+        "text": "Calculate gross margin using revenue and cost of goods sold.",
+        "stage": "gross margin|cogs|cost of goods",
+        "source": [
+          [
+            "COGS|cost of goods",
+            "revenue.{0,90}revenue|\\(revenue.{0,70}\\)\\s*/"
+          ]
+        ],
+        "witness": "finance-metrics-quickref/SKILL.md"
+      },
+      {
+        "id": "payback",
+        "kind": "deliverable",
+        "text": "Calculate monthly customer acquisition payback using ARPU and gross margin.",
+        "stage": "payback|arpu|acquisition",
+        "source": [
+          [
+            "payback|CAC",
+            "ARPU",
+            "gross margin"
+          ]
+        ],
+        "witness": "finance-metrics-quickref/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Presentation styling instead of margin/payback arithmetic",
+      "candidate": "slide-|visual identity"
+    }
+  },
+  {
+    "id": "roadmap",
+    "family": "Product planning",
+    "prompt": "Rank our backlog using reach, impact, confidence, and person-months of effort. Identify how a low-confidence estimate changes the resulting priority.",
+    "requirements": [
+      {
+        "id": "rank",
+        "kind": "deliverable",
+        "text": "Rank candidates by reach, impact, confidence and estimated effort.",
+        "stage": "rank|reach|impact|person.months",
+        "source": [
+          [
+            "reach.{0,35}impact.{0,35}confidence.{0,35}effort"
+          ]
+        ],
+        "witness": "prioritization-effort-impact/resources/methodology.md"
+      },
+      {
+        "id": "uncertainty",
+        "kind": "deliverable",
+        "text": "Interpret the role of lower confidence in the prioritization calculation.",
+        "stage": "confidence|estimate|priorit",
+        "source": [
+          [
+            "confidence",
+            "low|50%|medium|80%|evidence|certainty"
+          ],
+          [
+            "reach.{0,30}impact.{0,30}confidence.{0,30}(?:/|÷).{0,15}effort"
+          ]
+        ],
+        "witness": "prioritization-effort-impact/resources/methodology.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Sorting tasks without the reach-confidence-effort model",
+      "candidate": "todoist|calendar"
+    }
+  },
+  {
+    "id": "tutoring",
+    "family": "Instructional design",
+    "prompt": "Tutor a student who confuses correlation with causation. Use questions to uncover their misconception and fade worked examples until they can solve a fresh problem independently.",
+    "requirements": [
+      {
+        "id": "diagnose",
+        "kind": "deliverable",
+        "text": "Ask diagnostic questions to expose the learner’s mistaken mental model.",
+        "stage": "question|misconception|confus",
+        "source": [
+          [
+            "misconception|mental model",
+            "question|prompt"
+          ]
+        ],
+        "witness": "socratic-teaching-scaffolds/SKILL.md"
+      },
+      {
+        "id": "fade",
+        "kind": "deliverable",
+        "text": "Gradually fade worked examples and hints toward independent transfer.",
+        "stage": "fad|worked example|independen",
+        "source": [
+          [
+            "fading|fade|progressively remove",
+            "example|hint",
+            "independent|practice|challenge"
+          ]
+        ],
+        "witness": "socratic-teaching-scaffolds/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Answer delivery without diagnosis and scaffolding",
+      "candidate": "answer generator"
+    }
+  },
+  {
+    "id": "workshop",
+    "family": "Team facilitation",
+    "prompt": "Design a 45-minute team workshop to generate ideas silently and cluster similar ideas, then converge on a shortlist with dot voting.",
+    "requirements": [
+      {
+        "id": "diverge",
+        "kind": "deliverable",
+        "text": "Run silent individual ideation before the group discusses ideas.",
+        "stage": "silent|generate ideas|ideation",
+        "source": [
+          [
+            "silent|individual",
+            "brainstorm|ideation|sticky"
+          ]
+        ],
+        "witness": "facilitation-patterns/SKILL.md"
+      },
+      {
+        "id": "cluster",
+        "kind": "deliverable",
+        "text": "Group related ideas into themes using affinity clustering.",
+        "stage": "cluster|similar|affinity",
+        "source": [
+          [
+            "affinity|cluster",
+            "ideas|themes|notes"
+          ]
+        ],
+        "witness": "facilitation-patterns/SKILL.md"
+      },
+      {
+        "id": "vote",
+        "kind": "deliverable",
+        "text": "Use dot voting to converge on a shortlist.",
+        "stage": "dot vot|shortlist|converg",
+        "source": [
+          [
+            "dot.?vot|multi.?vot",
+            "priority|prioriti|converg|quick win|shortlist|select"
+          ]
+        ],
+        "witness": "facilitation-patterns/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Facilitation software setup without workshop technique",
+      "candidate": "automation"
+    }
+  },
+  {
+    "id": "evidence",
+    "family": "Research writing",
+    "prompt": "Build an evidence map for a disputed historical claim. Separate supporting from contradicting sources, rate their quality, and identify what evidence is still missing.",
+    "requirements": [
+      {
+        "id": "opposing",
+        "kind": "deliverable",
+        "text": "Map corroborating and contradicting evidence to the historical claim.",
+        "stage": "evidence map|support|contradict|disputed",
+        "source": [
+          [
+            "evidence (?:for|supporting)|supporting.{0,20}(?:claim|evidence|source)",
+            "evidence against|contradict"
+          ]
+        ],
+        "witness": "research-claim-map/SKILL.md"
+      },
+      {
+        "id": "quality",
+        "kind": "deliverable",
+        "text": "Distinguish primary from secondary evidence and identify knowledge gaps.",
+        "stage": "quality|missing|gaps",
+        "source": [
+          [
+            "primary|first.hand",
+            "secondary|second.hand",
+            "gaps?|limitation|quality|strength"
+          ]
+        ],
+        "witness": "research-claim-map/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Copywriting polish or topic suggestions without evidence assessment",
+      "candidate": "copywriting|headline"
+    }
+  },
+  {
+    "id": "email-layout",
+    "family": "Email production",
+    "prompt": "Build a single-column HTML launch email that works in legacy mail clients. Include one clear call-to-action and an unsubscribe link in the footer.",
+    "requirements": [
+      {
+        "id": "layout",
+        "kind": "deliverable",
+        "text": "Build a centered, single-column HTML email with a client-compatible layout.",
+        "stage": "html|legacy|single.column",
+        "source": [
+          [
+            "single.column|centered",
+            "table|inline.{0,12}(?:CSS|style)"
+          ]
+        ],
+        "witness": "email-marketing/SKILL.md"
+      },
+      {
+        "id": "cta",
+        "kind": "deliverable",
+        "text": "Include the primary call-to-action and the unsubscribe footer.",
+        "stage": "call.to.action|unsubscribe|footer",
+        "source": [
+          [
+            "primary CTA|call.to.action",
+            "unsubscribe"
+          ]
+        ],
+        "witness": "email-marketing/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Web page design lacking email-specific markup",
+      "candidate": "landing.page|dashboard"
+    }
+  },
+  {
+    "id": "browser-game",
+    "family": "Game QA",
+    "prompt": "Give a canvas game a machine-readable text view of the current game state, then advance the simulation by a known number of milliseconds for deterministic playtests.",
+    "requirements": [
+      {
+        "id": "state",
+        "kind": "deliverable",
+        "text": "Expose the canvas game state as text so the browser playtest can inspect it.",
+        "stage": "game state|text view|machine.readable",
+        "source": [
+          [
+            "render_game_to_text",
+            "state|JSON|canvas"
+          ]
+        ],
+        "witness": "develop-web-game/SKILL.md"
+      },
+      {
+        "id": "clock",
+        "kind": "verification",
+        "text": "Drive a deterministic game clock by a known elapsed interval in tests.",
+        "stage": "milliseconds|determin|advance",
+        "source": [
+          [
+            "advanceTime\\s*\\(|advanceTime\\b",
+            "determin|millisecond|\\bms\\b"
+          ]
+        ],
+        "witness": "develop-web-game/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Generic game narrative or real-time screenshot guidance without a test hook",
+      "candidate": "game narrative|worldbuilding"
+    }
+  },
+  {
+    "id": "invoice-archive",
+    "family": "Administrative operations",
+    "prompt": "Read the vendor and invoice date from a folder of receipts, then rename each PDF consistently using the date, vendor and purchased service.",
+    "requirements": [
+      {
+        "id": "extract",
+        "kind": "deliverable",
+        "text": "Extract the vendor and date fields from invoices or receipts.",
+        "stage": "vendor|receipt|invoice date",
+        "source": [
+          [
+            "invoice|receipt",
+            "(?:vendor|company|merchant)",
+            "\\bdate\\b"
+          ]
+        ],
+        "witness": "invoice-organizer/SKILL.md"
+      },
+      {
+        "id": "rename",
+        "kind": "deliverable",
+        "text": "Rename invoices consistently with date, vendor, and product or service.",
+        "stage": "rename|filename|consisten|service",
+        "source": [
+          [
+            "YYYY-MM-DD|ISO.{0,20}date",
+            "vendor|supplier",
+            "product|service|description"
+          ]
+        ],
+        "witness": "invoice-organizer/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Generating new invoices without receipts extraction or filename rules",
+      "candidate": "invoice generator|create an invoice"
+    }
+  },
+  {
+    "id": "helm-gap",
+    "family": "Infrastructure gap",
+    "prompt": "Lint this Kubernetes Helm chart and render its templates with the staging values file before deployment.",
+    "requirements": [
+      {
+        "id": "helm",
+        "kind": "verification",
+        "text": "Lint and render the Kubernetes chart with staging overrides.",
+        "stage": "kubernetes|helm|chart|staging|templates?",
+        "source": [
+          [
+            "helm\\s+lint",
+            "helm\\s+template|helm\\s+install.{0,80}--dry-run"
+          ]
+        ],
+        "witness": null,
+        "expected": "gap"
+      }
+    ],
+    "nearMiss": {
+      "description": "Strategic/financial planning called Helm",
+      "candidate": "^helm/|financial.model"
+    }
+  },
+  {
+    "id": "ceramic-gap",
+    "family": "Craft diagnostics gap",
+    "prompt": "Write a report diagnosing ceramic glaze crazing using the expansion coefficients of the fired clay body and glaze.",
+    "requirements": [
+      {
+        "id": "crazing",
+        "kind": "verification",
+        "text": "Diagnose glaze crazing from the specific clay and glaze thermal expansion measurements.",
+        "stage": "ceramic|glaze|crazing|expansion",
+        "source": [
+          [
+            "crazing",
+            "glaze",
+            "thermal expansion|expansion coefficient"
+          ]
+        ],
+        "witness": null,
+        "expected": "gap"
+      }
+    ],
+    "nearMiss": {
+      "description": "Software troubleshooting substituted for clay/glaze diagnosis",
+      "candidate": "typescript|debug|software"
+    }
+  },
+  {
+    "id": "identity-delivery",
+    "family": "Brand-to-implementation delivery",
+    "prompt": "Read the existing brand guidelines and extract the current palette. Translate it into primitive, semantic and component tokens for CSS, verify text contrast against the background, and supply the HTML link for the Apple touch icon.",
+    "requirements": [
+      {
+        "id": "extract",
+        "kind": "deliverable",
+        "text": "Extract the existing brand palette from the supplied guidelines.",
+        "stage": "guidelines|extract|palette",
+        "source": [
+          [
+            "inject-brand-context|extract-colors",
+            "--json|--palette|guideline"
+          ]
+        ],
+        "witness": "brand/SKILL.md"
+      },
+      {
+        "id": "tokens",
+        "kind": "deliverable",
+        "text": "Represent palette values as primitive, semantic and component tokens in CSS.",
+        "stage": "semantic|primitive|tokens?",
+        "source": [
+          [
+            "primitive",
+            "semantic",
+            "component"
+          ]
+        ],
+        "witness": "design-system/SKILL.md"
+      },
+      {
+        "id": "contrast",
+        "kind": "verification",
+        "text": "Measure foreground/background text contrast before sign-off.",
+        "stage": "contrast|foreground|background",
+        "source": [
+          [
+            "contrast",
+            "4\\.5.?[:/]?1|contrastRatio|contrast.ratio"
+          ]
+        ],
+        "witness": "accessibility-compliance/SKILL.md"
+      },
+      {
+        "id": "apple",
+        "kind": "deliverable",
+        "text": "Supply the HTML link element connecting the Apple touch icon.",
+        "stage": "apple|touch icon",
+        "source": [
+          [
+            "<link",
+            "apple-touch-icon"
+          ]
+        ],
+        "witness": "favicon-gen/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Brand strategy without the requested observable artifacts",
+      "candidate": "brand narrative|storybrand"
+    }
+  },
+  {
+    "id": "worktree-release",
+    "family": "Change delivery",
+    "prompt": "Isolate the change in a new Git worktree and confirm the baseline tests pass. After the release, derive user-facing notes from the included commits and specify how to roll back a blue-green deployment.",
+    "requirements": [
+      {
+        "id": "isolate",
+        "kind": "deliverable",
+        "text": "Isolate the change by making a new branch in a Git worktree.",
+        "stage": "worktree|isolate",
+        "source": [
+          [
+            "git worktree add",
+            "(?: -b |branch)"
+          ]
+        ],
+        "witness": "using-git-worktrees/SKILL.md"
+      },
+      {
+        "id": "baseline",
+        "kind": "verification",
+        "text": "Verify a clean test baseline in the isolated worktree.",
+        "stage": "baseline|tests pass",
+        "source": [
+          [
+            "baseline",
+            "tests?|verify"
+          ]
+        ],
+        "witness": "using-git-worktrees/SKILL.md"
+      },
+      {
+        "id": "notes",
+        "kind": "deliverable",
+        "text": "Convert included release commits into user-facing notes.",
+        "stage": "release|user.facing|notes|commits",
+        "source": [
+          [
+            "commits?",
+            "user.friendly|user.facing|customer|jargon"
+          ]
+        ],
+        "witness": "changelog-generator/SKILL.md"
+      },
+      {
+        "id": "rollback",
+        "kind": "deliverable",
+        "text": "Specify the traffic or deployment switch for a blue-green rollback.",
+        "stage": "rollback|roll back|blue.green",
+        "source": [
+          [
+            "blue.green",
+            "rollback|roll back",
+            "traffic|switch|service|route"
+          ]
+        ],
+        "witness": "deployment-pipeline-design/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "GitHub connector setup or blanket deployment recipes",
+      "candidate": "automation|deployment overview"
+    }
+  },
+  {
+    "id": "interview-readout",
+    "family": "Customer discovery",
+    "prompt": "Prepare an interview guide with open-ended, non-leading questions. Code the interviews into recurring themes, test them against disconfirming evidence, and create a slide deck with speaker notes for the research readout.",
+    "requirements": [
+      {
+        "id": "guide",
+        "kind": "deliverable",
+        "text": "Make an open-ended interview guide with neutral prompts.",
+        "stage": "interview guide|questions|non.leading|open.ended",
+        "source": [
+          [
+            "open.ended",
+            "questions?|interview guide"
+          ]
+        ],
+        "witness": "discovery-interviews-surveys/SKILL.md"
+      },
+      {
+        "id": "themes",
+        "kind": "deliverable",
+        "text": "Code the interviews systematically into themes.",
+        "stage": "themes?|coding|code the interviews",
+        "source": [
+          [
+            "thematic coding|code.{0,35}themes?|themes?.{0,35}coding",
+            "interviews?|quotes?|findings|responses"
+          ]
+        ],
+        "witness": "discovery-interviews-surveys/SKILL.md"
+      },
+      {
+        "id": "counter",
+        "kind": "verification",
+        "text": "Seek and document evidence contradicting the interview themes.",
+        "stage": "disconfirm|contradict|counter",
+        "source": [
+          [
+            "disconfirm|contradict",
+            "evidence|hypothes|theme|source"
+          ]
+        ],
+        "witness": "discovery-interviews-surveys/SKILL.md"
+      },
+      {
+        "id": "deck",
+        "kind": "deliverable",
+        "text": "Prepare PowerPoint slides with speaker notes for the research readout.",
+        "stage": "slides?|deck|speaker notes",
+        "source": [
+          [
+            "notesSlide|speaker notes",
+            "\\.xml|addNotes|\\.notes"
+          ]
+        ],
+        "witness": "pptx/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Sales scripts instead of research questions or evidence",
+      "candidate": "cold.call|sales script"
+    }
+  },
+  {
+    "id": "receipt-report",
+    "family": "Office reporting",
+    "prompt": "Extract vendor and transaction date from the receipts, rename the receipt PDFs consistently, add a fixed-width expense table to the Word report, and render the report to inspect every page.",
+    "requirements": [
+      {
+        "id": "metadata",
+        "kind": "deliverable",
+        "text": "Extract the vendor and transaction date from the receipts.",
+        "stage": "vendor|transaction date|receipts",
+        "source": [
+          [
+            "invoice|receipt",
+            "vendor|merchant|company",
+            "\\bdate\\b"
+          ]
+        ],
+        "witness": "invoice-organizer/SKILL.md"
+      },
+      {
+        "id": "filing",
+        "kind": "deliverable",
+        "text": "Rename the receipt PDFs using consistent date and vendor fields.",
+        "stage": "rename|consistent|filing",
+        "source": [
+          [
+            "YYYY-MM-DD|ISO.{0,20}date",
+            "vendor|supplier"
+          ]
+        ],
+        "witness": "invoice-organizer/SKILL.md"
+      },
+      {
+        "id": "report",
+        "kind": "deliverable",
+        "text": "Create the fixed-width expense table in the Word report.",
+        "stage": "fixed.width|word|expense table",
+        "source": [
+          [
+            "columnWidths|tblGrid",
+            "cell|tcW",
+            "DXA|twip"
+          ]
+        ],
+        "witness": "docx/SKILL.md"
+      },
+      {
+        "id": "render",
+        "kind": "verification",
+        "text": "Render the Word report and inspect it page by page.",
+        "stage": "render|inspect|every page",
+        "source": [
+          [
+            "render|convert",
+            "png|pdf|page image",
+            "inspect|look|visual|review"
+          ]
+        ],
+        "witness": "docx/SKILL.md"
+      }
+    ],
+    "nearMiss": {
+      "description": "Spreadsheet creation used for Word document output",
+      "candidate": "spreadsheet|xlsx"
+    }
+  }
+]

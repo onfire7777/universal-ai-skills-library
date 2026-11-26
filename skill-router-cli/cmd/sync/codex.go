@@ -36,7 +36,11 @@ preflight --hook-event UserPromptSubmit --json -- <literal-user-prompt>.
 
 For work with multiple deliverables, constraints, named skills or checks, call
 workflow_plan even when preflight suggests a single candidate or has no match.
-Identify the requirements separately and retain requested independent passes.
+Keep the user's original task in the prompt. Identify the requirements separately
+and retain requested independent passes. Set requirements[].facets for details
+the sources must address, such as a platform, output format, action or check.
+Give each acceptance criterion an ID and evidenceKind in requirements[].checks.
+Use evidence[].checks to link each observed result to the criterion it demonstrates.
 When a requirement is uncovered or its context is mismatched, use workflow_search
 to inspect alternative sections. Pin their skill, file, lines and digest in the
 revised requirement. For a single requirement, load a clearly matching hook
