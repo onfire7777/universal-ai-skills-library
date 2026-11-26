@@ -182,7 +182,11 @@ func discoverTaskDetails(idx *WorkflowIndex, r WorkflowRequirement, existing []W
 		}
 		var bodyMass float64
 		var terms int
-		for w, weight := range weights {
+		for _, w := range words {
+			weight := weights[w]
+			if weight == 0 {
+				continue
+			}
 			if termAppears(h.vocabulary, w) {
 				bodyMass += weight
 				terms++

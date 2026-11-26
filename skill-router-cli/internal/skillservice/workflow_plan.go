@@ -124,7 +124,7 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 			continue
 		}
 		refersBack := refersToPriorResult(r.Text)
-		depends := r.Kind == "verification" || outputReference.MatchString(r.Text) || refersBack
+		depends := r.Kind == "verification" || outputReference.MatchString(r.Text) || refersBack || afterPriorWork.MatchString(r.Text)
 		for _, step := range explicitSequence[min(1, len(explicitSequence)):] {
 			first := strings.Fields(step)
 			if len(first) > 0 && strings.HasPrefix(strings.ToLower(r.Text), strings.ToLower(strings.Join(first[:min(3, len(first))], " "))) {
@@ -350,9 +350,12 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 		}
 		if len(r.Facets) > 0 {
 			var excluded []string
-			methods, excluded = methodsForFacets(index, r, methods, lookup, eligible)
+			methods, excluded = methodsForFacets(index, scoped, methods, lookup, eligible)
 			stage.Gaps = append(stage.Gaps, excluded...)
 		}
+		methods = recoverSelectedProcedures(index, scoped, methods, lookup)
+		methods = declaredExaminedSubject(index, r, methods, lookup)
+		methods = relevantWorkflowMethods(index, scoped, methods, lookup)
 		methods, operationGaps := groundWorkflowOperations(index, plan.Request.Prompt, r, methods, lookup, eligible)
 		stage.Gaps = append(stage.Gaps, operationGaps...)
 		requestedPasses := map[string]int{}

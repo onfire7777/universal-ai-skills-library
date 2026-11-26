@@ -1,6 +1,6 @@
 # Workflow breadth and specificity evaluation
 
-The suite registers 24 prompts across creative production, technical work, analysis, writing, accessibility, operations, productivity, education and research. It has 55 positively sourced requirements and two expected catalog gaps. Four prompts require four distinct operations across skill families. The source witnesses and near-misses were recorded before the first routing comparison.
+The suite registers 24 prompts across creative production, technical work, analysis, writing, accessibility, operations, productivity, education and research. It has 55 positively sourced requirements and two expected catalog gaps. Four prompts require four distinct operations across skill families. The source witnesses and near-misses were recorded before the first routing comparison. Witness paths establish that the catalog describes the technique. Runtime eligibility applies to every selection, and any eligible section supporting the registered method can earn credit.
 
 Run from the repository root with a router built from the checkout under test.
 

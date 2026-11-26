@@ -14,6 +14,7 @@ import (
 // this command" without restating the platform and all its input names.
 type procedureProfile struct{ identity, scope, headings string }
 type procedureWord struct {
+	word   string
 	key    string
 	weight float64
 	named  bool
@@ -85,7 +86,7 @@ func procedureWords(idx *WorkflowIndex, q string) []procedureWord {
 			if named {
 				weight *= 1.45
 			}
-			out = append(out, procedureWord{key, weight, named})
+			out = append(out, procedureWord{w, key, weight, named})
 		}
 	}
 	return out
@@ -117,6 +118,42 @@ func procedureFit(p procedureProfile, words []procedureWord) (float64, int) {
 		return 0, 0
 	}
 	return mass / total, anchors
+}
+
+// Sparse postings let procedures establish their product and inputs across
+// sibling source sections. A long general library has a smaller signal for
+// terms appearing once. The bundle frequency prevents common workflow words
+// from establishing specialty ownership.
+func procedureBundleGrounding(idx *WorkflowIndex, words []procedureWord) []float64 {
+	out := make([]float64, len(idx.Bundles))
+	var total float64
+	for _, w := range words {
+		counts := map[int]int{}
+		for _, term := range objectForms(w.word) {
+			for _, post := range idx.search.postings[term] {
+				d := idx.search.docs[post.doc]
+				if post.weight >= 2 {
+					counts[d.bundle]++
+				}
+			}
+		}
+		if len(counts) == 0 {
+			continue
+		}
+		weight := w.weight * math.Log1p(float64(len(idx.Bundles))/float64(len(counts)))
+		total += weight
+		for i, n := range counts {
+			refs := len(idx.Bundles[i].Elements)
+			support := min(1., .25+math.Sqrt(float64(n)/float64(max(1, refs)))*1.6)
+			out[i] += weight * support
+		}
+	}
+	if total > 0 {
+		for j := range out {
+			out[j] /= total
+		}
+	}
+	return out
 }
 
 type procedureEvidence struct {
@@ -207,6 +244,8 @@ func discoverAuthoredProcedures(idx *WorkflowIndex, prompt string, r WorkflowReq
 	}
 	var domains []programCandidate
 	maxFit := 0.
+	localBody := procedureBundleGrounding(idx, scope.local)
+	globalBody := procedureBundleGrounding(idx, scope.original)
 	for i, b := range idx.Bundles {
 		if !eligible[b.Skill] || !scopedToTask(&b, local+" "+prompt) {
 			continue
@@ -214,8 +253,8 @@ func discoverAuthoredProcedures(idx *WorkflowIndex, prompt string, r WorkflowReq
 		p := idx.search.profiles[i]
 		fit, n := procedureFit(p, scope.local)
 		shared, global := procedureFit(p, scope.original)
-		score := fit + .52*shared
-		if n == 0 || global == 0 || score < .56 {
+		score := fit + .52*shared + .85*localBody[i] + .72*globalBody[i]
+		if n == 0 && localBody[i] < .49 || global == 0 && globalBody[i] < .51 || score < 1.00 {
 			continue
 		}
 		domains = append(domains, programCandidate{skill: b.Skill, score: score})
@@ -246,7 +285,7 @@ func discoverAuthoredProcedures(idx *WorkflowIndex, prompt string, r WorkflowReq
 		return strings.Compare(a.skill, b.skill)
 	})
 	c := candidates[0]
-	if c.score < 2.25 {
+	if c.score < 3.08 {
 		return methods
 	}
 	kept := map[string]bool{}
@@ -280,4 +319,49 @@ func discoverAuthoredProcedures(idx *WorkflowIndex, prompt string, r WorkflowReq
 		methods[at].Elements = append(methods[at].Elements, chosen...)
 	}
 	return methods
+}
+
+// An unfamiliar identifier can belong to a well documented task ("diagnose a
+// Python exception in AcmeWorker"). For a specific phenomenon whose name is
+// absent, require that a candidate's authored purpose covers the known part
+// of the examined object. Terms in an unrelated example cannot establish
+// that specialty.
+var examinedObject = regexp.MustCompile(`(?i)\b(?:diagnos(?:e|ing)|predict(?:ing)?|measure|investigate|detect|characteri[sz]e)\s+(?:the\s+|a\s+|an\s+)?([\pL\pN _-]+)`)
+var objectQualifier = regexp.MustCompile(`(?i)\s+(?:from|with|in|using|against|under|for|across|when|by|as|through|before|after)\b`)
+
+func declaredExaminedSubject(idx *WorkflowIndex, r WorkflowRequirement, methods []WorkflowContribution, lookup map[string]*WorkflowBundle) []WorkflowContribution {
+	if r.Selection == "explicit" || len(methods) == 0 {
+		return methods
+	}
+	match := examinedObject.FindStringSubmatch(r.Text)
+	if len(match) != 2 {
+		return methods
+	}
+	phrase := objectQualifier.Split(match[1], 2)[0]
+	words := procedureWords(idx, phrase)
+	if len(words) < 2 {
+		return methods
+	}
+	var absent bool
+	for _, w := range words {
+		if termFrequency(idx, w.word) == 0 && !w.named {
+			absent = true
+		}
+	}
+	if !absent {
+		return methods
+	}
+	return slices.DeleteFunc(methods, func(m WorkflowContribution) bool {
+		if m.Requested {
+			return false
+		}
+		p := newProcedureProfile(lookup[m.Skill])
+		for _, w := range words {
+			token := " " + w.key + " "
+			if strings.Contains(p.scope, token) || strings.Contains(p.identity, token) {
+				return false
+			}
+		}
+		return true
+	})
 }

@@ -197,6 +197,18 @@ func methodsForFacets(idx *WorkflowIndex, r WorkflowRequirement, methods []Workf
 	}
 	for _, m := range methods {
 		var kept []WorkflowElement
+		// The author's implementation example may use only syntax, while
+		// its sibling states the artifact and platform in prose. Retain a
+		// procedural example in the same selected program when a sibling
+		// actually grounds the requested scope. Exclusions still apply to both.
+		siblingEvidence := false
+		for _, e := range m.Elements {
+			hits, excluded := sourceFacets(matchers, e, idx.sourceText(e), "")
+			if len(hits) > 0 && excluded == "" {
+				siblingEvidence = true
+				break
+			}
+		}
 		for _, e := range m.Elements {
 			matches, exclude := sourceFacets(matchers, e, idx.sourceText(e), "")
 			if exclude != "" {
@@ -205,7 +217,7 @@ func methodsForFacets(idx *WorkflowIndex, r WorkflowRequirement, methods []Workf
 				}
 				continue
 			}
-			if !m.Requested && len(matches) == 0 && len(r.Facets) > 0 && !allExclusions(matchers) {
+			if !m.Requested && len(matches) == 0 && !allExclusions(matchers) && !(siblingEvidence && sourceInstruction.MatchString(idx.sourceText(e))) {
 				continue
 			}
 			kept = append(kept, e)

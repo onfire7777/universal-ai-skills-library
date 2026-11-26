@@ -43,3 +43,19 @@ func TestStructuredStageKeepsItsOriginalPlatformInRetrieval(t *testing.T) {
 		t.Fatal(enriched)
 	}
 }
+
+func TestNaturalClausesKeepConditionsWithTheirAction(t *testing.T) {
+	rs := naturalRequirements("Prepare the draft. After the meeting, publish the summary and create a calendar invitation.")
+	if len(rs) != 3 || rs[1].Text != "After the meeting, publish the summary" || !slices.Equal(rs[1].DependsOn, []string{rs[0].ID}) || len(rs[2].DependsOn) != 0 {
+		t.Fatal(rs)
+	}
+}
+
+func TestNaturalWorkflowRetainsCoordinatedDeliverablesAndTargets(t *testing.T) {
+	a := workflowClauses("Export the monthly ledger and a PDF statement.")
+	b := workflowClauses("Package the artwork for mobile devices and desktop browsers.")
+	c := workflowClauses("Review income and expenses.")
+	if !slices.Equal(a, []string{"Export the monthly ledger", "Export a PDF statement"}) || !slices.Equal(b, []string{"Package the artwork for mobile devices", "Package the artwork for desktop browsers"}) || len(c) != 1 {
+		t.Fatal(a, b, c)
+	}
+}

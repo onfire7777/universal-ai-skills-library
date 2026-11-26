@@ -149,9 +149,13 @@ def evidence(text, alternatives):
 
 
 def preregistration(cases, repo):
+    if len({c["id"] for c in cases}) != len(cases):
+        raise ValueError("Repeated case ID in preregistration")
     for case in cases:
         ids = set()
         for r in case["requirements"]:
+            if not r["source"] or any(not alt or not all(alt) for alt in r["source"]):
+                raise ValueError(f"{case['id']}/{r['id']}: missing actionable source criteria")
             if r["id"] in ids:
                 raise ValueError(f"{case['id']}: repeated requirement {r['id']}")
             ids.add(r["id"])
@@ -290,8 +294,8 @@ def totals(rows, mode):
     out["cases"] = len(data)
     out["plansWithoutGaps"] = sum(r.get("executable", False) for r in data)
     singles = [r for r in data if not r["deep"] and r["needed"]]
-    out["singleFamilies"] = len(singles)
-    out["groundedFamilies"] = sum(r["positiveCovered"] > 0 for r in singles)
+    out["singleFamilies"] = len({r["family"] for r in singles})
+    out["groundedFamilies"] = len({r["family"] for r in singles if r["positiveCovered"] > 0})
     out["deepComplete"] = sum(r["deepComplete"] for r in data if r["deep"])
     out["deepCases"] = sum(r["deep"] for r in data)
     return out

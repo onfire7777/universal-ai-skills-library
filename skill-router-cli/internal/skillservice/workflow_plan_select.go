@@ -823,6 +823,10 @@ var productionTechniques = []struct {
 	{"validation", regexp.MustCompile(`(?i)\b(validate|validation|verify|audit|reconcil(?:e|iation))\b`)},
 }
 
+// A source can declare a domain-specific technique the router has never
+// encountered. Require a substantive section with an authored method label.
+var declaredTechnique = regexp.MustCompile(`(?i)^(?:method|technique|approach|test strategy|verification method|analysis method|pattern)(?:\s+[0-9]+)?\s*[:–—-]\s*([^:.;|]{3,80})$`)
+
 func workflowTechniques(r WorkflowRequirement, e WorkflowElement) []string {
 	rules := productionTechniques
 	if r.Kind == "verification" {
@@ -830,6 +834,11 @@ func workflowTechniques(r WorkflowRequirement, e WorkflowElement) []string {
 	}
 	scope := e.Title + " " + e.Purpose
 	var names []string
+	if e.EndLine > e.StartLine && e.Origins.Title == "heading" {
+		if match := declaredTechnique.FindStringSubmatch(e.Title); len(match) > 1 {
+			names = append(names, strings.ToLower(strings.TrimSpace(match[1])))
+		}
+	}
 	for _, rule := range rules {
 		if rule.source.MatchString(scope) {
 			names = append(names, rule.name)
