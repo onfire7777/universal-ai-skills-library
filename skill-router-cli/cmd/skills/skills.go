@@ -529,7 +529,7 @@ func init() {
 	Cmd.AddCommand(anchorCmd)
 	Cmd.AddCommand(summarizeCmd)
 	Cmd.AddCommand(VectorsCmd)
-	Cmd.AddCommand(composeCmd)
+	Cmd.AddCommand(composeCmd, workflowCommand())
 }
 
 // cliRouteOptions builds the engine's CLI route options from a cobra command,

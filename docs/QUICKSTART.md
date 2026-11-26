@@ -89,7 +89,7 @@ Add compact instructions to each AI client instead of copying the full corpus:
 
 ```text
 For every real user prompt, run skill-router preflight --json "<latest user prompt>".
-If the route clearly matches the task, load one skill with skill-router skill <name>.
+For a single requirement, load its matching skill. For multi-part work, use `skill-router skills workflow plan` to select and sequence contributions.
 Keep always-loaded instructions compact. Do not paste the full skills corpus.
 ```
 

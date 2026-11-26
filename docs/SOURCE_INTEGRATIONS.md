@@ -120,7 +120,7 @@ Each AI client receives compact instructions that say:
 
 1. Run `skill-router preflight --json "<latest user prompt>"` only for real user
    prompts.
-2. Load exactly one clearly relevant skill with `skill-router skill <name>`.
+2. For a single requirement, load its matching skill. For multi-part work, use `skill-router skills workflow plan` to select and sequence contributions.
 3. Use `Search-UniversalAIMemory.ps1` for prior durable context.
 4. Use `Save-UniversalAIMemory.ps1` only for explicit durable saves or confirmed
    project facts.

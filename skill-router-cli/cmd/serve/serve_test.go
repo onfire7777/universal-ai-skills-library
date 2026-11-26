@@ -63,7 +63,7 @@ func TestInitializeAndToolsList(t *testing.T) {
 	for _, tl := range tools {
 		got[tl.(map[string]any)["name"].(string)] = true
 	}
-	for _, want := range []string{"route", "search_skills", "load_skill", "compose"} {
+	for _, want := range []string{"route", "search_skills", "skill_bundle", "load_skill", "compose", "workflow_search", "workflow_plan", "workflow_load", "workflow_review"} {
 		if !got[want] {
 			t.Errorf("tools/list missing %q", want)
 		}
@@ -130,6 +130,10 @@ func TestToolsCallComposePipeline(t *testing.T) {
 	steps, ok := plan["steps"].([]any)
 	if !ok || len(steps) != 2 {
 		t.Fatalf("expected a 2-step pipeline plan, got: %q", text)
+	}
+	wp, ok := plan["workflow"].(map[string]any)
+	if !ok || len(wp["stages"].([]any)) < 2 {
+		t.Fatalf("requirement-based workflow missing: %s", text)
 	}
 }
 
@@ -246,8 +250,8 @@ func TestStatelessDiscoveryAndTools(t *testing.T) {
 	if discovery["capabilities"].(map[string]any)["tools"] == nil {
 		t.Fatalf("discovery did not advertise tools: %v", discovery)
 	}
-	if tools := results["list"]["tools"].([]any); len(tools) != 5 {
-		t.Fatalf("expected five tools, got %v", tools)
+	if tools := results["list"]["tools"].([]any); len(tools) != 9 {
+		t.Fatalf("expected nine tools, got %v", tools)
 	}
 	content := results["bundle"]["content"].([]any)[0].(map[string]any)["text"].(string)
 	if !strings.Contains(content, "SKILL.md") {
@@ -307,5 +311,90 @@ func TestStatelessToolErrorsUseProtocolAndExecutionResults(t *testing.T) {
 		default:
 			t.Fatalf("unexpected message: %v", msg)
 		}
+	}
+}
+
+func TestWorkflowToolsRoundTrip(t *testing.T) {
+	call := func(name string, arguments any) map[string]any {
+		t.Helper()
+		line, err := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": name, "arguments": arguments}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		msg := run(t, string(line))[0]
+		result := msg["result"].(map[string]any)
+		body := result["content"].([]any)[0].(map[string]any)["text"].(string)
+		if result["isError"] == true {
+			t.Fatalf("%s returned %s", name, body)
+		}
+		var value map[string]any
+		if err := json.Unmarshal([]byte(body), &value); err != nil {
+			t.Fatalf("%s invalid JSON: %v", name, err)
+		}
+		return value
+	}
+	const prompt = "Organize files in this folder"
+	search := call("workflow_search", map[string]any{"prompt": prompt, "query": "file organization", "skill": "file-organizer", "limit": 1})
+	hits, ok := search["hits"].([]any)
+	if !ok || len(hits) != 1 {
+		t.Fatalf("expected an applicable section: %v", search)
+	}
+	element := hits[0].(map[string]any)["element"].(map[string]any)
+	ref := map[string]any{}
+	for _, key := range []string{"skill", "file", "startLine", "endLine", "digest"} {
+		ref[key] = element[key]
+	}
+	plan := call("workflow_plan", map[string]any{"prompt": prompt, "requirements": []map[string]any{{"id": "tidy", "text": "Organize the files", "elements": []map[string]any{ref}}}})
+	load := call("workflow_load", map[string]any{"plan": plan, "stage": "tidy"})
+	items, ok := load["contributions"].([]any)
+	if !ok || len(items) == 0 {
+		t.Fatalf("missing loaded contributions: %v", load)
+	}
+	item := items[0].(map[string]any)
+	if receipt, ok := item["receipt"].(string); !ok || receipt == "" || !strings.Contains(item["body"].(string), "Pinned test fixture stub.") {
+		t.Fatalf("expected real body and receipt: %v", load)
+	}
+	review := call("workflow_review", map[string]any{"plan": plan, "records": []any{}})
+	if review["complete"] != false {
+		t.Fatalf("loading alone cannot verify a task: %v", review)
+	}
+}
+
+func TestComposePipelineNamedPassesAndInlineBodies(t *testing.T) {
+	line := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"compose","arguments":{"pipeline":true,"skills":["file-organizer","onefilellm","file-organizer"],"load":true,"budget":6000}}}`
+	msg := run(t, line)[0]
+	result := msg["result"].(map[string]any)
+	text := result["content"].([]any)[0].(map[string]any)["text"].(string)
+	if result["isError"] == true {
+		t.Fatal(text)
+	}
+	var plan struct {
+		Steps []struct {
+			Loaded bool
+			Body   string
+		}
+		Workflow struct {
+			Stages []struct{ Requirement struct{ Skills []string } }
+		}
+	}
+	if err := json.Unmarshal([]byte(text), &plan); err != nil {
+		t.Fatal(err)
+	}
+	for i, name := range []string{"file-organizer", "onefilellm", "file-organizer"} {
+		if len(plan.Workflow.Stages) != 3 || !slices.Equal(plan.Workflow.Stages[i].Requirement.Skills, []string{name}) {
+			t.Fatalf("lost independent required skill pass %d: %s", i, text)
+		}
+	}
+	inline := 0
+	for _, step := range plan.Steps {
+		if step.Loaded {
+			inline++
+			if !strings.Contains(step.Body, "Pinned test fixture stub.") {
+				t.Fatalf("loaded step omitted source: %s", text)
+			}
+		}
+	}
+	if inline == 0 {
+		t.Fatalf("--load returned no skill content: %s", text)
 	}
 }

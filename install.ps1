@@ -65,6 +65,16 @@ if (!$SkipStackInstall) {
   & powershell @installArgs | Write-Host
 }
 
+if (!$SkipClientSync -and !$SkipStackInstall -and (Get-Command codex -ErrorAction SilentlyContinue)) {
+  Push-Location $RepoRoot
+  try {
+    & $RouterExe sync codex
+    if ($LASTEXITCODE -ne 0) { throw "Codex router sync failed with exit code $LASTEXITCODE" }
+  } finally {
+    Pop-Location
+  }
+}
+
 if (!$SkipValidate) {
   Write-Host '==> Validating repository'
   & $RouterExe skills validate-manifest

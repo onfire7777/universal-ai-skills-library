@@ -268,28 +268,34 @@ func printPreflight(preflight routePreflight, explain bool) {
 
 func printPreflightJSON(preflight routePreflight, explain bool) error {
 	out := struct {
-		Prompt          string          `json:"prompt,omitempty"`
-		PromptChars     int             `json:"prompt_chars,omitempty"`
-		PromptTruncated bool            `json:"prompt_truncated,omitempty"`
-		HookEvent       string          `json:"hook_event,omitempty"`
-		Decision        routeDecision   `json:"decision"`
-		Reason          string          `json:"reason"`
-		Best            *candidateJSON  `json:"best,omitempty"`
-		Second          *candidateJSON  `json:"second,omitempty"`
-		HostReview      *hostAIReview   `json:"host_ai_review,omitempty"`
-		Top             []candidateJSON `json:"top,omitempty"`
+		Prompt              string          `json:"prompt,omitempty"`
+		PromptChars         int             `json:"prompt_chars,omitempty"`
+		PromptTruncated     bool            `json:"prompt_truncated,omitempty"`
+		WorkflowRecommended bool            `json:"workflow_recommended,omitempty"`
+		WorkflowCandidate   string          `json:"workflow_candidate,omitempty"`
+		HookEvent           string          `json:"hook_event,omitempty"`
+		Decision            routeDecision   `json:"decision"`
+		Reason              string          `json:"reason"`
+		Best                *candidateJSON  `json:"best,omitempty"`
+		Second              *candidateJSON  `json:"second,omitempty"`
+		HostReview          *hostAIReview   `json:"host_ai_review,omitempty"`
+		Top                 []candidateJSON `json:"top,omitempty"`
 	}{
-		Prompt:          truncate(preflight.Prompt, routeOutputPromptMax),
-		PromptChars:     len(preflight.Prompt),
-		PromptTruncated: len(preflight.Prompt) > routeOutputPromptMax,
-		HookEvent:       preflight.HookEvent,
-		Decision:        preflight.Decision,
-		Reason:          preflight.Reason,
-		HostReview:      preflight.HostReview,
+		Prompt:              truncate(preflight.Prompt, routeOutputPromptMax),
+		PromptChars:         len(preflight.Prompt),
+		PromptTruncated:     len(preflight.Prompt) > routeOutputPromptMax,
+		WorkflowRecommended: isUserPromptHookEvent(preflight.HookEvent) && RecommendWorkflowPlan(preflight.Prompt),
+		HookEvent:           preflight.HookEvent,
+		Decision:            preflight.Decision,
+		Reason:              preflight.Reason,
+		HostReview:          preflight.HostReview,
 	}
 	if preflight.Best.name != "" {
 		best := routeCandidateJSON(preflight.Best)
 		out.Best = &best
+		if preflight.Decision == routeDecisionRoute && !out.WorkflowRecommended && best.Source == "canonical" && best.Eligible && workflowLoadAllowed(preflight.Prompt, best.Name) {
+			out.WorkflowCandidate = best.Name
+		}
 	}
 	if preflight.Second.name != "" {
 		second := routeCandidateJSON(preflight.Second)

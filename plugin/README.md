@@ -8,7 +8,7 @@ The intended flow is:
 
 1. search or preflight-route the user request with `skill-router`
 2. sanity-check that the selected skill matches the core task
-3. load exactly one skill when needed
+3. load a matching single skill or use the workflow planner for multi-part work
 4. continue with no skill when the route is weak, generic, or ambiguous
 
 Use:

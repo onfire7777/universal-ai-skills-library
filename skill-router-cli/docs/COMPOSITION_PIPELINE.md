@@ -1,5 +1,7 @@
 # Multi-step Composition (Phase 4, plan §3.6)
 
+For current requirement-based selection, source-section search, stage loading, and evidence review, see [Workflow planning](../../docs/WORKFLOW_PLANNING.md). Multi-part responses carry that requirement plan under `workflow`; `steps` and `edges` below preserve the original suggested sequence for existing callers. Explicit skill lists request independent passes in order.
+
 > Additive to the working-set `compose` engine. `compose` (default) assembles a
 > flat top-N working set for one task; **`compose --pipeline`** decomposes a
 > *multi-step* prompt into an ordered, capability-typed **DAG of skills**.

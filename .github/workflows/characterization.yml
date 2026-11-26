@@ -68,6 +68,12 @@ jobs:
         # P@1 / MRR / Recall@5 / abstention REGRESS vs the committed baseline.
         run: python3 tests/routing-eval/run_eval.py --check
 
+      - name: Check multi-skill requirement coverage against the live corpus
+        run: python3 tests/workflow-eval/run.py
+
+      - name: Verify dashboard workflow evidence with real keyboard input
+        run: node tests/workflow-eval/dashboard_e2e.mjs
+
   registry-drift:
     name: Registry single-source drift guard
     runs-on: ubuntu-latest

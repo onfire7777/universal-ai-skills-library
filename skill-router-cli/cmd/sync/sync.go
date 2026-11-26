@@ -119,12 +119,28 @@ skips workspace/source trees that should not be mutated generically.`,
 
 var codexCmd = &cobra.Command{
 	Use:   "codex",
-	Short: "Install the compact Codex CLI compatibility adapter",
-	Long: `Install only the compact universal-ai-skills wrapper into the Codex
-local skill root. This keeps Codex CLI connected to skill-router without
-copying the full skill corpus into ~/.codex/skills.`,
+	Short: "Install the compact Codex skill, workflow instructions and prompt hook",
+	Long: `Install the compact skill and merge router workflow instructions and the
+UserPromptSubmit hook into Codex. Codex manages hook trust. Agent instructions
+provide a fallback whenever a prompt hook is unavailable.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncNamedRoot("codex")
+		if err := syncNamedRoot("codex"); err != nil {
+			return err
+		}
+		router, err := os.Executable()
+		if err != nil {
+			return err
+		}
+		spec, _ := agentRootSpecByID("codex")
+		repo, err := filepath.Abs(platform.RepoDir())
+		if err != nil {
+			return err
+		}
+		home := filepath.Dir(spec.Path)
+		if err := installCodexGuidance(home, router, repo); err != nil {
+			return err
+		}
+		return configureCodexMCP(cmd, home, router, repo)
 	},
 }
 
@@ -243,6 +259,7 @@ func init() {
 	allCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	propagateAllCmd.Flags().Bool("full-copy", false, "Explicitly copy every canonical skill to default roots")
 	matrixCmd.Flags().Bool("json", false, "Output JSON")
+	codexCmd.Flags().Bool("mcp", true, "Register the router MCP server when the native codex CLI is available")
 
 	Cmd.AddCommand(allCmd)
 	Cmd.AddCommand(repoCmd)
@@ -423,7 +440,7 @@ Paperclip-specific operating rule:
 - Do not run automatic skill loading from Paperclip status checks, liveness loops, session-start/stop events, assistant messages, tool output, run logs, background jobs, or database maintenance.
 - If preflight returns decision=route, sanity-check that the selected skill clearly matches the core task object and action. If it only matched generic words such as issue, problem, fix, install, setup, local, AI, agent, or skill, continue with no universal skill.
 - If decision=ambiguous or host_ai_review.required is true, choose only from the listed candidates when one is clearly right; otherwise continue with no universal skill.
-- Load exactly one needed skill with skill-router skill <name>. Search first with skill-router skill search <query> when the name is unknown.
+- For multi-part work identify the requirements, call skill-router skills workflow plan, load each stage and review observed evidence. For a single requirement, load a clearly matching skill with skill-router skill <name>. Search first with skill-router skill search <query> when the name is unknown.
 - Do not copy or paste the full canonical skill corpus into Paperclip prompts, company skills, or agent instructions. The CLI is the source of truth and prints full skill bodies on demand.
 - MCP bridges are optional. Use the CLI for skill loading and use MCP only for persistent endpoint workflows such as durable memory, context routing, skill generation services, or browser/CDP automation.
 
@@ -431,7 +448,7 @@ Paperclip-specific operating rule:
 
 - Paperclip has access to the full centralized skill corpus through skill-router only.
 - Keep Paperclip's local skill root to compact wrappers plus native Paperclip company skills. Do not copy or install those full skill bodies into Paperclip's local root.
-- Automatic routing flow: run skill-router preflight for real user/task prompts, reject weak or generic matches, then load exactly one needed skill with skill-router skill <name>.
+- Automatic routing flow: run skill-router preflight for real user/task prompts, reject weak or generic matches, then load a clearly matching skill for a single requirement or use skill-router skills workflow plan for multi-part work.
 
 ## Universal Shared Memory
 

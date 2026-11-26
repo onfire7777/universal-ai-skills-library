@@ -32,7 +32,7 @@ prompt needs a matching skill.
 | Problem | This repo's answer |
 | --- | --- |
 | Every AI client wants skills in a different place. | Use compact adapters that all point back to one canonical router and corpus. |
-| Large skill libraries can bloat context. | Run deterministic preflight and load exactly one relevant skill when needed. |
+| Large skill libraries can bloat context. | Use preflight for simple tasks and load one workflow stage at a time for multi-part work. |
 | Local AI stacks drift across Hermes, Paperclip, Codex, Claude, and IDE tools. | Keep portable model, memory, routing, and adapter config in repo-owned templates. |
 | Public repos can accidentally leak machine state or secrets. | Ship public-safe defaults, ignored local state, validation scripts, and a release audit. |
 
@@ -201,13 +201,11 @@ real user-submitted prompt:
 1. Run `skill-router preflight --hook-event UserPromptSubmit --json "<latest user prompt>"`
    from a user-prompt hook, or `skill-router preflight --json "<latest user prompt>"`
    when the host AI performs the check directly.
-2. If the decision is `route`, sanity-check that the selected skill clearly
-   matches the core task, object, and action.
-3. Load exactly one skill with `skill-router skill <name>` only when the route
-   is clearly relevant.
-4. If the decision is `ambiguous`, the host AI chooses from only the listed
-   candidates or continues with no skill.
-5. If the decision is `no_route`, continue normally.
+2. For a single requirement, load a clearly matching skill with `skill-router skill <name>`.
+3. For multiple deliverables, constraints or checks, call `workflow_plan` or
+   `skill-router skills workflow plan` and name each requirement separately.
+4. Load a stage when beginning its work. Record the contribution and its actual
+   evidence, then review coverage. See [Workflow planning](docs/WORKFLOW_PLANNING.md).
 
 Do not run automatic skill loading from tool hooks, session-start hooks, stop
 hooks, compaction/resume hooks, assistant messages, tool outputs, status checks,

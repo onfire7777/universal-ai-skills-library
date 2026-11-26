@@ -76,14 +76,19 @@ func runComposePipeline(cmd *cobra.Command, prompt string, minScore int, jsonOut
 	load, _ := cmd.Flags().GetBool("load")
 	allowExternal, _ := cmd.Flags().GetBool("allow-external")
 
-	res, err := skillservice.ComposePlan(skillservice.ComposePlanRequest{
+	namesFlag, _ := cmd.Flags().GetString("skills")
+	var names []string
+	if namesFlag != "" {
+		names = strings.Split(namesFlag, ",")
+	}
+	res, err := skillservice.ComposeWorkflowPipeline(skillservice.ComposePlanRequest{
 		Prompt:        prompt,
 		MaxSteps:      maxSteps,
 		BudgetTokens:  budget,
 		Load:          load,
 		AllowExternal: allowExternal,
 		MinScore:      minScore,
-	})
+	}, names)
 	if err != nil {
 		return err
 	}
@@ -95,7 +100,28 @@ func runComposePipeline(cmd *cobra.Command, prompt string, minScore int, jsonOut
 		return enc.Encode(res)
 	}
 
-	if res.MultiStep {
+	if res.Workflow != nil {
+		fmt.Fprintln(out, "Requirement-based workflow")
+		for _, stage := range res.Workflow.Stages {
+			fmt.Fprintf(out, "  %s [%s] %s\n", stage.Requirement.ID, stage.Requirement.Kind, stage.Requirement.Text)
+			for _, c := range stage.Contributions {
+				fmt.Fprintf(out, "    %s (%s): %s\n", c.Skill, c.Status, c.Method)
+				for _, e := range c.Elements {
+					fmt.Fprintf(out, "      %s#L%d-L%d — %s\n", e.File, e.StartLine, e.EndLine, e.Title)
+				}
+			}
+			for _, gap := range stage.Gaps {
+				fmt.Fprintln(out, "    Gap:", gap)
+			}
+		}
+		if len(res.Workflow.Stages) == 0 {
+			for _, gap := range res.Workflow.Gaps {
+				fmt.Fprintln(out, "  Gap:", gap)
+			}
+		}
+		fmt.Fprintln(out, "Load each stage using workflow_load or skill-router skills workflow load. Pass the workflow object and its stage ID.")
+		fmt.Fprintf(out, "Legacy routing steps (%d):\n", len(res.Steps))
+	} else if res.MultiStep {
 		fmt.Fprintf(out, "Composition: %d-step pipeline\n", len(res.Steps))
 	} else {
 		fmt.Fprintln(out, "Composition: single skill (multi-step pipeline not required)")
@@ -105,10 +131,13 @@ func runComposePipeline(cmd *cobra.Command, prompt string, minScore int, jsonOut
 		if s.Decision == "route" {
 			marker := "load"
 			if s.Loaded {
-				marker = "inlined"
+				marker = "load command"
 			}
 			fmt.Fprintf(out, "  %d. [%s] %s (%s, score %d, ~%d tok)\n     %s: %s\n",
 				s.Index+1, caps, s.Skill, s.Source, s.Score, s.TokenEst, marker, s.LoadPointer)
+			if s.Loaded {
+				fmt.Fprintln(out, s.Body)
+			}
 		} else {
 			fmt.Fprintf(out, "  %d. [%s] (unresolved) %q\n", s.Index+1, caps, skillservice.Truncate(s.Text, 60))
 		}

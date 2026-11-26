@@ -56,7 +56,7 @@ func toolDefs() []map[string]any {
 	strProp := func(desc string) map[string]any {
 		return map[string]any{"type": "string", "description": desc}
 	}
-	return []map[string]any{
+	return append([]map[string]any{
 		{"name": "route", "description": "Route a prompt to the single best-matching skill.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{"prompt": strProp("user prompt")}, "required": []string{"prompt"}}},
 		{"name": "search_skills", "description": "Search skills by name/description.",
@@ -68,10 +68,13 @@ func toolDefs() []map[string]any {
 		{"name": "compose", "description": "Assemble a working set of skills for a task, or (pipeline) a multi-step capability DAG.",
 			"inputSchema": map[string]any{"type": "object", "properties": map[string]any{
 				"prompt":   strProp("task prompt"),
+				"skills":   map[string]any{"type": "array", "items": map[string]any{"type": "string"}, "description": "explicit ordered skill names"},
 				"full":     map[string]any{"type": "boolean", "description": "include concatenated bodies (working-set mode)"},
+				"load":     map[string]any{"type": "boolean", "description": "return complete skill bodies within the pipeline token budget"},
+				"budget":   map[string]any{"type": "integer", "minimum": 0, "description": "token budget for inline pipeline bodies"},
 				"pipeline": map[string]any{"type": "boolean", "description": "decompose a multi-step prompt into an ordered capability DAG (plan §3.6)"},
-			}, "required": []string{"prompt"}}},
-	}
+			}, "anyOf": []map[string]any{{"required": []string{"prompt"}}, {"required": []string{"skills"}}}}},
+	}, workflowTools()...)
 }
 
 func jsonText(v any) (string, error) {
@@ -84,6 +87,9 @@ func jsonText(v any) (string, error) {
 // their typed result as indented JSON; load_skill returns the raw SKILL.md body.
 func callTool(name string, args map[string]any) (string, error) {
 	s := func(k string) string { v, _ := args[k].(string); return v }
+	if run, ok := workflowCalls[name]; ok {
+		return callWorkflowTool(args, run)
+	}
 	switch name {
 	case "route":
 		r, err := skillservice.Route(s("prompt"), skillservice.RouteOptions{})
@@ -113,15 +119,30 @@ func callTool(name string, args map[string]any) (string, error) {
 		}
 		return r.Body, nil
 	case "compose":
+		var names []string
+		if raw, ok := args["skills"]; ok {
+			encoded, _ := json.Marshal(raw)
+			if json.Unmarshal(encoded, &names) != nil || names == nil {
+				return "", fmt.Errorf("skills must be an array of skill names")
+			}
+		}
 		if pipeline, _ := args["pipeline"].(bool); pipeline {
-			r, err := skillservice.ComposePlan(skillservice.ComposePlanRequest{Prompt: s("prompt")})
+			load, _ := args["load"].(bool)
+			budget := 6000
+			if requested, ok := args["budget"].(float64); ok {
+				if requested < 0 || requested != float64(int(requested)) {
+					return "", fmt.Errorf("budget must be a nonnegative integer")
+				}
+				budget = int(requested)
+			}
+			r, err := skillservice.ComposeWorkflowPipeline(skillservice.ComposePlanRequest{Prompt: s("prompt"), Load: load, BudgetTokens: budget}, names)
 			if err != nil {
 				return "", err
 			}
 			return jsonText(r)
 		}
 		full, _ := args["full"].(bool)
-		r, err := skillservice.Compose(skillservice.ComposeRequest{Prompt: s("prompt"), Full: full})
+		r, err := skillservice.Compose(skillservice.ComposeRequest{Prompt: s("prompt"), Full: full, Skills: names})
 		if err != nil {
 			return "", err
 		}

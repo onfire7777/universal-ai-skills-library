@@ -52,9 +52,11 @@ func TestCodexAndClaudeCommandsInstallWrapperOnly(t *testing.T) {
 			home := t.TempDir()
 			repo := t.TempDir()
 			t.Setenv("HOME", home)
+			t.Setenv("CODEX_HOME", "")
 			t.Setenv("USERPROFILE", home)
 			t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
 
+			t.Setenv("PATH", t.TempDir()) // exercise a CLI-only host without a Codex executable
 			writeSkill(t, filepath.Join(repo, "skills"), "universal-ai-skills")
 			writeSkill(t, filepath.Join(repo, "skills"), "extra-skill")
 
@@ -72,6 +74,7 @@ func TestPaperclipCommandInstallsWrapperAndInstructionsOnly(t *testing.T) {
 	home := t.TempDir()
 	repo := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("CODEX_HOME", "")
 	t.Setenv("USERPROFILE", home)
 	t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
 
@@ -103,6 +106,7 @@ func TestPaperclipCommandInstallsWrapperAndInstructionsOnly(t *testing.T) {
 func TestInstalledWrapperRootsIncludeInstalledReportOnlyRootsAndSkipSpecial(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("CODEX_HOME", "")
 	t.Setenv("USERPROFILE", home)
 	t.Setenv("SKILL_ROUTER_PAPERCLIP_SKILLS_DIR", "")
 
@@ -148,6 +152,7 @@ func TestInstalledCommandInstallsWrappersOnlyAndSkipsSpecialRoots(t *testing.T) 
 	home := t.TempDir()
 	repo := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("CODEX_HOME", "")
 	t.Setenv("USERPROFILE", home)
 	t.Setenv("SKILL_ROUTER_REPO_DIR", repo)
 	t.Setenv("SKILL_ROUTER_PAPERCLIP_SKILLS_DIR", "")

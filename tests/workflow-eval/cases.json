@@ -1,0 +1,114 @@
+[
+  {
+    "id": "dashboard",
+    "prompt": "Refresh the SaaS dashboard so it matches our existing brand and makes common tasks easier for keyboard users.",
+    "checks": [
+      {
+        "purpose": "existing brand rules",
+        "skills": [
+          "brand",
+          "brand-guidelines",
+          "brand-analyzer",
+          "design-system"
+        ],
+        "source": "brand|design tokens|design system"
+      },
+      {
+        "purpose": "dashboard task layout",
+        "skills": [
+          "dashboard",
+          "impeccable",
+          "ui-ux-pro-max",
+          "ux-researcher-designer",
+          "ui-audit",
+          "frontend-design"
+        ],
+        "source": "layout|user (flow|task)|interaction"
+      },
+      {
+        "purpose": "keyboard and focus checks",
+        "kind": "verification",
+        "source": "focus order|keyboard navigation|tab (order|through)|keyboard alone"
+      }
+    ]
+  },
+  {
+    "id": "flaky-python-test",
+    "prompt": "Find why a Python unit test fails only on Tuesdays and add a deterministic pytest regression test for the fix.",
+    "checks": [
+      {
+        "purpose": "diagnose the cause",
+        "skills": [
+          "debug-root-cause",
+          "systematic-debug",
+          "debugging-code",
+          "debugging-strategies",
+          "systematic-debugging",
+          "triage",
+          "diagnose"
+        ],
+        "source": "root cause|hypothesis|reproduc"
+      },
+      {
+        "purpose": "write the regression",
+        "skills": [
+          "python-testing-patterns",
+          "unit-testing",
+          "test-driven-development",
+          "e2e-testing"
+        ],
+        "source": "pytest|regression test|unit test"
+      }
+    ]
+  },
+  {
+    "id": "workbook-and-report",
+    "prompt": "Prepare a spreadsheet to reconcile invoice totals and deliver a formatted Word document explaining the discrepancies.",
+    "checks": [
+      {
+        "purpose": "reconcile the workbook",
+        "skills": [
+          "spreadsheet",
+          "xlsx"
+        ],
+        "source": "formula|reconcil|cross[- ]check|SUMIF|sum the range",
+        "inapplicable": "^## Investment banking layouts"
+      },
+      {
+        "purpose": "generate the Word document",
+        "skills": [
+          "docx",
+          "morph"
+        ],
+        "source": "creat(?:e|ing) (?:a |new )?(?:word |docx|document)|docx-js|new Document\\(|pandoc\\s+\\S+\\s+-o\\s+\\S+\\.docx",
+        "inapplicable": "^## Editing existing documents|^\"\"\"Merge adjacent"
+      }
+    ]
+  },
+  {
+    "id": "chart-and-interpretation",
+    "prompt": "Choose a chart to show the distribution of customer wait times and summarize the median and quartiles using descriptive statistics.",
+    "checks": [
+      {
+        "purpose": "choose the chart",
+        "skills": [
+          "visualization-choice-reporting",
+          "d3-visualization",
+          "statistical-analysis",
+          "data-visualization"
+        ],
+        "source": "histogram|box plot|chart (type|selection)|distribution"
+      },
+      {
+        "purpose": "compute summary statistics",
+        "skills": [
+          "statistical-analysis",
+          "spreadsheet",
+          "exploratory-data-analysis",
+          "statsmodels"
+        ],
+        "source": "median|quartile|descriptive statistics"
+      }
+    ]
+  }
+]

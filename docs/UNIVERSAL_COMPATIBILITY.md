@@ -113,7 +113,7 @@ from user-prompt hooks, or `skill-router preflight --json "<latest user prompt>"
 when the already-running host AI performs the precheck internally.
 If the JSON decision is `route`, the agent first sanity-checks that the selected
 skill clearly matches the user's core task, object, and action; only then does
-it load exactly one skill with `skill-router skill <best.name>`. If the route is
+it load the relevant skill with `skill-router skill <best.name>` for a single requirement. For multi-part work, call `workflow_plan` even when preflight finds a partial match or no match. If the route is
 only a generic modifier match, such as issue/problem/install/setup/local, the
 agent continues with no skill. If the decision is `ambiguous`, the already
 running host AI chooses only from the listed candidates or continues with no
