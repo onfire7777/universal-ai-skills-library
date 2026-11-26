@@ -6,5 +6,7 @@
   "source": "https://github.com/pbakaus/impeccable/releases/download/skill-v3.0.7/universal.zip",
   "release": "skill-v3.0.7",
   "subpath": ".agents\\skills\\impeccable",
-  "selfContained": true
+  "selfContained": true,
+  "upstreamTree": "9e460a87ef338ee9d12c7beed8fedc597a5af5f7",
+  "upstreamPath": ".agents/skills/impeccable"
 }

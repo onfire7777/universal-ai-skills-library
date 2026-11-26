@@ -3,5 +3,6 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\personal\\obsidian-vault",
-  "installedAt": "2026-05-07T22:17:38.117Z"
+  "installedAt": "2026-05-07T22:17:38.117Z",
+  "upstreamMissing": true
 }

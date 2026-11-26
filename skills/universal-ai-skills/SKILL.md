@@ -40,4 +40,5 @@ For every substantive user prompt:
 
 - Use an installed CLI directly or run `skill-router cli <executable> -- <arguments>` to pass its full native commands and flags through.
 - Read a skill's references, scripts, and assets using the base directory printed by `skill-router skill <name>`. Use `skill-router skills bundle <name>` to list the package and `skill-router skills path <name> <relative-file>` to resolve one file.
+- Use `skill-router skills source <name>` to locate the latest upstream source and the reviewed library copy.
 - For native skill discovery, install the complete selected skill with `skill-router skills install <name> --target <agent-skills-dir>`.

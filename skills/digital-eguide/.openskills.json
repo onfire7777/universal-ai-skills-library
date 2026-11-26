@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/nexu-io/open-design",
   "subpath": "skills\\digital-eguide",
-  "installedAt": "2026-05-07T21:50:03.427Z"
+  "installedAt": "2026-05-07T21:50:03.427Z",
+  "upstreamTree": "5fdcc3db1e31bd4fa70f673041b78e87977507c3",
+  "upstreamPath": "design-templates/digital-eguide"
 }

@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mvanhorn/cli-printing-press",
   "subpath": "skills\\printing-press-retro",
-  "installedAt": "2026-05-09T18:34:36.701Z"
+  "installedAt": "2026-05-09T18:34:36.701Z",
+  "upstreamTree": "1c47695ad167d9ff3000cc98ca8695c663fd92c3",
+  "upstreamPath": "skills/printing-press-retro"
 }

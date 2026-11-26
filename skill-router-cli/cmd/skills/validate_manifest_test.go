@@ -3,6 +3,7 @@ package skills
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -83,7 +84,11 @@ func TestValidateManifestDetectsDuplicateContent(t *testing.T) {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte("# same skill body\n"), 0644); err != nil {
+		body := "---\nname: " + name + "\ndescription: " + name + "\n---\n\n# same skill body\n"
+		if name == "beta" {
+			body = "\uFEFF" + strings.ReplaceAll(body, "\n", "\r\n")
+		}
+		if err := os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte(body), 0644); err != nil {
 			t.Fatal(err)
 		}
 	}

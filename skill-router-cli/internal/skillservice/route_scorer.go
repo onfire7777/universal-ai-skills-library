@@ -280,6 +280,11 @@ func scoreRouteFields(prompt, name string, aliases []string, description, source
 		if len(aliasTokens) == 0 {
 			continue
 		}
+		// A generic action alias such as "compress" identifies a skill by
+		// itself. In a request it needs a more specific phrase or description.
+		if len(promptTokens) > 1 && len(aliasTokens) == 1 && routeGenericActionTokens[aliasTokens[0].value] {
+			continue
+		}
 		evidence.uninstallSupport = evidence.uninstallSupport || routeHasAnyToken(aliasTokens, routeUninstallSupportTokens)
 		if routeContainsTokenPhrase(promptTokens, aliasTokens) {
 			evidence.exactAlias = true
@@ -657,7 +662,7 @@ var routeWeakTokens = map[string]bool{
 }
 
 var routeGenericActionTokens = map[string]bool{
-	"build": true, "check": true, "config": true, "configure": true,
+	"build": true, "check": true, "compress": true, "config": true, "configure": true,
 	"create": true, "creat": true, "debug": true, "fix": true,
 	"generate": true, "inspect": true, "install": true, "normalize": true,
 	"optimize": true, "optimiz": true, "review": true, "run": true,

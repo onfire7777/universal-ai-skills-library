@@ -46,7 +46,7 @@ import (
 
 // Version is the CLI version. It is a var (not const) so release builds can
 // stamp it via -ldflags "-X .../cmd/root.Version=<tag>".
-var Version = "2.3.0"
+var Version = "2.3.1"
 
 var rootCmd = &cobra.Command{
 	Use:   "skill-router",
@@ -133,7 +133,7 @@ func init() {
 	rootCmd.AddCommand(skills.AutoCmd)
 	rootCmd.AddCommand(skills.RouteCmd)
 	rootCmd.AddCommand(mcp.Cmd)
-	rootCmd.AddCommand(serve.Cmd)
+	rootCmd.AddCommand(serve.NewCommand(Version))
 	rootCmd.AddCommand(audit.Cmd)
 	rootCmd.AddCommand(oracle.Cmd)
 	rootCmd.AddCommand(print.Cmd)

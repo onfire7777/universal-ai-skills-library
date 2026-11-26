@@ -3,9 +3,9 @@
   "$doc": "Single source of truth for the unified skill registry. The skill CATALOG is derived from skills/ on disk; this file holds only the curated, non-derivable metadata. Generated CLI-first artifacts (manifest.json and docs/build_manifest.json) are produced by skill-router registry build and must never be hand-edited.",
   "schemaVersion": 1,
   "manifest": {
-    "version": "2.2.8",
-    "generated": "2026-05-15",
-    "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared 1,812-skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
+    "version": "2.3.1",
+    "generated": "2026-11-25",
+    "description": "Universal AI Skills Library manifest - machine-readable catalog of the shared skill corpus. Skill directories live under skills/ and are searched, preflight-routed, and loaded on demand through skill-router.",
     "canonical_id_policy": "Canonical skill ids are kebab-case top-level directory names. Legacy display names and old source names are aliases only.",
     "alias_count": 1917,
     "routing": {
@@ -36,20 +36,11 @@
     "ultimate-skill-creator"
   ],
   "aliases": {
-    "gstack": [
-      "garrytan-gstack",
-      "garry-tan-gstack",
-      "gstack-skills",
-      "gstack-router"
-    ],
-    "gbrain": [
-      "garrytan-gbrain",
-      "garry-tan-gbrain",
-      "gbrain-skills",
-      "brain-first"
-    ],
     "ahrefs-automation": [
       "Ahrefs Automation"
+    ],
+    "algorithmic-art": [
+      "claude-native-algorithmic-art"
     ],
     "anthropic-administrator-automation": [
       "anthropic_administrator-automation"
@@ -77,18 +68,40 @@
       "ckm-brand",
       "ckm:brand"
     ],
+    "brand-guidelines": [
+      "claude-native-brand-guidelines"
+    ],
     "brutalist-skill": [
       "industrial-brutalist-ui"
+    ],
+    "canvas-design": [
+      "claude-native-canvas-design"
     ],
     "capsule-crm-automation": [
       "Capsule CRM Automation",
       "capsule_crm-automation"
+    ],
+    "causal-inference-root-cause": [
+      "causal inference",
+      "causal DAG",
+      "confounding effects",
+      "treatment effects"
+    ],
+    "caveman-compress": [
+      "compress",
+      "compress memory file"
     ],
     "clockify-automation": [
       "Clockify Automation"
     ],
     "cloudinary-automation": [
       "Cloudinary Automation"
+    ],
+    "code-review": [
+      "claude-native-code-review",
+      "review pull request",
+      "review PR diff",
+      "review code for bugs"
     ],
     "coinbase-automation": [
       "Coinbase Automation"
@@ -124,17 +137,34 @@
       "customer-io-automation",
       "Customer.io Automation"
     ],
+    "debug-root-cause": [
+      "debug failing test",
+      "root cause failing test",
+      "debug test failure",
+      "diagnose failing test",
+      "test failing",
+      "failing unit test",
+      "unit test failure",
+      "flaky integration test",
+      "flaky test investigation",
+      "unit test failing"
+    ],
     "design": [
       "ckm-design",
-      "ckm:design"
+      "ckm:design",
+      "ckmdesign"
     ],
     "design-system": [
       "ckm-design-system",
-      "ckm:design-system"
+      "ckm:design-system",
+      "ckmdesign-system"
     ],
     "docker-hub-automation": [
       "Docker Hub Automation",
       "docker_hub-automation"
+    ],
+    "docx": [
+      "claude-native-docx"
     ],
     "dynamics365-automation": [
       "Dynamics 365 Automation",
@@ -179,6 +209,12 @@
     "freshbooks-automation": [
       "FreshBooks Automation"
     ],
+    "gbrain": [
+      "garrytan-gbrain",
+      "garry-tan-gbrain",
+      "gbrain-skills",
+      "brain-first"
+    ],
     "gong-automation": [
       "Gong Automation"
     ],
@@ -202,6 +238,12 @@
     ],
     "groqcloud-automation": [
       "GroqCloud Automation"
+    ],
+    "gstack": [
+      "garrytan-gstack",
+      "garry-tan-gstack",
+      "gstack-skills",
+      "gstack-router"
     ],
     "gumroad-automation": [
       "Gumroad Automation"
@@ -266,6 +308,9 @@
     ],
     "many-chat-automation": [
       "many_chat-automation"
+    ],
+    "mcp-builder": [
+      "claude-native-mcp-builder"
     ],
     "microsoft-clarity-automation": [
       "Microsoft Clarity Automation",
@@ -366,10 +411,18 @@
     "replicate-automation": [
       "Replicate Automation"
     ],
+    "requesting-code-review": [
+      "request code review",
+      "dispatch code reviewer",
+      "delegate code review"
+    ],
     "ring-central-automation": [
       "ring_central-automation",
       "RingCentral Automation",
       "ringcentral-automation"
+    ],
+    "saas-landing": [
+      "saas-landing-skill"
     ],
     "semrush-automation": [
       "SEMrush Automation"
@@ -412,12 +465,24 @@
     "taste-skill": [
       "design-taste-frontend"
     ],
+    "template": [
+      "template-skill"
+    ],
+    "test-driven-development": [
+      "write failing test first",
+      "write test first",
+      "red green refactor"
+    ],
+    "theme-factory": [
+      "claude-native-theme-factory"
+    ],
     "toggl-automation": [
       "Toggl Automation"
     ],
     "ui-styling": [
       "ckm-ui-styling",
-      "ckm:ui-styling"
+      "ckm:ui-styling",
+      "ckmui-styling"
     ],
     "uploadcare-automation": [
       "Uploadcare Automation"
@@ -425,6 +490,17 @@
     "wave-accounting-automation": [
       "Wave Accounting Automation",
       "wave_accounting-automation"
+    ],
+    "web-artifacts-builder": [
+      "artifacts-builder",
+      "claude-native-web-artifacts-builder"
+    ],
+    "webapp-testing": [
+      "claude-native-webapp-testing",
+      "playwright testing",
+      "test local web app",
+      "playwright end-to-end tests",
+      "playwright browser tests"
     ],
     "webex-automation": [
       "Webex Automation"
@@ -445,6 +521,9 @@
     ],
     "xero-automation": [
       "Xero Automation"
+    ],
+    "xlsx": [
+      "claude-native-xlsx"
     ],
     "zoho-bigin-automation": [
       "zoho_bigin-automation"
@@ -472,7 +551,6 @@
     "universal-ai-skills": "Use this whenever the user mentions Universal AI Skills, skill-router, router, route to a skill, unknown skill names, or wants the best skill selected automatically. This skill routes through the full `skill-router` corpus instead of relying on the native client skill list.",
     "gstack": "Universal adapter for Garry Tan's gstack engineering skill stack. Use when the user asks for gstack, gstack office-hours, gstack review, gstack QA, gstack shipping, gstack security review, gstack browser/PDF tooling, or gstack integration with Claude Code, Codex, OpenCode, Hermes, OpenClaw, Kiro, Cursor, or GBrain.",
     "gbrain": "Universal adapter for Garry Tan's GBrain personal knowledge brain. Use when the user asks for GBrain, brain-first retrieval, local PGLite brain setup, gbrain query/search/import/sync/embed, GBrain skills, Minions, durable agent jobs, soul-audit, brain maintenance, or integrating GBrain with gstack, Hermes, OpenClaw, Claude Code, or Codex.",
-    "causal-inference-root-cause": "Use when investigating why something happened and need to distinguish correlation from causation, identify root causes vs symptoms, test competing hypotheses, control for confounding variables, or design experiments to validate causal claims. Invoke when debugging systems, analyzing failures, researching health outcomes, evaluating policy impacts, or when user mentions root cause, causal chain, confounding, spurious correlation, or asks \"why did this really happen?",
     "scaffold-nextjs": "Scaffolds a production-ready Next.js turborepo with TypeScript, Tailwind CSS, the shadcn/ui CLI, Blode UI components from the ui.blode.co registry, blode-icons-react, Oxlint, Oxfmt, Ultracite, and Vercel deployment. Use when creating a new Next.js app, bootstrapping a turborepo, scaffolding a web project, starting a new website, or asking \"create a Next.js project.",
     "shopify-development": "Build Shopify apps, extensions, themes using GraphQL Admin API, Shopify CLI, Polaris UI, and Liquid. TRIGGER: \"shopify\", \"shopify app\", \"checkout extension\", \"admin extension\", \"POS extension\", \"shopify theme\", \"liquid template\", \"polaris\", \"shopify graphql\", \"shopify webhook\", \"shopify billing\", \"app subscription\", \"metafields\", \"shopify functions",
     "ui-animation": "Creates, reviews, and debugs UI motion and animation implementations. Covers springs, gestures, drag interactions, clip-path reveals, easing, timing, and animation review. Use when designing, implementing, or reviewing motion, CSS transitions, keyframes, framer-motion, spring animations, asking \"add animations to\", \"make this feel smooth\", \"review my animations\", \"should this animate\", or \"add a swipe gesture"
@@ -617,47 +695,96 @@
         "legacy_directory": "zoho_mail-automation",
         "canonical_directory": "zoho-mail-automation",
         "preserved_variant": true
+      },
+      {
+        "legacy_directory": "artifacts-builder",
+        "canonical_directory": "web-artifacts-builder",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "ckmdesign",
+        "canonical_directory": "design",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "ckmdesign-system",
+        "canonical_directory": "design-system",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "ckmui-styling",
+        "canonical_directory": "ui-styling",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-algorithmic-art",
+        "canonical_directory": "algorithmic-art",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-brand-guidelines",
+        "canonical_directory": "brand-guidelines",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-canvas-design",
+        "canonical_directory": "canvas-design",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-code-review",
+        "canonical_directory": "code-review",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-docx",
+        "canonical_directory": "docx",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-mcp-builder",
+        "canonical_directory": "mcp-builder",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-theme-factory",
+        "canonical_directory": "theme-factory",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-web-artifacts-builder",
+        "canonical_directory": "web-artifacts-builder",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-webapp-testing",
+        "canonical_directory": "webapp-testing",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "claude-native-xlsx",
+        "canonical_directory": "xlsx",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "compress",
+        "canonical_directory": "caveman-compress",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "saas-landing-skill",
+        "canonical_directory": "saas-landing",
+        "preserved_variant": false
+      },
+      {
+        "legacy_directory": "template-skill",
+        "canonical_directory": "template",
+        "preserved_variant": false
       }
     ],
     "disabled_colliding_aliases": {
-      "claude-native-algorithmic-art": [
-        "algorithmic-art"
-      ],
-      "claude-native-brand-guidelines": [
-        "brand-guidelines"
-      ],
-      "claude-native-canvas-design": [
-        "canvas-design"
-      ],
       "claude-native-claude-api": [
         "claude-api"
-      ],
-      "claude-native-code-review": [
-        "code-review"
-      ],
-      "claude-native-docx": [
-        "docx"
-      ],
-      "claude-native-mcp-builder": [
-        "mcp-builder"
-      ],
-      "claude-native-theme-factory": [
-        "theme-factory"
-      ],
-      "claude-native-web-artifacts-builder": [
-        "web-artifacts-builder"
-      ],
-      "claude-native-webapp-testing": [
-        "webapp-testing"
-      ],
-      "claude-native-xlsx": [
-        "xlsx"
-      ],
-      "saas-landing-skill": [
-        "saas-landing"
-      ],
-      "template": [
-        "template-skill"
       ]
     },
     "compatibility_policy": {

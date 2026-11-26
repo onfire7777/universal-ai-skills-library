@@ -241,6 +241,10 @@ def main() -> int:
         with open(BASELINE_PATH, encoding="utf-8") as fh:
             base = json.load(fh)
         regressions = []
+        for case, result in zip(cases, records):
+            if case.get("required") and not result.get("routed_to_expected", result["hit"]):
+                regressions.append(f"{case['id']}: expected {result['expect']}, "
+                                   f"got {result['decision']} {result['best']}")
         for k in GATED:
             delta = metrics.get(k, 0.0) - base.get(k, 0.0)
             if delta < -args.tolerance:

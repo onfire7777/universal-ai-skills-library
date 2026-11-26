@@ -1,6 +1,8 @@
 ---
 name: web-prototype-taste-brutalist
 description: Swiss industrial-print web prototype. Newsprint canvas, monolithic black grotesque, viewport-bleeding numerals, hairline grid dividers, hazard-red accent, ASCII syntax decoration. Distilled from Leonxlnx/taste-skill `brutalist-skill` (Swiss Industrial Print mode).
+od:
+  featured: 0.10
 ---
 
 # Web Prototype — Industrial Brutalist (Swiss Print)
@@ -9,7 +11,7 @@ For briefs that ask for "editorial", "newspaper", "agency portfolio", "Swiss des
 
 ## Source
 
-Distilled from [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) — `skills/brutalist-skill/SKILL.md` §2.1 (Swiss Industrial Print). For decks that lean into the dark CRT mode, see `skills/html-ppt-taste-brutalist/`.
+Distilled from [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) — `skills/brutalist-skill/SKILL.md` §2.1 (Swiss Industrial Print). For decks that lean into the dark CRT mode, see `design-templates/html-ppt-taste-brutalist/`.
 
 ## Hard rules
 

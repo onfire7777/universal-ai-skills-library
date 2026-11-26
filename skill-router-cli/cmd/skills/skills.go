@@ -85,6 +85,21 @@ var pathCmd = &cobra.Command{
 	},
 }
 
+var sourceCmd = &cobra.Command{
+	Use:   "source <skill-name>",
+	Short: "Locate the latest source of a skill and its reviewed library copy",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		source, err := skillservice.Source(args[0])
+		if err != nil {
+			return err
+		}
+		enc := json.NewEncoder(cmd.OutOrStdout())
+		enc.SetIndent("", "  ")
+		return enc.Encode(source)
+	},
+}
+
 var bundleCmd = &cobra.Command{
 	Use:   "bundle <skill-name>",
 	Short: "List the original skill bundle and all its files as JSON",
@@ -495,7 +510,7 @@ func init() {
 	composeCmd.Flags().Bool("allow-external", false, "Pipeline mode: inline third-party external skill bodies")
 
 	Cmd.AddCommand(readCmd)
-	Cmd.AddCommand(pathCmd, bundleCmd)
+	Cmd.AddCommand(pathCmd, bundleCmd, sourceCmd)
 	Cmd.AddCommand(loadSkillCmd)
 	Cmd.AddCommand(installCmd)
 	Cmd.AddCommand(syncCmd)

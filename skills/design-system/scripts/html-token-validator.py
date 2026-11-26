@@ -15,11 +15,43 @@ Usage:
 import re
 import json
 import sys
+import os
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-# Project root relative to this script
-PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
+# The skill can be installed outside the project it operates on (user-level
+# ~/.claude/skills/, or as a plugin), so the project root cannot be derived from
+# this file's location. Resolve it from the working directory instead -- the same
+# convention generate-tokens.cjs and validate-tokens.cjs already use via
+# process.cwd(). DESIGN_SYSTEM_PROJECT_ROOT overrides it explicitly.
+def _find_project_root():
+    override = os.environ.get('DESIGN_SYSTEM_PROJECT_ROOT')
+    if override:
+        return Path(override).resolve()
+    start = Path.cwd().resolve()
+    markers = (
+        Path('assets') / 'design-tokens.json',
+        Path('assets') / 'design-tokens.css',
+        Path('package.json'),
+        Path('.git'),
+    )
+    for candidate in (start, *start.parents):
+        if any((candidate / marker).exists() for marker in markers):
+            return candidate
+    return start
+
+
+PROJECT_ROOT = _find_project_root()
+
+# Force UTF-8 on stdout/stderr: this script prints emoji, which raises
+# UnicodeEncodeError on a Windows console (cp1252). Same guard as
+# src/ui-ux-pro-max/scripts/search.py.
+import io
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+if sys.stderr.encoding and sys.stderr.encoding.lower() != 'utf-8':
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 TOKENS_JSON_PATH = PROJECT_ROOT / 'assets' / 'design-tokens.json'
 TOKENS_CSS_PATH = PROJECT_ROOT / 'assets' / 'design-tokens.css'
 
@@ -79,7 +111,7 @@ def load_css_variables() -> Dict[str, str]:
     """Load CSS variables from design-tokens.css."""
     variables = {}
     if TOKENS_CSS_PATH.exists():
-        content = TOKENS_CSS_PATH.read_text()
+        content = TOKENS_CSS_PATH.read_text(encoding="utf-8")
         # Extract --var-name: value patterns
         for match in re.finditer(r'(--[\w-]+):\s*([^;]+);', content):
             variables[match.group(1)] = match.group(2).strip()
@@ -189,7 +221,7 @@ def validate_file(file_path: Path, verbose: bool = False) -> ValidationResult:
         result.add_error("File not found")
         return result
 
-    content = file_path.read_text()
+    content = file_path.read_text(encoding="utf-8")
     return validate_html(content, file_path, verbose)
 
 

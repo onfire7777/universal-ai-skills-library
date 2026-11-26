@@ -1,0 +1,9 @@
+{
+  "source": "anthropics/skills",
+  "sourceType": "git",
+  "repoUrl": "https://github.com/anthropics/skills",
+  "subpath": "skills\\docx",
+  "installedAt": "2026-05-07T21:40:18.769Z",
+  "upstreamTree": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
+  "upstreamPath": "skills/docx"
+}

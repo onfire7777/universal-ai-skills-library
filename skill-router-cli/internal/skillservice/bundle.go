@@ -11,8 +11,9 @@ import (
 
 // Bundle describes the original package. Paths in Files are relative to Directory.
 type Bundle struct {
-	Directory string   `json:"directory"`
-	Files     []string `json:"files"`
+	Directory string      `json:"directory"`
+	Files     []string    `json:"files"`
+	Source    SkillSource `json:"source"`
 }
 
 // ListBundle lists complete package contents without concatenating any files.
@@ -27,7 +28,7 @@ func ListBundle(name string) (Bundle, error) {
 	}
 	defer root.Close()
 
-	bundle := Bundle{Directory: dir, Files: []string{}}
+	bundle := Bundle{Directory: dir, Files: []string{}, Source: bundleSource(root, dir)}
 	err = fs.WalkDir(root.FS(), ".", func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err

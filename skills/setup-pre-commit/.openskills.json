@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\misc\\setup-pre-commit",
-  "installedAt": "2026-05-07T22:13:43.398Z"
+  "installedAt": "2026-05-07T22:13:43.398Z",
+  "upstreamTree": "6f7f7831a625f040a8e06a0e7954826b87ce775a",
+  "upstreamPath": "skills/misc/setup-pre-commit"
 }

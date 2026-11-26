@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/nexu-io/open-design",
   "subpath": "skills\\motion-frames",
-  "installedAt": "2026-05-07T22:14:53.420Z"
+  "installedAt": "2026-05-07T22:14:53.420Z",
+  "upstreamTree": "5fdcc3db1e31bd4fa70f673041b78e87977507c3",
+  "upstreamPath": "design-templates/motion-frames"
 }

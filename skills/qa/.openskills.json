@@ -3,5 +3,6 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\deprecated\\qa",
-  "installedAt": "2026-05-07T22:06:43.361Z"
+  "installedAt": "2026-05-07T22:06:43.361Z",
+  "upstreamMissing": true
 }

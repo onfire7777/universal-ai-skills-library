@@ -269,5 +269,5 @@ func updateSkillsRepo() error {
 }
 
 func updatePrintingPress() error {
-	return runner.RunCommand("go", "install", "github.com/mvanhorn/cli-printing-press/v4/cmd/printing-press@latest")
+	return runner.RunCommand("go", "install", "github.com/mvanhorn/cli-printing-press/v4/cmd/cli-printing-press@latest")
 }

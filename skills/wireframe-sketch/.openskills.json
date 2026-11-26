@@ -3,5 +3,6 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/nexu-io/open-design",
   "subpath": "skills\\wireframe-sketch",
-  "installedAt": "2026-05-06T07:15:57.084Z"
+  "installedAt": "2026-05-06T07:15:57.084Z",
+  "upstreamPath": "design-templates/wireframe-sketch"
 }

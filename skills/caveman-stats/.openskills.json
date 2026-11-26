@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/JuliusBrussee/caveman",
   "subpath": "skills\\caveman-stats",
-  "installedAt": "2026-05-07T21:38:01.043Z"
+  "installedAt": "2026-05-07T21:38:01.043Z",
+  "upstreamTree": "47c61be2d10a354f0c5cbe2b90959d24c06b16c6",
+  "upstreamPath": "skills/caveman-stats"
 }

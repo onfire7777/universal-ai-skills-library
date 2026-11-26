@@ -1,6 +1,6 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+description: "Request or delegate a code review to a separate reviewer. Prepare a review brief, gather the relevant diff and commit range, and hand the work to an independent reviewer."
 license: Unspecified
 ---
 # Requesting Code Review

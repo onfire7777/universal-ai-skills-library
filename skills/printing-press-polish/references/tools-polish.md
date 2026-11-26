@@ -16,7 +16,7 @@ This playbook has two passes. Both run on every CLI; do not skip either.
 Run the audit:
 
 ```bash
-printing-press tools-audit <cli-dir> --json
+cli-printing-press tools-audit <cli-dir> --json
 ```
 
 The audit emits findings on two surfaces:
@@ -24,7 +24,7 @@ The audit emits findings on two surfaces:
 - **Cobra source** (`internal/cli/*.go`) — `empty-short`, `thin-short`, `missing-read-only`. These check shell-out tools the runtime walker registers from Cobra metadata.
 - **Tools manifest** (`tools-manifest.json`) — `empty-mcp-description`, `thin-mcp-description`. These check the descriptions agents actually see for typed endpoint tools, where the source is the OpenAPI spec rather than the Cobra Short.
 
-The audit exempts `pp:endpoint`-annotated commands, parent groupers (no `RunE`), and framework-skipped commands (`auth`, `doctor`, `version`, …) from the Cobra-side checks — those don't become MCP tools the way Cobra Short would describe them.
+The audit exempts `pp:endpoint`-annotated commands, parent groupers (no `RunE`, or the generated `parentNoSubcommandRunE(flags)` sentinel), and framework-skipped commands (`auth`, `doctor`, `version`, …) from the Cobra-side checks — those are not actionable leaf tool descriptions for the Cobra Short audit.
 
 A finding here means the description is mechanically thin enough that there's no chance it's adequate. Fix it. But absence of a finding does NOT mean the description is good — the threshold is a floor, not a ceiling. That's what Pass 2 is for.
 
@@ -103,7 +103,7 @@ Both `tools-manifest.json` and `internal/mcp/tools.go` are generated artifacts (
 
 Keys are the MCP tool names exactly as they appear in `tools-manifest.json`'s `name` field (snake_case, e.g. `tags_create`, `bookings_attendees_booking-add`). Values are the new descriptions written per the MCP criteria below.
 
-After writing one or more overrides, **run `printing-press mcp-sync <cli-dir>`** to regenerate the manifest and runtime registration with the override applied. Then re-run the audit; the finding disappears because the manifest now reflects the override.
+After writing one or more overrides, **run `cli-printing-press mcp-sync <cli-dir>`** to regenerate the manifest and runtime registration with the override applied. If it refuses with `reprint required`, stop and reprint the CLI before retrying; do not rewrite the generated `tools.go` against an incompatible client. Then re-run the audit; the finding disappears because the manifest now reflects the override.
 
 The override file is hand-editable, persists across regenerations (it lives outside the generator's emit set), and survives `mcp-sync` runs. It's the only place an agent should write MCP descriptions that have to last.
 
@@ -117,7 +117,7 @@ This is where the actual quality assessment happens. Walk every user-facing comm
 For each command:
 
 - Read its `RunE` body (or for typed endpoint tools, the underlying spec method/path). Does it call an HTTP method (`client.Get`, `resolveRead`, `c.Post`, …)? Does it write to the local store, the filesystem, or config?
-  - **HTTP GET only, no local writes** → mark `mcp:read-only` (even if the audit didn't flag).
+  - **HTTP GET only, no local writes** → mark `mcp:read-only` (even if the audit didn't flag), unless the GET is an RPC-style mutation (`method=`/`action=` selector, shared gateway path, or a verb like login/rename/delete).
   - **Any local write or external mutation** → do NOT mark; the default destructive hint is correct.
   - **Side effect** (browser open, notification, audio) → do NOT mark; agents should be prompted.
 - Read the description (Cobra `Short` for shell-out, manifest entry for typed endpoint). Test against the criteria below — not just "is it long enough" but "does it actually answer the four questions an agent needs answered before calling this tool?" If the answer is "not really," rewrite.
@@ -158,11 +158,11 @@ The before is what OpenAPI auto-generators emit. The after is what an agent pick
 
 Don't write MCP descriptions from general API knowledge — that produces plausible but inaccurate prose. The CLI ships with the source material; ground every rewrite in it.
 
-**The spec is authoritative. `tools-manifest.json` is a derivative.** For required-vs-optional, parameter location (path / query / body), and the canonical parameter list, read `<cli-dir>/spec.json` (or `spec.yaml`) directly. The manifest's `params` field is generated from the spec; generator bugs can drop or misclassify entries. When the manifest disagrees with the spec, **the spec wins**. The manifest's `description` field is the spec's `summary` shaped for MCP — useful as orientation, not as the source of truth for parameter contracts.
+**The spec is authoritative. `tools-manifest.json` is a derivative.** For required-vs-optional, parameter location (path / query / header / body), and the canonical parameter list, read `<cli-dir>/spec.json` (or `spec.yaml`) directly. The manifest's `params` field is generated from the spec; generator bugs can drop or misclassify entries. When the manifest disagrees with the spec, **the spec wins**. The manifest's `description` field is the spec's `summary` shaped for MCP — useful as orientation, not as the source of truth for parameter contracts.
 
 **Per-tool spec walk** (do this for every finding, not a sample):
 
-1. **Find the operation.** `tools-manifest.json` gives you `path` and `method`. Look up `spec.paths[<path>][<method>]`.
+1. **Find the operation.** `tools-manifest.json` gives you `path` and `method`. Look up `spec.paths[<path>][<method>]`. When the tool also has `base_url`, join that origin in front of `path` to get the request URL the CLI calls. The `spec.paths` lookup uses `path`.
 
 2. **Description prose** comes from the operation:
    - `description` field — usually richer than `summary`. Primary source.
@@ -273,10 +273,12 @@ Write to `<cli-dir>/mcp-descriptions.json`, then run `mcp-sync` to apply.
 ```
 
 ```bash
-printing-press mcp-sync <cli-dir>
+cli-printing-press mcp-sync <cli-dir>
 ```
 
 The sync regenerates `tools-manifest.json` and `internal/mcp/tools.go` with the overrides applied. Both generated files now carry the richer text; both are wiped and re-emitted from the override file on every regen, so edits persist. Re-run `tools-audit` to confirm the finding is gone.
+
+If `mcp-sync` refuses with `reprint required`, the override is not applied yet. Reprint the CLI, retry the sync, and only then mark the finding resolved.
 
 ## Ledger and resumability
 
@@ -364,11 +366,11 @@ A run is complete only when the summary line reads `tools-audit: no pending find
 After applying fixes, before declaring the polish complete:
 
 - [ ] `go build ./...` clean (annotations don't break compilation)
-- [ ] `printing-press tools-audit <cli-dir>` summary line reads `no pending findings`. No `incomplete:` block — every gate (pre-decision fields, duplicate rationale, scorecard delta) passes.
-- [ ] `printing-press dogfood --dir <cli-dir>` reports `MCP Surface: PASS`
-- [ ] If `mcp-descriptions.json` was edited, `printing-press mcp-sync <cli-dir>` was run to apply the overrides into `tools-manifest.json` and `internal/mcp/tools.go`. Re-run `tools-audit` after the sync to confirm thin-mcp-description findings disappeared.
+- [ ] `cli-printing-press tools-audit <cli-dir>` summary line reads `no pending findings`. No `incomplete:` block — every gate (pre-decision fields, duplicate rationale, scorecard delta) passes.
+- [ ] `cli-printing-press dogfood --dir <cli-dir>` reports `MCP Surface: PASS`
+- [ ] If `mcp-descriptions.json` was edited, `cli-printing-press mcp-sync <cli-dir>` completed successfully to apply the overrides into `tools-manifest.json` and `internal/mcp/tools.go`. A `reprint required` refusal was resolved by reprinting before retrying. Re-run `tools-audit` after the sync to confirm thin-mcp-description findings disappeared.
 - [ ] If commands were renamed or had their annotations restructured, smoke-test the binary by inspecting `--help` output for the affected commands
 
 The ledger file persists until it ages out (24h). Once the polish PR merges and the CLI is rebuilt, the file is no longer load-bearing — the next `tools-audit` run can start fresh.
 
-If you're polishing a CLI inside a clone of the public library repo (not the internal `~/printing-press/library/`), add `.printing-press-tools-polish.json` to that repo's root `.gitignore` before committing — the ledger is local working state, not part of the published CLI.
+If you're polishing a CLI inside a clone of the public library repo (not the internal `$PRESS_LIBRARY/`), add `.printing-press-tools-polish.json` to that repo's root `.gitignore` before committing — the ledger is local working state, not part of the published CLI.

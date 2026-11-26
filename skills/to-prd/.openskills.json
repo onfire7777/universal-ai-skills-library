@@ -3,5 +3,6 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\engineering\\to-prd",
-  "installedAt": "2026-05-06T07:12:02.737Z"
+  "installedAt": "2026-05-06T07:12:02.737Z",
+  "upstreamMissing": true
 }

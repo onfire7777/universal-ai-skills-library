@@ -5,10 +5,10 @@
   "router_source": "skill-router-cli",
   "primary_binary": "skill-router",
   "compatibility_binary_aliases": [],
-  "skill_count": 1812,
-  "directories_total": 1812,
+  "skill_count": 1795,
+  "directories_total": 1795,
   "missing_skill_md": [],
-  "alias_count": 214,
+  "alias_count": 259,
   "merged_legacy_directories": [
     {
       "legacy_directory": "anthropic_administrator-automation",
@@ -139,47 +139,96 @@
       "legacy_directory": "zoho_mail-automation",
       "canonical_directory": "zoho-mail-automation",
       "preserved_variant": true
+    },
+    {
+      "legacy_directory": "artifacts-builder",
+      "canonical_directory": "web-artifacts-builder",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "ckmdesign",
+      "canonical_directory": "design",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "ckmdesign-system",
+      "canonical_directory": "design-system",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "ckmui-styling",
+      "canonical_directory": "ui-styling",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-algorithmic-art",
+      "canonical_directory": "algorithmic-art",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-brand-guidelines",
+      "canonical_directory": "brand-guidelines",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-canvas-design",
+      "canonical_directory": "canvas-design",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-code-review",
+      "canonical_directory": "code-review",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-docx",
+      "canonical_directory": "docx",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-mcp-builder",
+      "canonical_directory": "mcp-builder",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-theme-factory",
+      "canonical_directory": "theme-factory",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-web-artifacts-builder",
+      "canonical_directory": "web-artifacts-builder",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-webapp-testing",
+      "canonical_directory": "webapp-testing",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "claude-native-xlsx",
+      "canonical_directory": "xlsx",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "compress",
+      "canonical_directory": "caveman-compress",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "saas-landing-skill",
+      "canonical_directory": "saas-landing",
+      "preserved_variant": false
+    },
+    {
+      "legacy_directory": "template-skill",
+      "canonical_directory": "template",
+      "preserved_variant": false
     }
   ],
   "disabled_colliding_aliases": {
-    "claude-native-algorithmic-art": [
-      "algorithmic-art"
-    ],
-    "claude-native-brand-guidelines": [
-      "brand-guidelines"
-    ],
-    "claude-native-canvas-design": [
-      "canvas-design"
-    ],
     "claude-native-claude-api": [
       "claude-api"
-    ],
-    "claude-native-code-review": [
-      "code-review"
-    ],
-    "claude-native-docx": [
-      "docx"
-    ],
-    "claude-native-mcp-builder": [
-      "mcp-builder"
-    ],
-    "claude-native-theme-factory": [
-      "theme-factory"
-    ],
-    "claude-native-web-artifacts-builder": [
-      "web-artifacts-builder"
-    ],
-    "claude-native-webapp-testing": [
-      "webapp-testing"
-    ],
-    "claude-native-xlsx": [
-      "xlsx"
-    ],
-    "saas-landing-skill": [
-      "saas-landing"
-    ],
-    "template": [
-      "template-skill"
     ]
   },
   "compatibility_policy": {

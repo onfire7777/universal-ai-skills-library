@@ -109,7 +109,7 @@ Write only `index.html`. Do not generate a separate CSS file, JS file, or README
 This is a minimal but complete skill. Structure:
 
 ```
-saas-landing-skill/
+saas-landing/
 ├── SKILL.md    ← you are here
 └── assets/
     └── base.html    (optional starter template; this skill doesn't use one)
@@ -121,4 +121,4 @@ Things to notice:
 - DESIGN.md is treated as a collaborator, not an override. The skill gives the agent authority to override when the brief conflicts, but never to invent new tokens.
 - `data-od-id` tagging is how we wire elements to comment mode. Skills that want comment-mode compatibility must annotate their output.
 
-See [`../../skills-protocol.md`](../../skills-protocol.md) for the full protocol.
+See [`../../docs/skills-protocol.md`](../../docs/skills-protocol.md) for the full protocol.

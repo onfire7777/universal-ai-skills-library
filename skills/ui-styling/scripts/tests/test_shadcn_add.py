@@ -86,6 +86,25 @@ class TestShadcnInstaller:
 
         assert sorted(installed) == ["button", "card"]
 
+    @pytest.mark.parametrize(
+        "aliases, ui_path",
+        [
+            ({"components": "@/components", "ui": "@/components/ui"}, "src/components/ui"),
+            ({"components": "~/components"}, "components/ui"),
+            ({"components": "@/components", "ui": "@/components/shadcn"}, "components/shadcn"),
+        ],
+    )
+    def test_get_installed_components_resolves_aliases(self, tmp_path, aliases, ui_path):
+        """Installed components are found under src/, ~/ and custom ui aliases."""
+        (tmp_path / "components.json").write_text(json.dumps({"aliases": aliases}))
+        ui_dir = tmp_path / ui_path
+        ui_dir.mkdir(parents=True)
+        (ui_dir / "button.tsx").write_text("export const Button = () => {}")
+
+        installer = ShadcnInstaller(project_root=tmp_path)
+
+        assert installer.get_installed_components() == ["button"]
+
     def test_get_installed_components_no_config(self, tmp_path):
         """Test getting installed components without config."""
         installer = ShadcnInstaller(project_root=tmp_path)
@@ -173,7 +192,7 @@ class TestShadcnInstaller:
         # Verify correct command was called
         mock_run.assert_called_once()
         call_args = mock_run.call_args[0][0]
-        assert call_args[:3] == ["npx", "shadcn@latest", "add"]
+        assert call_args[:3] == ["npx", "shadcn@2.3.0", "add"]
         assert "button" in call_args
         assert "card" in call_args
 

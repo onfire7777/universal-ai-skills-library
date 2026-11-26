@@ -23,6 +23,7 @@ be features that can actually ship.
 | **Scope creep** | Feature is really an application, not a command. Would take >200 lines to implement, needs a TUI, or requires persistent background processes. | **Descope** to the one-command version. "Dashboard" → "summary stats." "Monitor" → "poll once with --watch." If the one-command version isn't useful, **cut**. |
 | **Verifiability** | Feature can't be tested in dogfood. No way to verify the output is correct without manual inspection or domain expertise. | **Flag** as low-confidence. Keep only if the value is high enough to justify manual QA. |
 | **Reimplementation** | Feature synthesizes API responses locally instead of calling the API. Hand-rolled response builders, hardcoded JSON returned as an "API result," endpoint stubs that return constants, or aggregations computed in-process when the API has an aggregation endpoint. | **Cut or rewrite.** A printed CLI that pretends to call the API is strictly worse than the API call it replaces. Local SQLite commands (`stale`, `bottleneck`, `health`, `reconcile`) are local-data commands, not fake API calls. Curated static-reference commands must use `// pp:novel-static-reference`. Commands that call a real API through a wrapper dogfood cannot see must use `// pp:client-call`; never use that directive for hardcoded payloads or fake stubs. Dogfood's `reimplementation_check` enforces this at generation time. |
+| **Credential getenv** | Novel command that calls the API reads the auth env var with `os.Getenv` instead of `config.Load` + `AuthHeader()` / `novelAuthHeader` | **Rewrite.** Endpoint commands already use that seam; getenv misses credentials saved by `auth login` / `auth set-token`. Check `resp.StatusCode` before decoding the body so a plain-text 401 is not reported as a JSON syntax error. Dogfood flags `os.Getenv("<AUTH_ENV>")` in novel command files. |
 
 **Buildability proof.** For each surviving feature, write one sentence:
 
@@ -48,16 +49,28 @@ Apply to candidates that survive the kill/keep checks.
 Survivors render as rows in the absorb manifest's transcendence table:
 
 ```markdown
-| # | Feature | Command | Score | How It Works | Evidence |
-|---|---------|---------|-------|-------------|----------|
-| N | Player comparison | compare "LeBron" "Curry" | 8/10 | Joins player_stats + team + season tables in local SQLite | ESPN community requests, espn_scraper lacks cross-player queries |
+| # | Feature | Command | Score | Buildability | How It Works | Evidence | Long Description |
+|---|---------|---------|-------|--------------|--------------|----------|------------------|
+| N | Player comparison | compare "LeBron" "Curry" | 8/10 | hand-code | Joins player_stats + team + season tables in local SQLite | ESPN community requests, espn_scraper lacks cross-player queries | Use this command to compare two players. Do NOT use it for team-level comparisons; use 'team compare' instead. |
 ```
 
 The "How It Works" column is the buildability proof — one sentence showing the
 specific API endpoint or local data that powers the feature.
 
+The "Buildability" column tags whether the generator auto-emits the feature
+from the spec (`spec-emits`) or whether the agent must hand-write the Cobra
+file plus `root.go` wiring after generate (`hand-code`). See Pass 3 question 5
+in [novel-features-subagent.md](novel-features-subagent.md) for the
+classification rules. The Phase Gate 1.5 prose showcase counts `hand-code`
+rows from this column when reading out the hand-code commitment.
+
 The "Evidence" column MUST cite specific findings from Phase 1 or Phase 1.5
 research. "Power users would love this" is not evidence.
+
+The "Long Description" column is `none` unless the feature overlaps with a
+sibling command closely enough that an agent may choose the wrong tool. When it
+is populated, it is implementation guidance for the hand-coded Cobra `Long`
+field and must reference only command names that survived the Pass 3 cut.
 
 ## Reprint verdict rules
 

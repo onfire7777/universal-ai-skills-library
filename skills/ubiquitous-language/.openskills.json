@@ -3,5 +3,6 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\deprecated\\ubiquitous-language",
-  "installedAt": "2026-05-06T07:12:02.649Z"
+  "installedAt": "2026-05-06T07:12:02.649Z",
+  "upstreamMissing": true
 }

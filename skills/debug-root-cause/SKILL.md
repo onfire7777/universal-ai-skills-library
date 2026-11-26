@@ -1,6 +1,6 @@
 ---
 name: debug-root-cause
-description: "Systematic root-cause debugging — reproduce, isolate, hypothesize, fix the actual cause not symptoms. Use when something is broken, behaving unexpectedly, or when a bug needs methodical investigation. Triggers on: 'debug this', 'why is this broken', 'this isn't working', 'find the bug', 'root cause', 'troubleshoot', 'figure out why', 'diagnose this error'."
+description: "Investigate a failing test, test failure, crash, exception, or software bug. Reproduce the failure, isolate the failing code, test hypotheses, and verify the fix with a regression test. Use to find the root cause of unexpected software behavior."
 ---
 
 # Debug — Root Cause Analysis

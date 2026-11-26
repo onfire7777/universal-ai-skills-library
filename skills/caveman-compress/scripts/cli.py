@@ -6,6 +6,7 @@ Usage:
     caveman <filepath>
 """
 
+import argparse
 import sys
 
 # Force UTF-8 on stdout/stderr before any code can print. Windows consoles
@@ -21,20 +22,20 @@ for _stream in (sys.stdout, sys.stderr):
 
 from pathlib import Path
 
-from .compress import compress_file
+# Direct script execution has no package context. Resolve imports relative to
+# this installed skill, independent of the caller's working directory.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    __package__ = "scripts"
+
+from .compress import backup_dir_for, compress_file, is_sensitive_path
 from .detect import detect_file_type, should_compress
 
 
-def print_usage():
-    print("Usage: caveman <filepath>")
-
-
 def main():
-    if len(sys.argv) != 2:
-        print_usage()
-        sys.exit(1)
-
-    filepath = Path(sys.argv[1])
+    parser = argparse.ArgumentParser(description="Compress a natural-language file with validation and an original backup.")
+    parser.add_argument("filepath", type=Path, help="path to the file to compress")
+    filepath = parser.parse_args().filepath
 
     # Check file exists
     if not filepath.exists():
@@ -46,6 +47,13 @@ def main():
         sys.exit(1)
 
     filepath = filepath.resolve()
+
+    # Refuse before detect_file_type(), which reads extensionless files to sniff them.
+    if is_sensitive_path(filepath):
+        print(f"❌ Refusing to compress {filepath}: filename looks sensitive "
+              "(credentials, keys, secrets, or known private paths). "
+              "Rename the file if this is a false positive.")
+        sys.exit(1)
 
     # Detect file type
     file_type = detect_file_type(filepath)
@@ -64,12 +72,13 @@ def main():
 
         if success:
             print("\nCompression completed successfully")
-            backup_path = filepath.with_name(filepath.stem + ".original.md")
+            backup_path = backup_dir_for(filepath) / (filepath.stem + ".original.md")
             print(f"Compressed: {filepath}")
             print(f"Original:   {backup_path}")
             sys.exit(0)
         else:
-            print("\n❌ Compression failed after retries")
+            # Also reached when no attempt ran (backup exists, empty file, ...).
+            print("\n❌ Compression did not complete (see above). Original file is untouched.")
             sys.exit(2)
 
     except KeyboardInterrupt:

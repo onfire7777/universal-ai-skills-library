@@ -66,14 +66,14 @@ func startsWithJSSpace(s string) bool {
 	return r != utf8.RuneError && isJSSpace(r)
 }
 
-// extractFrontMatterBlock returns the inner body of a leading `---\n ... \n---`
-// block (and true), or ("", false) when absent. Tolerates a UTF-8 BOM and CRLF.
-func extractFrontMatterBlock(content string) (string, bool) {
+// splitFrontMatter separates leading YAML metadata from the Markdown body.
+// It normalizes a UTF-8 BOM and CRLF independently of the host OS.
+func splitFrontMatter(content string) (string, string, bool) {
 	content = strings.TrimPrefix(content, bom)
 	content = strings.ReplaceAll(content, "\r\n", "\n")
 	const open = "---\n"
 	if !strings.HasPrefix(content, open) {
-		return "", false
+		return "", content, false
 	}
 	rest := content[len(open):]
 	// Find the first "\n---" whose closing fence is terminated by \n or EOF
@@ -82,15 +82,21 @@ func extractFrontMatterBlock(content string) (string, bool) {
 	for {
 		idx := strings.Index(rest[search:], "\n---")
 		if idx < 0 {
-			return "", false
+			return "", content, false
 		}
 		idx += search
 		after := idx + len("\n---")
 		if after == len(rest) || rest[after] == '\n' {
-			return rest[:idx], true
+			return rest[:idx], strings.TrimPrefix(rest[after:], "\n"), true
 		}
 		search = idx + 1
 	}
+}
+
+// SkillBody returns the instructions without frontmatter or outer whitespace.
+func SkillBody(content string) string {
+	_, body, _ := splitFrontMatter(content)
+	return strings.TrimSpace(body)
 }
 
 // readScalarField reads a single top-level scalar field from a front-matter
@@ -138,7 +144,7 @@ func readScalarField(body, key string) string {
 // parseFrontMatterDescription returns the collapsed `description` field of a
 // SKILL.md file, or "" when there is no front matter / no description.
 func parseFrontMatterDescription(content string) string {
-	body, ok := extractFrontMatterBlock(content)
+	body, _, ok := splitFrontMatter(content)
 	if !ok {
 		return ""
 	}

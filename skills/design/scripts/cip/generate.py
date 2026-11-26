@@ -7,11 +7,19 @@ Uses Gemini's native image generation (Nano Banana Flash/Pro) for high-quality m
 Supports text-and-image-to-image generation for using actual brand logos.
 
 - gemini-2.5-flash-image: Fast generation, cost-effective (default)
-- gemini-3-pro-image-preview: Pro quality, 4K text rendering
+- gemini-3-pro-image: Pro quality, 4K text rendering
+
+Set GEMINI_FLASH_IMAGE_MODEL or GEMINI_PRO_IMAGE_MODEL to use another Gemini
+model id, for example when Google retires one of these.
 
 Image Editing (text-and-image-to-image):
   When --logo is provided, the script uses Gemini's image editing capability
   to incorporate the actual logo into CIP mockups instead of generating one.
+
+Each mockup is saved with the extension of the image type Gemini returns
+(.png, .jpg or .webp). Exit status is 1 when nothing was generated: a failed
+single deliverable, or a set where every deliverable failed. A set where some
+deliverables succeed exits 0 and reports how many were generated.
 """
 
 import argparse
@@ -25,12 +33,13 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).parent))
 from core import search, get_cip_brief
 
-# Model options
-MODELS = {
-    "flash": "gemini-2.5-flash-image",      # Nano Banana Flash - fast, default
-    "pro": "gemini-3-pro-image-preview"      # Nano Banana Pro - quality, 4K text
-}
-DEFAULT_MODEL = "flash"
+# These scripts print emoji, which raises UnicodeEncodeError when stdout/stderr is
+# a cp1252 pipe or file (Windows without PYTHONUTF8). Same intent as the guard in
+# ui-ux-pro-max/scripts/search.py.
+for _stream in (sys.stdout, sys.stderr):
+    _encoding = getattr(_stream, "encoding", None)
+    if _encoding and _encoding.lower().replace("-", "") != "utf8" and hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors=_stream.errors)
 
 
 def load_logo_image(logo_path):
@@ -84,6 +93,16 @@ def load_env():
                             os.environ[key] = value.strip('"\'')
 
 load_env()
+
+# Model options (read after load_env so .env files can override the ids)
+MODELS = {
+    "flash": os.environ.get("GEMINI_FLASH_IMAGE_MODEL") or "gemini-2.5-flash-image",  # Nano Banana Flash - fast, default
+    "pro": os.environ.get("GEMINI_PRO_IMAGE_MODEL") or "gemini-3-pro-image"  # Nano Banana Pro - quality, 4K text
+}
+DEFAULT_MODEL = "flash"
+
+# File extensions for the image types Gemini returns as inline data
+IMAGE_EXTENSIONS = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
 
 
 def build_cip_prompt(deliverable, brand_name, style=None, industry=None, mockup=None, use_logo_image=False):
@@ -192,7 +211,7 @@ def generate_with_nano_banana(prompt_data, output_dir=None, model_key="flash", a
 
     Models:
     - flash: gemini-2.5-flash-image (fast, cost-effective) - DEFAULT
-    - pro: gemini-3-pro-image-preview (quality, 4K text rendering)
+    - pro: gemini-3-pro-image (quality, 4K text rendering)
 
     Args:
         prompt_data: Dict with prompt, deliverable, brand, etc.
@@ -265,7 +284,9 @@ def generate_with_nano_banana(prompt_data, output_dir=None, model_key="flash", a
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                     brand_slug = prompt_data["brand"].lower().replace(" ", "-")
                     deliverable_slug = prompt_data["deliverable"].lower().replace(" ", "-")
-                    filename = f"{brand_slug}-{deliverable_slug}-{timestamp}.png"
+                    mime_type = (part.inline_data.mime_type or "").split(";")[0].strip().lower()
+                    extension = IMAGE_EXTENSIONS.get(mime_type, ".png")
+                    filename = f"{brand_slug}-{deliverable_slug}-{timestamp}{extension}"
                     filepath = output_dir / filename
 
                     image_data = part.inline_data.data
@@ -390,7 +411,7 @@ Examples:
 
 Models:
   flash (default): gemini-2.5-flash-image - Fast, cost-effective
-  pro: gemini-3-pro-image-preview - Quality, 4K text rendering
+  pro: gemini-3-pro-image - Quality, 4K text rendering
 
 Image Editing Mode:
   When --logo is provided, uses Gemini's text-and-image-to-image capability
@@ -427,7 +448,10 @@ Image Editing Mode:
         action = check_logo_required(args.brand, skip_prompt=args.no_logo_prompt)
         if action == 'generate':
             print("\n💡 To generate a logo, use the logo-design skill:")
-            print(f"   python ~/.claude/skills/design/scripts/logo/generate.py --brand \"{args.brand}\" --industry \"{args.industry}\"")
+            # Resolved from this file so the hint is correct from any cwd and in
+            # every install layout (plugin cache, project or --global install).
+            logo_script = Path(__file__).resolve().parents[1] / "logo" / "generate.py"
+            print(f"   python \"{logo_script}\" --brand \"{args.brand}\" --industry \"{args.industry}\"")
             print("\n   Then re-run this command with --logo <generated_logo.png>")
             sys.exit(0)
         elif action == 'exit':
@@ -461,6 +485,8 @@ Image Editing Mode:
                 print(json.dumps(results, indent=2))
             else:
                 print(f"\n✅ Generated {len(results)} CIP mockups")
+            if not results:
+                sys.exit(1)
     else:
         # Generate single deliverable
         deliverable = args.deliverable or "business card"
@@ -478,6 +504,8 @@ Image Editing Mode:
             )
             if args.json:
                 print(json.dumps({"filepath": filepath, **prompt_data}, indent=2))
+            if filepath is None:
+                sys.exit(1)
 
 
 if __name__ == "__main__":
