@@ -80,3 +80,19 @@ func TestNaturalOwnSubjectKeepsPossessiveLocal(t *testing.T) {
 		t.Fatalf("local possessor borrowed another stage: %+v", stages)
 	}
 }
+
+func TestStructuredParallelSubjectsKeepTheirStatedDependencies(t *testing.T) {
+	req := WorkflowPlanRequest{Prompt: "Inspect the two sample batches and rate their quality.", Requirements: []WorkflowRequirement{
+		{ID: "left", Text: "Label the copper samples"},
+		{ID: "right", Text: "Label the ceramic samples"},
+		{ID: "grade-left", Text: "Rate their quality", DependsOn: []string{"left"}},
+	}}
+	stages, err := normalizeRequirements(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(stages) != 3 || len(stages[0].DependsOn) != 0 || len(stages[1].DependsOn) != 0 ||
+		stages[2].Text != "Rate their quality" || !slices.Equal(stages[2].DependsOn, []string{"left"}) {
+		t.Fatal(stages)
+	}
+}
