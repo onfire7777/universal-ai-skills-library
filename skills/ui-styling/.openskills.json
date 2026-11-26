@@ -4,5 +4,7 @@
   "subpath": ".claude\\skills\\ui-styling",
   "repoUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
   "selfContained": true,
-  "installedAt": "2026-05-06T02:50:15.6432621Z"
+  "installedAt": "2026-05-06T02:50:15.6432621Z",
+  "upstreamTree": "b73ee96f8d4ff7bbc279c52dadcd907ffe23629c",
+  "upstreamPath": ".claude/skills/ui-styling"
 }

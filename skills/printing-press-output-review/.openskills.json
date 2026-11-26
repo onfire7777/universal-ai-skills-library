@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mvanhorn/cli-printing-press",
   "subpath": "skills\\printing-press-output-review",
-  "installedAt": "2026-05-09T18:34:36.642Z"
+  "installedAt": "2026-05-09T18:34:36.642Z",
+  "upstreamTree": "1c47695ad167d9ff3000cc98ca8695c663fd92c3",
+  "upstreamPath": "skills/printing-press-output-review"
 }

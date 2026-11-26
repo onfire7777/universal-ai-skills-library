@@ -4,5 +4,7 @@
   "subpath": ".claude\\skills\\design-system",
   "repoUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
   "selfContained": true,
-  "installedAt": "2026-05-07T21:48:36.095Z"
+  "installedAt": "2026-05-07T21:48:36.095Z",
+  "upstreamTree": "b73ee96f8d4ff7bbc279c52dadcd907ffe23629c",
+  "upstreamPath": ".claude/skills/design-system"
 }

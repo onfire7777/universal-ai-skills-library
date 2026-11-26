@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/anthropics/skills",
   "subpath": "skills\\claude-api",
-  "installedAt": "2026-05-07T21:40:13.238Z"
+  "installedAt": "2026-05-07T21:40:13.238Z",
+  "upstreamTree": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
+  "upstreamPath": "skills/claude-api"
 }

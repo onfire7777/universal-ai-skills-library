@@ -1,5 +1,7 @@
 """Tests for tailwind_config_gen.py"""
 
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -276,6 +278,120 @@ class TestTailwindConfigGenerator:
         assert "import type { Config }" in content
         assert "brand" in content
 
+    def test_write_config_refuses_to_overwrite_existing_file(self, tmp_path):
+        """Existing project configuration must be preserved by default."""
+        output_path = tmp_path / "tailwind.config.ts"
+        existing = "// existing project config\nexport default { theme: {} }\n"
+        output_path.write_text(existing)
+        generator = TailwindConfigGenerator(output_path=output_path)
+
+        success, message = generator.write_config()
+
+        assert success is False
+        assert "already exists" in message
+        assert "--force" in message
+        assert output_path.read_text() == existing
+
+    def test_write_config_force_overwrites_existing_file(self, tmp_path):
+        """An explicit force opt-in permits replacing an existing config."""
+        output_path = tmp_path / "tailwind.config.ts"
+        output_path.write_text("// existing project config\n")
+        generator = TailwindConfigGenerator(output_path=output_path, force=True)
+        generator.add_colors({"brand": "#3b82f6"})
+
+        success, message = generator.write_config()
+
+        assert success is True
+        assert "written to" in message
+        assert "brand" in output_path.read_text()
+
+    def test_cli_refuses_existing_config_without_force(self, tmp_path):
+        """The CLI must return non-zero and preserve an existing default target."""
+        output_path = tmp_path / "tailwind.config.ts"
+        existing = "// existing project config\n"
+        output_path.write_text(existing)
+        script = Path(__file__).parent.parent / "tailwind_config_gen.py"
+
+        result = subprocess.run(
+            [sys.executable, str(script), "--colors", "brand:#3b82f6"],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 1
+        assert "already exists" in result.stderr
+        assert "--force" in result.stderr
+        assert output_path.read_text() == existing
+
+    def test_cli_refuses_sibling_config_extension_without_force(self, tmp_path):
+        """A default .ts write must not create a second config beside .js."""
+        existing_path = tmp_path / "tailwind.config.js"
+        existing = "// existing JavaScript project config\nmodule.exports = {}\n"
+        existing_path.write_text(existing)
+        output_path = tmp_path / "tailwind.config.ts"
+        script = Path(__file__).parent.parent / "tailwind_config_gen.py"
+
+        result = subprocess.run(
+            [sys.executable, str(script), "--colors", "brand:#3b82f6"],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 1
+        assert "tailwind.config.js" in result.stderr
+        assert "--force" in result.stderr
+        assert existing_path.read_text() == existing
+        assert not output_path.exists()
+
+    def test_cli_force_allows_target_beside_sibling_config(self, tmp_path):
+        """The explicit force opt-in also overrides cross-extension detection."""
+        existing_path = tmp_path / "tailwind.config.js"
+        existing = "// existing JavaScript project config\nmodule.exports = {}\n"
+        existing_path.write_text(existing)
+        output_path = tmp_path / "tailwind.config.ts"
+        script = Path(__file__).parent.parent / "tailwind_config_gen.py"
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(script),
+                "--colors",
+                "brand:#3b82f6",
+                "--force",
+            ],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0, result.stderr
+        assert existing_path.read_text() == existing
+        assert "brand" in output_path.read_text()
+
+    def test_cli_force_overwrites_existing_config(self, tmp_path):
+        """The CLI must wire --force through to the generator."""
+        output_path = tmp_path / "tailwind.config.ts"
+        output_path.write_text("// existing project config\n")
+        script = Path(__file__).parent.parent / "tailwind_config_gen.py"
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(script),
+                "--colors",
+                "brand:#3b82f6",
+                "--force",
+            ],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0, result.stderr
+        assert "brand" in output_path.read_text()
+
     def test_write_config_invalid_path(self):
         """Test writing config to invalid path."""
         generator = TailwindConfigGenerator(output_path=Path("/invalid/path/config.ts"))
@@ -334,3 +450,59 @@ class TestTailwindConfigGenerator:
         assert "module.exports" in content
         assert "primary" in content
         assert "@tailwindcss/forms" in content
+
+
+def _strip_to_object(config_str: str) -> str:
+    """Reduce a generated TS/JS config to a bare assignable object so it can be
+    handed to `node --check` without a TypeScript loader."""
+    lines = []
+    for line in config_str.splitlines():
+        if line.startswith("import type"):
+            continue
+        if line.strip() == "export default config":
+            continue
+        line = line.replace("const config: Config =", "const config =")
+        line = line.replace("module.exports =", "const config =")
+        lines.append(line)
+    return "\n".join(lines)
+
+
+class TestGeneratedConfigIsValidJs:
+    """Regression guard for the missing-comma bug between the ``theme`` block and
+    ``plugins`` that produced syntactically invalid config files. The data-shape
+    tests above all passed while the emitted string was unparseable, so these
+    tests validate the serialized output itself."""
+
+    @pytest.mark.parametrize("typescript", [True, False])
+    def test_property_before_plugins_is_comma_terminated(self, typescript):
+        """The property preceding ``plugins`` must end with a comma (pure-Python
+        check, so the regression is caught even where node is unavailable)."""
+        generator = TailwindConfigGenerator(typescript=typescript)
+        generator.add_colors({"brand": "#6366F1"})
+        generator.add_breakpoints({"3xl": "1920px"})
+        config = generator.generate_config_string()
+
+        assert "}\n  plugins:" not in config, "missing comma before plugins"
+        assert "},\n  plugins:" in config
+
+    @pytest.mark.parametrize("typescript", [True, False])
+    def test_node_check_parses_generated_config(self, typescript, tmp_path):
+        """The emitted config parses as valid JS via ``node --check``."""
+        node = shutil.which("node")
+        if not node:
+            pytest.skip("node not available")
+
+        generator = TailwindConfigGenerator(typescript=typescript)
+        generator.add_colors({"brand": "#6366F1", "accent": "#10B981"})
+        generator.add_fonts({"sans": ["Inter"]})
+        generator.add_breakpoints({"3xl": "1920px"})
+        generator.add_plugins(["tailwindcss-animate"])
+
+        snippet = _strip_to_object(generator.generate_config_string())
+        path = tmp_path / "config.cjs"
+        path.write_text(snippet)
+
+        result = subprocess.run(
+            [node, "--check", str(path)], capture_output=True, text=True
+        )
+        assert result.returncode == 0, result.stderr

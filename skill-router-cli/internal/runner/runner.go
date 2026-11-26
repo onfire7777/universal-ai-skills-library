@@ -129,16 +129,18 @@ func findPowerShell() string {
 }
 
 func findPrintingPress() string {
-	if p, err := exec.LookPath("printing-press"); err == nil {
-		return p
-	}
 	home, _ := os.UserHomeDir()
-	goBin := filepath.Join(home, "go", "bin", "printing-press")
-	if runtime.GOOS == "windows" {
-		goBin += ".exe"
-	}
-	if _, err := os.Stat(goBin); err == nil {
-		return goBin
+	for _, name := range []string{"cli-printing-press", "printing-press"} {
+		if p, err := exec.LookPath(name); err == nil {
+			return p
+		}
+		goBin := filepath.Join(home, "go", "bin", name)
+		if runtime.GOOS == "windows" {
+			goBin += ".exe"
+		}
+		if _, err := os.Stat(goBin); err == nil {
+			return goBin
+		}
 	}
 	return ""
 }

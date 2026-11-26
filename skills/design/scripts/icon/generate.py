@@ -174,16 +174,66 @@ def apply_color(svg_code, color):
     return svg_code
 
 
+# Root <svg ...> opening tag; quoted attribute values may contain ">".
+_SVG_ROOT_TAG = re.compile(r"""<svg\b(?:[^>"']|"[^"]*"|'[^']*')*>""")
+
+
+# One token of an opening tag: name[=value], or a stray quoted string.
+# Quoted values are consumed whole, so text inside them is never a name.
+_TAG_ATTR = re.compile(
+    r"""([^\s=/>"']+)(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>"']+))?|"[^"]*"|'[^']*'""")
+
+
+def _set_root_attr(tag, attr, value):
+    """Set attr on a single <svg ...> opening tag, whatever quote style it uses."""
+    for m in _TAG_ATTR.finditer(tag, len('<svg')):
+        if m.group(1) == attr:
+            return tag[:m.start()] + f'{attr}="{value}"' + tag[m.end():]
+    return tag.replace('<svg', f'<svg {attr}="{value}"', 1)
+
+
 def apply_viewbox_size(svg_code, size):
-    """Adjust SVG viewBox to target size"""
+    """Set width/height on the root <svg> tag only, leaving the viewBox alone"""
     if size:
-        # Update width/height attributes if present
-        svg_code = re.sub(r'width="[^"]*"', f'width="{size}"', svg_code)
-        svg_code = re.sub(r'height="[^"]*"', f'height="{size}"', svg_code)
-        # Add width/height if not present
-        if 'width=' not in svg_code:
-            svg_code = svg_code.replace('<svg', f'<svg width="{size}" height="{size}"', 1)
+        match = _SVG_ROOT_TAG.search(svg_code)
+        if match:
+            tag = _set_root_attr(match.group(0), 'width', size)
+            tag = _set_root_attr(tag, 'height', size)
+            svg_code = svg_code[:match.start()] + tag + svg_code[match.end():]
     return svg_code
+
+
+def _finish_reason(response):
+    """Return the first candidate's finish reason as a string ('' if unknown)"""
+    try:
+        reason = response.candidates[0].finish_reason
+    except (AttributeError, IndexError, TypeError):
+        return ""
+    return str(getattr(reason, "name", reason) or "")
+
+
+def _response_text(response):
+    """Collect the text of a response; '' when it has none (blocked, empty)"""
+    text = getattr(response, 'text', None) or ""
+    if not text:
+        candidates = response.candidates or []
+        content = candidates[0].content if candidates else None
+        for part in (content.parts or []) if content else []:
+            if getattr(part, 'text', None):
+                text += part.text
+    return text
+
+
+def _report_no_svg(response, response_text, what="SVG"):
+    """Say why no SVG came back: truncated, empty, or malformed output"""
+    if "MAX_TOKENS" in _finish_reason(response):
+        print("Error: output hit the token limit (finish_reason MAX_TOKENS) "
+              "before the SVG was complete. Try a simpler prompt or style.")
+    elif not response_text.strip():
+        print("Error: model returned an empty response.")
+    else:
+        print(f"No valid {what} generated. Model response:")
+        print(response_text[:500])
 
 
 def generate_icon(prompt, style=None, category=None, name=None,
@@ -237,22 +287,17 @@ def generate_icon(prompt, style=None, category=None, name=None,
             contents=full_prompt,
             config=types.GenerateContentConfig(
                 temperature=0.7,
-                max_output_tokens=4096,
+                max_output_tokens=16384,
             )
         )
 
         # Extract SVG from response
-        response_text = response.text if hasattr(response, 'text') else ""
-        if not response_text:
-            for part in response.candidates[0].content.parts:
-                if hasattr(part, 'text') and part.text:
-                    response_text += part.text
+        response_text = _response_text(response)
 
         svgs = extract_svgs(response_text)
 
         if not svgs:
-            print("No valid SVG generated. Model response:")
-            print(response_text[:500])
+            _report_no_svg(response, response_text)
             return None
 
         svg_code = svgs[0]
@@ -329,17 +374,12 @@ def generate_batch(prompt, count, output_dir, style=None, color=None,
             )
         )
 
-        response_text = response.text if hasattr(response, 'text') else ""
-        if not response_text:
-            for part in response.candidates[0].content.parts:
-                if hasattr(part, 'text') and part.text:
-                    response_text += part.text
+        response_text = _response_text(response)
 
         svgs = extract_svgs(response_text)
 
         if not svgs:
-            print("No valid SVGs generated.")
-            print(response_text[:500])
+            _report_no_svg(response, response_text, "SVGs")
             return []
 
         results = []
@@ -356,6 +396,10 @@ def generate_batch(prompt, count, output_dir, style=None, color=None,
 
             results.append(filepath)
             print(f"  [{i+1}/{len(svgs[:count])}] Saved: {filename}")
+
+        if len(results) < count and "MAX_TOKENS" in _finish_reason(response):
+            print("Warning: output hit the token limit (finish_reason MAX_TOKENS); "
+                  "the last icon was cut off. Try fewer variants or a simpler prompt.")
 
         print(f"\n{'='*60}")
         print(f"  BATCH COMPLETE: {len(results)}/{count} icons generated")
@@ -449,7 +493,7 @@ def main():
     # Multi-size mode
     if args.sizes:
         sizes = [int(s.strip()) for s in args.sizes.split(",")]
-        generate_sizes(
+        generated = generate_sizes(
             prompt=prompt,
             sizes=sizes,
             style=args.style,
@@ -460,7 +504,7 @@ def main():
     # Batch mode
     elif args.batch:
         output_dir = args.output_dir or "./icons"
-        generate_batch(
+        generated = generate_batch(
             prompt=prompt,
             count=args.batch,
             output_dir=output_dir,
@@ -471,7 +515,7 @@ def main():
         )
     # Single icon
     else:
-        generate_icon(
+        generated = generate_icon(
             prompt=prompt,
             style=args.style,
             category=args.category,
@@ -481,6 +525,10 @@ def main():
             output_path=args.output,
             viewbox=args.viewbox
         )
+
+    # Exit 1 when nothing was generated; a partly generated batch or size set exits 0
+    if not generated:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

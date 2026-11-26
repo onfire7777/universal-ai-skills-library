@@ -4,5 +4,7 @@
   "subpath": ".claude\\skills\\banner-design",
   "repoUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
   "selfContained": true,
-  "installedAt": "2026-05-07T21:26:29.509Z"
+  "installedAt": "2026-05-07T21:26:29.509Z",
+  "upstreamTree": "b73ee96f8d4ff7bbc279c52dadcd907ffe23629c",
+  "upstreamPath": ".claude/skills/banner-design"
 }

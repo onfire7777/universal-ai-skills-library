@@ -9,10 +9,32 @@ import json
 import csv
 import re
 import sys
+import os
 from pathlib import Path
 
-# Project root relative to this script
-PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
+# The skill can be installed outside the project it operates on (user-level
+# ~/.claude/skills/, or as a plugin), so the project root cannot be derived from
+# this file's location. Resolve it from the working directory instead -- the same
+# convention generate-tokens.cjs and validate-tokens.cjs already use via
+# process.cwd(). DESIGN_SYSTEM_PROJECT_ROOT overrides it explicitly.
+def _find_project_root():
+    override = os.environ.get('DESIGN_SYSTEM_PROJECT_ROOT')
+    if override:
+        return Path(override).resolve()
+    start = Path.cwd().resolve()
+    markers = (
+        Path('assets') / 'design-tokens.json',
+        Path('assets') / 'design-tokens.css',
+        Path('package.json'),
+        Path('.git'),
+    )
+    for candidate in (start, *start.parents):
+        if any((candidate / marker).exists() for marker in markers):
+            return candidate
+    return start
+
+
+PROJECT_ROOT = _find_project_root()
 TOKENS_PATH = PROJECT_ROOT / 'assets' / 'design-tokens.json'
 BACKGROUNDS_CSV = Path(__file__).parent.parent / 'data' / 'slide-backgrounds.csv'
 
@@ -42,7 +64,7 @@ def load_brand_colors():
     Resolves semantic token references to actual hex values.
     """
     try:
-        with open(TOKENS_PATH) as f:
+        with open(TOKENS_PATH, encoding='utf-8') as f:
             tokens = json.load(f)
 
         colors = tokens.get('primitive', {}).get('color', {})
@@ -117,7 +139,7 @@ def load_backgrounds_config():
     """Load background configuration from CSV."""
     config = {}
     try:
-        with open(BACKGROUNDS_CSV, newline='') as f:
+        with open(BACKGROUNDS_CSV, newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 config[row['slide_type']] = row

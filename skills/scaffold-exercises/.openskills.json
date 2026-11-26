@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/mattpocock/skills",
   "subpath": "skills\\misc\\scaffold-exercises",
-  "installedAt": "2026-05-07T22:11:26.958Z"
+  "installedAt": "2026-05-07T22:11:26.958Z",
+  "upstreamTree": "6f7f7831a625f040a8e06a0e7954826b87ce775a",
+  "upstreamPath": "skills/misc/scaffold-exercises"
 }

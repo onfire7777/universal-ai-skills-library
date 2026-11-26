@@ -4,7 +4,7 @@ description: >
   Internal sub-skill: agentic review of a printed CLI's sampled command output for
   plausibility issues that rule-based checks can't encode (substring-match
   relevance, format bugs, silent source drops, ranking failures). Invoked via the
-  Skill tool by main printing-press SKILL.md (Phase 4.85) and printing-press-polish
+  Skill tool by the main printing-press skill at Phase 4.85 and printing-press-polish
   SKILL.md during the diagnostic loop. Not for direct user invocation — its
   actionable wrappers are /printing-press and /printing-press-polish.
 context: fork
@@ -12,13 +12,14 @@ user-invocable: false
 allowed-tools:
   - Bash
   - Agent
+created_by: user
 ---
 
 # printing-press-output-review (internal)
 
 Review the sampled outputs from a printed CLI for plausibility bugs that dogfood, verify, and the rule-based `scorecard --live-check` rules can't catch. Wave B policy: all findings surface as warnings, never errors.
 
-This skill is **internal-only** (`user-invocable: false`). It's invoked by parents — main printing-press skill at shipcheck Phase 4.85, polish skill during its diagnostic loop. Running it standalone would produce floating findings text with no ship verdict, no fixes applied, no publish offer; the actionable wrappers are `/printing-press` and `/printing-press-polish`. The skill carries `context: fork` so the reviewer agent's diagnostic chatter stays isolated from the calling skill's context.
+This skill is **internal-only** (`user-invocable: false`). It's invoked by parents — the main printing-press skill at its shipcheck Phase 4.85, and the printing-press-polish skill during its diagnostic loop. Running it standalone would produce floating findings text with no ship verdict, no fixes applied, no publish offer; the actionable wrappers are `/printing-press` and `/printing-press-polish`. The skill carries `context: fork` so the reviewer agent's diagnostic chatter stays isolated from the calling skill's context.
 
 ## Input
 
@@ -39,10 +40,32 @@ Bugs that rule-based checks miss, typically surfaced by 5 minutes of hands-on te
 ### Step 1: Gather sample data
 
 ```bash
-printing-press scorecard --dir "$CLI_DIR" --live-check --json > /tmp/output-review-livecheck.json 2>&1 || true
+# Locate research.json. Adjacent to the binary covers the post-promote
+# layout (standalone polish, shipcheck against the library copy). The
+# grandparent fallback covers mid-pipeline invocations where $CLI_DIR is
+# $PRESS_RUNSTATE/runs/<id>/working/<cli> and research.json lives at
+# $PRESS_RUNSTATE/runs/<id>/research.json. Without the fallback, scorecard
+# reports `unable: true` mid-pipeline and we SKIP the most informative review.
+# Use a bash array so the flag survives paths with spaces.
+RESEARCH_ARGS=()
+if [ ! -f "$CLI_DIR/research.json" ]; then
+  _grandparent="$(dirname "$(dirname "$CLI_DIR")")"
+  if [ -f "$_grandparent/research.json" ]; then
+    RESEARCH_ARGS=(--research-dir "$_grandparent")
+  fi
+fi
+
+cli-printing-press scorecard --dir "$CLI_DIR" "${RESEARCH_ARGS[@]}" --live-check --json > /tmp/output-review-livecheck.json 2>&1 || true
 ```
 
 If the scorecard call fails or `/tmp/output-review-livecheck.json` is empty, return the SKIP result (Step 3) without dispatching the reviewer.
+
+Before dispatch, read `live_check.review_status` when that field is present.
+If it is `skipped`, or `live_check.features[]` has zero entries whose `status`
+is `pass`, return `SKIP` with the reason `no eligible passing samples;
+plausibility not assessed`. Do not dispatch the reviewer. A skipped review is
+not a pass: never emit `status: PASS`, and never describe the outcome as a
+clean review, merely because every sampled command failed or was excluded.
 
 ### Step 2: Dispatch the reviewer agent
 
@@ -50,8 +73,8 @@ Use the Agent tool (general-purpose) with this prompt contract:
 
 > Review the sampled outputs from the shipped CLI at `$CLI_DIR`. You have these ground-truth sources:
 >
-> - Sampled command output: read `/tmp/output-review-livecheck.json` and inspect the `live_check.features[]` array. Each entry has the command, example invocation, actual stdout (in `output_sample`, bounded to ~4 KiB), the pass/fail reason, and a `warnings` array (populated by rule-based checks like the raw-HTML-entity detector).
-> - **Review only `status: pass` entries.** Entries with `status: fail` either crashed, timed out, or had placeholder args (`<id>`, `<url>`) that never produced real output — their sample is empty and there's nothing for you to judge. Phase 5 dogfood handles test-coverage and exit-code concerns.
+> - Sampled command output: read `/tmp/output-review-livecheck.json` and inspect the `live_check.features[]` array. Each entry has the command, example invocation, redacted stdout evidence (in `output_sample`, bounded to ~4 KiB), the redacted pass/fail reason, and a `warnings` array (populated by rule-based checks like the raw-HTML-entity detector). Treat `<redacted>` markers as privacy scrubbed values, not format bugs.
+> - **Review only `status: pass` entries.** Entries with `status: fail` either crashed, timed out, or had placeholder args (`<id>`, `<url>`) that never produced real output — their sample is empty and there's nothing for you to judge.
 > - `$CLI_DIR/research.json` `novel_features` (planned behavior per feature) and `novel_features_built` (verified built commands).
 > - The CLI binary at `$CLI_DIR/<cli-name>-pp-cli` — you may invoke additional commands to gather more output when a finding needs verification.
 >
@@ -62,6 +85,8 @@ Use the Agent tool (general-purpose) with this prompt contract:
 > 3. **Aggregation commands show all requested sources.** For commands with a `--source`/`--site`/`--region` CSV flag: if the user requested N sources, does output show N, or does stderr explain the missing ones? Silent drops of failed sources are a top failure mode for fan-out commands.
 > 4. **Result ordering/ranking makes sense.** For commands that claim to rank or sort, does the top result look plausibly best given the query? Watch for broken score weights, off-by-one sort bugs, and silent fallback to recency when relevance computation fails.
 >
+> Calibration for learn-loop command samples (`recall`, `learnings`, `playbook`): on a fresh print the local learning store starts empty, so empty candidate lists, zero-count `learnings stats`, and "no learnings recorded" outputs are plausible-correct. Do not flag them as silent failures or missing data.
+>
 > Return a list of findings. For each: check name, severity (`warning` in Wave B; `error` reserved for Wave C), one-line description, one-sentence fix suggestion. If the CLI passes all four checks, return "PASS — no findings."
 
 ### Step 3: Emit the structured result block
@@ -69,6 +94,9 @@ Use the Agent tool (general-purpose) with this prompt contract:
 End the skill response with a `---OUTPUT-REVIEW-RESULT---` block the parent parses:
 
 **On clean pass:**
+
+Use this result only when the reviewer assessed at least one eligible
+`status: pass` sample.
 
 ```
 ---OUTPUT-REVIEW-RESULT---
@@ -91,7 +119,7 @@ findings:
 ---END-OUTPUT-REVIEW-RESULT---
 ```
 
-**On reviewer failure (timeout, agent-budget exhaustion, missing live-check data):**
+**On reviewer failure or absence of assessable output (timeout, agent-budget exhaustion, missing live-check data, `review_status: skipped`, or zero eligible `status: pass` samples):**
 
 ```
 ---OUTPUT-REVIEW-RESULT---
@@ -100,6 +128,8 @@ reason: <one-line description>
 findings: []
 ---END-OUTPUT-REVIEW-RESULT---
 ```
+
+`status: SKIP` is not a pass. Callers must report it as skipped and must not count it as a passing review.
 
 ## Wave B policy (current)
 
@@ -124,5 +154,5 @@ Output-plausibility questions are not pattern-matchable against source. Rule-bas
 - Can't verify numeric accuracy (prices, ratings, rankings vs ground-truth). If the CLI says a recipe has 4.8 stars and it actually has 4.2, this skill won't catch it.
 - Can't detect data-freshness issues (recipe published 2019 vs 2024). These need live comparison against authoritative sources.
 - Can't judge subjective preferences ("is this the *best* recipe for chocolate chip cookies?").
-- Sampled outputs only — covers the commands in `live_check.features[]`. Full command-tree coverage belongs in Phase 5 dogfood.
+- Sampled outputs only — covers the commands in `live_check.features[]`. Full command-tree coverage belongs to the main printing-press skill's Phase 5 dogfood, not this review.
 - Non-English output: the reviewer's query-intent check assumes English-language query/output. For non-English CLIs, calibrate the prompt separately.

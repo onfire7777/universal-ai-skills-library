@@ -3,5 +3,7 @@
   "sourceType": "git",
   "repoUrl": "https://github.com/nexu-io/open-design",
   "subpath": "skills\\social-carousel",
-  "installedAt": "2026-05-07T22:17:05.781Z"
+  "installedAt": "2026-05-07T22:17:05.781Z",
+  "upstreamTree": "5fdcc3db1e31bd4fa70f673041b78e87977507c3",
+  "upstreamPath": "design-templates/social-carousel"
 }
