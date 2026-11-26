@@ -104,3 +104,24 @@ func TestSkillToolingEligibilityNeedsSpecificGroundedMetadata(t *testing.T) {
 		t.Fatal("lost the authored description", b)
 	}
 }
+
+func TestWorkflowGroundsSourceDescriptionOnlyAtEntrypoint(t *testing.T) {
+	b := WorkflowBundle{Skill: "table-guide", Description: "Spreadsheet guide", SourceDescription: "Balances a quincunx ledger", Elements: []WorkflowElement{
+		{Skill: "table-guide", File: "SKILL.md", Title: "Overview", Purpose: "Read the guide", Role: "workflow"},
+		{Skill: "table-guide", File: "SKILL.md", Title: "Operations", Purpose: "Create a table", Role: "workflow"},
+	}}
+	idx := WorkflowIndex{Bundles: []WorkflowBundle{b}, search: &workflowSearchIndex{terms: [][]string{{"overview", "operations"}}}}
+	hits := idx.Search("quincunx operations", "", 0)
+	if len(hits) != 2 {
+		t.Fatal(hits)
+	}
+	for _, h := range hits {
+		got := groundedHit(h, &b, subjectGrounding{Rare: []string{"quincunx"}, Specific: []string{"quincunx"}})
+		if got != (h.Element.Title == "Overview") {
+			t.Fatalf("description grounding leaked or missing for %s", h.Element.Title)
+		}
+	}
+	if !workflowIndexGroundsTask(&idx, "quincunx ledger", nil) {
+		t.Fatal("authored description did not ground task")
+	}
+}
