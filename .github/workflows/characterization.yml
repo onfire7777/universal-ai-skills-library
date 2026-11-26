@@ -76,6 +76,15 @@ jobs:
           python3 -m unittest discover -s tests/workflow-eval/breadth
           python3 tests/workflow-eval/breadth/evaluate.py --gate --output "$RUNNER_TEMP/workflow-breadth.json"
 
+      - name: Save workflow source coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: workflow-source-coverage
+          path: ${{ runner.temp }}/workflow-breadth.json
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Verify data, document and software workflows against real outputs
         run: python3 tests/workflow-eval/execution/run.py
 

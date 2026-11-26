@@ -12,7 +12,7 @@ import (
 // A skill's authored purpose establishes what it works on. Use this separately
 // from the score for an individual implementation step: a step can say "run
 // this command" without restating the platform and all its input names.
-type procedureProfile struct{ identity, scope, headings string }
+type procedureProfile struct{ identity, scope, headings, named string }
 type procedureWord struct {
 	word   string
 	key    string
@@ -67,7 +67,14 @@ func newProcedureProfile(b *WorkflowBundle) procedureProfile {
 			headings = append(headings, e.Title)
 		}
 	}
-	return procedureProfile{procedureVocabulary(b.Skill + " " + strings.Join(b.Aliases, " ")), procedureVocabulary(b.Description + " " + b.SourceDescription + " " + strings.Join(b.Capabilities, " ")), procedureVocabulary(strings.Join(headings, " "))}
+	metadata := b.Description + " " + b.SourceDescription + " " + strings.Join(b.Capabilities, " ")
+	var named []string
+	for i, raw := range taskToken.FindAllString(metadata, -1) {
+		if technicalSpelling(raw) || i > 0 && strings.IndexFunc(raw, unicode.IsUpper) >= 0 {
+			named = append(named, raw)
+		}
+	}
+	return procedureProfile{procedureVocabulary(b.Skill + " " + strings.Join(b.Aliases, " ")), procedureVocabulary(metadata), procedureVocabulary(strings.Join(headings, " ")), procedureVocabulary(strings.Join(named, " "))}
 }
 func procedureWords(idx *WorkflowIndex, q string) []procedureWord {
 	var out []procedureWord
@@ -103,6 +110,9 @@ func procedureFit(p procedureProfile, words []procedureWord) (float64, int) {
 		}
 		if strings.Contains(p.scope, token) {
 			gain = .85
+			if t.named && strings.Contains(p.named, token) {
+				gain = 1.45
+			}
 			anchors++
 		}
 		if strings.Contains(p.identity, token) {
@@ -129,7 +139,11 @@ func procedureBundleGrounding(idx *WorkflowIndex, words []procedureWord) []float
 	var total float64
 	for _, w := range words {
 		counts := map[int]int{}
-		for _, term := range procedureForms(w.word) {
+		forms := objectForms(w.word)
+		if !w.named {
+			forms = procedureForms(w.word)
+		}
+		for _, term := range forms {
 			for _, post := range idx.search.postings[term] {
 				d := idx.search.docs[post.doc]
 				if post.weight >= 2 {

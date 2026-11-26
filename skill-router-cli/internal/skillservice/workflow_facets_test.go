@@ -196,3 +196,8 @@ func TestReleasedAssessmentSkillsCanBePlannedAndHydrated(t *testing.T) {
 		}
 	}
 }
+func TestWorkflowGeneralPlatformCoversNamedDevices(t *testing.T) {
+	if !platformSupported("iOS output", "Prepare the iPhone package") || platformSupported("iPad layout", "Prepare the iPhone package") {
+		t.Fatal("generic OS and device-specific scope were conflated")
+	}
+}

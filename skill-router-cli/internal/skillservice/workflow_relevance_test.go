@@ -43,3 +43,27 @@ func TestWorkflowFiltersIncidentalMentionsAndKeepsDistinctPasses(t *testing.T) {
 		t.Fatal("dropped sole documented facet")
 	}
 }
+
+func TestDirectObjectiveDistinguishesArtifactFromSubject(t *testing.T) {
+	task := "Prepare a spreadsheet to reconcile invoice totals"
+	if !directObjectiveOf(task).names("spreadsheet") || directObjectiveOf(task).names("invoice") || directObjectiveOf("Review the note about spreadsheets").names("spreadsheet") {
+		t.Fatal("lost direct artifact scope")
+	}
+}
+
+func TestWorkflowRecoversNamedArtifactOwnerFromCorpus(t *testing.T) {
+	planningFixture(t)
+	idx, err := BuildWorkflowIndex()
+	if err != nil {
+		t.Fatal(err)
+	}
+	req := WorkflowRequirement{Text: "Choose an editor for the document", Kind: "deliverable"}
+	methods := includeDirectObjectives(idx, req, nil, map[string]bool{"editor": true})
+	if len(methods) != 1 || methods[0].Skill != "editor" || len(methods[0].Elements) == 0 {
+		t.Fatal(methods)
+	}
+	req.Selection = "explicit"
+	if len(includeDirectObjectives(idx, req, nil, map[string]bool{"editor": true})) != 0 {
+		t.Fatal("changed exact user selection")
+	}
+}

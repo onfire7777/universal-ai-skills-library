@@ -345,6 +345,7 @@ var sourceBrand = regexp.MustCompile(`(?i)\b([a-z][a-z0-9.-]+)[’']s (?:officia
 var taskWorkflowHeading = regexp.MustCompile(`(?i)^(?:workflow|execution|method|implementation|how to design|heuristic evaluation|decision tree|procedure|quick start|steps|process|manual testing checklist)$`)
 var uxTask = regexp.MustCompile(`(?i)\b(usability|common tasks|user flows?|friction|task completion)\b`)
 
+var iosDevice = regexp.MustCompile(`(?i)\b(?:iphone|ipad)\b`)
 var scopedPlatform = regexp.MustCompile(`(?i)\b(ios|iphone|ipad|swiftui|uikit|android|jetpack|salesforce|shopify|wordpress|kubernetes|terraform|figma|storybook|unity|unreal)\b`)
 var diagnoseIntent = regexp.MustCompile(`(?i)\b(find (?:out )?why|determine why|root cause|diagnos(?:e|is)|investigate|debug|why.{1,30}(?:fails?|broke|crash))\b`)
 var languageName = regexp.MustCompile(`(?i)\b(python|pytest|typescript|jest|javascript|js|junit|java|golang|swift|rust|ruby|rspec|php|csharp|kotlin)\b`)
@@ -397,6 +398,9 @@ var docTopic = regexp.MustCompile(`(?i)\b(word (?:document|report|file)|microsof
 
 func platformSupported(in, task string) bool {
 	for _, p := range scopedPlatform.FindAllString(strings.ReplaceAll(strings.ReplaceAll(in, "-", " "), "_", " "), -1) {
+		if strings.EqualFold(p, "ios") && iosDevice.MatchString(task) {
+			continue
+		}
 		if !strings.Contains(strings.ToLower(task), strings.ToLower(p)) {
 			return false
 		}

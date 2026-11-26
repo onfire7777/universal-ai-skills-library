@@ -296,6 +296,7 @@ func planWithIndex(plan WorkflowPlan, index *WorkflowIndex, requirements []Workf
 		methods := selectMethods(index, scoped, names, lookup, eligible)
 		methods = discoverAuthoredProcedures(index, &procedureContext, scoped, methods, lookup, eligible)
 		methods = discoverTaskDetails(index, scoped, methods, lookup, eligible)
+		methods = includeDirectObjectives(index, scoped, methods, eligible)
 		pinned := make(map[string][]WorkflowElement)
 		for _, ref := range r.Elements {
 			b := lookup[strings.ToLower(ref.Skill)]

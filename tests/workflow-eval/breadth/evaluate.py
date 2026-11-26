@@ -222,6 +222,7 @@ def score(case, mode, plan, repo):
     source_revisions = {}
     section_count = credited_sections = satisfied_facets = facet_count = 0
     supported_stages = set()
+    stage_trace = []
     stages = plan.get("stages") or []
     previous = set()
     for si, stage in enumerate(stages):
@@ -229,6 +230,9 @@ def score(case, mode, plan, repo):
         if requirement["id"] in previous or not set(requirement.get("dependsOn") or []) <= previous:
             raise ValueError(f"Invalid workflow dependency order for {case['id']}: {requirement}")
         previous.add(requirement["id"])
+        stage_trace.append({"id": requirement["id"], "kind": requirement["kind"],
+                            "text": requirement["text"], "dependsOn": requirement.get("dependsOn") or [],
+                            "gaps": stage.get("gaps") or []})
         if mode == "faceted":
             proven, count = verify_facet_quotes(stage, repo)
             satisfied_facets += proven
@@ -239,6 +243,7 @@ def score(case, mode, plan, repo):
         for c in stage.get("contributions") or []:
             credited = set()
             provenances = []
+            locators = []
             for e in c["elements"]:
                 text = selected_source(repo, c, e)
                 pointer = f"{c['skill']}/{e['file']}"
@@ -261,8 +266,11 @@ def score(case, mode, plan, repo):
                 if element_checks:
                     credited_sections += 1
                 provenances.append((e["file"], e["title"]))
+                locators.append({"file": e["file"], "title": e["title"], "startLine": e.get("startLine", 0),
+                                 "endLine": e.get("endLine", 0), "sectionDigest": e["sectionDigest"]})
             labels = c["skill"] + "/" + " ".join(f"{p} {t}" for p, t in provenances)
             contributions.append({"stage": requirement["id"], "skill": c["skill"], "checks": sorted(credited),
+                                  "contribution": c["id"], "sources": locators,
                                   "nearMiss": not credited and bool(re.search(case["nearMiss"]["candidate"], labels, re.I)),
                                   "blocked": c.get("status") == "blocked"})
         if stage.get("gaps"):
@@ -280,7 +288,7 @@ def score(case, mode, plan, repo):
     no_gap = all(result["status"] in ("supported", "declared-gap") for result in results.values())
     executable = bool(stages) and not plan.get("gaps") and not any(s.get("gaps") for s in stages)
     return {"id": case["id"], "family": case["family"], "mode": mode, "requirements": results,
-            "contributions": contributions, "sourceRevisions": source_revisions, "supported": supported, "positiveCovered": positive, "needed": needed,
+            "stageTrace": stage_trace, "contributions": contributions, "sourceRevisions": source_revisions, "supported": supported, "positiveCovered": positive, "needed": needed,
             "expectedGaps": len(results) - needed, "declaredGaps": gap_count,
             "gapCorrect": sum(results[r['id']]['status'] in ('supported', 'declared-gap')
                               for r in case['requirements'] if r.get('expected') == 'gap'),

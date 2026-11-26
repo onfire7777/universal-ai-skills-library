@@ -1,6 +1,8 @@
 package skillservice
 
 import (
+	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -31,11 +33,12 @@ func relevantWorkflowMethods(idx *WorkflowIndex, r WorkflowRequirement, methods 
 	if best < .45 {
 		return methods
 	}
+	objective := directObjectiveOf(r.Text)
 	keep := make([]bool, len(methods))
 	covered := map[string]bool{}
 	for i, c := range methods {
 		rank := ranks[i]
-		keep[i] = c.Requested || rank.score >= best*.60
+		keep[i] = c.Requested || objective.names(c.Skill) || rank.score >= best*.60
 		if keep[i] {
 			for key := range rank.details {
 				covered[key] = true
@@ -120,4 +123,53 @@ func methodSourceRelevance(idx *WorkflowIndex, b *WorkflowBundle, c WorkflowCont
 		}
 	}
 	return out
+}
+
+// Keep the method for the artifact the user directly requests. An invoice
+// can be the subject of a spreadsheet, for example, while the spreadsheet is
+// the deliverable. Secondary subject matches cannot replace that artifact.
+var objectiveClauseEnd = regexp.MustCompile(`(?i)\s+(?:to|from|for|using|with|about|that|which|whose|by|of|on)\s+`)
+
+type directObjective string
+
+func (obj directObjective) names(skill string) bool {
+	name := strings.Join(workflowWords(skill), " ")
+	return name != "" && strings.Contains(string(obj), " "+name+" ")
+}
+func directObjectiveOf(text string) directObjective {
+	before := objectiveClauseEnd.Split(text, 2)[0]
+	words := workflowWords(before)
+	if len(words) < 2 {
+		return ""
+	}
+	// Exclude the instruction verb itself.
+	return directObjective(" " + strings.Join(words[1:], " ") + " ")
+}
+
+// Look up a literal artifact owner before topical matches are consolidated.
+// Its canonical procedure can be complementary to a source about the subject.
+func includeDirectObjectives(idx *WorkflowIndex, r WorkflowRequirement, methods []WorkflowContribution, eligible map[string]bool) []WorkflowContribution {
+	if r.Selection == "explicit" || (r.Kind == "verification" && slices.ContainsFunc(methods, func(c WorkflowContribution) bool { return c.Requested })) {
+		return methods
+	}
+	objective := directObjectiveOf(r.Text)
+	if objective == "" {
+		return methods
+	}
+	for i := range idx.Bundles {
+		b := &idx.Bundles[i]
+		if !eligible[b.Skill] || !objective.names(b.Skill) || !scopedToTask(b, r.Text) {
+			continue
+		}
+		if slices.ContainsFunc(methods, func(c WorkflowContribution) bool { return c.Skill == b.Skill }) {
+			continue
+		}
+		method := contribution(idx, b, r, nil)
+		if len(method.Elements) == 0 || !slices.ContainsFunc(method.Elements, func(e WorkflowElement) bool { return applicableElement(e, r) && len(idx.sourceText(e)) > 0 }) {
+			continue
+		}
+		method.Reason = "Provides the canonical procedure for the requested " + b.Skill
+		methods = append(methods, method)
+	}
+	return methods
 }

@@ -93,6 +93,17 @@ func taskDetails(idx *WorkflowIndex, q string) []taskDetail {
 	return details
 }
 
+func substantiveDetail(d taskDetail, source WorkflowElement) bool {
+	if len(d.words) > 1 && d.weight >= 4 {
+		return true
+	}
+	if !d.technical || d.weight < 3.5 {
+		return false
+	}
+	heading := workflowVocabulary(source.Title + " " + source.Purpose + " " + strings.Join(source.Context, " "))
+	return allDetailWords(heading, d.words)
+}
+
 type groundedMethod struct {
 	hit      WorkflowHit
 	claims   []WorkflowFacetSource
@@ -142,6 +153,10 @@ func discoverTaskDetails(idx *WorkflowIndex, r WorkflowRequirement, existing []W
 	details := taskDetails(idx, r.Text)
 	if len(details) == 0 {
 		return existing
+	}
+	detailsByKey := map[string]taskDetail{}
+	for _, d := range details {
+		detailsByKey[d.key] = d
 	}
 	words := methodTerms(r.Text)
 	var weightTotal float64
@@ -277,6 +292,16 @@ func discoverTaskDetails(idx *WorkflowIndex, r WorkflowRequirement, existing []W
 		}
 		i := slices.IndexFunc(existing, func(m WorkflowContribution) bool { return m.Skill == e.Skill })
 		if i < 0 {
+			// Evidence shared with an existing method cannot justify adding a
+			// new bundle for an incidental noun. The newly covered detail must
+			// itself name a substantive technique, tool, output or condition.
+			if !sourceInstruction.MatchString(c.hit.body) {
+				continue
+			}
+			novel = slices.DeleteFunc(novel, func(cl WorkflowFacetSource) bool { return !substantiveDetail(detailsByKey[cl.Facet], e) })
+			if len(novel) == 0 {
+				continue
+			}
 			existing = append(existing, WorkflowContribution{Skill: e.Skill, Method: e.Title + " — " + e.Purpose, Reason: "Provides a source procedure for “" + novel[0].Term + "”", Elements: []WorkflowElement{e}, Grounding: novel})
 		} else {
 			existing[i].Elements = append(existing[i].Elements, e)
