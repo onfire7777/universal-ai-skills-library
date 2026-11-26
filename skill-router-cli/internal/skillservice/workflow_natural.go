@@ -76,7 +76,30 @@ func coordinatedObjectives(text string) []string {
 	return []string{text}
 }
 
+// In "weigh them" or "compare their weights", the first object refers to
+// the preceding user clause. In "rank the boxes by their weight", the same
+// pronoun refers to the boxes named in this clause.
+var directPriorSubject = regexp.MustCompile(`(?i)^(?:please\s+)?[a-z][a-z-]*\s+(?:(?:that|whether)\s+)?(?:it|its|them|their)\b`)
+var localPossessor = regexp.MustCompile(`(?i)^(?:please\s+)?[a-z][a-z-]*\s+(?:an?|another|the|our|each|new|existing)\s+[^,;.!?]+?\s+(?:by|for|on|against|with)\s+(?:their|its)\b`)
+
+func antecedentSubject(previous string) string {
+	clause, inherited, _ := strings.Cut(previous, " (context: ")
+	if inherited != "" && directPriorSubject.MatchString(clause) {
+		return strings.TrimSuffix(inherited, ")")
+	}
+	// Keep the object phrase and its user-specified qualifiers. A bounded
+	// carry prevents a lengthy earlier instruction from becoming the task.
+	words := strings.Fields(clause)
+	if len(words) < 2 {
+		return ""
+	}
+	return strings.TrimRight(strings.Join(words[1:min(len(words), 25)], " "), ",.;:!?")
+}
+
 func refersToPriorResult(text string) bool {
+	if !directPriorSubject.MatchString(text) && localPossessor.MatchString(text) && !outputReference.MatchString(text) {
+		return false
+	}
 	return resultPronoun.MatchString(text) || (followupAction.MatchString(text) && workflowContext(text) == "")
 }
 

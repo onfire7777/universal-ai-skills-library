@@ -84,8 +84,65 @@ func completeAuthoredWorkflow(idx *WorkflowIndex, r WorkflowRequirement, methods
 }
 
 type continuationMatch struct {
-	e     WorkflowElement
-	score float64
+	e            WorkflowElement
+	score        float64
+	linkedAssets int
+}
+
+// The producer's export example can name concrete files while its integration
+// example uses only markup or configuration. Compare those exact filenames
+// across different authored sections. A lone mention in the same snippet
+// cannot corroborate its own handoff.
+var workflowAssetFile = regexp.MustCompile(`(?i)\b([a-z0-9][a-z0-9_-]*(?:\.[a-z0-9_-]+)*\.[a-z][a-z0-9]{1,7})\b`)
+var explicitOutputPath = regexp.MustCompile(`(?i)(?:\s(?:-o|--out(?:put)?)\s|\s>\s*|\b(?:destination|output|save as)\s*[:=])`)
+var genericOutputFile = regexp.MustCompile(`(?i)^(?:index|example|placeholder|input|output|sample|test|file)\.`)
+var referenceOperand = regexp.MustCompile(`(?i)\b(?:connect|embed|link|reference|attach|import|wire|load|integrate)\b`)
+var priorArtifactOperand = regexp.MustCompile(`(?i)\b(?:both|these|those|the generated|the exported|the resulting|these generated|the preceding|the previous)\s+(?:assets?|files?|outputs?|artifacts?|images?|icons?|templates?|datasets?)\b`)
+
+func workflowOutputFiles(body string) map[string]bool {
+	out := map[string]bool{}
+	var fence string
+	for raw := range strings.SplitSeq(body, "\n") {
+		line := strings.TrimSpace(raw)
+		if marker := methodCodeFence.FindStringSubmatch(line); marker != nil {
+			if fence == "" {
+				fence = marker[1]
+			} else if strings.HasPrefix(marker[1], fence) {
+				fence = ""
+			}
+			continue
+		}
+		if fence == "" {
+			continue
+		}
+		files := workflowAssetFile.FindAllString(line, -1)
+		if len(files) == 0 {
+			continue
+		}
+		file := files[len(files)-1]
+		if genericOutputFile.MatchString(file) {
+			continue
+		}
+		endsWithFile := strings.HasSuffix(strings.TrimRight(line, "\"'"), file)
+		if explicitOutputPath.MatchString(line) || len(files) >= 2 && endsWithFile {
+			out[strings.ToLower(file)] = true
+		}
+	}
+	return out
+}
+
+func linkedWorkflowAssets(e WorkflowElement, body string, sources map[string]map[string]bool) int {
+	seen := map[string]bool{}
+	for _, token := range workflowAssetFile.FindAllString(body, -1) {
+		name := strings.ToLower(token)
+		for supplier := range sources[name] {
+			if supplier != e.SectionDigest {
+				seen[name] = true
+				break
+			}
+		}
+	}
+	return len(seen)
 }
 
 func producerContinuations(idx *WorkflowIndex, r WorkflowRequirement, methods []WorkflowContribution, lookup map[string]*WorkflowBundle, states map[string]WorkflowStage) []WorkflowContribution {
@@ -99,8 +156,14 @@ func producerContinuations(idx *WorkflowIndex, r WorkflowRequirement, methods []
 	type producer struct {
 		input    string
 		supplied map[string]bool
+		files    map[string]map[string]bool
 	}
 	prior := map[string]producer{}
+	bindsAssets := referenceOperand.MatchString(r.Text) && priorArtifactOperand.MatchString(r.Text)
+	minimumFiles := 1
+	if strings.Contains(strings.ToLower(r.Text), "both ") {
+		minimumFiles = 2
+	}
 	for _, id := range r.DependsOn {
 		stage := states[id]
 		for _, c := range stage.Contributions {
@@ -111,9 +174,18 @@ func producerContinuations(idx *WorkflowIndex, r WorkflowRequirement, methods []
 			p.input += " " + stage.Requirement.Text
 			if p.supplied == nil {
 				p.supplied = map[string]bool{}
+				p.files = map[string]map[string]bool{}
 			}
 			for _, e := range c.Elements {
 				p.supplied[e.SectionDigest] = true
+				if bindsAssets {
+					for file := range workflowOutputFiles(idx.sourceText(e)) {
+						if p.files[file] == nil {
+							p.files[file] = map[string]bool{}
+						}
+						p.files[file][e.SectionDigest] = true
+					}
+				}
 			}
 			prior[c.Skill] = p
 		}
@@ -173,23 +245,43 @@ func producerContinuations(idx *WorkflowIndex, r WorkflowRequirement, methods []
 		if formatSyntax {
 			score += .5
 		}
-		if score >= .70 && (matched >= 2 || formatSyntax) {
-			candidates = append(candidates, continuationMatch{e, score})
+		linked := 0
+		if formatSyntax && bindsAssets {
+			linked = linkedWorkflowAssets(e, h.body, p.files)
+			if linked < minimumFiles {
+				linked = 0
+			}
+		}
+		if linked > 0 || score >= .70 && (matched >= 2 || formatSyntax) {
+			candidates = append(candidates, continuationMatch{e, score, linked})
 		}
 	}
 	if len(candidates) == 0 {
 		return methods
 	}
-	slices.SortStableFunc(candidates, func(a, b continuationMatch) int { return cmp.Compare(b.score, a.score) })
+	slices.SortStableFunc(candidates, func(a, b continuationMatch) int {
+		if diff := cmp.Compare(b.linkedAssets, a.linkedAssets); diff != 0 {
+			return diff
+		}
+		return cmp.Compare(b.score, a.score)
+	})
 	best := candidates[0]
 	var sections []WorkflowElement
 	for _, m := range candidates {
-		if m.score < best.score*.80 {
+		if m.linkedAssets < best.linkedAssets || m.score < best.score*.80 {
 			break
 		}
 		if m.e.Skill == best.e.Skill {
 			sections = append(sections, m.e)
 		}
+	}
+	if best.linkedAssets > 0 && len(r.Facets) == 0 {
+		// A generic snippet cannot integrate the specified previous outputs.
+		// Keep explicit passes and methods that actually consume those files.
+		files := prior[best.e.Skill].files
+		methods = slices.DeleteFunc(methods, func(c WorkflowContribution) bool {
+			return !c.Requested && c.Skill != best.e.Skill && !slices.ContainsFunc(c.Elements, func(e WorkflowElement) bool { return linkedWorkflowAssets(e, idx.sourceText(e), files) >= minimumFiles })
+		})
 	}
 	at := slices.IndexFunc(methods, func(c WorkflowContribution) bool { return c.Skill == best.e.Skill })
 	if at < 0 {

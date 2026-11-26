@@ -49,7 +49,9 @@ func relevantWorkflowMethods(idx *WorkflowIndex, r WorkflowRequirement, methods 
 	covered := map[string]bool{}
 	for i, c := range methods {
 		rank := ranks[i]
-		keep[i] = !incompatible[i] && (c.Requested || objective.names(c.Skill) || namesDeclaredFormat(r.Text, lookup[c.Skill]) || rank.score >= best*.60)
+		// A supplementary source with weaker local evidence must establish a
+		// distinct requested detail below before it expands the workflow.
+		keep[i] = !incompatible[i] && (c.Requested || objective.names(c.Skill) || namesDeclaredFormat(r.Text, lookup[c.Skill]) || rank.score >= best*.72)
 		if keep[i] {
 			for key := range rank.details {
 				covered[key] = true

@@ -59,3 +59,24 @@ func TestNaturalWorkflowRetainsCoordinatedDeliverablesAndTargets(t *testing.T) {
 		t.Fatal(a, b, c)
 	}
 }
+
+func TestNaturalPronounUsesImmediateSubject(t *testing.T) {
+	stages := naturalRequirements("Collect shipments of citrus fruit. Inspect the ceramic bowls, measure their thickness. Prepare a separate wholesale order.")
+	if len(stages) != 4 {
+		t.Fatal(stages)
+	}
+	follow := stages[2]
+	if !strings.Contains(follow.Text, "ceramic bowls") || strings.Contains(follow.Text, "citrus") || !slices.Equal(follow.DependsOn, []string{stages[1].ID}) {
+		t.Fatalf("possessive follow-up lost the nearest subject: %+v", stages)
+	}
+	if strings.Contains(stages[3].Text, "bowls") || len(stages[3].DependsOn) != 0 {
+		t.Fatalf("independent output inherited a subject: %+v", stages[3])
+	}
+}
+
+func TestNaturalOwnSubjectKeepsPossessiveLocal(t *testing.T) {
+	stages := naturalRequirements("Count the packing crates. Rate the new storage racks by their capacity.")
+	if len(stages) != 2 || strings.Contains(stages[1].Text, "packing crates") || len(stages[1].DependsOn) != 0 {
+		t.Fatalf("local possessor borrowed another stage: %+v", stages)
+	}
+}

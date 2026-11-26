@@ -9,6 +9,17 @@ import (
 	"testing"
 )
 
+func TestExplicitStandardReadingReplacesInferredPrerequisite(t *testing.T) {
+	reqs := naturalRequirements("Read the approved style guide. Draft the announcement. Independently review the announcement against the guide.")
+	if len(reqs) != 3 || reqs[0].Kind != "prerequisite" || !strings.Contains(reqs[0].Text, "approved style guide") || !slices.Contains(reqs[1].DependsOn, reqs[0].ID) || reqs[2].Kind != "verification" {
+		t.Fatal(reqs)
+	}
+	implicit := naturalRequirements("Draft the announcement in our brand voice")
+	if len(implicit) < 2 || implicit[0].Kind != "prerequisite" {
+		t.Fatal(implicit)
+	}
+}
+
 func planningFixture(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()

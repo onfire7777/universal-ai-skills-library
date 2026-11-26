@@ -71,6 +71,7 @@ var fixingTest = regexp.MustCompile(`(?i)\b(failing test|test failure|broken tes
 var outputReference = regexp.MustCompile(`(?i)\b(for the fix|the discrepancies|those findings|the results?|the resulting|from (?:that|those)|based on (?:that|those)|its final)\b`)
 var verificationWords = regexp.MustCompile(`(?i)\b(check|audit|verify|verification|validate|test|tests|inspect|independently review)\b`)
 var existingStandard = regexp.MustCompile(`(?i)\b(existing|current|our|house|approved)\s+(brand(?:ing)?|style guide|design system|design tokens|voice|template)\b`)
+var readExistingStandard = regexp.MustCompile(`(?i)^(?:first\s+)?(?:read|consult|load|open|extract|inspect)\b`)
 var keyboardWords = regexp.MustCompile(`(?i)\b(keyboard(?:-only)?|tab order|focus order)\b`)
 var explicitName = regexp.MustCompile("(?i)(?:\\$|(?:use|using|apply|invoke|load|run)\\s+(?:the\\s+)?|`)([a-z0-9][a-z0-9-]*)(?:`|\\b)")
 var requirementID = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$`)
@@ -81,10 +82,13 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 	// Context supplied by the user is an input to implementation. An accessibility
 	// constraint also calls for a separate observable check after the edit.
 	standard := existingStandard.FindString(prompt)
-	if standard != "" {
+	// Use the author's first explicit source-reading step as the prerequisite.
+	// A later independent review still needs its own stage.
+	firstReadsStandard := len(parts) > 0 && readExistingStandard.MatchString(strings.TrimSpace(parts[0])) && existingStandard.MatchString(parts[0])
+	if standard != "" && !firstReadsStandard {
 		result = append(result, WorkflowRequirement{Text: "Extract and apply the " + standard + " guidelines and visual identity rules", Kind: "prerequisite"})
 	}
-	for _, raw := range parts {
+	for i, raw := range parts {
 		p := strings.TrimSpace(raw)
 		if standard != "" && strings.HasPrefix(strings.ToLower(p), "matches ") && !strings.Contains(strings.ToLower(p), " and ") {
 			continue
@@ -93,7 +97,9 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 			continue
 		}
 		kind := "deliverable"
-		if verificationWords.MatchString(p) && !fixingTest.MatchString(p) {
+		if i == 0 && firstReadsStandard {
+			kind = "prerequisite"
+		} else if verificationWords.MatchString(p) && !fixingTest.MatchString(p) {
 			kind = "verification"
 		}
 		if keyboardWords.MatchString(p) && interfaceWords.MatchString(prompt) && (kind == "verification" || strings.HasPrefix(strings.ToLower(p), "makes ")) {
@@ -122,6 +128,7 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 	}
 	previousWork := ""
 	previousContext := ""
+	previousText := ""
 	var prerequisites []string
 	explicitSequence := segmentPrompt(prompt)
 	for i := range result {
@@ -145,12 +152,22 @@ func naturalRequirements(prompt string) []WorkflowRequirement {
 		} else {
 			r.DependsOn = slices.Clone(prerequisites)
 		}
-		if previousWork != "" && depends && (refersBack || r.Kind == "verification") && previousContext != "" && workflowContext(r.Text) == "" {
+		if i > 0 && directPriorSubject.MatchString(r.Text) {
+			previous := result[i-1]
+			if subject := antecedentSubject(previous.Text); subject != "" {
+				// Independent checks of the same delivered object share its prerequisite.
+				if r.Kind != "verification" || previous.Kind != "verification" || len(sharedTerms(methodTerms(subject), previousText)) == 0 {
+					r.DependsOn = []string{previous.ID}
+				}
+				r.Text += " (context: " + subject + ")"
+			}
+		} else if previousWork != "" && depends && (refersBack || r.Kind == "verification") && previousContext != "" && workflowContext(r.Text) == "" {
 			r.Text += " (context: " + previousContext + ")"
 		}
 		if r.Kind != "verification" {
 			previousWork = r.ID
 			previousContext = workflowContext(r.Text)
+			previousText = r.Text
 		}
 	}
 	return result
