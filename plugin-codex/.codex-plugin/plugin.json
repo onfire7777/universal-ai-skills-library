@@ -1,6 +1,6 @@
 {
   "name": "universal-ai-skills",
-  "version": "2.2.8",
+  "version": "2.4.0",
   "description": "Router-first AI skill system for Codex, Claude, Cursor, Hermes, Paperclip, OpenCode, and local AI stacks: search, preflight-route, and load skills on demand without duplicating the corpus.",
   "author": {
     "name": "onfire7777",
@@ -24,7 +24,7 @@
   "interface": {
     "displayName": "Universal AI Skills",
     "shortDescription": "Router-first AI skill system",
-    "longDescription": "Search, preflight-route, and load one relevant skill on demand from the shared canonical skill corpus. The plugin exposes only the compact router wrapper; the full corpus stays in the canonical repository and is loaded through skill-router on demand.",
+    "longDescription": "Plan multi-skill workflows, search, and load relevant skills on demand from the shared canonical skill corpus. The plugin exposes only the compact router wrapper; the full corpus stays in the canonical repository and is loaded through skill-router on demand.",
     "developerName": "onfire7777",
     "category": "Productivity",
     "capabilities": [

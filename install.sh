@@ -43,7 +43,7 @@ Options:
   --bin-dir DIR        Install skill-router into DIR (default: active PATH binary
                        dir, ~/.local/bin, $GOBIN, or ~/go/bin)
   --copy-skills DIR    Optional offline/full-copy export of skills/ into DIR
-  --sync-codex         Install compact wrapper into ~/.codex/skills
+  --sync-codex         Install Codex workflow adapter and register MCP when available
   --sync-claude        Install compact wrapper into ~/.claude/skills
   --sync-paperclip     Install compact wrapper and AGENTS.md for Paperclip
   --sync-cli-clients   Install compact wrappers for both Codex and Claude
@@ -143,7 +143,7 @@ if [[ "$SKIP_VALIDATE" -eq 0 ]]; then
 fi
 
 if [[ "$SYNC_CODEX" -eq 1 ]]; then
-  echo "==> Installing Codex CLI wrapper"
+  echo "==> Installing Codex workflow adapter"
   (
     cd "$SCRIPT_DIR"
     "$BIN_DIR/skill-router" sync codex

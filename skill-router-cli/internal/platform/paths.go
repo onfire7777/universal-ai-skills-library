@@ -236,11 +236,15 @@ type AgentRootSpec struct {
 // AgentRootSpecs returns the full known local-agent compatibility matrix.
 func AgentRootSpecs() []AgentRootSpec {
 	home := HomeDir()
+	codexHome := os.Getenv("CODEX_HOME")
+	if codexHome == "" {
+		codexHome = filepath.Join(home, ".codex")
+	}
 	return []AgentRootSpec{
 		{ID: "agent", Name: "OpenSkills / .agent", Path: filepath.Join(home, ".agent", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "OpenSkills standard root"},
 		{ID: "agent-skills-standard", Name: "Agent Skills open-standard root", Path: filepath.Join(home, ".agents", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Shared AgentSkills-compatible root used by clients such as OpenCode/OpenClaw when configured"},
 		{ID: "claude", Name: "Claude Code / Claude Skills", Path: filepath.Join(home, ".claude", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Claude Code filesystem skill root"},
-		{ID: "codex", Name: "OpenAI Codex", Path: filepath.Join(home, ".codex", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Codex local skill root plus AGENTS.md project instructions"},
+		{ID: "codex", Name: "OpenAI Codex", Path: filepath.Join(codexHome, "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Codex local skill root plus AGENTS.md project instructions"},
 		{ID: "aion-codex-home", Name: "Aion Codex home", Path: filepath.Join(home, "AppData", "Roaming", "AionUi", "codex-home", "skills"), Adapter: "skill-root", DefaultSync: false, Notes: "Aion-hosted Codex profile skill root; report-only until local install semantics are confirmed"},
 		{ID: "gemini", Name: "Gemini CLI", Path: filepath.Join(home, ".gemini", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Gemini CLI skill root plus AGENTS.md project instructions"},
 		{ID: "cursor", Name: "Cursor", Path: filepath.Join(home, ".cursor", "skills"), Adapter: "skill-root", DefaultSync: true, Notes: "Cursor skill root plus .cursor/rules project rules"},

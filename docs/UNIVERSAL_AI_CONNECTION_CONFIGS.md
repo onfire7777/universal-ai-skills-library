@@ -83,7 +83,7 @@ Each local AI client gets the same compact policy:
 
 1. Run `skill-router preflight --json "<latest user prompt>"` only for real user prompts.
 2. Reject weak generic matches before loading a skill.
-3. Load exactly one matching skill with `skill-router skill <name>`.
+3. For a single requirement, load its matching skill. For multi-part work, use `skill-router skills workflow plan` to select and sequence contributions.
 4. Search with `skill-router skill search <query>` when the skill name is unknown.
 5. Use `Search-UniversalAIMemory.ps1` before answering from prior durable context.
 6. Use `Save-UniversalAIMemory.ps1` only for explicit durable memories or confirmed project facts.

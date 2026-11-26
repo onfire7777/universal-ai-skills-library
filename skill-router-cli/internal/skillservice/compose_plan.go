@@ -1,6 +1,7 @@
 package skillservice
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -48,6 +49,7 @@ type ComposeStep struct {
 	LoadPointer  string   `json:"load,omitempty"`
 	TokenEst     int      `json:"tokenEst"`
 	Loaded       bool     `json:"loaded"`
+	Body         string   `json:"body,omitempty"`
 	Note         string   `json:"note,omitempty"`
 }
 
@@ -245,7 +247,7 @@ func ComposePlan(req ComposePlanRequest) (ComposePlanResult, error) {
 			step.Skill = best.Name
 			step.Source = best.Source
 			step.Score = best.Score
-			step.LoadPointer = "skill-router skills load_skill " + best.Name
+			step.LoadPointer = "skill-router skill " + best.Name
 
 			est := best.TokenEst
 			if est <= 0 {
@@ -265,12 +267,26 @@ func ComposePlan(req ComposePlanRequest) (ComposePlanResult, error) {
 				// context-light default: pointer only
 			case loaded[key]:
 				step.Note = "body already inlined by an earlier step"
-			case used+est <= budget:
-				step.Loaded = true
-				loaded[key] = true
-				used += est
-			default:
+			case used >= budget:
 				step.Note = "deferred: inlining would exceed the context budget"
+			default:
+				body, err := loadEligibleWorkflowBody(req.Prompt, best.Name)
+				if errors.Is(err, errWorkflowLoadIneligible) {
+					step.Note = "deferred: this skill is outside automatic workflow loading"
+					break
+				}
+				if err != nil {
+					return ComposePlanResult{}, fmt.Errorf("load %s: %w", best.Name, err)
+				}
+				step.TokenEst = EstimateTokens(body)
+				if step.TokenEst > budget-used {
+					step.Note = "deferred: inlining would exceed the context budget"
+				} else if body != "" {
+					step.Body = body
+					step.Loaded = true
+					loaded[key] = true
+					used += step.TokenEst
+				}
 			}
 		} else {
 			step.Note = "no confident skill for this sub-task (" + composeGapReason(rr.Decision) + ")"

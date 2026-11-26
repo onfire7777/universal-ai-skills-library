@@ -32,15 +32,16 @@ Instead of receiving a copied wrapper, an agent should reach the canonical
 engine directly. There is exactly one engine
 (`internal/skillservice`) behind both surfaces:
 
-1. **CLI (direct calls)** — the four canonical verbs:
-   - `skill-router route "<task prompt>"`
-   - `skill-router search_skills "<query>"`
-   - `skill-router load_skill <name>`
-   - `skill-router compose "<task prompt>"`
-   (`search` / `skill` remain as back-compat aliases.)
+1. **CLI.** Use `skill-router route "<task>"`, `skill-router skill search "<query>"`,
+   `skill-router skill <name>`, `skill-router skills bundle <name>`, and
+   `skill-router skills compose "<task>"` for direct routing and reading.
+   Use `skill-router skills workflow` for requirement-based search, planning,
+   stage loading, and evidence review.
 
-2. **MCP server** — `skill-router serve` is a hand-rolled stdio JSON-RPC MCP
-   server exposing the same verbs as tools. Point any MCP-capable client at it:
+2. **MCP server.** `skill-router serve` exposes `route`, `search_skills`,
+   `load_skill`, `skill_bundle`, `compose`, `workflow_search`, `workflow_plan`,
+   `workflow_load`, and `workflow_review` over stdio.
+
    ```jsonc
    // example MCP client config entry
    {

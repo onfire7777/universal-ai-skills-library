@@ -11,7 +11,7 @@ router-first skill system:
 1. Keep one canonical 1,795-skill corpus in `skills/`.
 2. Give each AI client compact instructions or a wrapper skill.
 3. Run `skill-router preflight` for real user prompts.
-4. Load exactly one matching skill only when the route clearly fits.
+4. For a single requirement, load its matching skill. For multi-part work, use `skill-router skills workflow plan` to select and sequence contributions.
 5. Keep local model routing, memory, embeddings, and tool adapters centralized.
 
 ## Recommended GitHub About

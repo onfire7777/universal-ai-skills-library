@@ -157,6 +157,10 @@ func TestComposePlanTokenBudgetGatesInlining(t *testing.T) {
 	loaded := 0
 	for _, s := range rich.Steps {
 		if s.Loaded {
+			body, err := Load(s.Skill)
+			if err != nil || s.Body == "" || s.Body != body.Body || s.TokenEst != EstimateTokens(s.Body) {
+				t.Fatalf("step %d claims a load without delivering the full budgeted skill body", s.Index)
+			}
 			loaded++
 		}
 	}
